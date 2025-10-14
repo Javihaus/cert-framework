@@ -48,12 +48,12 @@ export async function analyzeCommand(options: AnalyzeOptions) {
 
     // Calculate statistics
     const consistencyScores = history
-      .map((r) => r.consistency)
-      .filter((c): c is number => c !== undefined);
+      .map((r: any) => r.consistency)
+      .filter((c: any): c is number => c !== undefined);
 
     if (consistencyScores.length > 0) {
       const avg =
-        consistencyScores.reduce((a, b) => a + b, 0) / consistencyScores.length;
+        consistencyScores.reduce((a: number, b: number) => a + b, 0) / consistencyScores.length;
       const min = Math.min(...consistencyScores);
       const max = Math.max(...consistencyScores);
 
@@ -65,11 +65,11 @@ export async function analyzeCommand(options: AnalyzeOptions) {
     }
 
     // Show recent failures
-    const failures = history.filter((r) => r.status === 'fail').slice(0, 5);
+    const failures = history.filter((r: any) => r.status === 'fail').slice(0, 5);
 
     if (failures.length > 0) {
       console.log(`\nRecent Failures (${failures.length}):`);
-      failures.forEach((f) => {
+      failures.forEach((f: any) => {
         console.log(`  ${f.timestamp.toISOString()}: ${f.diagnosis}`);
       });
     }

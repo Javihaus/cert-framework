@@ -30,14 +30,14 @@ function formatResult(result: TestResult): string {
 
     if (result.suggestions && result.suggestions.length > 0) {
       output += '\n  Suggestions:';
-      result.suggestions.forEach((s) => {
+      result.suggestions.forEach((s: string) => {
         output += `\n    - ${s}`;
       });
     }
 
     if (result.evidence && result.evidence.examples.length > 0) {
       output += `\n  Examples of outputs (${result.evidence.uniqueCount} unique):`;
-      result.evidence.examples.slice(0, 3).forEach((ex) => {
+      result.evidence.examples.slice(0, 3).forEach((ex: string) => {
         output += `\n    ${ex}`;
       });
     }
@@ -145,6 +145,6 @@ export async function testCommand(pattern: string, options: TestOptions) {
   }
 
   // Exit with failure code if any tests failed
-  const hasFailures = mockResults.some((r) => r.status === 'fail');
+  const hasFailures = mockResults.some((r: any) => r.status === 'fail');
   process.exit(hasFailures ? 1 : 0);
 }
