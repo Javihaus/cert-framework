@@ -1,0 +1,29 @@
+{
+  "name": "@cert/semantic",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["semantic", "comparison", "nlp", "llm"],
+  "author": "",
+  "license": "ISC",
+  "description": "Semantic comparison engine for CERT framework",
+  "dependencies": {
+    "@cert/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

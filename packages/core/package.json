@@ -1,0 +1,30 @@
+{
+  "name": "@cert/core",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["llm", "testing", "reliability", "consistency"],
+  "author": "",
+  "license": "ISC",
+  "description": "Core testing primitives for CERT - LLM system reliability testing",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "@types/better-sqlite3": "^7.6.11"
+  }
+}
