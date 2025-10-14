@@ -2,7 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "composite": true,
+    "declarationMap": true,
+    "paths": {
+      "@cert/core": ["../core/src"],
+      "@cert/semantic": ["../semantic/src"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
