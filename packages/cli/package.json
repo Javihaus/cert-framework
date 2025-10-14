@@ -1,0 +1,31 @@
+{
+  "name": "@cert/cli",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "cert": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["cli", "testing", "llm", "cert"],
+  "author": "",
+  "license": "ISC",
+  "description": "CLI tool for CERT framework",
+  "dependencies": {
+    "@cert/core": "*",
+    "@cert/semantic": "*",
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "@types/node": "^24.7.2"
+  }
+}
