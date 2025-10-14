@@ -8,15 +8,35 @@ describe('CERT Integration Tests', () => {
   it('detects consistency failures', async () => {
     const runner = new TestRunner();
     let counter = 0;
-    
+
     runner.addGroundTruth({
       id: 'test-1',
       question: 'Test question',
-      expected: 'consistent output'
+      expected: 'consistent output',
+      metadata: {
+        correctPages: [1]
+      }
     });
-    
+
     runner.setComparator(new SemanticComparator());
-    
+
+    // Follow layer enforcement: retrieval -> accuracy -> consistency
+
+    // 1. Test retrieval
+    await runner.testRetrieval(
+      'test-1',
+      async () => [{ pageNum: 1, content: 'test' }],
+      { precisionMin: 0.8 }
+    );
+
+    // 2. Test accuracy
+    await runner.testAccuracy(
+      'test-1',
+      async () => 'consistent output',
+      { threshold: 0.8 }
+    );
+
+    // 3. Test consistency (with varying output)
     const result = await runner.testConsistency(
       'test-1',
       async () => {
@@ -25,7 +45,7 @@ describe('CERT Integration Tests', () => {
       },
       { nTrials: 4, consistencyThreshold: 0.9, accuracyThreshold: 0.8, semanticComparison: true }
     );
-    
+
     expect(result.consistency).toBeLessThan(0.9);
     expect(result.status).toBe('fail');
   });
