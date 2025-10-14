@@ -11,8 +11,8 @@
   "license": "ISC",
   "description": "Basic example demonstrating CERT framework usage",
   "dependencies": {
-    "@cert/core": "*",
-    "@cert/semantic": "*"
+    "@cert/core": "file:../../packages/core",
+    "@cert/semantic": "file:../../packages/semantic"
   },
   "devDependencies": {
     "tsx": "^4.20.6"
