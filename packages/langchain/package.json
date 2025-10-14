@@ -1,5 +1,5 @@
 {
-  "name": "@cert/core",
+  "name": "@cert/langchain",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,21 +15,20 @@
     "test": "vitest",
     "lint": "tsc --noEmit"
   },
-  "keywords": [
-    "llm",
-    "testing",
-    "reliability",
-    "consistency"
-  ],
+  "keywords": ["langchain", "llm", "testing", "cert"],
   "author": "",
   "license": "ISC",
-  "description": "Core testing primitives for CERT - LLM system reliability testing",
-  "devDependencies": {
-    "@types/better-sqlite3": "^7.6.11",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+  "description": "LangChain integration for CERT framework",
+  "dependencies": {
+    "@cert/core": "file:../core",
+    "@cert/semantic": "file:../semantic"
   },
-  "optionalDependencies": {
-    "better-sqlite3": "^9.6.0"
+  "peerDependencies": {
+    "langchain": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "@types/node": "^24.7.2"
   }
 }

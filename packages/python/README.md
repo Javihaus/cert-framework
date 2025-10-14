@@ -1,0 +1,304 @@
+# CERT Framework - Python
+
+Consistency Evaluation and Reliability Testing for LLM systems in Python.
+
+## Installation
+
+```bash
+pip install cert-framework
+```
+
+For semantic comparison with fuzzy matching:
+
+```bash
+pip install cert-framework[semantic]
+```
+
+## Quick Start
+
+```python
+import asyncio
+from cert import TestRunner, GroundTruth, TestConfig
+
+# Define ground truth
+ground_truth = GroundTruth(
+    id="capital-france",
+    question="What is the capital of France?",
+    expected="Paris"
+)
+
+# Create test runner
+runner = TestRunner()
+runner.add_ground_truth(ground_truth)
+
+# Your LLM agent function
+async def my_agent():
+    # Your LLM call here
+    return "Paris"
+
+async def main():
+    # Test accuracy first (required)
+    accuracy_result = await runner.test_accuracy(
+        "capital-france",
+        my_agent
+    )
+    print(f"Accuracy: {accuracy_result.accuracy:.2%}")
+
+    # Then test consistency
+    config = TestConfig(n_trials=10, consistency_threshold=0.9)
+    consistency_result = await runner.test_consistency(
+        "capital-france",
+        my_agent,
+        config
+    )
+    print(f"Consistency: {consistency_result.consistency:.2%}")
+
+asyncio.run(main())
+```
+
+## Features
+
+### Layer Enforcement
+
+CERT enforces proper testing order to prevent accepting consistent but incorrect answers:
+
+```python
+runner = TestRunner()
+runner.add_ground_truth(ground_truth)
+
+# This will raise ValueError - must test accuracy first!
+# await runner.test_consistency("test-1", agent, config)
+
+# Correct order:
+await runner.test_accuracy("test-1", agent)  # First verify correctness
+await runner.test_consistency("test-1", agent, config)  # Then check consistency
+```
+
+### Consistency Testing
+
+Measure how consistently your LLM produces the same output:
+
+```python
+config = TestConfig(
+    n_trials=10,
+    consistency_threshold=0.9,
+    timeout=30000  # milliseconds
+)
+
+result = await runner.test_consistency("test-id", agent, config)
+
+if result.status == "fail":
+    print(f"Diagnosis: {result.diagnosis}")
+    print(f"Suggestions: {result.suggestions}")
+    print(f"Unique outputs: {result.evidence.unique_count}")
+```
+
+### Accuracy Testing
+
+Verify outputs match expected values with semantic comparison:
+
+```python
+ground_truth = GroundTruth(
+    id="revenue-q4",
+    question="What was Q4 revenue?",
+    expected="$391 billion",
+    equivalents=["391B", "$391,000,000,000"]  # Alternative valid formats
+)
+
+result = await runner.test_accuracy("revenue-q4", agent)
+```
+
+### Semantic Comparison
+
+Built-in rules handle equivalent outputs automatically:
+
+```python
+from cert import SemanticComparator
+
+comparator = SemanticComparator()
+
+# These all match:
+comparator.compare("$391 billion", "391B")  # ✓
+comparator.compare("$391 billion", "$391,000,000,000")  # ✓
+comparator.compare("Paris", "paris")  # ✓ (case insensitive)
+```
+
+### Custom Comparison Rules
+
+Add your own semantic rules:
+
+```python
+from cert import ComparisonRule
+
+def date_match(expected: str, actual: str) -> bool:
+    # Custom logic to compare dates in different formats
+    # "2024-01-15" == "January 15, 2024"
+    return parse_date(expected) == parse_date(actual)
+
+custom_rule = ComparisonRule(
+    name="date-format",
+    priority=95,  # Higher priority = checked first
+    match=date_match
+)
+
+comparator = SemanticComparator()
+comparator.add_rule(custom_rule)
+
+runner = TestRunner(semantic_comparator=comparator)
+```
+
+### Automatic Diagnosis
+
+When tests fail, CERT automatically diagnoses the cause:
+
+```python
+result = await runner.test_consistency("test-id", agent, config)
+
+if result.status == "fail":
+    # Automatic diagnosis:
+    # "High variance: All 10 outputs were unique.
+    #  Likely causes: high temperature, non-deterministic retrieval"
+    print(result.diagnosis)
+
+    # Actionable suggestions:
+    # - Set temperature=0 if not already
+    # - Check for non-deterministic data sources
+    # - Review prompt for ambiguous instructions
+    for suggestion in result.suggestions:
+        print(f"  - {suggestion}")
+```
+
+## Error Handling
+
+```python
+from cert import ConsistencyError, AccuracyError
+
+try:
+    result = await runner.test_accuracy("test-1", agent)
+    if result.status == "fail":
+        raise AccuracyError(
+            result.diagnosis,
+            str(ground_truth.expected),
+            str(actual_output)
+        )
+except AccuracyError as e:
+    print(f"Expected: {e.expected}")
+    print(f"Got: {e.actual}")
+    print(f"Why: {e.diagnosis}")
+```
+
+## Integration with pytest
+
+See `@cert/pytest-plugin` for pytest integration.
+
+## API Reference
+
+### `TestRunner`
+
+Main test runner with layer enforcement.
+
+**Methods:**
+- `add_ground_truth(ground_truth: GroundTruth)`: Register ground truth
+- `test_accuracy(test_id, agent_fn, config?) -> TestResult`: Test accuracy
+- `test_consistency(test_id, agent_fn, config) -> TestResult`: Test consistency
+- `get_results(test_id?) -> List[TestResult]`: Get test results
+
+### `GroundTruth`
+
+Definition of expected output.
+
+**Fields:**
+- `id: str`: Unique identifier
+- `question: str`: Input question
+- `expected: Union[str, int, float, dict]`: Expected output
+- `equivalents: List[str]`: Alternative valid outputs
+- `metadata: dict`: Additional metadata
+
+### `TestConfig`
+
+Test configuration.
+
+**Fields:**
+- `n_trials: int = 10`: Number of trials for consistency
+- `consistency_threshold: float = 0.9`: Minimum acceptable consistency
+- `accuracy_threshold: float = 0.8`: Minimum acceptable accuracy
+- `semantic_comparison: bool = True`: Use semantic comparison
+- `timeout: int = 30000`: Timeout in milliseconds
+
+### `TestResult`
+
+Test execution result.
+
+**Fields:**
+- `test_id: str`: Test identifier
+- `status: TestStatus`: "pass", "fail", or "warn"
+- `timestamp: datetime`: When test ran
+- `consistency: float`: Consistency score (0-1)
+- `accuracy: float`: Accuracy score (0-1)
+- `evidence: Evidence`: Evidence of variance
+- `diagnosis: str`: Failure diagnosis
+- `suggestions: List[str]`: Fix suggestions
+
+## Examples
+
+### LangChain Integration
+
+```python
+from langchain.chains import LLMChain
+from langchain.llms import OpenAI
+from cert import TestRunner, GroundTruth, TestConfig
+
+llm = OpenAI(temperature=0)
+chain = LLMChain(llm=llm, prompt=prompt)
+
+async def agent():
+    return await chain.arun(input="What is the capital of France?")
+
+runner = TestRunner()
+runner.add_ground_truth(GroundTruth(
+    id="test-1",
+    question="Capital of France?",
+    expected="Paris"
+))
+
+# Test it
+await runner.test_accuracy("test-1", agent)
+await runner.test_consistency("test-1", agent, TestConfig(n_trials=5))
+```
+
+### RAG Pipeline
+
+```python
+async def rag_agent(query: str):
+    # Retrieve
+    docs = await retriever.retrieve(query)
+    # Generate
+    response = await llm.generate(query, docs)
+    return response
+
+result = await runner.test_consistency(
+    "rag-test",
+    lambda: rag_agent("What was Q4 revenue?"),
+    TestConfig(n_trials=10)
+)
+```
+
+## Development
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+black cert/
+
+# Type check
+mypy cert/
+```
+
+## License
+
+MIT
