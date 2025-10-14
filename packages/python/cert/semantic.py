@@ -118,6 +118,10 @@ def normalized_number_rule() -> ComparisonRule:
         return value * multipliers.get(unit, 1)
 
     def match(expected: str, actual: str) -> Union[bool, float]:
+        # Fast rejection: if neither string contains digits, this isn't a number comparison
+        if not any(c.isdigit() for c in expected) or not any(c.isdigit() for c in actual):
+            return False
+
         exp_num = extract_number(expected)
         act_num = extract_number(actual)
 
