@@ -14,6 +14,13 @@ from .runner import TestRunner, ConsistencyError, AccuracyError
 from .consistency import measure_consistency, autodiagnose_variance
 from .semantic import SemanticComparator, ComparisonRule, ComparisonResult
 
+# Conditional import for LangChain integration
+try:
+    from .langchain_integration import wrap_chain, CertChainWrapper
+    __all_langchain__ = ["wrap_chain", "CertChainWrapper"]
+except ImportError:
+    __all_langchain__ = []
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -35,4 +42,4 @@ __all__ = [
     "SemanticComparator",
     "ComparisonRule",
     "ComparisonResult",
-]
+] + __all_langchain__
