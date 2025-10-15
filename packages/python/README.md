@@ -123,9 +123,71 @@ comparator.compare("$391 billion", "$391,000,000,000")  # ✓
 comparator.compare("Paris", "paris")  # ✓ (case insensitive)
 ```
 
+## Intelligent Comparator (Recommended)
+
+The `IntelligentComparator` automatically detects input types and routes to the optimal comparison strategy:
+
+```python
+from cert import IntelligentComparator
+
+# Default: automatic routing
+comparator = IntelligentComparator()
+
+# With domain hint for domain-specific routing
+comparator = IntelligentComparator(domain='medical')
+
+# With embeddings for enhanced semantic matching
+comparator = IntelligentComparator(use_embeddings=True)
+
+# Use with TestRunner
+from cert import TestRunner
+runner = TestRunner(semantic_comparator=comparator)
+
+# Automatically uses number normalization for numerical inputs
+result = comparator.compare('$391 billion', '391B')
+# → matched=True, rule='normalized-number', confidence=1.0
+
+# Automatically uses semantic comparison for text
+result = comparator.compare('reduced latency', 'faster response times')
+# → matched=True, rule='fuzzy-text' or 'embedding-similarity'
+
+# Explain routing decisions
+explanation = comparator.explain('$391 billion', '391B', result)
+print(explanation)
+# Detected input type: numerical (confidence: 0.95)
+# Comparison result: ✓ MATCHED (confidence: 1.00)
+# Rule used: normalized-number
+# Used rule-based number normalization...
+```
+
+### Routing Logic
+
+| Input Type | Detection Criteria | Strategy Used |
+|------------|-------------------|---------------|
+| **Numerical** | Numbers with units/currency ($391B, 42%, 100kg) | Rule-based normalization |
+| **Dates** | Date formats (MM/DD/YYYY, ISO-8601, Q4 2024) | Date parsing + comparison |
+| **Domain-Specific** | User-specified domain hint | Fine-tuned model or fallback |
+| **General Text** | Everything else | Embeddings or fuzzy matching |
+
+### Progressive Enhancement
+
+The comparator gracefully degrades based on available dependencies:
+
+```python
+# Basic: uses rule-based + fuzzy matching (no extra deps)
+basic = IntelligentComparator()
+
+# With embeddings: semantic similarity for text
+with_embeddings = IntelligentComparator(use_embeddings=True)
+
+# With domain model: fine-tuned comparisons
+with_domain = IntelligentComparator(domain='medical')
+# Loads domain model if available, otherwise falls back
+```
+
 ## Choosing a Comparator
 
-CERT provides three comparison strategies:
+CERT provides multiple comparison strategies:
 
 ### Rule-Based (Default) - Fast & Deterministic
 

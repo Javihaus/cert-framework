@@ -9,10 +9,13 @@ from .types import (
     ConsistencyResult,
     DegradationAlert,
     TestStatus,
+    HumanAnnotation,
 )
 from .runner import TestRunner, ConsistencyError, AccuracyError
 from .consistency import measure_consistency, autodiagnose_variance
 from .semantic import SemanticComparator, ComparisonRule, ComparisonResult
+from .intelligent_comparator import IntelligentComparator
+from .detectors import InputType, DetectionResult
 
 # Conditional import for LangChain integration
 try:
@@ -45,6 +48,7 @@ __all__ = [
     "ConsistencyResult",
     "DegradationAlert",
     "TestStatus",
+    "HumanAnnotation",
     # Runner
     "TestRunner",
     "ConsistencyError",
@@ -56,4 +60,8 @@ __all__ = [
     "SemanticComparator",
     "ComparisonRule",
     "ComparisonResult",
+    "IntelligentComparator",
+    # Detectors
+    "InputType",
+    "DetectionResult",
 ] + __all_langchain__ + __all_embeddings__ + __all_llm_judge__

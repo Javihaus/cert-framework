@@ -56,6 +56,7 @@ class TestResult:
     evidence: Optional[Evidence] = None
     diagnosis: Optional[str] = None
     suggestions: Optional[List[str]] = None
+    human_annotation: Optional['HumanAnnotation'] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
@@ -72,6 +73,7 @@ class TestResult:
             } if self.evidence else None,
             "diagnosis": self.diagnosis,
             "suggestions": self.suggestions,
+            "humanAnnotation": self.human_annotation.to_dict() if self.human_annotation else None,
         }
 
 
@@ -92,6 +94,33 @@ class DegradationAlert:
     test_id: str
     message: str
     severity: str  # 'info', 'warning', 'critical'
+
+
+@dataclass
+class HumanAnnotation:
+    """Human annotation of test result equivalence."""
+
+    id: str
+    test_id: str
+    expected: str
+    actual: str
+    equivalent: bool
+    reason: Optional[str] = None
+    timestamp: datetime = field(default_factory=datetime.now)
+    domain: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary representation."""
+        return {
+            "id": self.id,
+            "testId": self.test_id,
+            "expected": self.expected,
+            "actual": self.actual,
+            "equivalent": self.equivalent,
+            "reason": self.reason,
+            "timestamp": self.timestamp.isoformat(),
+            "domain": self.domain,
+        }
 
 
 @dataclass
