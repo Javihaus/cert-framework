@@ -24,12 +24,9 @@ try:
 except ImportError:
     __all_langchain__ = []
 
-# Conditional import for Embedding comparator
-try:
-    from .embeddings import EmbeddingComparator
-    __all_embeddings__ = ["EmbeddingComparator"]
-except ImportError:
-    __all_embeddings__ = []
+# Embedding comparator (REQUIRED)
+from .embeddings import EmbeddingComparator
+__all_embeddings__ = ["EmbeddingComparator"]
 
 # Conditional import for LLM Judge comparator
 try:

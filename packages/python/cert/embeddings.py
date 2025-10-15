@@ -1,14 +1,14 @@
-"""Embedding-based semantic comparison using sentence transformers."""
+"""Embedding-based semantic comparison using sentence transformers.
+
+Embeddings are now REQUIRED for semantic comparison. If you're testing
+LLM outputs, you need semantic similarity. The model download (~420MB)
+is the cost of doing business.
+"""
 
 from typing import Optional
+from sentence_transformers import SentenceTransformer
+import numpy as np
 from cert.types import ComparisonResult
-
-try:
-    from sentence_transformers import SentenceTransformer
-    import numpy as np
-    EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    EMBEDDINGS_AVAILABLE = False
 
 
 class EmbeddingComparator:
@@ -45,12 +45,17 @@ class EmbeddingComparator:
         threshold: float = 0.75,
         cache_size: int = 1000
     ):
-        if not EMBEDDINGS_AVAILABLE:
-            raise ImportError(
-                "sentence-transformers not installed. Install with:\n"
-                "  pip install cert-framework[embeddings]"
-            )
+        """
+        Initialize embedding comparator with sentence transformers.
 
+        Args:
+            model_name: Model to use (default: all-MiniLM-L6-v2, ~420MB)
+            threshold: Similarity threshold (0-1)
+            cache_size: Number of embeddings to cache
+
+        Note: First run downloads the model (~420MB). This is required
+        for semantic comparison of LLM outputs.
+        """
         self.model = SentenceTransformer(model_name)
         self.threshold = threshold
         self.cache: dict = {}

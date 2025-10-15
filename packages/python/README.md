@@ -8,11 +8,7 @@ Consistency Evaluation and Reliability Testing for LLM systems in Python.
 pip install cert-framework
 ```
 
-For semantic comparison with fuzzy matching:
-
-```bash
-pip install cert-framework[semantic]
-```
+**Note:** Sentence transformer embeddings (~420MB model) are **required** for semantic comparison and will be downloaded on first use. This is necessary for testing LLM outputs with semantic similarity.
 
 ## Quick Start
 
@@ -125,19 +121,19 @@ comparator.compare("Paris", "paris")  # ✓ (case insensitive)
 
 ## Intelligent Comparator (Recommended)
 
-The `IntelligentComparator` automatically detects input types and routes to the optimal comparison strategy:
+The `IntelligentComparator` automatically detects input types and routes to the optimal comparison strategy. **Embeddings are always used** for semantic text comparison.
 
 ```python
 from cert import IntelligentComparator
 
-# Default: automatic routing
+# Default: automatic routing with embeddings
 comparator = IntelligentComparator()
 
 # With domain hint for domain-specific routing
 comparator = IntelligentComparator(domain='medical')
 
-# With embeddings for enhanced semantic matching
-comparator = IntelligentComparator(use_embeddings=True)
+# Adjust embedding threshold for stricter/looser matching
+comparator = IntelligentComparator(embedding_threshold=0.80)
 
 # Use with TestRunner
 from cert import TestRunner
@@ -169,20 +165,18 @@ print(explanation)
 | **Domain-Specific** | User-specified domain hint | Fine-tuned model or fallback |
 | **General Text** | Everything else | Embeddings or fuzzy matching |
 
-### Progressive Enhancement
+### Why Embeddings Are Required
 
-The comparator gracefully degrades based on available dependencies:
+Embeddings are essential for semantic comparison of LLM outputs:
 
 ```python
-# Basic: uses rule-based + fuzzy matching (no extra deps)
-basic = IntelligentComparator()
+# These should match (vocabulary substitutions):
+comparator.compare("revenue increased", "sales grew")  # ✓ with embeddings
+comparator.compare("smartphones", "phones")  # ✓ with embeddings
+comparator.compare("faster response", "reduced latency")  # ✓ with embeddings
 
-# With embeddings: semantic similarity for text
-with_embeddings = IntelligentComparator(use_embeddings=True)
-
-# With domain model: fine-tuned comparisons
-with_domain = IntelligentComparator(domain='medical')
-# Loads domain model if available, otherwise falls back
+# Without embeddings, you'd need manual equivalents for EVERY variation
+# The ~420MB model download is the cost of doing business
 ```
 
 ## Choosing a Comparator
@@ -204,11 +198,9 @@ runner = TestRunner()  # Uses SemanticComparator
 - Requires manual equivalents lists
 - May fail on semantic shifts ("speed" vs "fast")
 
-### Embedding-Based - Semantic Similarity
+### Embedding-Based - Semantic Similarity (Included by Default)
 
-```bash
-pip install cert-framework[embeddings]
-```
+**Embeddings are now required** and included with the base installation.
 
 ```python
 from cert.embeddings import EmbeddingComparator
@@ -220,11 +212,14 @@ runner = TestRunner(semantic_comparator=EmbeddingComparator(threshold=0.75))
 - Open-ended questions ("Name a benefit...")
 - Abstract concepts
 - Multiple valid phrasings
+- Vocabulary substitutions
 
 **Tradeoffs:**
-- 500MB model download (one-time)
+- ~420MB model download (one-time, required)
 - 50-100ms per comparison
-- Requires threshold tuning
+- May require threshold tuning
+
+**Validation:** See `tests/test_benchmark_validation.py` for STS-Benchmark validation (8,628 human-annotated sentence pairs). Expected accuracy: 82-86%.
 
 ### LLM-as-Judge - Most Robust
 

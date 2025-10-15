@@ -46,37 +46,39 @@ class IntelligentComparator:
         self,
         domain: Optional[str] = None,
         fuzzy_threshold: float = 0.8,
-        use_embeddings: bool = False,
         embedding_threshold: float = 0.75,
     ):
+        """
+        Initialize intelligent comparator with automatic routing.
+
+        Embeddings are REQUIRED and loaded automatically. If you're testing
+        LLM outputs, you need semantic comparison. The ~420MB model download
+        on first run is the cost of doing business.
+
+        Args:
+            domain: Optional domain hint for domain-specific detection
+            fuzzy_threshold: Threshold for fuzzy text matching
+            embedding_threshold: Threshold for embedding similarity
+        """
         self.domain = domain
         self.fuzzy_threshold = fuzzy_threshold
-        self.use_embeddings = use_embeddings
         self.embedding_threshold = embedding_threshold
 
         # Base comparator (always available)
         self.base_comparator = SemanticComparator()
 
-        # Optional comparators
-        self.embedding_comparator = None
+        # Embedding comparator (REQUIRED)
+        self._load_embedding_comparator()
+
+        # Domain comparator (optional, loaded on demand)
         self.domain_comparator = None
 
-        # Lazy load embedding comparator if requested
-        if use_embeddings:
-            self._load_embedding_comparator()
-
     def _load_embedding_comparator(self):
-        """Lazy load embedding comparator if available."""
-        try:
-            from cert.embeddings import EmbeddingComparator
-            self.embedding_comparator = EmbeddingComparator(
-                threshold=self.embedding_threshold
-            )
-        except ImportError:
-            import warnings
-            warnings.warn(
-                "Embeddings not available. Install with: pip install cert-framework[embeddings]"
-            )
+        """Load embedding comparator (REQUIRED)."""
+        from cert.embeddings import EmbeddingComparator
+        self.embedding_comparator = EmbeddingComparator(
+            threshold=self.embedding_threshold
+        )
 
     def compare(self, expected: str, actual: str) -> ComparisonResult:
         """

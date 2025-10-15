@@ -37,7 +37,9 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "typing-extensions>=4.0.0",
-        "rapidfuzz>=3.0.0",  # For semantic comparison
+        "rapidfuzz>=3.0.0",  # For fuzzy text matching
+        "sentence-transformers>=2.0.0",  # Required for semantic comparison
+        "numpy>=1.20.0",  # Required for embeddings
     ],
     extras_require={
         "dev": [
@@ -58,10 +60,6 @@ setup(
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
         ],
-        "embeddings": [
-            "sentence-transformers>=2.0.0",
-            "numpy>=1.20.0",
-        ],
         "llm-judge": [
             "anthropic>=0.18.0",
         ],
@@ -72,8 +70,6 @@ setup(
             "langchain-core>=0.1.0",
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
-            "sentence-transformers>=2.0.0",
-            "numpy>=1.20.0",
             "anthropic>=0.18.0",
         ],
     },
