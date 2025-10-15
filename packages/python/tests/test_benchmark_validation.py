@@ -34,7 +34,7 @@ class TestSTSBenchmarkValidation:
         - sts-dev.csv: 1,500 pairs (development set)
         - sts-test.csv: 1,379 pairs (test set)
 
-        Format: genre, filename, year, id, score, sentence1, sentence2
+        Format: sentence1, sentence2, score
         Score: 0 (no relation) to 5 (semantic equivalence)
         """
         if self.dataset_path.exists():
@@ -43,17 +43,53 @@ class TestSTSBenchmarkValidation:
         # Create data directory
         self.dataset_path.mkdir(parents=True, exist_ok=True)
 
-        # Download from official source
-        import urllib.request
-        base_url = "https://raw.githubusercontent.com/PhilipMay/stsb-multi-mt/main/data/en/"
+        print("Downloading STS-Benchmark from Hugging Face...")
 
-        for split in ["train", "dev", "test"]:
-            url = base_url + "sts-" + split + ".csv"
-            output_path = self.dataset_path / ("sts-" + split + ".csv")
+        try:
+            # Try using datasets library (preferred)
+            from datasets import load_dataset
 
-            print("Downloading {} split from {}...".format(split, url))
-            urllib.request.urlretrieve(url, output_path)
-            print("Saved to {}".format(output_path))
+            dataset = load_dataset("mteb/stsbenchmark-sts")
+
+            # Save to CSV files
+            for split in ["train", "validation", "test"]:
+                output_path = self.dataset_path / ("sts-{}.csv".format(
+                    "dev" if split == "validation" else split
+                ))
+
+                split_data = dataset[split]
+
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    import csv
+                    writer = csv.writer(f, delimiter='\t')
+
+                    for item in split_data:
+                        # Format: sentence1, sentence2, score
+                        writer.writerow([
+                            item['sentence1'],
+                            item['sentence2'],
+                            item['score']
+                        ])
+
+                print("Saved {} split to {}".format(split, output_path))
+
+        except ImportError:
+            # Fallback: Download from ixa2.si.ehu.es (original source)
+            import urllib.request
+            base_url = "http://ixa2.si.ehu.es/stswiki/images/4/48/"
+
+            files = {
+                "train": "Stsbenchmark.tar.gz",
+                "dev": "Stsbenchmark.tar.gz",
+                "test": "Stsbenchmark.tar.gz"
+            }
+
+            print("datasets library not available, using direct download...")
+            print("Please install with: pip install datasets")
+            raise ImportError(
+                "STS-Benchmark download requires datasets library. "
+                "Install with: pip install datasets"
+            )
 
     def _load_split(self, split: str):
         """Load a dataset split.
@@ -69,11 +105,11 @@ class TestSTSBenchmarkValidation:
         with open(path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter='\t')
             for row in reader:
-                if len(row) >= 7:
-                    # Format: genre, filename, year, id, score, sentence1, sentence2
-                    score = float(row[4])
-                    sentence1 = row[5]
-                    sentence2 = row[6]
+                if len(row) >= 3:
+                    # Format: sentence1, sentence2, score
+                    sentence1 = row[0]
+                    sentence2 = row[1]
+                    score = float(row[2])
                     pairs.append((sentence1, sentence2, score))
 
         return pairs

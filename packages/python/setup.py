@@ -47,6 +47,7 @@ setup(
             "pytest-asyncio>=0.21.0",
             "black>=23.0.0",
             "mypy>=1.0.0",
+            "datasets>=2.0.0",  # For STS-Benchmark validation
         ],
         "inspector": [
             "flask>=2.0.0",  # Lightweight server for inspector UI
