@@ -184,24 +184,35 @@ print(f"Recall: {metrics['recall']:.1%}")
 ## Project Structure
 
 ```
-cert-framework/packages/python/
-├── cert/                       # Core library
-│   ├── __init__.py            # Exports: compare, ComparisonResult, EmbeddingComparator
-│   ├── compare.py             # Simple API: compare(text1, text2, threshold)
-│   ├── embeddings.py          # EmbeddingComparator class
-│   ├── validation.py          # User-facing validation functions
-│   └── cli.py                 # CLI tools: cert-compare
-├── examples/                   # Production-ready examples
-│   ├── README.md              # Performance notes and scaling guidance
-│   ├── 01_deduplication.py    # Find and remove duplicate documents
-│   ├── 02_ticket_classification.py  # Route tickets by similarity
-│   ├── 03_content_similarity.py     # Find similar articles
-│   └── 04_debugging_inspector.py    # Debug and tune comparisons
-├── tests/                      # Comprehensive test suite
-│   ├── test_compare_api.py    # API tests (20+ test cases)
-│   ├── test_benchmark_validation.py  # STS-Benchmark validation
-│   └── test_domain_specific_quick.py # Domain terminology tests
-└── setup.py                    # Package configuration
+cert-framework/
+├── packages/
+│   ├── python/                 # Python bindings (this package)
+│   │   ├── cert/              # Core library
+│   │   │   ├── __init__.py    # Exports: compare, ComparisonResult, EmbeddingComparator
+│   │   │   ├── compare.py     # Simple API: compare(text1, text2, threshold)
+│   │   │   ├── embeddings.py  # EmbeddingComparator class
+│   │   │   ├── validation.py  # User-facing validation functions
+│   │   │   └── cli.py         # CLI tools: cert-compare
+│   │   ├── examples/          # Production-ready examples
+│   │   │   ├── README.md      # Performance notes and scaling guidance
+│   │   │   ├── 01_deduplication.py        # Find and remove duplicates
+│   │   │   ├── 02_ticket_classification.py # Route tickets by similarity
+│   │   │   ├── 03_content_similarity.py    # Find similar articles
+│   │   │   └── 04_debugging_inspector.py   # Debug and tune comparisons
+│   │   ├── tests/             # Comprehensive test suite
+│   │   │   ├── test_compare_api.py         # API tests (20+ cases)
+│   │   │   ├── test_benchmark_validation.py # STS-Benchmark validation
+│   │   │   └── test_domain_specific_quick.py # Domain tests
+│   │   └── setup.py           # Package configuration
+│   ├── core/                   # Core testing primitives
+│   ├── semantic/               # Semantic comparison engine
+│   ├── inspector/              # Web UI (Next.js + React)
+│   ├── cli/                    # CLI tool
+│   ├── langchain/              # LangChain integration
+│   └── pytest-plugin/          # pytest plugin
+├── examples/                   # Example implementations
+│   └── apple-10k/             # Apple 10-K financial data extraction
+└── docs/                       # Documentation site
 ```
 
 ## Development
