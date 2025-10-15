@@ -79,48 +79,82 @@ Limitations:
 
 ## Examples
 
-### Basic Usage
+Four production-ready examples showing real-world use cases:
+
+### 1. Document Deduplication ([`01_deduplication.py`](examples/01_deduplication.py))
+Find and remove near-duplicate documents:
 ```python
 from cert import compare
 
-# Simple comparison
-result = compare("revenue increased", "sales grew")
-if result:
-    print(f"Match! Confidence: {result.confidence:.1%}")
-
-# Batch processing
-pairs = [
-    ("net income rose", "profit increased"),
-    ("CEO resigned", "executive departed"),
-    ("Q3 earnings", "third quarter profits"),
+documents = [
+    "Apple reported strong iPhone sales in Q4 2024",
+    "Apple's Q4 2024 results showed robust iPhone revenue",  # Near-duplicate
+    "Microsoft Azure cloud revenue grew 30% year-over-year",
 ]
 
-for text1, text2 in pairs:
-    result = compare(text1, text2)
-    symbol = "✓" if result else "✗"
-    print(f"{symbol} '{text1}' ↔ '{text2}' ({result.confidence:.0%})")
+duplicates = []
+for i in range(len(documents)):
+    for j in range(i + 1, len(documents)):
+        result = compare(documents[i], documents[j])
+        if result.matched:
+            duplicates.append((i, j, result.confidence))
 ```
 
-### Advanced Usage
+### 2. Support Ticket Classification ([`02_ticket_classification.py`](examples/02_ticket_classification.py))
+Route tickets by similarity to resolved tickets:
 ```python
-from cert import EmbeddingComparator
+resolved_tickets = [
+    {"category": "billing", "text": "I was charged twice"},
+    {"category": "technical", "text": "App crashes on export"},
+]
 
-# Use a different model (faster but less accurate)
-comparator = EmbeddingComparator(
-    model_name='sentence-transformers/all-MiniLM-L6-v2',
-    threshold=0.75
-)
+new_ticket = "I see two charges on my credit card"
 
-result = comparator.compare(
-    "The quarterly earnings exceeded expectations",
-    "Q3 profits beat forecasts"
-)
-
-print(f"Matched: {result.matched}")
-print(f"Confidence: {result.confidence:.1%}")
+best_match = None
+best_confidence = 0.0
+for ticket in resolved_tickets:
+    result = compare(new_ticket, ticket["text"])
+    if result.confidence > best_confidence:
+        best_match = ticket
+        best_confidence = result.confidence
 ```
 
-See more examples in [`examples/`](examples/) directory.
+### 3. Content Similarity Search ([`03_content_similarity.py`](examples/03_content_similarity.py))
+Find similar articles (suitable for datasets up to ~1000 items):
+```python
+query = "Introduction to Machine Learning"
+corpus = [
+    "Deep Learning Fundamentals",
+    "Natural Language Processing Basics",
+    "Getting Started with Python",
+]
+
+similarities = []
+for article in corpus:
+    result = compare(query, article)
+    if result.matched:
+        similarities.append((article, result.confidence))
+
+# Sort by confidence
+similarities.sort(key=lambda x: x[1], reverse=True)
+```
+
+### 4. Debugging Comparisons ([`04_debugging_inspector.py`](examples/04_debugging_inspector.py))
+Understand why comparisons succeed or fail:
+```python
+result = compare("revenue up", "revenue down")
+print(f"Matched: {result.matched}")
+print(f"Confidence: {result.confidence:.3f}")
+print(f"Threshold: 0.80")
+
+if not result.matched:
+    print("✗ FALSE NEGATIVE: Should have matched but didn't")
+    print("→ Consider lowering threshold to 0.70-0.75")
+```
+
+**Performance note**: CERT does pairwise comparison (O(N²)). Good for deduplication and classification. For large-scale search (>10K documents), use vector databases (Pinecone, Weaviate, FAISS).
+
+See full examples with sample data in [`examples/`](examples/) directory.
 
 ## Validation
 
@@ -145,6 +179,29 @@ metrics = run_sts_benchmark()
 print(f"Accuracy: {metrics['accuracy']:.1%}")
 print(f"Precision: {metrics['precision']:.1%}")
 print(f"Recall: {metrics['recall']:.1%}")
+```
+
+## Project Structure
+
+```
+cert-framework/packages/python/
+├── cert/                       # Core library
+│   ├── __init__.py            # Exports: compare, ComparisonResult, EmbeddingComparator
+│   ├── compare.py             # Simple API: compare(text1, text2, threshold)
+│   ├── embeddings.py          # EmbeddingComparator class
+│   ├── validation.py          # User-facing validation functions
+│   └── cli.py                 # CLI tools: cert-compare
+├── examples/                   # Production-ready examples
+│   ├── README.md              # Performance notes and scaling guidance
+│   ├── 01_deduplication.py    # Find and remove duplicate documents
+│   ├── 02_ticket_classification.py  # Route tickets by similarity
+│   ├── 03_content_similarity.py     # Find similar articles
+│   └── 04_debugging_inspector.py    # Debug and tune comparisons
+├── tests/                      # Comprehensive test suite
+│   ├── test_compare_api.py    # API tests (20+ test cases)
+│   ├── test_benchmark_validation.py  # STS-Benchmark validation
+│   └── test_domain_specific_quick.py # Domain terminology tests
+└── setup.py                    # Package configuration
 ```
 
 ## Development
