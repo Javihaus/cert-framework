@@ -11,20 +11,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from cert.intelligent_comparator import IntelligentComparator
-    from cert.detectors import detect_input_type, InputType
+    from cert.detectors import detect_input_type
+
     print("✓ Imports successful")
 except Exception as e:
     print(f"✗ Import failed: {e}")
     sys.exit(1)
 
 # Statistics
-stats = {
-    'total': 0,
-    'passed': 0,
-    'failed': 0,
-    'by_type': {},
-    'failures': []
-}
+stats = {"total": 0, "passed": 0, "failed": 0, "by_type": {}, "failures": []}
+
 
 def test_comparison(expected, actual, category):
     """Run a single comparison and record result."""
@@ -32,30 +28,37 @@ def test_comparison(expected, actual, category):
     result = comparator.compare(expected, actual)
     detection = detect_input_type(expected, actual)
 
-    stats['total'] += 1
-    stats['by_type'][detection.type.value] = stats['by_type'].get(detection.type.value, 0) + 1
+    stats["total"] += 1
+    stats["by_type"][detection.type.value] = (
+        stats["by_type"].get(detection.type.value, 0) + 1
+    )
 
     if result.matched:
-        stats['passed'] += 1
+        stats["passed"] += 1
         status = "✓"
     else:
-        stats['failed'] += 1
+        stats["failed"] += 1
         status = "✗"
-        stats['failures'].append({
-            'category': category,
-            'expected': expected,
-            'actual': actual,
-            'type': detection.type.value,
-            'rule': result.rule,
-            'confidence': result.confidence
-        })
+        stats["failures"].append(
+            {
+                "category": category,
+                "expected": expected,
+                "actual": actual,
+                "type": detection.type.value,
+                "rule": result.rule,
+                "confidence": result.confidence,
+            }
+        )
 
-    print(f"  {status} '{actual[:50]}' -> rule:{result.rule}, conf:{result.confidence:.2f}")
+    print(
+        f"  {status} '{actual[:50]}' -> rule:{result.rule}, conf:{result.confidence:.2f}"
+    )
     return result.matched
 
-print("\n" + "="*70)
+
+print("\n" + "=" * 70)
 print("RUNNING ACTUAL EXPERIMENTS")
-print("="*70)
+print("=" * 70)
 
 # NUMERICAL TESTS
 print("\n1. NUMERICAL TESTS")
@@ -97,12 +100,10 @@ print("\nTest: Business description")
 test_comparison(
     "designs, manufactures, and markets smartphones",
     "creates and sells phones",
-    "semantic"
+    "semantic",
 )
 test_comparison(
-    "designs, manufactures, and markets smartphones",
-    "produces smartphones",
-    "semantic"
+    "designs, manufactures, and markets smartphones", "produces smartphones", "semantic"
 )
 
 print("\nTest: Market position")
@@ -122,30 +123,30 @@ print("\nTest: Complex statement")
 test_comparison(
     "Net income was $93.736 billion",
     "Apple's net income for fiscal 2024 was $93.736 billion",
-    "edge"
+    "edge",
 )
 
 print("\nTest: Abbreviation")
 test_comparison("R&D", "research and development", "edge")
 
 # PRINT RESULTS
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("ACTUAL RESULTS")
-print("="*70)
+print("=" * 70)
 
-print(f"\n📊 OVERALL:")
+print("\n📊 OVERALL:")
 print(f"  Total tests: {stats['total']}")
-print(f"  Passed: {stats['passed']} ({stats['passed']/stats['total']*100:.1f}%)")
-print(f"  Failed: {stats['failed']} ({stats['failed']/stats['total']*100:.1f}%)")
+print(f"  Passed: {stats['passed']} ({stats['passed'] / stats['total'] * 100:.1f}%)")
+print(f"  Failed: {stats['failed']} ({stats['failed'] / stats['total'] * 100:.1f}%)")
 
-print(f"\n🎯 BY INPUT TYPE:")
-for input_type, count in sorted(stats['by_type'].items()):
-    pct = count / stats['total'] * 100
+print("\n🎯 BY INPUT TYPE:")
+for input_type, count in sorted(stats["by_type"].items()):
+    pct = count / stats["total"] * 100
     print(f"  {input_type}: {count} tests ({pct:.1f}%)")
 
 print(f"\n❌ FAILURES ({len(stats['failures'])} total):")
-if stats['failures']:
-    for i, failure in enumerate(stats['failures'], 1):
+if stats["failures"]:
+    for i, failure in enumerate(stats["failures"], 1):
         print(f"\n  {i}. [{failure['category']}] {failure['type']}")
         print(f"     Expected: '{failure['expected'][:60]}'")
         print(f"     Actual: '{failure['actual'][:60]}'")
@@ -154,12 +155,12 @@ else:
     print("  None!")
 
 # RECOMMENDATIONS
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("RECOMMENDATIONS BASED ON ACTUAL RESULTS")
-print("="*70)
+print("=" * 70)
 
-semantic_failures = [f for f in stats['failures'] if f['category'] == 'semantic']
-numerical_failures = [f for f in stats['failures'] if f['category'] == 'numerical']
+semantic_failures = [f for f in stats["failures"] if f["category"] == "semantic"]
+numerical_failures = [f for f in stats["failures"] if f["category"] == "numerical"]
 
 print(f"\nSemantic failures: {len(semantic_failures)}")
 print(f"Numerical failures: {len(numerical_failures)}")
@@ -173,4 +174,4 @@ else:
     print(f"   {len(semantic_failures)} semantic failures found")
     print("   Patterns may justify training pipeline")
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)

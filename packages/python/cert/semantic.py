@@ -64,11 +64,7 @@ class SemanticComparator:
             result = rule.match(expected, actual)
             # Now all rules return float (0.0-1.0)
             if result > 0.0:
-                return ComparisonResult(
-                    matched=True,
-                    rule=rule.name,
-                    confidence=result
-                )
+                return ComparisonResult(matched=True, rule=rule.name, confidence=result)
 
         return ComparisonResult(matched=False, confidence=0.0)
 
@@ -79,11 +75,7 @@ def exact_match_rule() -> ComparisonRule:
     def match(expected: str, actual: str) -> Union[bool, float]:
         return 1.0 if expected == actual else 0.0
 
-    return ComparisonRule(
-        name="exact-match",
-        priority=100,
-        match=match
-    )
+    return ComparisonRule(name="exact-match", priority=100, match=match)
 
 
 def normalized_number_rule() -> ComparisonRule:
@@ -92,10 +84,12 @@ def normalized_number_rule() -> ComparisonRule:
     def extract_number(text: str) -> Optional[dict]:
         """Extract number and unit from text."""
         # Remove currency symbols and commas
-        text = re.sub(r'[$,£€¥]', '', text)
+        text = re.sub(r"[$,£€¥]", "", text)
 
         # Match number with optional unit - more aggressive pattern
-        pattern = r'(\d+(?:\.\d+)?)\s*(billion|million|thousand|trillion|%|percent|B|M|K|T)?'
+        pattern = (
+            r"(\d+(?:\.\d+)?)\s*(billion|million|thousand|trillion|%|percent|B|M|K|T)?"
+        )
 
         matches = re.finditer(pattern, text, re.IGNORECASE)
 
@@ -103,7 +97,7 @@ def normalized_number_rule() -> ComparisonRule:
         for match in matches:
             try:
                 value = float(match.group(1))
-                unit = (match.group(2) or '').lower()
+                unit = (match.group(2) or "").lower()
                 return {"value": value, "unit": unit}
             except (ValueError, AttributeError):
                 continue
@@ -113,23 +107,25 @@ def normalized_number_rule() -> ComparisonRule:
     def normalize_to_base(value: float, unit: str) -> float:
         """Normalize number to base unit."""
         multipliers = {
-            'trillion': 1e12,
-            't': 1e12,
-            'billion': 1e9,
-            'b': 1e9,
-            'million': 1e6,
-            'm': 1e6,
-            'thousand': 1e3,
-            'k': 1e3,
-            '%': 0.01,
-            'percent': 0.01,
-            '': 1
+            "trillion": 1e12,
+            "t": 1e12,
+            "billion": 1e9,
+            "b": 1e9,
+            "million": 1e6,
+            "m": 1e6,
+            "thousand": 1e3,
+            "k": 1e3,
+            "%": 0.01,
+            "percent": 0.01,
+            "": 1,
         }
         return value * multipliers.get(unit, 1)
 
     def match(expected: str, actual: str) -> Union[bool, float]:
         # Fast rejection: if neither string contains digits, this isn't a number comparison
-        if not any(c.isdigit() for c in expected) or not any(c.isdigit() for c in actual):
+        if not any(c.isdigit() for c in expected) or not any(
+            c.isdigit() for c in actual
+        ):
             return 0.0
 
         exp_num = extract_number(expected)
@@ -148,11 +144,7 @@ def normalized_number_rule() -> ComparisonRule:
         diff = abs(exp_val - act_val) / exp_val
         return 1.0 if diff < 0.001 else 0.0
 
-    return ComparisonRule(
-        name="normalized-number",
-        priority=95,
-        match=match
-    )
+    return ComparisonRule(name="normalized-number", priority=95, match=match)
 
 
 def contains_match_rule() -> ComparisonRule:
@@ -160,7 +152,7 @@ def contains_match_rule() -> ComparisonRule:
 
     def normalize(text: str) -> str:
         """Normalize for comparison."""
-        return ' '.join(text.lower().split())
+        return " ".join(text.lower().split())
 
     def match(expected: str, actual: str) -> Union[bool, float]:
         exp_norm = normalize(expected)
@@ -179,7 +171,7 @@ def contains_match_rule() -> ComparisonRule:
     return ComparisonRule(
         name="contains-match",
         priority=90,  # Between exact (100) and number (95)
-        match=match
+        match=match,
     )
 
 
@@ -188,7 +180,19 @@ def key_phrase_rule() -> ComparisonRule:
 
     def get_content_words(text: str) -> set:
         """Extract meaningful words, excluding stopwords."""
-        stopwords = {'the', 'a', 'an', 'is', 'of', 'in', 'to', 'for', 'and', 'or', 'but'}
+        stopwords = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "of",
+            "in",
+            "to",
+            "for",
+            "and",
+            "or",
+            "but",
+        }
         words = text.lower().split()
         return {w for w in words if w not in stopwords and len(w) > 2}
 
@@ -214,7 +218,7 @@ def key_phrase_rule() -> ComparisonRule:
     return ComparisonRule(
         name="key-phrase",
         priority=85,  # After contains, before fuzzy
-        match=match
+        match=match,
     )
 
 
@@ -226,9 +230,9 @@ def fuzzy_text_rule() -> ComparisonRule:
         # Convert to lowercase
         text = text.lower()
         # Remove punctuation
-        text = re.sub(r'[^\w\s]', '', text)
+        text = re.sub(r"[^\w\s]", "", text)
         # Normalize whitespace
-        text = ' '.join(text.split())
+        text = " ".join(text.split())
         return text
 
     def match(expected: str, actual: str) -> Union[bool, float]:
@@ -245,13 +249,10 @@ def fuzzy_text_rule() -> ComparisonRule:
         # Try fuzzy matching if rapidfuzz is available
         try:
             from rapidfuzz import fuzz
+
             ratio = fuzz.ratio(norm_exp, norm_act) / 100.0
             return ratio if ratio > 0.85 else 0.0
         except ImportError:
             return 0.0
 
-    return ComparisonRule(
-        name="fuzzy-text",
-        priority=70,
-        match=match
-    )
+    return ComparisonRule(name="fuzzy-text", priority=70, match=match)

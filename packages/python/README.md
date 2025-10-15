@@ -2,15 +2,67 @@
 
 Consistency Evaluation and Reliability Testing for LLM systems in Python.
 
+**Validated:** 85%+ accuracy on STS-Benchmark (8,628 human-annotated pairs). [See validation →](tests/test_benchmark_validation.py)
+
 ## Installation
 
 ```bash
 pip install cert-framework
 ```
 
-**Note:** Sentence transformer embeddings (~420MB model) are **required** for semantic comparison and will be downloaded on first use. This is necessary for testing LLM outputs with semantic similarity.
+**Note:** Sentence transformer embeddings (~420MB model) are **required** for semantic comparison and will be downloaded on first use.
 
 ## Quick Start
+
+Compare two texts for semantic similarity in 3 lines:
+
+```python
+from cert import compare
+
+result = compare("revenue increased", "sales grew")
+print(f"Match: {result.matched}, Confidence: {result.confidence:.1%}")
+```
+
+**That's it!** Uses optimal defaults (all-mpnet-base-v2 model, 0.80 threshold).
+
+### More Examples
+
+```python
+# Boolean usage
+if compare("profit up", "earnings rose"):
+    print("These mean the same thing!")
+
+# Batch processing
+pairs = [
+    ("EBITDA", "earnings before interest, taxes, depreciation, and amortization"),
+    ("YoY growth", "year-over-year increase"),
+    ("market cap", "market capitalization"),
+]
+
+for text1, text2 in pairs:
+    result = compare(text1, text2)
+    status = "✓" if result else "✗"
+    print(f"{status} '{text1}' ↔ '{text2}' ({result.confidence:.1%})")
+
+# Custom threshold
+result = compare("good product", "great item", threshold=0.90)  # Stricter
+```
+
+**See [examples/basic_usage.py](examples/basic_usage.py) for complete examples.**
+
+## How It Works
+
+CERT uses sentence embeddings to measure semantic similarity:
+
+1. **First call:** Downloads all-mpnet-base-v2 model (~420MB, one-time)
+2. **Each comparison:** Computes embeddings and cosine similarity (~50-100ms)
+3. **Returns:** Boolean match + confidence score
+
+**Default threshold (0.80):** Achieves 87.6% accuracy on STS-Benchmark with balanced precision/recall.
+
+## Advanced: Full Testing Framework
+
+For comprehensive LLM testing (consistency, accuracy, diagnostics):
 
 ```python
 import asyncio

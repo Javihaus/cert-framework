@@ -1,9 +1,8 @@
 """LLM-as-judge semantic comparison."""
 
-from typing import Optional
-
 try:
     import anthropic
+
     ANTHROPIC_AVAILABLE = True
 except ImportError:
     ANTHROPIC_AVAILABLE = False
@@ -45,9 +44,9 @@ class LLMJudgeComparator:
 
     def __init__(
         self,
-        client: 'anthropic.Anthropic',
+        client: "anthropic.Anthropic",
         model: str = "claude-haiku-4-20250514",
-        temperature: float = 0
+        temperature: float = 0,
     ):
         if not ANTHROPIC_AVAILABLE:
             raise ImportError(
@@ -90,11 +89,12 @@ IMPORTANT: Respond ONLY with valid JSON, no other text."""
                 model=self.model,
                 max_tokens=200,
                 temperature=self.temperature,
-                messages=[{"role": "user", "content": prompt}]
+                messages=[{"role": "user", "content": prompt}],
             )
 
             # Parse response
             import json
+
             result_text = response.content[0].text.strip()
 
             # Remove markdown code blocks if present
@@ -109,13 +109,11 @@ IMPORTANT: Respond ONLY with valid JSON, no other text."""
             return ComparisonResult(
                 matched=result["equivalent"],
                 rule="llm-judge",
-                confidence=result["confidence"]
+                confidence=result["confidence"],
             )
 
-        except Exception as e:
+        except Exception:
             # On error, fall back to conservative judgment
             return ComparisonResult(
-                matched=False,
-                rule="llm-judge-error",
-                confidence=0.0
+                matched=False, rule="llm-judge-error", confidence=0.0
             )

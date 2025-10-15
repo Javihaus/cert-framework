@@ -7,8 +7,7 @@ from .types import ConsistencyResult, TestConfig
 
 
 async def measure_consistency(
-    fn: Callable[[], Any],
-    config: TestConfig
+    fn: Callable[[], Any], config: TestConfig
 ) -> ConsistencyResult:
     """
     Measure consistency by running a function multiple times.
@@ -28,7 +27,7 @@ async def measure_consistency(
             # Add timeout
             result = await asyncio.wait_for(
                 fn() if asyncio.iscoroutinefunction(fn) else asyncio.to_thread(fn),
-                timeout=config.timeout / 1000
+                timeout=config.timeout / 1000,
             )
             outputs.append(result)
         except asyncio.TimeoutError:
@@ -54,7 +53,7 @@ async def measure_consistency(
         consistency=consistency,
         outputs=outputs,
         unique_count=unique_count,
-        evidence=evidence
+        evidence=evidence,
     )
 
 

@@ -57,7 +57,7 @@ class TestRunner:
         runner = TestRunner(semantic_comparator=LLMJudgeComparator(client=client))
     """
 
-    def __init__(self, semantic_comparator: Optional['ComparatorProtocol'] = None):
+    def __init__(self, semantic_comparator: Optional[Any] = None):
         """Initialize test runner with optional custom comparator."""
         self.ground_truths: Dict[str, GroundTruth] = {}
         self.results: List[TestResult] = []
@@ -80,7 +80,7 @@ class TestRunner:
         self,
         test_id: str,
         agent_fn: Callable[[], Any],
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
     ) -> TestResult:
         """
         Test accuracy against ground truth.
@@ -101,15 +101,13 @@ class TestRunner:
 
         # Execute agent
         actual = await (
-            agent_fn() if asyncio.iscoroutinefunction(agent_fn)
+            agent_fn()
+            if asyncio.iscoroutinefunction(agent_fn)
             else asyncio.to_thread(agent_fn)
         )
 
         # Compare with ground truth
-        comparison = self.comparator.compare(
-            str(ground_truth.expected),
-            str(actual)
-        )
+        comparison = self.comparator.compare(str(ground_truth.expected), str(actual))
 
         # Check equivalents if no match
         if not comparison.matched and ground_truth.equivalents:
@@ -127,14 +125,18 @@ class TestRunner:
             status=status,
             timestamp=datetime.now(),
             accuracy=comparison.confidence if comparison.matched else 0.0,
-            diagnosis=None if passed else (
+            diagnosis=None
+            if passed
+            else (
                 f"Output '{actual}' does not match expected '{ground_truth.expected}'"
             ),
-            suggestions=None if passed else [
+            suggestions=None
+            if passed
+            else [
                 "Check if the agent is retrieving correct context",
                 "Verify prompt clearly specifies expected output format",
-                "Consider adding equivalents to ground truth"
-            ]
+                "Consider adding equivalents to ground truth",
+            ],
         )
 
         if passed:
@@ -144,10 +146,7 @@ class TestRunner:
         return result
 
     async def test_consistency(
-        self,
-        test_id: str,
-        agent_fn: Callable[[], Any],
-        config: TestConfig
+        self, test_id: str, agent_fn: Callable[[], Any], config: TestConfig
     ) -> TestResult:
         """
         Test consistency across multiple runs.
@@ -179,15 +178,19 @@ class TestRunner:
             evidence=Evidence(
                 outputs=[str(o) for o in consistency_result.outputs],
                 unique_count=consistency_result.unique_count,
-                examples=consistency_result.evidence
-            ) if not passed else None,
+                examples=consistency_result.evidence,
+            )
+            if not passed
+            else None,
             diagnosis=autodiagnose_variance(consistency_result) if not passed else None,
             suggestions=[
                 "Set temperature=0 if not already",
                 "Check for non-deterministic data sources (timestamps, random sampling)",
                 "Review prompt for ambiguous instructions",
-                "Consider using semantic comparison if outputs are semantically equivalent"
-            ] if not passed else None
+                "Consider using semantic comparison if outputs are semantically equivalent",
+            ]
+            if not passed
+            else None,
         )
 
         self.results.append(result)

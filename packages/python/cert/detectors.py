@@ -8,6 +8,7 @@ from typing import Optional, Dict, Any
 
 class InputType(Enum):
     """Input type categories for routing."""
+
     NUMERICAL = "numerical"
     DATE = "date"
     DOMAIN_SPECIFIC = "domain_specific"
@@ -17,6 +18,7 @@ class InputType(Enum):
 @dataclass
 class DetectionResult:
     """Result of input type detection."""
+
     type: InputType
     confidence: float
     metadata: Optional[Dict[str, Any]] = None
@@ -33,18 +35,15 @@ def detect_numerical(text: str) -> Optional[DetectionResult]:
         - 3.14, $1,234.56
     """
     patterns = [
-        r'\$?\d+\.?\d*\s*(billion|million|thousand|trillion|B|M|K|T)',
-        r'\d+\.?\d*\s*%',
-        r'\$\d+[,\d]*',
-        r'\d+\.?\d*\s*(kg|km|lb|ft|m|cm|g|oz)',
+        r"\$?\d+\.?\d*\s*(billion|million|thousand|trillion|B|M|K|T)",
+        r"\d+\.?\d*\s*%",
+        r"\$\d+[,\d]*",
+        r"\d+\.?\d*\s*(kg|km|lb|ft|m|cm|g|oz)",
     ]
 
     for pattern in patterns:
         if re.search(pattern, text, re.IGNORECASE):
-            return DetectionResult(
-                type=InputType.NUMERICAL,
-                confidence=0.95
-            )
+            return DetectionResult(type=InputType.NUMERICAL, confidence=0.95)
 
     return None
 
@@ -60,23 +59,22 @@ def detect_date(text: str) -> Optional[DetectionResult]:
         - Q4 2024
     """
     patterns = [
-        r'\d{1,2}/\d{1,2}/\d{2,4}',  # MM/DD/YYYY
-        r'\d{4}-\d{2}-\d{2}',  # ISO format
-        r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}',
-        r'Q[1-4] \d{4}',  # Quarter format
+        r"\d{1,2}/\d{1,2}/\d{2,4}",  # MM/DD/YYYY
+        r"\d{4}-\d{2}-\d{2}",  # ISO format
+        r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}",
+        r"Q[1-4] \d{4}",  # Quarter format
     ]
 
     for pattern in patterns:
         if re.search(pattern, text, re.IGNORECASE):
-            return DetectionResult(
-                type=InputType.DATE,
-                confidence=0.9
-            )
+            return DetectionResult(type=InputType.DATE, confidence=0.9)
 
     return None
 
 
-def detect_domain_specific(text: str, domain: Optional[str] = None) -> Optional[DetectionResult]:
+def detect_domain_specific(
+    text: str, domain: Optional[str] = None
+) -> Optional[DetectionResult]:
     """
     Detect if input is domain-specific based on user hints.
 
@@ -91,16 +89,12 @@ def detect_domain_specific(text: str, domain: Optional[str] = None) -> Optional[
 
     # User explicitly tagged this with a domain
     return DetectionResult(
-        type=InputType.DOMAIN_SPECIFIC,
-        confidence=1.0,
-        metadata={"domain": domain}
+        type=InputType.DOMAIN_SPECIFIC, confidence=1.0, metadata={"domain": domain}
     )
 
 
 def detect_input_type(
-    expected: str,
-    actual: str,
-    domain: Optional[str] = None
+    expected: str, actual: str, domain: Optional[str] = None
 ) -> DetectionResult:
     """
     Master detector that runs all detection strategies.
@@ -135,7 +129,4 @@ def detect_input_type(
             return result
 
     # Default: general text
-    return DetectionResult(
-        type=InputType.GENERAL_TEXT,
-        confidence=0.7
-    )
+    return DetectionResult(type=InputType.GENERAL_TEXT, confidence=0.7)

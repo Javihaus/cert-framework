@@ -3,13 +3,11 @@
 Uses a tiny model to avoid resource constraints.
 """
 
-import pytest
-from cert.types import ComparisonResult
-
 
 def test_embedding_import():
     """Test that we can import the embedding module."""
     from cert.embeddings import EmbeddingComparator
+
     assert EmbeddingComparator is not None
 
 
@@ -23,7 +21,7 @@ def test_embedding_initialization_lightweight():
     # Use smallest possible model for testing
     comparator = EmbeddingComparator(
         model_name="paraphrase-MiniLM-L3-v2",  # Much smaller: ~60MB
-        threshold=0.75
+        threshold=0.75,
     )
 
     # Basic sanity check
@@ -46,7 +44,7 @@ def test_embedding_vocabulary_substitutions():
     # Use lightweight model
     comparator = EmbeddingComparator(
         model_name="paraphrase-MiniLM-L3-v2",
-        threshold=0.70  # Slightly lower for smaller model
+        threshold=0.70,  # Slightly lower for smaller model
     )
 
     # Test vocabulary substitutions
@@ -65,7 +63,9 @@ def test_embedding_vocabulary_substitutions():
         confidence = result.confidence
 
         status = "✓" if matched == should_match else "✗"
-        print(f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f})")
+        print(
+            f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f})"
+        )
 
         results.append(matched == should_match)
 
@@ -92,4 +92,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ Test failed: {e}")
         import traceback
+
         traceback.print_exc()

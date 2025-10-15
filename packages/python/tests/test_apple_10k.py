@@ -5,12 +5,7 @@ This tests intelligent routing with actual financial document extraction scenari
 """
 
 import pytest
-from cert import (
-    IntelligentComparator,
-    TestRunner,
-    GroundTruth,
-    TestConfig
-)
+from cert import IntelligentComparator, TestRunner, GroundTruth
 
 
 class TestApple10KFinancialData:
@@ -27,13 +22,15 @@ class TestApple10KFinancialData:
 
     def test_total_revenue_fy2024(self):
         """Test: Total net sales FY2024."""
-        self.runner.add_ground_truth(GroundTruth(
-            id="revenue-2024",
-            question="What was Apple's total net sales in fiscal 2024?",
-            expected="$391.035 billion",
-            equivalents=["391B", "$391,035 million", "391 billion", "391.035B"],
-            metadata={"correctPages": [1]}
-        ))
+        self.runner.add_ground_truth(
+            GroundTruth(
+                id="revenue-2024",
+                question="What was Apple's total net sales in fiscal 2024?",
+                expected="$391.035 billion",
+                equivalents=["391B", "$391,035 million", "391 billion", "391.035B"],
+                metadata={"correctPages": [1]},
+            )
+        )
 
         # Simulate LLM responses with various formats
         test_cases = [
@@ -46,21 +43,22 @@ class TestApple10KFinancialData:
 
         for output in test_cases:
             result = self.comparator.compare(
-                str(self.runner.ground_truths["revenue-2024"].expected),
-                output
+                str(self.runner.ground_truths["revenue-2024"].expected), output
             )
             assert result.matched, f"Failed to match: {output}"
             assert "number" in result.rule.lower(), f"Wrong rule for: {output}"
 
     def test_iphone_revenue_fy2024(self):
         """Test: iPhone revenue FY2024."""
-        self.runner.add_ground_truth(GroundTruth(
-            id="iphone-revenue-2024",
-            question="What was iPhone revenue in fiscal 2024?",
-            expected="$201.183 billion",
-            equivalents=["201B", "$201,183 million", "201.183 billion"],
-            metadata={"correctPages": [1]}
-        ))
+        self.runner.add_ground_truth(
+            GroundTruth(
+                id="iphone-revenue-2024",
+                question="What was iPhone revenue in fiscal 2024?",
+                expected="$201.183 billion",
+                equivalents=["201B", "$201,183 million", "201.183 billion"],
+                metadata={"correctPages": [1]},
+            )
+        )
 
         result = self.comparator.compare("$201.183 billion", "201B")
         assert result.matched
@@ -85,12 +83,6 @@ class TestApple10KFinancialData:
     def test_gross_margin_percentage(self):
         """Test: Gross margin as percentage."""
         expected = "46.2%"
-
-        test_outputs = [
-            "46.2%",
-            "46.2 percent",
-            "0.462",  # This might not match - testing edge case
-        ]
 
         result = self.comparator.compare(expected, "46.2%")
         assert result.matched
@@ -144,7 +136,9 @@ class TestApple10KFinancialData:
             result = self.comparator.compare(expected, output)
             # Should match via contains or fuzzy
             if not result.matched:
-                print(f"Failed to match HQ: {output}, rule: {result.rule}, confidence: {result.confidence}")
+                print(
+                    f"Failed to match HQ: {output}, rule: {result.rule}, confidence: {result.confidence}"
+                )
 
     def test_product_categories(self):
         """Test: Product category listing."""
@@ -152,7 +146,7 @@ class TestApple10KFinancialData:
 
         # Substring in longer response
         output = "Apple's main product categories include iPhone, Mac, iPad, Wearables, and Services"
-        result = self.comparator.compare(expected, output)
+        self.comparator.compare(expected, output)
         # Should match via contains or key-phrase
 
     def test_fiscal_year_end(self):
@@ -167,7 +161,7 @@ class TestApple10KFinancialData:
         ]
 
         for output in test_outputs:
-            result = self.comparator.compare(expected, output)
+            self.comparator.compare(expected, output)
             # Date detection should trigger
 
     # ============================================================================
@@ -232,7 +226,7 @@ class TestApple10KFinancialData:
         # LLM might return longer response
         output = "According to the consolidated statements, Apple's net income for fiscal 2024 was $93.736 billion"
 
-        result = self.comparator.compare(expected, output)
+        self.comparator.compare(expected, output)
         # Should match via contains + number normalization
 
     def test_year_over_year_comparison(self):
@@ -241,7 +235,7 @@ class TestApple10KFinancialData:
 
         output = "Revenue grew 2% from $383.285B (2023) to $391.035B (2024)"
 
-        result = self.comparator.compare(expected, output)
+        self.comparator.compare(expected, output)
         # This is challenging - multiple numbers
 
     def test_abbreviation_expansion(self):
@@ -293,15 +287,10 @@ class TestRoutingDecisionLogging:
         """Test routing when content has both numbers and text."""
         comparator = IntelligentComparator()
 
-        result = comparator.compare(
-            "Revenue was $391 billion",
-            "Sales were 391B"
-        )
+        result = comparator.compare("Revenue was $391 billion", "Sales were 391B")
 
         explanation = comparator.explain(
-            "Revenue was $391 billion",
-            "Sales were 391B",
-            result
+            "Revenue was $391 billion", "Sales were 391B", result
         )
         print(f"\nMixed content routing:\n{explanation}")
 
@@ -322,18 +311,30 @@ def print_routing_stats():
     yield stats
 
     # Print statistics after tests
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ROUTING STATISTICS")
-    print("="*60)
+    print("=" * 60)
     print(f"Total comparisons: {stats['total']}")
-    print(f"  Numerical: {stats['numerical']} ({stats['numerical']/max(stats['total'],1)*100:.1f}%)")
-    print(f"  Dates: {stats['date']} ({stats['date']/max(stats['total'],1)*100:.1f}%)")
-    print(f"  Domain-specific: {stats['domain_specific']} ({stats['domain_specific']/max(stats['total'],1)*100:.1f}%)")
-    print(f"  General text: {stats['general_text']} ({stats['general_text']/max(stats['total'],1)*100:.1f}%)")
+    print(
+        f"  Numerical: {stats['numerical']} ({stats['numerical'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
+    print(
+        f"  Dates: {stats['date']} ({stats['date'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
+    print(
+        f"  Domain-specific: {stats['domain_specific']} ({stats['domain_specific'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
+    print(
+        f"  General text: {stats['general_text']} ({stats['general_text'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
     print()
-    print(f"Matched: {stats['matched']} ({stats['matched']/max(stats['total'],1)*100:.1f}%)")
-    print(f"Failed: {stats['failed']} ({stats['failed']/max(stats['total'],1)*100:.1f}%)")
-    print("="*60)
+    print(
+        f"Matched: {stats['matched']} ({stats['matched'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
+    print(
+        f"Failed: {stats['failed']} ({stats['failed'] / max(stats['total'], 1) * 100:.1f}%)"
+    )
+    print("=" * 60)
 
 
 if __name__ == "__main__":

@@ -76,6 +76,7 @@ class IntelligentComparator:
     def _load_embedding_comparator(self):
         """Load embedding comparator (REQUIRED)."""
         from cert.embeddings import EmbeddingComparator
+
         self.embedding_comparator = EmbeddingComparator(
             threshold=self.embedding_threshold
         )
@@ -122,9 +123,7 @@ class IntelligentComparator:
         """
         return self.base_comparator.compare(expected, actual)
 
-    def _compare_domain_specific(
-        self, expected: str, actual: str
-    ) -> ComparisonResult:
+    def _compare_domain_specific(self, expected: str, actual: str) -> ComparisonResult:
         """
         Compare domain-specific content.
 
@@ -159,9 +158,7 @@ class IntelligentComparator:
         # Fallback to base comparator
         return self.base_comparator.compare(expected, actual)
 
-    def explain(
-        self, expected: str, actual: str, result: ComparisonResult
-    ) -> str:
+    def explain(self, expected: str, actual: str, result: ComparisonResult) -> str:
         """
         Explain why the comparison resulted in this outcome.
 
@@ -193,20 +190,17 @@ class IntelligentComparator:
             )
         elif detection.type == InputType.DATE:
             explanation.append(
-                "\nUsed date parsing and normalization. "
-                "Handles various date formats."
+                "\nUsed date parsing and normalization. Handles various date formats."
             )
         elif detection.type == InputType.DOMAIN_SPECIFIC:
-            domain_name = detection.metadata.get("domain") if detection.metadata else "unknown"
-            explanation.append(
-                f"\nDetected domain-specific content ({domain_name}). "
+            domain_name = (
+                detection.metadata.get("domain") if detection.metadata else "unknown"
             )
+            explanation.append(f"\nDetected domain-specific content ({domain_name}). ")
             if self.domain_comparator:
                 explanation.append("Used fine-tuned domain comparator.")
             elif self.embedding_comparator:
-                explanation.append(
-                    "No domain comparator available, used embeddings."
-                )
+                explanation.append("No domain comparator available, used embeddings.")
             else:
                 explanation.append(
                     f"No domain comparator or embeddings available, "
@@ -229,7 +223,7 @@ class IntelligentComparator:
         detection: DetectionResult,
         result: ComparisonResult,
         expected: str,
-        actual: str
+        actual: str,
     ):
         """
         Log routing decision for analysis.
@@ -237,8 +231,10 @@ class IntelligentComparator:
         Can be overridden to send logs to a file or monitoring system.
         """
         import os
+
         if os.environ.get("CERT_LOG_ROUTING") == "1":
             import json
+
             log_entry = {
                 "detection_type": detection.type.value,
                 "detection_confidence": detection.confidence,
@@ -262,6 +258,7 @@ class IntelligentComparator:
         """
         try:
             from cert.trained_comparator import TrainedComparator
+
             self.domain_comparator = TrainedComparator(model_path=model_path)
         except ImportError:
             raise ImportError(

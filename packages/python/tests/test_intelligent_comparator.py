@@ -5,6 +5,16 @@ from cert.intelligent_comparator import IntelligentComparator
 from cert.detectors import InputType, detect_input_type
 
 
+def _embeddings_available() -> bool:
+    """Check if embeddings package is available."""
+    try:
+        from cert.embeddings import EmbeddingComparator  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
+
 class TestInputDetection:
     """Test input type detection."""
 
@@ -66,8 +76,10 @@ class TestIntelligentComparator:
         assert comparator.compare("$391.035 billion", "$391,035 million").matched
 
         # Percentages
-        assert comparator.compare("42%", "0.42").matched or \
-               comparator.compare("42", "42 percent").matched
+        assert (
+            comparator.compare("42%", "0.42").matched
+            or comparator.compare("42", "42 percent").matched
+        )
 
     def test_routes_general_text_to_fuzzy(self):
         """Should route general text to fuzzy matching by default."""
@@ -107,16 +119,14 @@ class TestIntelligentComparator:
 
         # Test substring matching
         result = comparator.compare(
-            "faster data access",
-            "The main benefit of caching is faster data access"
+            "faster data access", "The main benefit of caching is faster data access"
         )
         assert result.matched
         assert result.confidence >= 0.9
 
         # Test key phrase matching
         result = comparator.compare(
-            "faster access",
-            "The system provides quicker data retrieval"
+            "faster access", "The system provides quicker data retrieval"
         )
         # Should match via key-phrase rule (word overlap)
         assert result.confidence > 0.5
@@ -133,27 +143,12 @@ class TestIntelligentComparatorWithEmbeddings:
         result = comparator.compare("hello", "hello")
         assert result.matched
 
-    @pytest.mark.skipif(
-        not _embeddings_available(),
-        reason="Embeddings not installed"
-    )
+    @pytest.mark.skipif(not _embeddings_available(), reason="Embeddings not installed")
     def test_uses_embeddings_when_available(self):
         """Should use embeddings for semantic matching when available."""
         comparator = IntelligentComparator(use_embeddings=True)
 
-        result = comparator.compare(
-            "reduced latency",
-            "faster response times"
-        )
+        result = comparator.compare("reduced latency", "faster response times")
 
         # If embeddings available, should detect semantic similarity
         assert result.confidence > 0.6
-
-
-def _embeddings_available() -> bool:
-    """Check if embeddings package is available."""
-    try:
-        from cert.embeddings import EmbeddingComparator
-        return True
-    except ImportError:
-        return False

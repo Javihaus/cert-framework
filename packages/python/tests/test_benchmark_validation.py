@@ -12,9 +12,7 @@ If <85%: Consider domain-specific fine-tuning.
 
 import pytest
 from cert.embeddings import EmbeddingComparator
-from cert.types import ComparisonResult
 import csv
-import os
 from pathlib import Path
 
 
@@ -53,36 +51,27 @@ class TestSTSBenchmarkValidation:
 
             # Save to CSV files
             for split in ["train", "validation", "test"]:
-                output_path = self.dataset_path / ("sts-{}.csv".format(
-                    "dev" if split == "validation" else split
-                ))
+                output_path = self.dataset_path / (
+                    "sts-{}.csv".format("dev" if split == "validation" else split)
+                )
 
                 split_data = dataset[split]
 
-                with open(output_path, 'w', encoding='utf-8') as f:
+                with open(output_path, "w", encoding="utf-8") as f:
                     import csv
-                    writer = csv.writer(f, delimiter='\t')
+
+                    writer = csv.writer(f, delimiter="\t")
 
                     for item in split_data:
                         # Format: sentence1, sentence2, score
-                        writer.writerow([
-                            item['sentence1'],
-                            item['sentence2'],
-                            item['score']
-                        ])
+                        writer.writerow(
+                            [item["sentence1"], item["sentence2"], item["score"]]
+                        )
 
                 print("Saved {} split to {}".format(split, output_path))
 
         except ImportError:
             # Fallback: Download from ixa2.si.ehu.es (original source)
-            import urllib.request
-            base_url = "http://ixa2.si.ehu.es/stswiki/images/4/48/"
-
-            files = {
-                "train": "Stsbenchmark.tar.gz",
-                "dev": "Stsbenchmark.tar.gz",
-                "test": "Stsbenchmark.tar.gz"
-            }
 
             print("datasets library not available, using direct download...")
             print("Please install with: pip install datasets")
@@ -102,8 +91,8 @@ class TestSTSBenchmarkValidation:
             self._download_dataset()
 
         pairs = []
-        with open(path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f, delimiter='\t')
+        with open(path, "r", encoding="utf-8") as f:
+            reader = csv.reader(f, delimiter="\t")
             for row in reader:
                 if len(row) >= 3:
                     # Format: sentence1, sentence2, score
@@ -148,6 +137,7 @@ class TestSTSBenchmarkValidation:
 
         if sample_size:
             import random
+
             pairs = random.sample(pairs, min(sample_size, len(pairs)))
 
         # Evaluate each pair
@@ -178,9 +168,21 @@ class TestSTSBenchmarkValidation:
         total = len(pairs)
         accuracy = (true_positives + true_negatives) / total
 
-        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
-        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        precision = (
+            true_positives / (true_positives + false_positives)
+            if (true_positives + false_positives) > 0
+            else 0
+        )
+        recall = (
+            true_positives / (true_positives + false_negatives)
+            if (true_positives + false_negatives) > 0
+            else 0
+        )
+        f1 = (
+            2 * (precision * recall) / (precision + recall)
+            if (precision + recall) > 0
+            else 0
+        )
 
         return {
             "split": split,
@@ -194,33 +196,35 @@ class TestSTSBenchmarkValidation:
                 "true_negatives": true_negatives,
                 "false_positives": false_positives,
                 "false_negatives": false_negatives,
-            }
+            },
         }
 
     def test_dev_split_sample(self):
         """Quick validation on 100 samples from dev set."""
         results = self._evaluate_split("dev", sample_size=100)
 
-        print(f"\n=== STS-Benchmark Dev Split (100 samples) ===")
+        print("\n=== STS-Benchmark Dev Split (100 samples) ===")
         print(f"Accuracy: {results['accuracy']:.2%}")
         print(f"Precision: {results['precision']:.2%}")
         print(f"Recall: {results['recall']:.2%}")
         print(f"F1: {results['f1']:.2%}")
-        print(f"Confusion Matrix:")
+        print("Confusion Matrix:")
         print(f"  TP: {results['confusion_matrix']['true_positives']}")
         print(f"  TN: {results['confusion_matrix']['true_negatives']}")
         print(f"  FP: {results['confusion_matrix']['false_positives']}")
         print(f"  FN: {results['confusion_matrix']['false_negatives']}")
 
         # Quick check: Should be reasonable (>60%)
-        assert results['accuracy'] > 0.60, f"Accuracy too low: {results['accuracy']:.2%}"
+        assert results["accuracy"] > 0.60, (
+            f"Accuracy too low: {results['accuracy']:.2%}"
+        )
 
     @pytest.mark.slow
     def test_full_dev_split(self):
         """Full validation on dev split (1,500 pairs)."""
         results = self._evaluate_split("dev")
 
-        print(f"\n=== STS-Benchmark Dev Split (Full) ===")
+        print("\n=== STS-Benchmark Dev Split (Full) ===")
         print(f"Total pairs: {results['total']}")
         print(f"Accuracy: {results['accuracy']:.2%}")
         print(f"Precision: {results['precision']:.2%}")
@@ -228,21 +232,23 @@ class TestSTSBenchmarkValidation:
         print(f"F1: {results['f1']:.2%}")
 
         # Target: >85% accuracy for shipping without training
-        if results['accuracy'] >= 0.85:
+        if results["accuracy"] >= 0.85:
             print("\n✓ Accuracy >= 85%: Embeddings are sufficient, ship it!")
-        elif results['accuracy'] >= 0.75:
+        elif results["accuracy"] >= 0.75:
             print("\n⚠ Accuracy 75-85%: Consider domain-specific training")
         else:
             print("\n✗ Accuracy < 75%: Domain-specific training recommended")
 
-        assert results['accuracy'] > 0.70, f"Accuracy too low: {results['accuracy']:.2%}"
+        assert results["accuracy"] > 0.70, (
+            f"Accuracy too low: {results['accuracy']:.2%}"
+        )
 
     @pytest.mark.slow
     def test_full_test_split(self):
         """Full validation on test split (1,379 pairs)."""
         results = self._evaluate_split("test")
 
-        print(f"\n=== STS-Benchmark Test Split (Full) ===")
+        print("\n=== STS-Benchmark Test Split (Full) ===")
         print(f"Total pairs: {results['total']}")
         print(f"Accuracy: {results['accuracy']:.2%}")
         print(f"Precision: {results['precision']:.2%}")
@@ -250,16 +256,18 @@ class TestSTSBenchmarkValidation:
         print(f"F1: {results['f1']:.2%}")
 
         # Report recommendation
-        if results['accuracy'] >= 0.85:
+        if results["accuracy"] >= 0.85:
             recommendation = "SHIP: Embeddings sufficient for production"
-        elif results['accuracy'] >= 0.75:
+        elif results["accuracy"] >= 0.75:
             recommendation = "CONSIDER: Training may improve accuracy by 5-10%"
         else:
             recommendation = "TRAIN: Domain-specific fine-tuning recommended"
 
         print(f"\nRecommendation: {recommendation}")
 
-        assert results['accuracy'] > 0.70, f"Accuracy too low: {results['accuracy']:.2%}"
+        assert results["accuracy"] > 0.70, (
+            f"Accuracy too low: {results['accuracy']:.2%}"
+        )
 
     def test_threshold_tuning(self):
         """Test different thresholds to find optimal value.
@@ -271,13 +279,14 @@ class TestSTSBenchmarkValidation:
 
         # Sample for faster tuning
         import random
+
         if len(pairs) > 500:
             pairs = random.sample(pairs, 500)
 
         thresholds = [0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]
         results = []
 
-        print(f"\n=== Threshold Tuning (500 samples) ===")
+        print("\n=== Threshold Tuning (500 samples) ===")
 
         for threshold in thresholds:
             comparator = EmbeddingComparator(threshold=threshold)
@@ -370,15 +379,16 @@ if __name__ == "__main__":
         # Run threshold tuning
         best_threshold = validator.test_threshold_tuning()
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("Quick validation complete!")
         print(f"Recommended threshold: {best_threshold:.2f}")
         print("\nTo run full validation:")
         print("  pytest -v -m slow tests/test_benchmark_validation.py")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
     except Exception as e:
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

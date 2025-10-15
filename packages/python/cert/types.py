@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 
 class TestStatus(str, Enum):
     """Status of a test result."""
+
     PASS = "pass"
     FAIL = "fail"
     WARN = "warn"
@@ -56,7 +57,7 @@ class TestResult:
     evidence: Optional[Evidence] = None
     diagnosis: Optional[str] = None
     suggestions: Optional[List[str]] = None
-    human_annotation: Optional['HumanAnnotation'] = None
+    human_annotation: Optional["HumanAnnotation"] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
@@ -70,10 +71,14 @@ class TestResult:
                 "outputs": self.evidence.outputs,
                 "uniqueCount": self.evidence.unique_count,
                 "examples": self.evidence.examples,
-            } if self.evidence else None,
+            }
+            if self.evidence
+            else None,
             "diagnosis": self.diagnosis,
             "suggestions": self.suggestions,
-            "humanAnnotation": self.human_annotation.to_dict() if self.human_annotation else None,
+            "humanAnnotation": self.human_annotation.to_dict()
+            if self.human_annotation
+            else None,
         }
 
 
@@ -125,8 +130,26 @@ class HumanAnnotation:
 
 @dataclass
 class ComparisonResult:
-    """Result of semantic comparison."""
+    """Result of semantic comparison.
+
+    Can be used as a boolean for simple checks:
+        if compare(text1, text2):
+            print("Match!")
+
+    Or access detailed information:
+        result = compare(text1, text2)
+        print(f"Confidence: {result.confidence:.1%}")
+    """
 
     matched: bool
     rule: Optional[str] = None
     confidence: float = 0.0
+
+    def __bool__(self) -> bool:
+        """Allow using result as boolean: if compare(text1, text2): ..."""
+        return self.matched
+
+    def __str__(self) -> str:
+        """Human-readable string representation."""
+        status = "Match" if self.matched else "No match"
+        return f"{status} (confidence: {self.confidence:.1%})"

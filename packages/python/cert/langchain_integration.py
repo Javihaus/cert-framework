@@ -3,7 +3,8 @@ CERT Framework - LangChain Integration
 
 Native Python wrapper for LangChain chains with CERT testing capabilities.
 """
-from typing import Any, Optional, Callable, Dict
+
+from typing import Any, Optional, Callable
 import asyncio
 
 
@@ -45,7 +46,9 @@ class CertChainWrapper:
         self._consistency_trials = n_trials
         return self
 
-    def with_accuracy(self, expected_output: Any, comparison_fn: Optional[Callable] = None):
+    def with_accuracy(
+        self, expected_output: Any, comparison_fn: Optional[Callable] = None
+    ):
         """
         Add accuracy testing to the chain.
 
@@ -87,9 +90,9 @@ class CertChainWrapper:
 
         async def _run_chain():
             """Helper to run chain"""
-            if hasattr(self.chain, 'ainvoke'):
+            if hasattr(self.chain, "ainvoke"):
                 return await self.chain.ainvoke(input_data, **kwargs)
-            elif hasattr(self.chain, 'arun'):
+            elif hasattr(self.chain, "arun"):
                 return await self.chain.arun(input_data, **kwargs)
             else:
                 # Fallback to sync invoke
@@ -98,76 +101,74 @@ class CertChainWrapper:
         # If accuracy testing is enabled, run it first
         if self._expected_output is not None:
             # Add ground truth
-            runner.add_ground_truth(GroundTruth(
-                id=self.test_id,
-                question=str(input_data),
-                expected=self._expected_output,
-                metadata={'correctPages': [1]}  # Dummy for layer enforcement
-            ))
+            runner.add_ground_truth(
+                GroundTruth(
+                    id=self.test_id,
+                    question=str(input_data),
+                    expected=self._expected_output,
+                    metadata={"correctPages": [1]},  # Dummy for layer enforcement
+                )
+            )
 
             # Test retrieval (dummy)
             await runner.test_retrieval(
                 self.test_id,
-                lambda _: asyncio.create_task(asyncio.coroutine(lambda: [{'pageNum': 1}])()),
-                {'precisionMin': 0.8}
+                lambda _: asyncio.create_task(
+                    asyncio.coroutine(lambda: [{"pageNum": 1}])()
+                ),
+                {"precisionMin": 0.8},
             )
 
             # Test accuracy
             accuracy_result = await runner.test_accuracy(
-                self.test_id,
-                _run_chain,
-                {'threshold': 0.8}
+                self.test_id, _run_chain, {"threshold": 0.8}
             )
 
-            if accuracy_result.status == 'fail':
+            if accuracy_result.status == "fail":
                 raise AccuracyError(
-                    accuracy_result.diagnosis or 'Accuracy test failed',
+                    accuracy_result.diagnosis or "Accuracy test failed",
                     str(self._expected_output),
-                    'actual output'
+                    "actual output",
                 )
 
         # If consistency testing is enabled, run it
         if self._consistency_threshold is not None:
             if self._expected_output is None:
                 # Add dummy ground truth for layer enforcement
-                runner.add_ground_truth(GroundTruth(
-                    id=self.test_id,
-                    question=str(input_data),
-                    expected='dummy',
-                    metadata={'correctPages': [1]}
-                ))
+                runner.add_ground_truth(
+                    GroundTruth(
+                        id=self.test_id,
+                        question=str(input_data),
+                        expected="dummy",
+                        metadata={"correctPages": [1]},
+                    )
+                )
 
                 # Test retrieval (dummy)
                 await runner.test_retrieval(
                     self.test_id,
-                    lambda _: asyncio.create_task(asyncio.coroutine(lambda: [{'pageNum': 1}])()),
-                    {'precisionMin': 0.8}
+                    lambda _: asyncio.create_task(
+                        asyncio.coroutine(lambda: [{"pageNum": 1}])()
+                    ),
+                    {"precisionMin": 0.8},
                 )
 
                 # Test accuracy (dummy)
-                await runner.test_accuracy(
-                    self.test_id,
-                    _run_chain,
-                    {'threshold': 0.8}
-                )
+                await runner.test_accuracy(self.test_id, _run_chain, {"threshold": 0.8})
 
             config = TestConfig(
                 n_trials=self._consistency_trials,
                 consistency_threshold=self._consistency_threshold,
                 accuracy_threshold=0.8,
-                semantic_comparison=True
+                semantic_comparison=True,
             )
 
-            result = await runner.test_consistency(
-                self.test_id,
-                _run_chain,
-                config
-            )
+            result = await runner.test_consistency(self.test_id, _run_chain, config)
 
-            if result.status == 'fail':
+            if result.status == "fail":
                 raise ConsistencyError(
-                    result.diagnosis or 'Consistency test failed',
-                    result.suggestions or []
+                    result.diagnosis or "Consistency test failed",
+                    result.suggestions or [],
                 )
 
             # Return the first output from consistency testing

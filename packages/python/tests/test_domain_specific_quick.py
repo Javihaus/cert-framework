@@ -17,7 +17,11 @@ def test_financial_terminology():
         # (expected, actual, should_match)
         ("revenue increased", "sales grew", True),
         ("revenue decreased", "sales grew", False),
-        ("EBITDA", "earnings before interest, taxes, depreciation, and amortization", True),
+        (
+            "EBITDA",
+            "earnings before interest, taxes, depreciation, and amortization",
+            True,
+        ),
         ("operating income", "EBIT", True),
         ("net income", "bottom line", True),
         ("cash flow", "liquidity", True),
@@ -49,7 +53,9 @@ def test_financial_terminology():
         confidence = result.confidence
 
         status = "✓" if matched == should_match else "✗"
-        print(f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]")
+        print(
+            f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]"
+        )
 
         results.append(matched == should_match)
 
@@ -98,7 +104,9 @@ def test_medical_terminology():
         confidence = result.confidence
 
         status = "✓" if matched == should_match else "✗"
-        print(f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]")
+        print(
+            f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]"
+        )
 
         results.append(matched == should_match)
 
@@ -145,7 +153,9 @@ def test_legal_terminology():
         confidence = result.confidence
 
         status = "✓" if matched == should_match else "✗"
-        print(f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]")
+        print(
+            f"{status} '{expected}' vs '{actual}': {matched} (conf: {confidence:.3f}) [expected: {should_match}]"
+        )
 
         results.append(matched == should_match)
 
@@ -157,26 +167,26 @@ def test_legal_terminology():
 
 if __name__ == "__main__":
     """Run all domain-specific tests."""
-    print("="*60)
+    print("=" * 60)
     print("Domain-Specific Terminology Validation")
     print("Testing if embeddings handle domain jargon without fine-tuning")
-    print("="*60)
+    print("=" * 60)
 
     financial_acc = test_financial_terminology()
     medical_acc = test_medical_terminology()
     legal_acc = test_legal_terminology()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("OVERALL RESULTS")
-    print("="*60)
+    print("=" * 60)
     print(f"Financial: {financial_acc:.1%}")
     print(f"Medical:   {medical_acc:.1%}")
     print(f"Legal:     {legal_acc:.1%}")
     print(f"Average:   {(financial_acc + medical_acc + legal_acc) / 3:.1%}")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DECISION FRAMEWORK")
-    print("="*60)
+    print("=" * 60)
 
     avg_accuracy = (financial_acc + medical_acc + legal_acc) / 3
 
@@ -193,4 +203,4 @@ if __name__ == "__main__":
         print("   Domain-specific fine-tuning recommended.")
         print("   Embeddings struggle with domain jargon.")
 
-    print("="*60)
+    print("=" * 60)
