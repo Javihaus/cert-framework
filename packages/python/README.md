@@ -81,7 +81,7 @@ Limitations:
 
 Four production-ready examples showing real-world use cases:
 
-### 1. Document Deduplication ([`01_deduplication.py`](examples/01_deduplication.py))
+### 1. Document Deduplication ([`01_deduplication.py`](../../examples/01_deduplication.py))
 Find and remove near-duplicate documents:
 ```python
 from cert import compare
@@ -100,7 +100,7 @@ for i in range(len(documents)):
             duplicates.append((i, j, result.confidence))
 ```
 
-### 2. Support Ticket Classification ([`02_ticket_classification.py`](examples/02_ticket_classification.py))
+### 2. Support Ticket Classification ([`02_ticket_classification.py`](../../examples/02_ticket_classification.py))
 Route tickets by similarity to resolved tickets:
 ```python
 resolved_tickets = [
@@ -119,7 +119,7 @@ for ticket in resolved_tickets:
         best_confidence = result.confidence
 ```
 
-### 3. Content Similarity Search ([`03_content_similarity.py`](examples/03_content_similarity.py))
+### 3. Content Similarity Search ([`03_content_similarity.py`](../../examples/03_content_similarity.py))
 Find similar articles (suitable for datasets up to ~1000 items):
 ```python
 query = "Introduction to Machine Learning"
@@ -139,7 +139,7 @@ for article in corpus:
 similarities.sort(key=lambda x: x[1], reverse=True)
 ```
 
-### 4. Debugging Comparisons ([`04_debugging_inspector.py`](examples/04_debugging_inspector.py))
+### 4. Debugging Comparisons ([`04_debugging_inspector.py`](../../examples/04_debugging_inspector.py))
 Understand why comparisons succeed or fail:
 ```python
 result = compare("revenue up", "revenue down")
@@ -154,7 +154,7 @@ if not result.matched:
 
 **Performance note**: CERT does pairwise comparison (O(N²)). Good for deduplication and classification. For large-scale search (>10K documents), use vector databases (Pinecone, Weaviate, FAISS).
 
-See full examples with sample data in [`examples/`](examples/) directory.
+See full examples with sample data in [`examples/`](../../examples/) directory.
 
 ## Validation
 
@@ -193,12 +193,6 @@ cert-framework/
 │   │   │   ├── embeddings.py  # EmbeddingComparator class
 │   │   │   ├── validation.py  # User-facing validation functions
 │   │   │   └── cli.py         # CLI tools: cert-compare
-│   │   ├── examples/          # Production-ready examples
-│   │   │   ├── README.md      # Performance notes and scaling guidance
-│   │   │   ├── 01_deduplication.py        # Find and remove duplicates
-│   │   │   ├── 02_ticket_classification.py # Route tickets by similarity
-│   │   │   ├── 03_content_similarity.py    # Find similar articles
-│   │   │   └── 04_debugging_inspector.py   # Debug and tune comparisons
 │   │   ├── tests/             # Comprehensive test suite
 │   │   │   ├── test_compare_api.py         # API tests (20+ cases)
 │   │   │   ├── test_benchmark_validation.py # STS-Benchmark validation
@@ -210,9 +204,14 @@ cert-framework/
 │   ├── cli/                    # CLI tool
 │   ├── langchain/              # LangChain integration
 │   └── pytest-plugin/          # pytest plugin
-├── examples/                   # Example implementations
-│   └── apple-10k/             # Apple 10-K financial data extraction
-└── docs/                       # Documentation site
+├── examples/                   # Production-ready examples
+│   ├── README.md              # Performance notes and scaling guidance
+│   ├── 01_deduplication.py    # Find and remove duplicate documents
+│   ├── 02_ticket_classification.py  # Route tickets by similarity
+│   ├── 03_content_similarity.py     # Find similar articles
+│   └── 04_debugging_inspector.py    # Debug and tune comparisons
+├── docs/                       # Documentation site
+└── turbo.json                  # Monorepo configuration
 ```
 
 ## Development
