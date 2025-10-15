@@ -51,6 +51,8 @@ describe('CERT Integration Tests', () => {
   });
   
   it('pipeline analyzer localizes failing agent', async () => {
+    let variantCounter = 0;
+
     const agents: Agent[] = [
       {
         name: 'ConsistentAgent',
@@ -58,14 +60,17 @@ describe('CERT Integration Tests', () => {
       },
       {
         name: 'VariantAgent',
-        execute: async () => Math.random() > 0.5 ? 'A' : 'B'
+        execute: async () => {
+          variantCounter++;
+          return variantCounter % 2 === 0 ? 'A' : 'B';
+        }
       },
       {
         name: 'DeterministicAgent',
-        execute: async (input: any) => input.toUpperCase()
+        execute: async (input: any) => String(input).toUpperCase()
       }
     ];
-    
+
     const analyzer = new PipelineAnalyzer();
     const config: TestConfig = {
       nTrials: 5,
@@ -73,9 +78,11 @@ describe('CERT Integration Tests', () => {
       accuracyThreshold: 0.8,
       semanticComparison: true
     };
-    
+
     const result = await analyzer.localizeFailure(agents, 'test input', config);
-    
+
+    // The analyzer correctly identifies where variance is introduced
+    // VariantAgent introduces the variance, so it should be detected
     expect(result.failingAgent).toBe('VariantAgent');
     expect(result.diagnosis).toContain('variance');
   });
