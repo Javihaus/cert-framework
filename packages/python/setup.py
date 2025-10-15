@@ -58,6 +58,13 @@ setup(
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
         ],
+        "embeddings": [
+            "sentence-transformers>=2.0.0",
+            "numpy>=1.20.0",
+        ],
+        "llm-judge": [
+            "anthropic>=0.18.0",
+        ],
         "all": [
             "flask>=2.0.0",
             "jinja2>=3.0.0",
@@ -65,6 +72,9 @@ setup(
             "langchain-core>=0.1.0",
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
+            "sentence-transformers>=2.0.0",
+            "numpy>=1.20.0",
+            "anthropic>=0.18.0",
         ],
     },
     entry_points={

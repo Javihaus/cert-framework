@@ -123,17 +123,84 @@ comparator.compare("$391 billion", "$391,000,000,000")  # ✓
 comparator.compare("Paris", "paris")  # ✓ (case insensitive)
 ```
 
+## Choosing a Comparator
+
+CERT provides three comparison strategies:
+
+### Rule-Based (Default) - Fast & Deterministic
+
+```python
+runner = TestRunner()  # Uses SemanticComparator
+```
+
+**Use for:**
+- Extracting specific facts (revenue numbers, dates, names)
+- Classification tasks with known categories
+- Fast CI/CD tests
+
+**Limitations:**
+- Requires manual equivalents lists
+- May fail on semantic shifts ("speed" vs "fast")
+
+### Embedding-Based - Semantic Similarity
+
+```bash
+pip install cert-framework[embeddings]
+```
+
+```python
+from cert.embeddings import EmbeddingComparator
+
+runner = TestRunner(semantic_comparator=EmbeddingComparator(threshold=0.75))
+```
+
+**Use for:**
+- Open-ended questions ("Name a benefit...")
+- Abstract concepts
+- Multiple valid phrasings
+
+**Tradeoffs:**
+- 500MB model download (one-time)
+- 50-100ms per comparison
+- Requires threshold tuning
+
+### LLM-as-Judge - Most Robust
+
+```bash
+pip install cert-framework[llm-judge]
+```
+
+```python
+import anthropic
+from cert.llm_judge import LLMJudgeComparator
+
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+comparator = LLMJudgeComparator(client)
+
+runner = TestRunner(semantic_comparator=comparator)
+```
+
+**Use for:**
+- Complex semantic equivalence
+- Domain-specific terminology
+- High-stakes validation
+
+**Tradeoffs:**
+- ~500-1000ms per comparison
+- ~$0.00005 per comparison
+- Requires API key
+
 ### Custom Comparison Rules
 
-Add your own semantic rules:
+Add your own semantic rules to any comparator:
 
 ```python
 from cert import ComparisonRule
 
-def date_match(expected: str, actual: str) -> bool:
+def date_match(expected: str, actual: str) -> float:
     # Custom logic to compare dates in different formats
     # "2024-01-15" == "January 15, 2024"
-    return parse_date(expected) == parse_date(actual)
+    return 1.0 if parse_date(expected) == parse_date(actual) else 0.0
 
 custom_rule = ComparisonRule(
     name="date-format",

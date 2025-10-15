@@ -21,6 +21,20 @@ try:
 except ImportError:
     __all_langchain__ = []
 
+# Conditional import for Embedding comparator
+try:
+    from .embeddings import EmbeddingComparator
+    __all_embeddings__ = ["EmbeddingComparator"]
+except ImportError:
+    __all_embeddings__ = []
+
+# Conditional import for LLM Judge comparator
+try:
+    from .llm_judge import LLMJudgeComparator
+    __all_llm_judge__ = ["LLMJudgeComparator"]
+except ImportError:
+    __all_llm_judge__ = []
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -42,4 +56,4 @@ __all__ = [
     "SemanticComparator",
     "ComparisonRule",
     "ComparisonResult",
-] + __all_langchain__
+] + __all_langchain__ + __all_embeddings__ + __all_llm_judge__

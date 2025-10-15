@@ -35,13 +35,30 @@ class AccuracyError(Exception):
 
 class TestRunner:
     """
-    Main test runner with layer enforcement.
+    Test runner with pluggable semantic comparison.
 
     Enforces testing order: retrieval → accuracy → consistency
+
+    Args:
+        semantic_comparator: Optional custom comparator. Defaults to SemanticComparator
+                           with rule-based matching. Can be replaced with EmbeddingComparator
+                           or LLMJudgeComparator for different tradeoffs.
+
+    Example:
+        # Default rule-based comparison
+        runner = TestRunner()
+
+        # Embedding-based comparison (slower, better semantic matching)
+        from cert.embeddings import EmbeddingComparator
+        runner = TestRunner(semantic_comparator=EmbeddingComparator())
+
+        # LLM-as-judge (slowest, most robust)
+        from cert.llm_judge import LLMJudgeComparator
+        runner = TestRunner(semantic_comparator=LLMJudgeComparator(client=client))
     """
 
-    def __init__(self, semantic_comparator: Optional[SemanticComparator] = None):
-        """Initialize test runner."""
+    def __init__(self, semantic_comparator: Optional['ComparatorProtocol'] = None):
+        """Initialize test runner with optional custom comparator."""
         self.ground_truths: Dict[str, GroundTruth] = {}
         self.results: List[TestResult] = []
         self.passed_accuracy: set[str] = set()
