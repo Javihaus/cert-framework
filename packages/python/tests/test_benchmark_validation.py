@@ -266,7 +266,13 @@ class TestSTSBenchmarkValidation:
 
         This helps tune the embedding_threshold parameter for IntelligentComparator.
         """
-        pairs = self._load_split("dev", sample_size=500)
+        # Load all pairs and sample
+        pairs = self._load_split("dev")
+
+        # Sample for faster tuning
+        import random
+        if len(pairs) > 500:
+            pairs = random.sample(pairs, 500)
 
         thresholds = [0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]
         results = []
