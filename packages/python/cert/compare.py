@@ -33,6 +33,10 @@ def compare(
     Returns:
         ComparisonResult with matched (bool) and confidence (float) attributes
 
+    Raises:
+        TypeError: If text1 or text2 are not strings
+        ValueError: If texts are empty or threshold is out of range
+
     Example:
         Basic usage:
             result = compare("revenue increased", "sales grew")
@@ -53,10 +57,25 @@ def compare(
         Uses all-mpnet-base-v2 model with 0.80 threshold (87.6% accuracy on
         STS-Benchmark). Validated on 8,628 human-annotated pairs.
     """
+    # Validate inputs
+    if not isinstance(text1, str) or not isinstance(text2, str):
+        raise TypeError(
+            f"Both texts must be strings. Got {type(text1).__name__} and {type(text2).__name__}"
+        )
+
+    if not text1.strip() or not text2.strip():
+        raise ValueError(
+            "Cannot compare empty texts. Both text1 and text2 must contain content."
+        )
+
+    if threshold is not None and not 0.0 <= threshold <= 1.0:
+        raise ValueError(f"Threshold must be between 0.0 and 1.0, got {threshold}")
+
     global _default_comparator
 
     # Lazy initialization: load model on first use
     if _default_comparator is None:
+        print("Loading semantic model (one-time, ~5 seconds)...")
         _default_comparator = EmbeddingComparator()
 
     # Custom threshold for this comparison
