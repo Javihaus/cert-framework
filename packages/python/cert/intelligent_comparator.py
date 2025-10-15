@@ -94,13 +94,18 @@ class IntelligentComparator:
 
         # Step 2: Route to appropriate comparator
         if detection.type == InputType.NUMERICAL:
-            return self._compare_numerical(expected, actual)
+            result = self._compare_numerical(expected, actual)
         elif detection.type == InputType.DATE:
-            return self._compare_date(expected, actual)
+            result = self._compare_date(expected, actual)
         elif detection.type == InputType.DOMAIN_SPECIFIC:
-            return self._compare_domain_specific(expected, actual)
+            result = self._compare_domain_specific(expected, actual)
         else:  # GENERAL_TEXT
-            return self._compare_general_text(expected, actual)
+            result = self._compare_general_text(expected, actual)
+
+        # Log routing decision for analysis
+        self._log_routing_decision(detection, result, expected, actual)
+
+        return result
 
     def _compare_numerical(self, expected: str, actual: str) -> ComparisonResult:
         """Use rule-based number normalization."""
@@ -216,6 +221,32 @@ class IntelligentComparator:
                 )
 
         return "\n".join(explanation)
+
+    def _log_routing_decision(
+        self,
+        detection: DetectionResult,
+        result: ComparisonResult,
+        expected: str,
+        actual: str
+    ):
+        """
+        Log routing decision for analysis.
+
+        Can be overridden to send logs to a file or monitoring system.
+        """
+        import os
+        if os.environ.get("CERT_LOG_ROUTING") == "1":
+            import json
+            log_entry = {
+                "detection_type": detection.type.value,
+                "detection_confidence": detection.confidence,
+                "matched": result.matched,
+                "rule": result.rule,
+                "confidence": result.confidence,
+                "expected": expected[:100],  # Truncate for readability
+                "actual": actual[:100],
+            }
+            print(f"[ROUTING] {json.dumps(log_entry)}")
 
     def load_domain_model(self, model_path: str):
         """
