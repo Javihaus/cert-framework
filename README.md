@@ -53,7 +53,12 @@ cert-framework/
 │   └── pytest-plugin/     # pytest plugin
 ├── examples/              # Example implementations
 ├── docs/                  # Documentation site
-└── turbo.json            # Monorepo configuration
+└── package.json           # Defines monorepo structure, scripts, workspaces
+└── package-lock.json      # Lock file for reproducible installs
+└── turbo.json             # Monorepo configuration
+└── README.md              
+└── LICENSE                
+└── .gitignore             
 ```
 
 ## Architecture
