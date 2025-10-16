@@ -1,4 +1,6 @@
-import { createStorage } from '@cert/core';
+import { JSONStorage } from '@cert/core';
+import * as path from 'path';
+import * as os from 'os';
 
 interface AnalyzeOptions {
   detectDegradation?: boolean;
@@ -7,7 +9,9 @@ interface AnalyzeOptions {
 }
 
 export async function analyzeCommand(options: AnalyzeOptions) {
-  const storage = createStorage('./cert-metrics.db');
+  // Use same JSON storage as test command
+  const resultsPath = path.join(os.homedir(), '.cert', 'results.json');
+  const storage = new JSONStorage(resultsPath);
   const days = parseInt(options.days, 10);
 
   if (options.detectDegradation) {
