@@ -26,6 +26,31 @@ export default defineConfig({
     semanticComparison: true
   },
 
+  // REQUIRED: Define your agent function for testing
+  // This function should call your LLM and return its response
+  agent: async (query: string) => {
+    // Replace this with your actual LLM call
+    //
+    // Example with OpenAI:
+    // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    // const response = await openai.chat.completions.create({
+    //   model: 'gpt-4',
+    //   messages: [{ role: 'user', content: query }]
+    // });
+    // return response.choices[0].message.content || '';
+    //
+    // Example with Anthropic:
+    // const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    // const response = await anthropic.messages.create({
+    //   model: 'claude-3-sonnet-20240229',
+    //   max_tokens: 1024,
+    //   messages: [{ role: 'user', content: query }]
+    // });
+    // return response.content[0].text;
+
+    throw new Error('Agent function not implemented. Update cert.config.ts with your LLM call');
+  },
+
   // Optional: Setup function to run before tests
   setup: async () => {
     // Load data, initialize clients, etc.
