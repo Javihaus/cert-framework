@@ -1,53 +1,167 @@
 # CERT Framework Examples
 
-Four examples showing real-world semantic comparison use cases.
+Examples showing how to test LLM systems for consistency and reliability.
 
-## Running Examples
-
+## Quick Start
 ```bash
-# Install CERT first
-pip install cert-framework
+# Run pytest integration example
+pytest examples/test_llm_consistency.py -v
 
-# Run any example
-python examples/01_deduplication.py
-python examples/02_ticket_classification.py
-python examples/03_content_similarity.py
-python examples/04_debugging_inspector.py
+# Run standalone examples
+python examples/01_chatbot_consistency.py
+python examples/02_rag_retrieval.py
+python examples/03_model_regression.py
+python examples/04_pytest_integration.py
 ```
 
 ## Examples
 
-1. **Document Deduplication** (`01_deduplication.py`)
-   - Find duplicate documents in a corpus
-   - Remove near-duplicates before processing
-   - ~5 minutes runtime on 100 documents
+### 1. Chatbot Consistency (`01_chatbot_consistency.py`)
+Tests whether a chatbot gives consistent answers to the same question.
 
-2. **Support Ticket Classification** (`02_ticket_classification.py`)
-   - Route new tickets by similarity to resolved tickets
-   - Automatic categorization based on historical data
-   - Shows precision/recall tradeoffs
+**Problem**: LLMs are non-deterministic - same input, different outputs.
 
-3. **Content Similarity Search** (`03_content_similarity.py`)
-   - Find similar articles in a small dataset
-   - Batch comparison with performance notes
-   - Suitable for datasets up to ~1000 items
+**Solution**: CERT validates outputs are semantically equivalent even when worded differently.
 
-4. **Debugging with Inspector** (`04_debugging_inspector.py`)
-   - Understand why comparisons succeed or fail
-   - Visualize similarity scores and thresholds
-   - Tune threshold based on your data
+**Use when**:
+- Building customer service chatbots
+- Testing prompt engineering changes
+- Validating temperature/sampling parameters
 
-## Performance Notes
+**Example output**:
+```
+✗ Found 1 inconsistent responses:
+  run_5: 'We offer a 90-day refund window for all purchases.'
+  Confidence: 62% (below threshold)
+  → ISSUE: This response contradicts the baseline
+```
 
-CERT does pairwise comparison: comparing N documents to each other is O(N²).
+### 2. RAG Retrieval Testing (`02_rag_retrieval.py`)
+Tests whether RAG systems retrieve consistent documents for query variations.
 
-- ✅ **Good for:** Deduplication, classification, small-scale search
-- ❌ **Not for:** Large-scale vector search (use dedicated vector DBs)
+**Problem**: Similar questions should retrieve similar documents, but don't always.
 
-**Scaling:**
-- 100 documents to each other: ~5,000 comparisons, ~2-3 seconds
-- 1,000 documents to each other: ~500,000 comparisons, ~3-4 minutes
+**Solution**: CERT validates retrieval consistency across paraphrased queries.
 
-For large-scale similarity search (>10K documents), use dedicated vector databases:
-- **Managed:** Pinecone, Weaviate, Qdrant
-- **Self-hosted:** FAISS, Annoy, Milvus
+**Use when**:
+- Building RAG/semantic search systems
+- Testing embedding model quality
+- Validating chunking strategies
+
+**Example**:
+```python
+queries = [
+    "What programming language is good for beginners?",
+    "Which language should I learn first for coding?",
+    "Best programming language for someone starting out?",
+]
+# All should retrieve similar documents
+```
+
+### 3. Model Regression Testing (`03_model_regression.py`)
+Tests whether model upgrades break existing behavior.
+
+**Problem**: Upgrading models (GPT-3.5→4, version bumps) can change outputs unpredictably.
+
+**Solution**: CERT compares new model outputs against baseline test suite.
+
+**Use when**:
+- Deploying model upgrades
+- A/B testing different models
+- Validating fine-tuned models
+
+**Example**:
+```python
+# Test that new model produces semantically equivalent outputs
+old_output = "Q4 revenue increased 20% year-over-year to $10 million."
+new_output = "The company's Q4 revenue reached $10M, a 20% increase YoY."
+result = compare(old_output, new_output, threshold=0.85)
+assert result.matched  # Should pass - same meaning, different wording
+```
+
+### 4. pytest Integration (`test_llm_consistency.py`)
+Shows how to integrate CERT into your pytest test suite.
+
+**Run with**: `pytest examples/test_llm_consistency.py -v`
+
+**Use when**: You want LLM consistency testing in your CI/CD pipeline.
+
+**Example**:
+```python
+def test_summarization_consistency(self, input_text):
+    """Test that repeated summarizations are semantically equivalent."""
+    output_1 = get_summarization_output(input_text, 1)
+    output_2 = get_summarization_output(input_text, 2)
+
+    result = compare(output_1, output_2, threshold=0.80)
+    assert result.matched, f"Inconsistent (confidence: {result.confidence:.2f})"
+```
+
+### 5. Real LLM Testing (`05_real_llm_testing.py`)
+Tests CERT with actual OpenAI or Anthropic API calls.
+
+**Setup**:
+```bash
+# OpenAI
+export OPENAI_API_KEY="your-key"
+pip install openai
+
+# OR Anthropic
+export ANTHROPIC_API_KEY="your-key"
+pip install anthropic
+
+# Run
+python examples/05_real_llm_testing.py
+```
+
+**Cost**: ~$0.001 per run (5 API calls)
+
+**What it proves**:
+- CERT validates real LLM non-determinism
+- Framework catches inconsistent/wrong outputs
+- Ready for production integration
+
+**Use this when**: You want proof CERT works with real LLMs before integrating.
+
+## Live OpenAI Integration
+
+The examples use simulated outputs for zero-friction running. For live OpenAI integration:
+
+```python
+import openai
+from cert import compare
+
+def test_live_consistency():
+    prompt = "Explain quantum computing in one sentence"
+
+    response1 = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    response2 = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    output1 = response1.choices[0].message.content
+    output2 = response2.choices[0].message.content
+
+    result = compare(output1, output2)
+    assert result.matched, "Inconsistent responses"
+```
+
+## Why These Examples Matter
+
+LLM systems fail in production because of:
+1. **Inconsistency**: Same input → different outputs
+2. **Hallucination**: Outputs unrelated to inputs
+3. **Regression**: Model upgrades break behavior
+
+CERT catches these failures before production through systematic testing.
+
+## Next Steps
+
+- Add CERT to your test suite: `pip install cert-framework`
+- Write consistency tests for your LLM application
+- Run tests in CI/CD before deployments
+- See full documentation: https://github.com/Javihaus/cert-framework

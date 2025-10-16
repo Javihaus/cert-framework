@@ -79,82 +79,86 @@ Limitations:
 
 ## Examples
 
-Four production-ready examples showing real-world use cases:
+Five production-ready examples showing how to test LLM systems:
 
-### 1. Document Deduplication ([`01_deduplication.py`](../../examples/01_deduplication.py))
-Find and remove near-duplicate documents:
+### 1. Chatbot Consistency ([`01_chatbot_consistency.py`](../../examples/01_chatbot_consistency.py))
+Test whether chatbots give consistent answers to the same question:
 ```python
 from cert import compare
 
-documents = [
-    "Apple reported strong iPhone sales in Q4 2024",
-    "Apple's Q4 2024 results showed robust iPhone revenue",  # Near-duplicate
-    "Microsoft Azure cloud revenue grew 30% year-over-year",
+# Same question, multiple runs
+responses = {
+    "run_1": "We offer full refunds within 30 days of purchase.",
+    "run_2": "You can get a complete refund if you request it within 30 days.",
+    "run_5": "We offer a 90-day refund window for all purchases.",  # INCONSISTENT!
+}
+
+baseline = responses["run_1"]
+for run_id, response in list(responses.items())[1:]:
+    result = compare(baseline, response, threshold=0.80)
+    if not result.matched:
+        print(f"✗ {run_id}: Inconsistent policy statement!")
+```
+
+### 2. RAG Retrieval Testing ([`02_rag_retrieval.py`](../../examples/02_rag_retrieval.py))
+Test whether RAG systems retrieve consistent documents for query variations:
+```python
+# Different ways of asking the same question
+queries = [
+    "What programming language is good for beginners?",
+    "Which language should I learn first for coding?",
 ]
 
-duplicates = []
-for i in range(len(documents)):
-    for j in range(i + 1, len(documents)):
-        result = compare(documents[i], documents[j])
-        if result.matched:
-            duplicates.append((i, j, result.confidence))
+baseline_docs = rag_retrieve(queries[0])
+for query in queries[1:]:
+    docs = rag_retrieve(query)
+    result = compare(" ".join(baseline_docs), " ".join(docs))
+    assert result.matched, "Inconsistent retrieval"
 ```
 
-### 2. Support Ticket Classification ([`02_ticket_classification.py`](../../examples/02_ticket_classification.py))
-Route tickets by similarity to resolved tickets:
+### 3. Model Regression Testing ([`03_model_regression.py`](../../examples/03_model_regression.py))
+Test whether model upgrades break existing behavior:
 ```python
-resolved_tickets = [
-    {"category": "billing", "text": "I was charged twice"},
-    {"category": "technical", "text": "App crashes on export"},
+# Test cases from production
+test_cases = [
+    ("Summarize: Q4 revenue was $10M, up 20% YoY.",
+     "Q4 revenue increased 20% to $10 million."),
 ]
 
-new_ticket = "I see two charges on my credit card"
-
-best_match = None
-best_confidence = 0.0
-for ticket in resolved_tickets:
-    result = compare(new_ticket, ticket["text"])
-    if result.confidence > best_confidence:
-        best_match = ticket
-        best_confidence = result.confidence
+for input_text, expected in test_cases:
+    new_output = new_model.generate(input_text)
+    result = compare(expected, new_output, threshold=0.85)
+    assert result.matched, f"Regression detected: {result.confidence:.0%}"
 ```
 
-### 3. Content Similarity Search ([`03_content_similarity.py`](../../examples/03_content_similarity.py))
-Find similar articles (suitable for datasets up to ~1000 items):
+### 4. pytest Integration ([`test_llm_consistency.py`](../../examples/test_llm_consistency.py))
+Integrate CERT into your pytest test suite:
 ```python
-query = "Introduction to Machine Learning"
-corpus = [
-    "Deep Learning Fundamentals",
-    "Natural Language Processing Basics",
-    "Getting Started with Python",
-]
+def test_llm_consistency():
+    """Test that repeated calls produce semantically equivalent outputs."""
+    output_1 = llm.generate("Explain machine learning")
+    output_2 = llm.generate("Explain machine learning")
 
-similarities = []
-for article in corpus:
-    result = compare(query, article)
-    if result.matched:
-        similarities.append((article, result.confidence))
-
-# Sort by confidence
-similarities.sort(key=lambda x: x[1], reverse=True)
+    result = compare(output_1, output_2, threshold=0.80)
+    assert result.matched, f"Inconsistent: {result.confidence:.2f}"
 ```
 
-### 4. Debugging Comparisons ([`04_debugging_inspector.py`](../../examples/04_debugging_inspector.py))
-Understand why comparisons succeed or fail:
-```python
-result = compare("revenue up", "revenue down")
-print(f"Matched: {result.matched}")
-print(f"Confidence: {result.confidence:.3f}")
-print(f"Threshold: 0.80")
+Run with: `pytest examples/test_llm_consistency.py -v`
 
-if not result.matched:
-    print("✗ FALSE NEGATIVE: Should have matched but didn't")
-    print("→ Consider lowering threshold to 0.70-0.75")
+### 5. Real LLM Testing ([`05_real_llm_testing.py`](../../examples/05_real_llm_testing.py))
+Test with actual OpenAI or Anthropic APIs:
+```bash
+# Setup
+export OPENAI_API_KEY="your-key"
+pip install openai
+
+# Run (costs ~$0.001)
+python examples/05_real_llm_testing.py
 ```
 
-**Performance note**: CERT does pairwise comparison (O(N²)). Good for deduplication and classification. For large-scale search (>10K documents), use vector databases (Pinecone, Weaviate, FAISS).
+Proves CERT works with real LLM non-determinism and catches hallucinations.
 
-See full examples with sample data in [`examples/`](../../examples/) directory.
+**See all examples with full code**: [`examples/`](../../examples/) directory
 
 ## Validation
 
@@ -204,12 +208,14 @@ cert-framework/
 │   ├── cli/                    # CLI tool
 │   ├── langchain/              # LangChain integration
 │   └── pytest-plugin/          # pytest plugin
-├── examples/                   # Production-ready examples
-│   ├── README.md              # Performance notes and scaling guidance
-│   ├── 01_deduplication.py    # Find and remove duplicate documents
-│   ├── 02_ticket_classification.py  # Route tickets by similarity
-│   ├── 03_content_similarity.py     # Find similar articles
-│   └── 04_debugging_inspector.py    # Debug and tune comparisons
+├── examples/                   # LLM testing examples
+│   ├── README.md              # Full documentation
+│   ├── 01_chatbot_consistency.py       # Test chatbot response consistency
+│   ├── 02_rag_retrieval.py            # Test RAG system retrieval
+│   ├── 03_model_regression.py         # Test model upgrades
+│   ├── 04_pytest_integration.py       # pytest integration guide
+│   ├── 05_real_llm_testing.py         # Real API testing (OpenAI/Anthropic)
+│   └── test_llm_consistency.py        # Runnable pytest examples
 ├── docs/                       # Documentation site
 └── turbo.json                  # Monorepo configuration
 ```
