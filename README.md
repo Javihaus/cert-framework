@@ -52,7 +52,6 @@ cert-framework/
 │   ├── python/            # Python bindings
 │   └── pytest-plugin/     # pytest plugin
 ├── examples/              # Example implementations
-│   └── apple-10k/        # Apple 10-K financial data extraction
 ├── docs/                  # Documentation site
 └── turbo.json            # Monorepo configuration
 ```
