@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import type { TestResult } from '@cert/core';
+
+interface TestResultWithDate extends Omit<TestResult, 'timestamp'> {
+  timestamp: Date;
+}
 
 export async function GET() {
   try {
@@ -14,15 +19,17 @@ export async function GET() {
 
     // Read and parse results
     const data = fs.readFileSync(resultsPath, 'utf-8');
-    const results = JSON.parse(data);
+    const results = JSON.parse(data) as TestResult[];
 
     // Convert timestamp strings back to Date objects for sorting
     const sorted = results
-      .map((r: any) => ({
+      .map((r: TestResult): TestResultWithDate => ({
         ...r,
         timestamp: new Date(r.timestamp),
       }))
-      .sort((a: any, b: any) => b.timestamp.getTime() - a.timestamp.getTime());
+      .sort((a: TestResultWithDate, b: TestResultWithDate) =>
+        b.timestamp.getTime() - a.timestamp.getTime()
+      );
 
     return NextResponse.json(sorted);
   } catch (error) {
