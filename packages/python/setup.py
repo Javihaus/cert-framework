@@ -1,12 +1,22 @@
 from setuptools import setup, find_packages
+import pathlib
+import re
 
 # Read README
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+# Single source of truth for version - read from __init__.py
+def get_version():
+    init_py = pathlib.Path("cert/__init__.py").read_text()
+    match = re.search(r'^__version__ = ["\']([^"\']+)["\']', init_py, re.M)
+    if match:
+        return match.group(1)
+    raise RuntimeError("Unable to find version string in cert/__init__.py")
+
 setup(
     name="cert-framework",
-    version="0.2.0",
+    version=get_version(),
     author="Javier Marin",
     author_email="cert@javihaus.com",
     description="Semantic document comparison with validated accuracy (87.6% on STS-Benchmark)",
