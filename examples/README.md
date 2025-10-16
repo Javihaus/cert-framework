@@ -11,6 +11,8 @@ pytest examples/test_llm_consistency.py -v
 python examples/01_chatbot_consistency.py
 python examples/02_rag_retrieval.py
 python examples/03_model_regression.py
+
+# View pytest integration guide
 python examples/04_pytest_integration.py
 ```
 
