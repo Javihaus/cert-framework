@@ -20,8 +20,14 @@ export class TestRunner {
   private storage: MetricsStorage;
   private comparator: any; // Will be SemanticComparator from @cert/semantic
 
-  constructor(dbPath?: string) {
-    this.storage = createStorage(dbPath);
+  constructor(dbPathOrStorage?: string | MetricsStorage) {
+    if (typeof dbPathOrStorage === 'string') {
+      this.storage = createStorage(dbPathOrStorage);
+    } else if (dbPathOrStorage) {
+      this.storage = dbPathOrStorage;
+    } else {
+      this.storage = createStorage();
+    }
   }
 
   /**

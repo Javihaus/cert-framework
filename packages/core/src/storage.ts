@@ -241,13 +241,17 @@ export class SQLiteStorage implements MetricsStorage {
 /**
  * Factory function to create the appropriate storage implementation.
  *
- * @param dbPath - Optional path to SQLite database. If not provided, uses in-memory storage.
+ * @param dbPath - Optional path to database file. If not provided, uses in-memory storage.
+ *                 Use .json extension for JSON storage, .db for SQLite.
  * @returns MetricsStorage implementation
  *
  * @example
  * ```typescript
  * // Use in-memory storage
  * const storage = createStorage();
+ *
+ * // Use JSON storage (no native dependencies)
+ * const storage = createStorage('./cert-metrics.json');
  *
  * // Use SQLite
  * const storage = createStorage('./cert-metrics.db');
@@ -258,6 +262,39 @@ export function createStorage(dbPath?: string): MetricsStorage {
     return new InMemoryStorage();
   }
 
+  // Use JSON storage for .json files (no native dependencies required)
+  if (dbPath.endsWith('.json')) {
+    try {
+      // Import JSONStorage - will be available after build
+      // Use dynamic require for CommonJS compatibility
+      let JSONStorageClass;
+      try {
+        // Try ESM import first
+        JSONStorageClass = (global as any).__JSONStorage;
+      } catch {
+        // Fall back to require
+        try {
+          const mod = eval('require')('./json-storage.js');
+          JSONStorageClass = mod.JSONStorage;
+        } catch {
+          // If neither works, throw to fall back to in-memory
+          throw new Error('JSONStorage not available');
+        }
+      }
+
+      if (JSONStorageClass) {
+        return new JSONStorageClass(dbPath);
+      }
+      throw new Error('JSONStorage class not found');
+    } catch (error) {
+      console.warn(
+        `Failed to create JSON storage: ${error}. Falling back to in-memory storage.`
+      );
+      return new InMemoryStorage();
+    }
+  }
+
+  // Try SQLite for .db files
   try {
     return new SQLiteStorage(dbPath);
   } catch (error) {

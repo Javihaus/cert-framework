@@ -36,3 +36,4 @@ export { PipelineAnalyzer } from './pipeline.js';
 // Export storage
 export type { MetricsStorage } from './storage.js';
 export { InMemoryStorage, SQLiteStorage, createStorage } from './storage.js';
+export { JSONStorage } from './json-storage.js';

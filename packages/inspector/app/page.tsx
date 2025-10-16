@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TestPanel } from './components/TestPanel'
 import { ConfigPanel } from './components/ConfigPanel'
 import { ResultPanel } from './components/ResultPanel'
@@ -23,6 +23,27 @@ export default function Inspector() {
   const [selectedTest, setSelectedTest] = useState<string | null>('example-test')
   const [results, setResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
+
+  // Load real test results from API
+  useEffect(() => {
+    async function loadResults() {
+      try {
+        const response = await fetch('/api/results')
+        if (response.ok) {
+          const data = await response.json()
+          setResults(data)
+        }
+      } catch (error) {
+        console.error('Failed to load results:', error)
+      }
+    }
+
+    loadResults()
+
+    // Refresh results every 5 seconds
+    const interval = setInterval(loadResults, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleAddTest = () => {
     const newTest: GroundTruth = {

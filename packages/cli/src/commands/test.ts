@@ -1,6 +1,7 @@
-import { TestResult, TestRunner } from '@cert/core';
+import { TestResult, TestRunner, JSONStorage } from '@cert/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 interface TestOptions {
   watch?: boolean;
@@ -110,8 +111,15 @@ export async function testCommand(pattern: string, options: TestOptions) {
       process.exit(1);
     }
 
-    // Initialize test runner
-    const runner = new TestRunner();
+    // Initialize test runner with JSON storage for cross-tool sharing
+    const certDir = path.join(os.homedir(), '.cert');
+    if (!fs.existsSync(certDir)) {
+      fs.mkdirSync(certDir, { recursive: true });
+    }
+
+    const resultsPath = path.join(certDir, 'results.json');
+    const storage = new JSONStorage(resultsPath);
+    const runner = new TestRunner(storage);
 
     // Add ground truths from config
     if (config.groundTruths && Array.isArray(config.groundTruths)) {
@@ -247,6 +255,9 @@ export async function testCommand(pattern: string, options: TestOptions) {
       const { inspectCommand } = await import('./inspect.js');
       await inspectCommand({ port: '3000', config: options.config });
     }
+
+    // Close storage connection
+    runner.close();
 
     // Exit with failure code if any tests failed
     process.exit(failed > 0 ? 1 : 0);

@@ -1,6 +1,12 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface InspectOptions {
   port: string;
@@ -25,31 +31,7 @@ export async function inspectCommand(options: InspectOptions) {
     process.exit(1);
   }
 
-  // Check if Next.js dependencies are installed
-  const nodeModulesPath = path.join(inspectorPath, 'node_modules');
-  if (!fs.existsSync(nodeModulesPath)) {
-    console.log('Installing Inspector dependencies...');
-    console.log('This may take a minute on first run.\n');
-
-    const install = spawn('npm', ['install'], {
-      cwd: inspectorPath,
-      stdio: 'inherit',
-      shell: true,
-    });
-
-    await new Promise((resolve, reject) => {
-      install.on('close', (code) => {
-        if (code === 0) {
-          resolve(null);
-        } else {
-          reject(new Error(`npm install failed with code ${code}`));
-        }
-      });
-      install.on('error', reject);
-    });
-
-    console.log();
-  }
+  // Skip dependency check in monorepo - dependencies are handled by workspace
 
   console.log(`Inspector UI will be available at: http://localhost:${options.port}\n`);
   console.log('Starting Next.js development server...\n');
