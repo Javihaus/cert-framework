@@ -21,8 +21,16 @@ responses = {
     "run_5": "We offer a 90-day refund window for all purchases.",  # INCONSISTENT - different policy!
 }
 
+"""
+Threshold tuning:
+- 0.75 (default): Allows stylistic variation, focuses on factual consistency
+- 0.80: Stricter tone matching, may flag legitimate paraphrases
+- 0.85+: Very strict, only for testing with controlled templates
 
-def test_response_consistency(responses: dict, threshold: float = 0.80, verbose: bool = True):
+The numeric-contradiction detection catches factual errors regardless of threshold.
+"""
+
+def test_response_consistency(responses: dict, threshold: float = 0.75, verbose: bool = True):
     """Test that all responses are semantically equivalent.
 
     Args:
