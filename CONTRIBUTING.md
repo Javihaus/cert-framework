@@ -211,6 +211,3 @@ test: add tests for pipeline analyzer
 - Start a discussion for questions
 - Check existing issues before creating new ones
 
-## Code of Conduct
-
-Be respectful, inclusive, and collaborative. We're all here to build better LLM testing tools.
