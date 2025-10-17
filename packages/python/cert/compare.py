@@ -13,6 +13,7 @@ Progressive disclosure: simple by default, configurable for advanced use.
 
 from typing import Optional
 from cert.embeddings import EmbeddingComparator, ComparisonResult
+from cert.fact_extractor import check_factual_contradiction
 
 # Global comparator with lazy initialization
 _default_comparator: Optional[EmbeddingComparator] = None
@@ -70,6 +71,17 @@ def compare(
 
     if threshold is not None and not 0.0 <= threshold <= 1.0:
         raise ValueError(f"Threshold must be between 0.0 and 1.0, got {threshold}")
+
+    # CRITICAL: Check for factual contradictions BEFORE embeddings
+    # Embeddings can miss specific facts like "30 days vs 90 days"
+    has_contradiction, explanation = check_factual_contradiction(text1, text2)
+    if has_contradiction:
+        return ComparisonResult(
+            matched=False,
+            rule="numeric-contradiction",
+            confidence=0.0,
+            explanation=explanation
+        )
 
     global _default_comparator
 

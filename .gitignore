@@ -8,3 +8,6 @@ cert-metrics.db
 cert-results.xml
 *.tsbuildinfo
 coverage/
+# Python build artifacts
+__pycache__/
+*.egg-info/

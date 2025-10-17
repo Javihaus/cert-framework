@@ -144,6 +144,7 @@ class ComparisonResult:
     matched: bool
     rule: Optional[str] = None
     confidence: float = 0.0
+    explanation: Optional[str] = None  # Human-readable reason for the result
 
     def __bool__(self) -> bool:
         """Allow using result as boolean: if compare(text1, text2): ..."""
@@ -152,4 +153,7 @@ class ComparisonResult:
     def __str__(self) -> str:
         """Human-readable string representation."""
         status = "Match" if self.matched else "No match"
-        return f"{status} (confidence: {self.confidence:.1%})"
+        info = f"{status} (confidence: {self.confidence:.1%})"
+        if self.explanation:
+            info += f" - {self.explanation}"
+        return info
