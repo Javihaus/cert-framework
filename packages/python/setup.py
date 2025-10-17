@@ -19,7 +19,7 @@ setup(
     version=get_version(),
     author="Javier Marin",
     author_email="info@cert-framework.com",
-    description="A framewrok to test your LLM application for reliability",
+    description="A framework to test your LLM application for reliability",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Javihaus/cert-framework",
