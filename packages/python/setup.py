@@ -48,7 +48,7 @@ setup(
     install_requires=[
         "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison (required)
         "torch>=1.11.0",  # PyTorch for embeddings
-        "numpy>=1.21.0,<2.0.0",  # Numerical operations
+        "numpy>=1.21.0",  # Numerical operations (compatible with numpy 2.x)
         "typing-extensions>=4.0.0",  # Type hints for older Python
     ],
     extras_require={
