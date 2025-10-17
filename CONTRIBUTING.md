@@ -50,11 +50,6 @@ cert-framework/
 ├── docs/                  # Documentation
 └── .github/               # CI/CD workflows
 ```
-## Code Style
-- We use ruff for linting and formatting
-- Follow PEP 8 style guidelines
-- Add type hints to all functions
-- Include docstrings for public APIs
 
 ## Development Workflow
 
@@ -91,6 +86,10 @@ npm run dev  # Watches all packages in parallel
 - Strict TypeScript configuration
 - JSDoc comments for public APIs
 - Descriptive variable names
+- We use ruff for linting and formatting
+- Follow PEP 8 style guidelines
+- Add type hints to all functions
+- Include docstrings for public APIs
 
 ### Example:
 
