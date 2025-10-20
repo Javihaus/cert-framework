@@ -4,8 +4,11 @@ Example 1: Testing Chatbot Response Consistency
 Problem: LLMs are non-deterministic. Same question, different answers.
 Solution: CERT validates answers are semantically equivalent.
 
-This example uses pre-recorded responses. For live OpenAI integration,
-see: examples/05_real_llm_testing.py
+This example shows:
+- Fast mode: compare() - for development and unit tests (~50ms)
+- NLI mode: compare(use_nli=True) - for production verification (~300ms)
+
+For live OpenAI integration, see: examples/05_real_llm_testing.py
 """
 
 from cert import compare
@@ -22,20 +25,37 @@ responses = {
 }
 
 """
-Threshold tuning:
-- 0.75 (default): Allows stylistic variation, focuses on factual consistency
-- 0.80: Stricter tone matching, may flag legitimate paraphrases
-- 0.85+: Very strict, only for testing with controlled templates
+Fast mode vs NLI mode:
 
-The numeric-contradiction detection catches factual errors regardless of threshold.
+Fast mode (default):
+- Use for: Development, unit tests, CI/CD, model regression testing
+- Speed: ~50ms per comparison
+- Detection: Regex contradictions + semantic similarity
+
+NLI mode (use_nli=True):
+- Use for: Production verification, audit trails, high-stakes applications
+- Speed: ~300ms per comparison
+- Detection: Transformer-based semantic contradiction detection
+
+Threshold tuning (fast mode only):
+- 0.75: Allows stylistic variation, focuses on factual consistency
+- 0.80 (default): Stricter tone matching
+- 0.85+: Very strict, only for testing with controlled templates
 """
 
-def test_response_consistency(responses: dict, threshold: float = 0.75, verbose: bool = True):
+
+def test_response_consistency(
+    responses: dict,
+    threshold: float = 0.75,
+    use_nli: bool = False,
+    verbose: bool = True,
+):
     """Test that all responses are semantically equivalent.
 
     Args:
         responses: Dict of response_id -> response_text
-        threshold: Similarity threshold for equivalence
+        threshold: Similarity threshold for equivalence (fast mode only)
+        use_nli: If True, use NLI-based contradiction detection
         verbose: Show all comparisons, not just failures
 
     Returns:
@@ -46,21 +66,24 @@ def test_response_consistency(responses: dict, threshold: float = 0.75, verbose:
     all_results = []
     inconsistencies = []
 
+    mode = "NLI mode (~300ms/comparison)" if use_nli else "Fast mode (~50ms/comparison)"
+
     if verbose:
+        print(f"Mode: {mode}")
         print(f"Baseline ({baseline_id}):")
         print(f"  '{baseline}'\n")
         print("Comparisons:")
         print("-" * 70)
 
     for run_id, response in list(responses.items())[1:]:
-        result = compare(baseline, response, threshold=threshold)
+        result = compare(baseline, response, threshold=threshold, use_nli=use_nli)
 
         result_data = {
             "run": run_id,
             "response": response,
             "confidence": result.confidence,
             "matched": result.matched,
-            "rule": getattr(result, 'rule', 'embedding-similarity')
+            "rule": getattr(result, "rule", "embedding-similarity"),
         }
         all_results.append(result_data)
 
@@ -72,7 +95,7 @@ def test_response_consistency(responses: dict, threshold: float = 0.75, verbose:
             print(f"{run_id}: {status}")
             print(f"  Confidence: {result.confidence:.1%} (threshold: {threshold:.0%})")
             print(f"  Text: '{response}'")
-            if hasattr(result, 'rule'):
+            if hasattr(result, "rule"):
                 print(f"  Rule: {result.rule}")
             print()
 
@@ -80,15 +103,27 @@ def test_response_consistency(responses: dict, threshold: float = 0.75, verbose:
 
 
 if __name__ == "__main__":
+    import sys
+
+    # Check if user wants NLI mode
+    use_nli = "--nli" in sys.argv
+
     print("=" * 70)
     print("CHATBOT CONSISTENCY TEST")
     print("=" * 70)
     print(f"\nQuestion: 'What's your refund policy?'")
     print(f"Testing {len(responses)} responses for consistency\n")
-    print("Loading semantic model (one-time, ~5 seconds)...")
+
+    if use_nli:
+        print("Mode: NLI (use_nli=True) - Production verification")
+        print("Loading models (one-time, ~15 seconds)...")
+    else:
+        print("Mode: Fast (default) - Development testing")
+        print("Loading semantic model (one-time, ~5 seconds)...")
+        print("\nTip: Run with --nli flag for production-grade verification")
     print()
 
-    all_results, issues = test_response_consistency(responses)
+    all_results, issues = test_response_consistency(responses, use_nli=use_nli)
 
     print("=" * 70)
     print(f"RESULTS: {len(responses) - 1 - len(issues)}/{len(responses) - 1} passed")
@@ -102,6 +137,7 @@ if __name__ == "__main__":
             print(f"\n  {issue['run']}:")
             print(f"    Text: '{issue['response']}'")
             print(f"    Confidence: {issue['confidence']:.1%}")
+            print(f"    Rule: {issue['rule']}")
             print(f"    → FAILED: Below threshold or contradicts baseline")
 
     print("\n" + "=" * 70)
@@ -116,3 +152,7 @@ if __name__ == "__main__":
     print("  - Catch inconsistencies before production")
     print("  - Validate prompt changes don't break consistency")
     print("  - Test temperature/sampling parameter effects")
+    print()
+    print("Fast mode vs NLI mode:")
+    print("  - Fast: Development, CI/CD, unit tests (~50ms)")
+    print("  - NLI:  Production, audit trails, compliance (~300ms)")

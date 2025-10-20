@@ -39,14 +39,42 @@ pip install cert-framework
 
 ## Quick Start
 
-### Hallucination Detection for RAG Systems
+### Simple API: One-Line Verification
+
+```python
+from cert import compare
+
+# Fast mode (~50ms) - Development, unit tests, CI/CD
+result = compare("revenue increased", "sales grew")
+if result.matched:
+    print(f"✓ Match! Confidence: {result.confidence:.1%}")
+
+# NLI mode (~300ms) - Production RAG verification
+context = "Apple's Q4 2024 revenue was $391.035 billion"
+answer = "Apple's Q4 2024 revenue was $450 billion"
+
+result = compare(context, answer, use_nli=True)
+if not result.matched:
+    print(f"✗ Hallucination detected: {result.explanation}")
+    # result.rule = "nli-contradiction" or "numeric-contradiction"
+```
+
+**Fast mode** (default): Regex contradictions + embeddings (~50ms)
+- Use for: Development, unit tests, model regression testing
+
+**NLI mode** (`use_nli=True`): Transformer-based detection (~300ms)
+- Use for: Production RAG, audit trails, compliance
+- Catches semantic contradictions fast mode misses
+
+### Advanced API: Batch Testing
+
+For statistical analysis across multiple LLM calls:
 
 ```python
 from cert import TestRunner
 
-# Initialize
 runner = TestRunner()
-runner.initialize_energy_scorer()  # Loads NLI model (~500MB first time)
+runner.initialize_energy_scorer()
 
 # Your RAG system
 context = "Apple's Q4 2024 revenue was $391.035 billion."
@@ -54,7 +82,7 @@ context = "Apple's Q4 2024 revenue was $391.035 billion."
 def my_rag_agent():
     return rag_pipeline(query="What was Apple's Q4 revenue?")
 
-# Test for hallucinations
+# Test for hallucinations (5 trials)
 result = runner.test_hallucination(
     'rag-test-1',
     context=context,
@@ -65,7 +93,8 @@ result = runner.test_hallucination(
 # Check results
 if result['contradiction_rate'] > 0:
     print(f"⚠️  {result['diagnosis']}")
-    print(f"Energy: {result['avg_energy']:.3f}")
+    print(f"Average energy: {result['avg_energy']:.3f}")
+    print(f"Contradiction rate: {result['contradiction_rate']:.0%}")
 ```
 
 ### Consistency Testing

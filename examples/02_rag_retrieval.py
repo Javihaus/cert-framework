@@ -6,6 +6,10 @@ Solution: CERT validates retrieval consistency across query variations.
 
 Tests whether your RAG system retrieves consistent documents when users
 ask the same question in different ways.
+
+Note: This example uses fast mode (default) since we're testing retrieval
+consistency, not answer verification. For answer verification, use
+compare(use_nli=True) as shown in financial_rag_hallucination.py
 """
 
 from cert import compare

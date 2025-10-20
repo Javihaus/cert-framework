@@ -4,16 +4,16 @@ Financial RAG Hallucination Detection Example
 Demonstrates using CERT to detect when a RAG system hallucinates
 financial data by contradicting source documents.
 
-This example shows:
-1. How to set up hallucination detection
-2. What contradictions look like
-3. How to interpret energy scores
-4. Why this matters for compliance (EU AI Act)
+This example shows two approaches:
+1. Simple API: compare(use_nli=True) - one-line verification
+2. Advanced API: TestRunner with batch testing
+
+For most use cases, the simple API is recommended.
 
 Run: python examples/financial_rag_hallucination.py
 """
 
-from cert import TestRunner
+from cert import compare, TestRunner
 import random
 
 
@@ -48,26 +48,85 @@ def simulated_rag_agent():
         "$391.035 billion in total net sales",
         "Apple's Q4 2024 revenue was $391B",
         "Total sales were $391.035 billion",
-
         # HALLUCINATIONS - Wrong numbers
         "$450 billion",  # Contradiction
         "$350.5 billion",  # Contradiction
-
         # HALLUCINATIONS - Wrong units (catastrophic!)
         "$391.035 million",  # Off by 1000x
         "$391 thousand",  # Off by 1,000,000x
-
         # HALLUCINATIONS - Invented data
         "$391B with 50% growth YoY",  # Growth not in context
     ]
     return random.choice(responses)
 
 
-def main():
-    """Run financial RAG hallucination detection test."""
+def simple_api_example():
+    """Demonstrate simple compare() API with NLI."""
     print("=" * 70)
-    print("CERT FRAMEWORK - FINANCIAL RAG HALLUCINATION DETECTION")
+    print("APPROACH 1: SIMPLE API - compare(use_nli=True)")
     print("=" * 70)
+    print()
+    print("For single comparisons, use the simple API:")
+    print()
+
+    # Example 1: Correct paraphrase
+    print("Example 1: Correct paraphrase")
+    print("-" * 70)
+    result = compare(
+        "Apple's Q4 2024 total net sales: $391.035 billion",
+        "Apple's Q4 2024 revenue was $391B",
+        use_nli=True,
+    )
+    print(f"Context:  'Apple's Q4 2024 total net sales: $391.035 billion'")
+    print(f"Answer:   'Apple's Q4 2024 revenue was $391B'")
+    print(f"Result:   {result.matched} ({result.rule})")
+    print(f"Explanation: {result.explanation}")
+    print()
+
+    # Example 2: Numeric contradiction
+    print("Example 2: Numeric contradiction")
+    print("-" * 70)
+    result = compare(
+        "Apple's Q4 2024 total net sales: $391.035 billion",
+        "Apple's Q4 2024 revenue was $450 billion",
+        use_nli=True,
+    )
+    print(f"Context:  'Apple's Q4 2024 total net sales: $391.035 billion'")
+    print(f"Answer:   'Apple's Q4 2024 revenue was $450 billion'")
+    print(f"Result:   {result.matched} ({result.rule})")
+    print(f"Explanation: {result.explanation}")
+    print()
+
+    # Example 3: Unit contradiction (catastrophic!)
+    print("Example 3: Unit contradiction (catastrophic!)")
+    print("-" * 70)
+    result = compare(
+        "Apple's Q4 2024 total net sales: $391.035 billion",
+        "Apple's Q4 2024 revenue was $391 million",
+        use_nli=True,
+    )
+    print(f"Context:  'Apple's Q4 2024 total net sales: $391.035 billion'")
+    print(f"Answer:   'Apple's Q4 2024 revenue was $391 million'")
+    print(f"Result:   {result.matched} ({result.rule})")
+    print(f"Explanation: {result.explanation}")
+    print()
+
+    print("✓ Simple API is perfect for:")
+    print("  - Single verification checks")
+    print("  - Production RAG pipelines")
+    print("  - Real-time hallucination detection")
+    print()
+    print("=" * 70)
+    print()
+
+
+def advanced_api_example():
+    """Demonstrate advanced TestRunner API for batch testing."""
+    print("=" * 70)
+    print("APPROACH 2: ADVANCED API - TestRunner.test_hallucination()")
+    print("=" * 70)
+    print()
+    print("For batch testing and statistical analysis:")
     print()
 
     # Step 1: Initialize test runner
@@ -102,13 +161,10 @@ def main():
 
     # Step 4: Run hallucination test
     result = runner.test_hallucination(
-        'apple-revenue-test',
+        "apple-revenue-test",
         context=CONTEXT,
         agent_fn=simulated_rag_agent,
-        config={
-            'n_trials': 20,
-            'energy_threshold': 0.3
-        }
+        config={"n_trials": 20, "energy_threshold": 0.3},
     )
 
     # Step 5: Display results
@@ -125,7 +181,7 @@ def main():
     print()
 
     # Step 6: Show examples of failures
-    if result['contradiction_rate'] > 0:
+    if result["contradiction_rate"] > 0:
         print("=" * 70)
         print("DETECTED HALLUCINATIONS")
         print("=" * 70)
@@ -133,9 +189,11 @@ def main():
         print("The following responses contradicted the source context:")
         print()
 
-        for i, (output, energy) in enumerate(zip(result['outputs'], result['energies'])):
+        for i, (output, energy) in enumerate(
+            zip(result["outputs"], result["energies"])
+        ):
             if energy.contradiction:
-                print(f"Trial {i+1}: '{output}'")
+                print(f"Trial {i + 1}: '{output}'")
                 print(f"  Energy:     {energy.total_energy:.3f}")
                 print(f"  Semantic:   {energy.semantic:.3f}")
                 print(f"  NLI:        {energy.nli:.3f} (< 0.3 = contradiction)")
@@ -145,7 +203,7 @@ def main():
     # Step 7: Show examples of passes
     good_responses = [
         (output, energy)
-        for output, energy in zip(result['outputs'], result['energies'])
+        for output, energy in zip(result["outputs"], result["energies"])
         if not energy.contradiction
     ]
 
@@ -187,9 +245,31 @@ def main():
     print()
 
     # Step 9: Return status code
-    return 0 if result['status'] == 'pass' else 1
+    return 0 if result["status"] == "pass" else 1
+
+
+def main():
+    """Run both simple and advanced examples."""
+    print()
+    print("╔" + "=" * 68 + "╗")
+    print(
+        "║"
+        + " " * 10
+        + "CERT FRAMEWORK - FINANCIAL RAG HALLUCINATION DETECTION"
+        + " " * 4
+        + "║"
+    )
+    print("╚" + "=" * 68 + "╝")
+    print()
+
+    # Show simple API first (recommended for most users)
+    simple_api_example()
+
+    # Show advanced API for batch testing
+    return advanced_api_example()
 
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

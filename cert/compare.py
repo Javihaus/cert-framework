@@ -20,9 +20,9 @@ _default_comparator: Optional[EmbeddingComparator] = None
 
 
 def compare(
-    text1: str, text2: str, threshold: Optional[float] = None
+    text1: str, text2: str, threshold: Optional[float] = None, use_nli: bool = False
 ) -> ComparisonResult:
-    """Compare two texts for semantic similarity.
+    """Compare two texts for semantic similarity with optional NLI contradiction detection.
 
     This is the simplest way to use CERT. One function call, immediate value.
 
@@ -30,6 +30,9 @@ def compare(
         text1: First text to compare
         text2: Second text to compare
         threshold: Optional custom threshold (0-1). If None, uses default 0.80
+        use_nli: If True, use NLI-based contradiction detection (~300ms).
+                 If False (default), use fast regex + embeddings (~50ms).
+                 Recommended True for production RAG verification.
 
     Returns:
         ComparisonResult with matched (bool) and confidence (float) attributes
@@ -39,10 +42,15 @@ def compare(
         ValueError: If texts are empty or threshold is out of range
 
     Example:
-        Basic usage:
+        Fast comparison (development):
             result = compare("revenue increased", "sales grew")
             print(result.matched)  # True
             print(result.confidence)  # 0.847
+
+        Production verification (with NLI):
+            result = compare("Revenue: $30M", "Revenue: $90M", use_nli=True)
+            print(result.matched)  # False - NLI detects contradiction
+            print(result.explanation)  # "CRITICAL: Answers contradict..."
 
         As boolean:
             if compare("profit up", "earnings rose"):
@@ -52,11 +60,18 @@ def compare(
             result = compare("good", "great", threshold=0.90)
 
     Note:
-        First call downloads the embedding model (~420MB). Subsequent calls
-        are fast (~50-100ms per comparison).
+        Fast mode (use_nli=False):
+          - Regex contradiction check + embeddings
+          - ~50-100ms per comparison
+          - Good for development, unit tests, model regression
 
-        Uses all-mpnet-base-v2 model with 0.80 threshold (87.6% accuracy on
-        STS-Benchmark). Validated on 8,628 human-annotated pairs.
+        NLI mode (use_nli=True):
+          - Transformer-based semantic contradiction detection
+          - ~300ms per comparison (first call downloads ~500MB model)
+          - Recommended for production RAG verification, audit trails
+
+        First call downloads embedding model (~420MB). With use_nli=True,
+        also downloads NLI model (~500MB). Models cached after first use.
     """
     # Validate inputs
     if not isinstance(text1, str) or not isinstance(text2, str):
@@ -89,6 +104,48 @@ def compare(
     if _default_comparator is None:
         print("Loading semantic model (one-time, ~5 seconds)...")
         _default_comparator = EmbeddingComparator()
+
+    # NLI mode: Use ProductionEnergyScorer for comprehensive contradiction detection
+    if use_nli:
+        # Lazy initialization of NLI components
+        if not hasattr(_default_comparator, "_nli_detector"):
+            print("Loading NLI model (one-time, ~10 seconds)...")
+            from cert.nli import NLIDetector
+            from cert.energy import ProductionEnergyScorer
+
+            _default_comparator._nli_detector = NLIDetector()
+            _default_comparator._energy_scorer = ProductionEnergyScorer(
+                embeddings=_default_comparator, nli=_default_comparator._nli_detector
+            )
+
+        # Use energy scorer for comprehensive check
+        energy = _default_comparator._energy_scorer.compute_energy(text1, text2)
+
+        # Convert to ComparisonResult
+        if energy.contradiction:
+            # Hard contradiction detected by NLI
+            return ComparisonResult(
+                matched=False,
+                rule="nli-contradiction",
+                confidence=0.0,
+                explanation=f"NLI detected contradiction (entailment score: {energy.nli:.2f})",
+            )
+        elif energy.total_energy > 0.5:
+            # High energy = likely hallucination
+            return ComparisonResult(
+                matched=False,
+                rule="nli-hallucination",
+                confidence=1.0 - energy.total_energy,
+                explanation=f"High hallucination energy: {energy.total_energy:.2f} (semantic: {energy.semantic:.2f}, nli: {energy.nli:.2f}, grounding: {energy.grounding:.2f})",
+            )
+        else:
+            # Low energy = well-grounded match
+            return ComparisonResult(
+                matched=True,
+                rule="nli-verified",
+                confidence=1.0 - energy.total_energy,
+                explanation=f"NLI-verified match (energy: {energy.total_energy:.2f})",
+            )
 
     # Custom threshold for this comparison
     if threshold is not None:
