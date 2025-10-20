@@ -5,9 +5,9 @@ on:
   push:
     branches: [master]
     paths:
-      - 'packages/python/cert/**'
-      - 'packages/python/tests/test_benchmark_validation.py'
-      - 'packages/python/tests/test_minimal_embedding.py'
+      - 'cert/**'
+      - 'tests/test_benchmark_validation.py'
+      - 'tests/test_minimal_embedding.py'
 
 jobs:
   validate-embeddings:
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -27,30 +27,26 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/torch/sentence_transformers
-          key: sentence-transformers-${{ runner.os }}-${{ hashFiles('packages/python/setup.py') }}
+          key: sentence-transformers-${{ runner.os }}-${{ hashFiles('setup.py') }}
           restore-keys: |
             sentence-transformers-${{ runner.os }}-
 
       - name: Install dependencies
         run: |
-          cd packages/python
           pip install --upgrade pip
           pip install -e .
           pip install pytest datasets
 
       - name: Run minimal embedding test
         run: |
-          cd packages/python
           python3 tests/test_minimal_embedding.py
 
       - name: Run STS-Benchmark validation (sample)
         run: |
-          cd packages/python
           pytest tests/test_benchmark_validation.py::TestSTSBenchmarkValidation::test_dev_split_sample -v
 
       - name: Run threshold tuning
         run: |
-          cd packages/python
           pytest tests/test_benchmark_validation.py::TestSTSBenchmarkValidation::test_threshold_tuning -v
 
   full-validation:
@@ -60,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -71,25 +67,22 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/torch/sentence_transformers
-          key: sentence-transformers-${{ runner.os }}-${{ hashFiles('packages/python/setup.py') }}
+          key: sentence-transformers-${{ runner.os }}-${{ hashFiles('setup.py') }}
           restore-keys: |
             sentence-transformers-${{ runner.os }}-
 
       - name: Install dependencies
         run: |
-          cd packages/python
           pip install --upgrade pip
           pip install -e .
           pip install pytest datasets
 
       - name: Run full STS-Benchmark validation
         run: |
-          cd packages/python
           pytest -v -m slow tests/test_benchmark_validation.py::TestSTSBenchmarkValidation::test_full_dev_split
 
       - name: Run test set validation
         run: |
-          cd packages/python
           pytest -v -m slow tests/test_benchmark_validation.py::TestSTSBenchmarkValidation::test_full_test_split
 
       - name: Upload results
@@ -97,4 +90,4 @@ jobs:
         if: always()
         with:
           name: benchmark-results
-          path: packages/python/test-results/
+          path: test-results/
