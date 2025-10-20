@@ -47,7 +47,8 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison (required)
-        "torch>=1.11.0",  # PyTorch for embeddings
+        "torch>=1.11.0",  # PyTorch for embeddings and NLI
+        "transformers>=4.30.0",  # NLI models for hallucination detection
         "numpy>=1.21.0",  # Numerical operations (compatible with numpy 2.x)
         "typing-extensions>=4.0.0",  # Type hints for older Python
     ],
