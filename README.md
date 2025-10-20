@@ -166,7 +166,11 @@ Ensures LLM outputs remain stable across multiple runs:
 
 ### Energy Scoring
 
-CERT uses a three-component energy function:
+We use "energy" as an intuitive metaphor: high energy = system is "working hard" 
+to reconcile contradictions. This is NOT physics-based energy conservation - it's 
+a weighted scoring function (lower scores = more confident matches).
+
+CERT uses a three-component "energy" function:
 - **Semantic**: Cosine similarity of embeddings (catches paraphrases)
 - **NLI**: Entailment score from transformer (catches contradictions)
 - **Grounding**: Term overlap ratio (catches invented terminology)
