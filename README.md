@@ -97,53 +97,15 @@ if result['contradiction_rate'] > 0:
     print(f"Contradiction rate: {result['contradiction_rate']:.0%}")
 ```
 
-### Consistency Testing
-
-```python
-from cert import TestRunner, GroundTruth
-
-runner = TestRunner()
-
-# Add ground truth
-runner.add_ground_truth(GroundTruth(
-    id="chatbot-greeting",
-    expected="Hello! How can I help you?",
-    equivalents=["Hi! How can I assist you?"]
-))
-
-# Test accuracy
-result = await runner.test_accuracy(
-    "chatbot-greeting",
-    agent_fn=lambda: chatbot.respond("hi"),
-    config={"threshold": 0.8}
-)
-
-# Test consistency (requires passing accuracy first)
-result = await runner.test_consistency(
-    "chatbot-greeting",
-    agent_fn=lambda: chatbot.respond("hi"),
-    config={"n_samples": 10, "consistency_threshold": 0.95}
-)
-```
 
 ## Features
 
-### Hallucination Detection
-
-Detects when LLM outputs contradict or aren't grounded in provided context:
-
-- **Multi-component scoring**: Combines NLI, embeddings, and grounding
+- **Multi-component scoring**: Combines NLI, embeddings, and grounding heuristics
+- **Fast and NLI modes**: ~50ms for development, ~300ms for production verification
 - **Proven accuracy**: 95% precision on financial RAG contradiction detection
 - **Energy threshold tuning**: Configure sensitivity for your use case
+- **No fine-tuning required**: Works out-of-the-box with pre-trained models
 - **EU AI Act compliant**: Provides "appropriate measures to detect errors" (Article 15)
-
-### Consistency Testing
-
-Ensures LLM outputs remain stable across multiple runs:
-
-- **Variance detection**: Identifies non-deterministic behavior
-- **Auto-diagnosis**: Explains why outputs vary
-- **Layered testing**: Enforces accuracy before consistency
 
 ## Use Cases
 
@@ -205,14 +167,17 @@ with $\tau_{\text{critical}} = 0.3$ empirically chosen for high-risk systems. Th
 
 See `examples/` for complete working examples:
 
-- **`financial_rag_hallucination.py`**: Financial RAG with contradiction detection
-- **`01_chatbot_consistency.py`**: Chatbot consistency testing
-- **`02_caching_accuracy.py`**: Testing caching optimizations
-- **`03_medical_triage.py`**: Medical triage accuracy testing
+- **`financial_rag_hallucination.py`**: Financial RAG with NLI contradiction detection
+- **`01_chatbot_consistency.py`**: Chatbot consistency testing with fast/NLI modes
+- **`02_rag_retrieval.py`**: RAG retrieval consistency testing
+- **`03_model_regression.py`**: Testing model changes don't break responses
+- **`04_pytest_integration.py`**: Pytest integration patterns
+- **`05_real_llm_testing.py`**: Live OpenAI/LLM testing
 
 Run any example:
 ```bash
 python examples/financial_rag_hallucination.py
+python examples/01_chatbot_consistency.py --nli
 ```
 
 ## Configuration
@@ -251,8 +216,11 @@ scorer = ProductionEnergyScorer(
 
 - **Embedding model**: ~420MB download (sentence-transformers/all-mpnet-base-v2)
 - **NLI model**: ~500MB download (microsoft/deberta-v3-base)
-- **Inference time**: ~100-200ms per comparison (CPU)
+- **Inference time**:
+  - Fast mode: ~50ms per comparison (CPU)
+  - NLI mode: ~300ms per comparison (CPU)
 - **Memory**: ~2GB RAM with both models loaded
+- **First run**: Downloads models automatically, subsequent runs load from cache
 
 ## EU AI Act Compliance
 
@@ -300,6 +268,14 @@ If you use CERT in research, please cite:
 - **Issues**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)
 - **Documentation**: See `examples/` for working code
 
-## Contributing
+## Architecture
 
-See CONTRIBUTING.md for guidelines.
+CERT provides two APIs for different use cases:
+
+1. **Simple API** (`compare()`): One-line verification for single comparisons
+   - Ideal for: Production RAG pipelines, real-time verification
+   - Returns: `ComparisonResult` with matched status and explanation
+
+2. **Batch API** (`TestRunner`): Statistical analysis across multiple trials
+   - Ideal for: Testing, regression detection, quality monitoring
+   - Returns: Aggregate metrics (contradiction rate, average energy)
