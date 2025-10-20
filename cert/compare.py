@@ -80,7 +80,7 @@ def compare(
             matched=False,
             rule="numeric-contradiction",
             confidence=0.0,
-            explanation=explanation
+            explanation=explanation,
         )
 
     global _default_comparator

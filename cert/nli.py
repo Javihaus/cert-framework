@@ -28,7 +28,8 @@ class NLIResult:
         score: Model confidence (0-1)
         entailment_score: Normalized score where 1.0 = fully entailed
     """
-    label: Literal['entailment', 'neutral', 'contradiction']
+
+    label: Literal["entailment", "neutral", "contradiction"]
     score: float
     entailment_score: float
 
@@ -72,7 +73,7 @@ class NLIDetector:
             "text-classification",
             model=model,
             device=-1,  # CPU
-            top_k=None  # Return all label scores
+            top_k=None,  # Return all label scores
         )
         print("✓ NLI model loaded")
 
@@ -101,35 +102,29 @@ class NLIDetector:
         """
         # Format for NLI: premise [SEP] hypothesis
         # The model checks if hypothesis follows from premise
-        result = self.nli(
-            f"{context} [SEP] {answer}",
-            truncation=True,
-            max_length=512
-        )
+        result = self.nli(f"{context} [SEP] {answer}", truncation=True, max_length=512)
 
         # Result is list of dicts with 'label' and 'score'
         # Find the label with highest score
-        best = max(result[0], key=lambda x: x['score'])
-        label = self._normalize_label(best['label'])
-        score = best['score']
+        best = max(result[0], key=lambda x: x["score"])
+        label = self._normalize_label(best["label"])
+        score = best["score"]
 
         entailment_score = self._normalize_score(label, score)
 
-        return NLIResult(
-            label=label,
-            score=score,
-            entailment_score=entailment_score
-        )
+        return NLIResult(label=label, score=score, entailment_score=entailment_score)
 
-    def _normalize_label(self, raw_label: str) -> Literal['entailment', 'neutral', 'contradiction']:
+    def _normalize_label(
+        self, raw_label: str
+    ) -> Literal["entailment", "neutral", "contradiction"]:
         """Normalize model label to standard format."""
         label_lower = raw_label.lower()
-        if 'entail' in label_lower:
-            return 'entailment'
-        elif 'contra' in label_lower:
-            return 'contradiction'
+        if "entail" in label_lower:
+            return "entailment"
+        elif "contra" in label_lower:
+            return "contradiction"
         else:
-            return 'neutral'
+            return "neutral"
 
     def _normalize_score(self, label: str, score: float) -> float:
         """Convert NLI output to [0, 1] where 1 = entailed.
@@ -139,9 +134,9 @@ class NLIDetector:
         - neutral → 0.5 (ambiguous)
         - contradiction → 1 - score (0.0-0.2)
         """
-        if label == 'entailment':
+        if label == "entailment":
             return score
-        elif label == 'neutral':
+        elif label == "neutral":
             return 0.5
         else:  # contradiction
             return 1.0 - score

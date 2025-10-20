@@ -32,26 +32,22 @@ def extract_numbers(text: str) -> Set[Tuple[float, str]]:
     """
     patterns = [
         # Time periods
-        (r'(\d+)-day', 'day'),  # "30-day"
-        (r'(\d+)\s*days?', 'day'),  # "30 days" or "30 day"
-        (r'(\d+)\s*weeks?', 'week'),  # "4 weeks"
-        (r'(\d+)\s*months?', 'month'),  # "3 months"
-        (r'(\d+)\s*years?', 'year'),  # "1 year"
-
+        (r"(\d+)-day", "day"),  # "30-day"
+        (r"(\d+)\s*days?", "day"),  # "30 days" or "30 day"
+        (r"(\d+)\s*weeks?", "week"),  # "4 weeks"
+        (r"(\d+)\s*months?", "month"),  # "3 months"
+        (r"(\d+)\s*years?", "year"),  # "1 year"
         # Percentages
-        (r'(\d+(?:\.\d+)?)\s*%', 'percent'),  # "100%" or "99.5%"
-        (r'(\d+(?:\.\d+)?)\s*percent', 'percent'),  # "100 percent"
-
+        (r"(\d+(?:\.\d+)?)\s*%", "percent"),  # "100%" or "99.5%"
+        (r"(\d+(?:\.\d+)?)\s*percent", "percent"),  # "100 percent"
         # Currency
-        (r'\$\s*(\d+(?:\.\d+)?)', 'currency'),  # "$50" or "$50.00"
-        (r'(\d+(?:\.\d+)?)\s*dollars?', 'currency'),  # "50 dollars"
-
+        (r"\$\s*(\d+(?:\.\d+)?)", "currency"),  # "$50" or "$50.00"
+        (r"(\d+(?:\.\d+)?)\s*dollars?", "currency"),  # "50 dollars"
         # Quantities
-        (r'(\d+(?:\.\d+)?)\s*(?:items?|units?|pieces?)', 'quantity'),
-
+        (r"(\d+(?:\.\d+)?)\s*(?:items?|units?|pieces?)", "quantity"),
         # Hours/minutes
-        (r'(\d+(?:\.\d+)?)\s*hours?', 'hour'),
-        (r'(\d+(?:\.\d+)?)\s*minutes?', 'minute'),
+        (r"(\d+(?:\.\d+)?)\s*hours?", "hour"),
+        (r"(\d+(?:\.\d+)?)\s*minutes?", "minute"),
     ]
 
     results = set()
@@ -131,10 +127,7 @@ def check_numeric_contradiction(
 
                 relative_diff = abs(v1 - v2) / max_val
                 if relative_diff > tolerance:
-                    return (
-                        True,
-                        f"Numeric contradiction: {unit} ({v1} vs {v2})"
-                    )
+                    return (True, f"Numeric contradiction: {unit} ({v1} vs {v2})")
 
     return (False, None)
 
@@ -156,13 +149,25 @@ def extract_named_entities(text: str) -> Set[str]:
         {'Apple', 'Microsoft'}
     """
     # Find capitalized words that aren't at sentence start
-    pattern = r'(?<!^)(?<!\. )\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b'
+    pattern = r"(?<!^)(?<!\. )\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b"
     entities = set(re.findall(pattern, text))
 
     # Filter out common non-entities
     common_words = {
-        'The', 'A', 'An', 'This', 'That', 'These', 'Those',
-        'We', 'You', 'I', 'He', 'She', 'It', 'They'
+        "The",
+        "A",
+        "An",
+        "This",
+        "That",
+        "These",
+        "Those",
+        "We",
+        "You",
+        "I",
+        "He",
+        "She",
+        "It",
+        "They",
     }
     entities = {e for e in entities if e not in common_words}
 
@@ -192,19 +197,13 @@ def check_entity_contradiction(text1: str, text2: str) -> Tuple[bool, Optional[s
     # If one text has entities and the other doesn't, check if they differ
     if entities1 and entities2 and not (entities1 & entities2):
         # They have entities but no overlap
-        return (
-            True,
-            f"Entity contradiction: {entities1} vs {entities2}"
-        )
+        return (True, f"Entity contradiction: {entities1} vs {entities2}")
 
     return (False, None)
 
 
 def check_factual_contradiction(
-    text1: str,
-    text2: str,
-    numeric_tolerance: float = 0.0,
-    check_entities: bool = False
+    text1: str, text2: str, numeric_tolerance: float = 0.0, check_entities: bool = False
 ) -> Tuple[bool, Optional[str]]:
     """Check for any factual contradictions between two texts.
 

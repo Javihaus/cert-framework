@@ -36,6 +36,7 @@ class EnergyComponents:
         total_energy: Weighted combination (0-1, lower is better)
         contradiction: True if NLI detected contradiction
     """
+
     semantic: float
     nli: float
     grounding: float
@@ -68,7 +69,7 @@ class ProductionEnergyScorer:
         self,
         embeddings,  # EmbeddingComparator
         nli,  # NLIDetector
-        weights: Dict[str, float] = None
+        weights: Dict[str, float] = None,
     ):
         """Initialize production energy scorer.
 
@@ -83,11 +84,7 @@ class ProductionEnergyScorer:
         """
         self.embeddings = embeddings
         self.nli = nli
-        self.weights = weights or {
-            'semantic': 0.25,
-            'nli': 0.55,
-            'grounding': 0.20
-        }
+        self.weights = weights or {"semantic": 0.25, "nli": 0.55, "grounding": 0.20}
 
         # Validate weights sum to 1.0
         total = sum(self.weights.values())
@@ -134,9 +131,9 @@ class ProductionEnergyScorer:
         # 4. Weighted combination
         # Higher values = more consistent (entailed, similar, grounded)
         consistency = (
-            self.weights['semantic'] * semantic +
-            self.weights['nli'] * nli +
-            self.weights['grounding'] * grounding
+            self.weights["semantic"] * semantic
+            + self.weights["nli"] * nli
+            + self.weights["grounding"] * grounding
         )
 
         # 5. Convert to energy (lower is better)
@@ -151,7 +148,7 @@ class ProductionEnergyScorer:
             nli=nli,
             grounding=grounding,
             total_energy=total_energy,
-            contradiction=contradiction
+            contradiction=contradiction,
         )
 
     def _compute_grounding(self, context: str, answer: str) -> float:
@@ -174,9 +171,7 @@ class ProductionEnergyScorer:
         """
         # Extract significant terms (>4 chars to avoid articles/prepositions)
         answer_terms = [
-            w.strip('.,!?;:')
-            for w in answer.split()
-            if len(w.strip('.,!?;:')) > 4
+            w.strip(".,!?;:") for w in answer.split() if len(w.strip(".,!?;:")) > 4
         ]
 
         if not answer_terms:
@@ -184,9 +179,6 @@ class ProductionEnergyScorer:
 
         # Case-insensitive search
         context_lower = context.lower()
-        grounded = sum(
-            1 for term in answer_terms
-            if term.lower() in context_lower
-        )
+        grounded = sum(1 for term in answer_terms if term.lower() in context_lower)
 
         return grounded / len(answer_terms)

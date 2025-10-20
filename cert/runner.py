@@ -57,6 +57,8 @@ class TestRunner:
         runner = TestRunner(semantic_comparator=LLMJudgeComparator(client=client))
     """
 
+    __test__ = False  # Tell pytest this is not a test class
+
     def __init__(self, semantic_comparator: Optional[Any] = None):
         """Initialize test runner with optional custom comparator."""
         self.ground_truths: Dict[str, GroundTruth] = {}
@@ -233,14 +235,13 @@ class TestRunner:
         self.nli_detector = NLIDetector()
 
         # Initialize embeddings if not already set
-        if not hasattr(self, 'embeddings') or self.embeddings is None:
+        if not hasattr(self, "embeddings") or self.embeddings is None:
             print("Initializing embedding model...")
             self.embeddings = EmbeddingComparator()
 
         # Initialize energy scorer
         self.energy_scorer = ProductionEnergyScorer(
-            embeddings=self.embeddings,
-            nli=self.nli_detector
+            embeddings=self.embeddings, nli=self.nli_detector
         )
 
     def test_hallucination(
@@ -248,7 +249,7 @@ class TestRunner:
         test_id: str,
         context: str,
         agent_fn: Callable[[], Any],
-        config: Dict[str, Any]
+        config: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Test for hallucinations using production energy scorer.
 
@@ -296,8 +297,8 @@ class TestRunner:
                 "Energy scorer not initialized. Call initialize_energy_scorer() first."
             )
 
-        n_trials = config.get('n_trials', 5)
-        threshold = config.get('energy_threshold', 0.3)
+        n_trials = config.get("n_trials", 5)
+        threshold = config.get("energy_threshold", 0.3)
 
         outputs = []
         energies = []
@@ -315,19 +316,19 @@ class TestRunner:
         contradiction_rate = contradictions / n_trials
 
         # Determine pass/fail
-        status = 'pass' if avg_energy <= threshold else 'fail'
+        status = "pass" if avg_energy <= threshold else "fail"
 
         # Generate diagnosis
         diagnosis = self._diagnose_hallucination(energies)
 
         return {
-            'test_id': test_id,
-            'status': status,
-            'avg_energy': avg_energy,
-            'contradiction_rate': contradiction_rate,
-            'diagnosis': diagnosis,
-            'energies': energies,
-            'outputs': outputs
+            "test_id": test_id,
+            "status": status,
+            "avg_energy": avg_energy,
+            "contradiction_rate": contradiction_rate,
+            "diagnosis": diagnosis,
+            "energies": energies,
+            "outputs": outputs,
         }
 
     def _diagnose_hallucination(self, energies: List[Any]) -> str:
@@ -345,12 +346,12 @@ class TestRunner:
 
         # Priority: contradiction > grounding > semantic
         if avg_nli < 0.4:
-            return 'CRITICAL: Answers contradict provided context (NLI detection)'
+            return "CRITICAL: Answers contradict provided context (NLI detection)"
 
         if avg_grounding < 0.4:
-            return 'WARNING: Answers not well-grounded in context (invented terms/entities)'
+            return "WARNING: Answers not well-grounded in context (invented terms/entities)"
 
         if avg_semantic < 0.6:
-            return 'WARNING: Answers semantically distant from context'
+            return "WARNING: Answers semantically distant from context"
 
-        return 'PASS: Answers well-grounded and entailed by context'
+        return "PASS: Answers well-grounded and entailed by context"
