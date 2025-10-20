@@ -1,19 +1,36 @@
 # CERT Framework
 
-Production-ready hallucination detection for LLM systems.
+Context Entailment Reliability Testing
 
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 ## What is CERT?
 
-CERT (Consistency and Entailment Regression Testing) detects hallucinations in RAG systems and other LLM applications using multi-component energy scoring:
+CERT (Context Entailment Reliability Testing) provides context entailment reliability testing for LLM systems. We use NLI models to verify that generated outputs are logically entailed by their source context, combined with semantic similarity and grounding heuristics. 
 
-- **NLI Contradiction Detection**: Uses transformers (deberta-v3-base) to detect when answers contradict context
-- **Semantic Similarity**: Embedding-based comparison to catch paraphrases and rewording
-- **Grounding Analysis**: Term overlap to detect invented entities or terminology
-- **Production Ready**: No training required, works reliably on financial, medical, and legal domains
+## Why CERT?
+We didn't start with an acronym. We started with a problem.
+Companies deploying AI systems under EU AI Act regulations need to demonstrate due diligence. They need audit trails. They need risk assessments. They need to show they've taken reasonable steps to prevent harm.
+But how do you demonstrate due diligence with systems that are fundamentally non-deterministic?
+You can't make autoregressive models certain. The architecture - sampling from probability distributions over discrete tokens - doesn't permit guaranteed correctness. Temperature isn't zero. Context windows are finite. The models don't learn world models or logical constraints.
+But you can measure certainty. You can ask:
 
+- Is this output entailed by the source context? (NLI)
+- Is it semantically similar to verified information? (Embeddings)
+- Are its claims grounded in provided evidence? (Citation checking)
+
+These measurements don't make the system certain. They quantify degrees of certainty - reliability scores you can use for risk-based decision making.
+That's what I needed. A framework for measuring certainty in systems that can't be made certain.
+
+**CERT: Context Entailment Reliability Testing**
+The name came later. I needed something deployable - infrastructure that:
+
+Measures entailment (does context support this conclusion?)
+Assesses reliability (how confident should we be?)
+Enables testing (continuous monitoring, not one-time validation)
+
+CERT doesn't provide certainty. It provides certainty metrics for risk management in inherently uncertain systems.
 ## Installation
 
 ```bash
