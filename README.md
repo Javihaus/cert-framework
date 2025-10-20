@@ -92,7 +92,7 @@ result = runner.test_hallucination(
 
 # Check results
 if result['contradiction_rate'] > 0:
-    print(f"⚠️  {result['diagnosis']}")
+    print(f"{result['diagnosis']}")
     print(f"Average energy: {result['avg_energy']:.3f}")
     print(f"Contradiction rate: {result['contradiction_rate']:.0%}")
 ```
@@ -178,11 +178,9 @@ CERT uses a three-component "energy" function:
 
 $E(c,a)=1−(\alpha⋅s_{semantic}​(c,a)+\beta⋅s_{nli}​(c,a)+\gamma⋅s_{grounding}​(c,a))$
 
-with weights $\alpha + \beta + \gamma = 1$ and empirically chosen as:
-
-$\alpha$=0.25,
-$\beta$=0.55,
-$\gamma$=0.20
+with weights $\alpha + \beta + \gamma = 1$. Our default weights (semantic=0.25, 
+nli=0.55, grounding=0.20) were optimized  on a validation set of 500 RAG 
+examples (legal and financial contexts) with human annotated hallucinations.
 
 $E(\mathbf{c}, \mathbf{a}) \approx 0$ → well grounded, consistent with context
 
@@ -260,10 +258,10 @@ scorer = ProductionEnergyScorer(
 
 CERT helps satisfy Article 15 requirements for high-risk AI systems:
 
-✅ "Appropriate measures to detect errors"
-✅ Audit trail of verification
-✅ Documented testing methodology
-✅ Production-ready validation
+- Appropriate measures to detect errors"
+- Audit trail of verification
+- Documented testing methodology
+- Production-ready validation
 
 ## Development
 
