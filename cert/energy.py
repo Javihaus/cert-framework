@@ -21,7 +21,7 @@ Validated on:
 - Legal analysis: 89% accuracy on unsupported claims
 """
 
-from typing import Dict, Any
+from typing import Dict
 from dataclasses import dataclass
 
 
