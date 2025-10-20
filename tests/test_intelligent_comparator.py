@@ -115,40 +115,40 @@ class TestIntelligentComparator:
 
     def test_contains_and_key_phrase_matching(self):
         """Should use contains and key-phrase rules for text matching."""
-        comparator = IntelligentComparator()
+        comparator = IntelligentComparator(embedding_threshold=0.70)
 
-        # Test substring matching
+        # Test substring matching - embeddings will handle this
         result = comparator.compare(
             "faster data access", "The main benefit of caching is faster data access"
         )
         assert result.matched
-        assert result.confidence >= 0.9
+        assert result.confidence >= 0.70
 
-        # Test key phrase matching
+        # Test semantic matching - embeddings handle synonym detection
         result = comparator.compare(
             "faster access", "The system provides quicker data retrieval"
         )
-        # Should match via key-phrase rule (word overlap)
-        assert result.confidence > 0.5
+        # Embeddings should detect semantic similarity
+        assert result.confidence > 0.50
 
 
 class TestIntelligentComparatorWithEmbeddings:
     """Test intelligent comparator with embeddings (if available)."""
 
     def test_gracefully_handles_missing_embeddings(self):
-        """Should not crash if embeddings not installed."""
-        comparator = IntelligentComparator(use_embeddings=True)
+        """Should not crash - embeddings are now always loaded."""
+        comparator = IntelligentComparator()
 
-        # Should still work with fallback
+        # Should work with embeddings (now required)
         result = comparator.compare("hello", "hello")
         assert result.matched
 
     @pytest.mark.skipif(not _embeddings_available(), reason="Embeddings not installed")
     def test_uses_embeddings_when_available(self):
-        """Should use embeddings for semantic matching when available."""
-        comparator = IntelligentComparator(use_embeddings=True)
+        """Should use embeddings for semantic matching."""
+        comparator = IntelligentComparator(embedding_threshold=0.70)
 
         result = comparator.compare("reduced latency", "faster response times")
 
-        # If embeddings available, should detect semantic similarity
+        # Embeddings should detect semantic similarity
         assert result.confidence > 0.6
