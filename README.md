@@ -138,16 +138,23 @@ Ensures LLM outputs remain stable across multiple runs:
 ### Energy Scoring
 
 CERT uses a three-component energy function:
-
-```
-Energy = 1 - (0.25 × semantic + 0.55 × NLI + 0.20 × grounding)
-```
-
 - **Semantic**: Cosine similarity of embeddings (catches paraphrases)
 - **NLI**: Entailment score from transformer (catches contradictions)
 - **Grounding**: Term overlap ratio (catches invented terminology)
 
-Lower energy = better grounding. Threshold 0.3 works for most applications.
+
+$E(c,a)=1−(\alpha⋅s_{semantic}​(c,a)+\beta⋅s_{nli}​(c,a)+\gamma⋅s_{grounding}​(c,a))$
+
+with weights $\alpha + \beta + \gamma = 1$ and empirically chosen as:
+
+$\alpha$=0.25,
+$\beta$=0.55,
+$\gamma$=0.20
+
+$E(\mathbf{c}, \mathbf{a}) \approx 0$ → well grounded, consistent with context
+
+$E(\mathbf{c}, \mathbf{a}) \approx 1$ → answer contradicts or unsupported by context
+
 
 ### NLI Contradiction Detection
 
@@ -155,6 +162,13 @@ Uses `microsoft/deberta-v3-base` trained on MNLI:
 - 90%+ accuracy on contradiction detection
 - Proven on financial, medical, and legal domains
 - No fine-tuning required
+
+We flag critical contradictions when:
+
+$s_{\text{nli}}(\mathbf{c}, \mathbf{a}) < \tau_{\text{critical}}$
+
+with $\tau_{\text{critical}} = 0.3$ empirically chosen for high-risk systems. This threshold can be adjusted based on domain requirements and risk tolerance.
+
 
 ## Examples
 
