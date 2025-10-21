@@ -47,7 +47,7 @@ from cert import compare
 # Fast mode (~50ms) - Development, unit tests, CI/CD
 result = compare("revenue increased", "sales grew")
 if result.matched:
-    print(f"✓ Match! Confidence: {result.confidence:.1%}")
+    print(f" Match! Confidence: {result.confidence:.1%}")
 
 # NLI mode (~300ms) - Production RAG verification
 context = "Apple's Q4 2024 revenue was $391.035 billion"
@@ -55,11 +55,11 @@ answer = "Apple's Q4 2024 revenue was $450 billion"
 
 result = compare(context, answer, use_nli=True)
 if not result.matched:
-    print(f"✗ Hallucination detected: {result.explanation}")
+    print(f" Hallucination detected: {result.explanation}")
     # result.rule = "nli-contradiction" or "numeric-contradiction"
 ```
 
-**Fast mode** (default): Regex contradictions + embeddings (~50ms)
+**Fast mode** (default): Contradictions + embeddings (~50ms)
 - Use for: Development, unit tests, model regression testing
 
 **NLI mode** (`use_nli=True`): Transformer-based detection (~300ms)
@@ -168,16 +168,17 @@ with $\tau_{\text{critical}} = 0.3$ empirically chosen for high-risk systems. Th
 See `examples/` for complete working examples:
 
 - **`financial_rag_hallucination.py`**: Financial RAG with NLI contradiction detection
-- **`01_chatbot_consistency.py`**: Chatbot consistency testing with fast/NLI modes
+- **`01_LLM_response_consistency.py`**: Chatbot consistency testing with fast/NLI modes
 - **`02_rag_retrieval.py`**: RAG retrieval consistency testing
-- **`03_model_regression.py`**: Testing model changes don't break responses
+- **`03_model_matching.py`**: Testing model changes don't break responses
 - **`04_pytest_integration.py`**: Pytest integration patterns
-- **`05_real_llm_testing.py`**: Live OpenAI/LLM testing
+- **`05_real_llm_testing.py`**: Anthropic-OpenAI/LLM testing
+- **`06_rag_hallucination_detection.py`**: RAG systems check
 
 Run any example:
 ```bash
-python examples/financial_rag_hallucination.py
-python examples/01_chatbot_consistency.py --nli
+python examples/06_rag_hallucination_detection.py
+python examples/01_LLM_response_consistency.py --nli
 ```
 
 ## Configuration
@@ -186,17 +187,18 @@ python examples/01_chatbot_consistency.py --nli
 
 ```python
 config = {
-    'n_trials': 10,           # More trials = better statistics
+    'n_trials': 10,           # More trials = most significant results
     'energy_threshold': 0.3   # Lower = stricter
 }
 ```
 
 Recommended thresholds:
-- **High-stakes (financial, medical)**: 0.3
+- **High-stakes (financial, medica, legal)**: 0.3
 - **General RAG applications**: 0.4
 - **Low-stakes (recommendations)**: 0.5
 
 ### Custom Component Weights
+Component weights can be calibrated for each context.
 
 ```python
 from cert.energy import ProductionEnergyScorer
@@ -226,7 +228,7 @@ scorer = ProductionEnergyScorer(
 
 CERT helps satisfy Article 15 requirements for high-risk AI systems:
 
-- Appropriate measures to detect errors"
+- Appropriate measures to detect errors
 - Audit trail of verification
 - Documented testing methodology
 - Production-ready validation
@@ -256,9 +258,9 @@ If you use CERT in research, please cite:
 
 ```bibtex
 @software{cert_framework,
-  title = {CERT Framework: Production-Ready Hallucination Detection for LLM Systems},
+  title = {CERT Framework: Context Entailment Reliability Testing},
   author = {Marin, Javier},
-  year = {2024},
+  year = {2025},
   url = {https://github.com/Javihaus/cert-framework}
 }
 ```
