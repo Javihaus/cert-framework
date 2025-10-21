@@ -1,5 +1,5 @@
 """
-Financial RAG Hallucination Detection Example
+RAG Hallucination Detection Example in Financial Context
 
 Demonstrates using CERT to detect when a RAG system hallucinates
 financial data by contradicting source documents.
@@ -255,7 +255,7 @@ def main():
     print(
         "║"
         + " " * 10
-        + "CERT FRAMEWORK - FINANCIAL RAG HALLUCINATION DETECTION"
+        + "CERT FRAMEWORK - RAG HALLUCINATION DETECTION"
         + " " * 4
         + "║"
     )
