@@ -223,14 +223,64 @@ benchmarks. Contributions **welcome!**
 - **Memory**: ~2GB RAM with both models loaded
 - **First run**: Downloads models automatically, subsequent runs load from cache
 
-## EU AI Act Compliance
+## EU AI Act Compliance Support
 
-CERT helps satisfy Article 15 requirements for high-risk AI systems:
+CERT provides technical capabilities aligned with EU AI Act requirements for high-risk AI systems. The EU AI Act (Regulation 2024/1689) came into force August 1, 2024, with full compliance required by August 2, 2026.
 
-- Appropriate measures to detect errors
-- Audit trail of verification
-- Documented testing methodology
-- Production-ready validation
+### Relevant Requirements
+
+**[Article 15: Accuracy, Robustness and Cybersecurity](https://artificialintelligenceact.eu/article/15/)**
+- Systems must achieve "appropriate levels of accuracy" (Art. 15.1)
+- Accuracy metrics must be "declared in accompanying instructions" (Art. 15.3)
+- Systems must be "resilient regarding errors, faults or inconsistencies" (Art. 15.4)
+
+**[Article 12: Record-Keeping](https://artificialintelligenceact.eu/article/12/)** & **[Article 19: Automatically Generated Logs](https://artificialintelligenceact.eu/article/19/)**
+- "Automatic recording of events (logs) over the lifetime of the system" (Art. 12.1)
+- Logs must enable "identifying situations that may result in...risk" (Art. 12.2.a)
+- Logs must "facilitate post-market monitoring" (Art. 12.2.b)
+- Providers must retain logs for "at least six months" (Art. 19.1)
+
+### How CERT Helps
+
+**Error Detection (Article 15.1)**  
+CERT's NLI contradiction detection and energy scoring provide systematic error detection for RAG/LLM systems. This supports the requirement for "appropriate measures to detect errors."
+
+**Accuracy Documentation (Article 15.3)**  
+CERT's `TestRunner` generates metrics (contradiction rate, average energy) that can be included in accuracy declarations required by Article 15.3.
+
+**Audit Trails (Article 12 & 19)**  
+CERT test results create timestamped records of system verification, supporting automated logging requirements. Export results to your logging infrastructure for 6+ month retention.
+
+### Official Resources
+
+**Determine Your Obligations:**
+- [EU AI Act Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/) - 10-minute interactive tool to assess if your system is high-risk
+- [Small Business Guide](https://artificialintelligenceact.eu/small-businesses-guide-to-the-ai-act/) - Everything SMEs need to know
+
+**Read the Regulation:**
+- [Article 15 Full Text](https://artificialintelligenceact.eu/article/15/) - Accuracy, robustness, and cybersecurity requirements
+- [Article 12 Full Text](https://artificialintelligenceact.eu/article/12/) - Record-keeping requirements
+- [AI Act Explorer](https://artificialintelligenceact.eu/ai-act-explorer/) - Searchable full text of the regulation
+
+**Implementation:**
+- [Implementation Timeline](https://artificialintelligenceact.eu/ai-act-implementation-next-steps/) - Key dates and deadlines
+- [High-Level Summary](https://artificialintelligenceact.eu/high-level-summary/) - 10-minute overview of the Act
+
+### Important Disclaimers
+
+**CERT is a technical testing tool, not a compliance solution.**
+
+- Using CERT does not automatically ensure EU AI Act compliance
+- Compliance requires organizational processes, documentation, and governance beyond technical testing
+- High-risk system classification depends on your specific use case - use the [Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/) to determine obligations
+- Seek professional legal advice for compliance strategy
+
+**Compliance Deadlines:**
+- August 2, 2025: Prohibited AI systems ban takes effect
+- August 2, 2026: High-risk AI system requirements take full effect
+- August 2, 2027: Obligations for General Purpose AI models with systemic risk
+
+For comprehensive compliance guidance you can contact us at info@cert-framework.com
 
 
 ### Run Tests
@@ -268,14 +318,6 @@ If you use CERT in research, please cite:
 - **Issues**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)
 - **Documentation**: See `examples/` for working code
 
-## Architecture
+## Contact
 
-CERT provides two APIs for different use cases:
-
-1. **Simple API** (`compare()`): One-line verification for single comparisons
-   - Ideal for: Production RAG pipelines, real-time verification
-   - Returns: `ComparisonResult` with matched status and explanation
-
-2. **Batch API** (`TestRunner`): Statistical analysis across multiple trials
-   - Ideal for: Testing, regression detection, quality monitoring
-   - Returns: Aggregate metrics (contradiction rate, average energy)
+CERT is an ongoing and more ambitious project. Currently several modules are under development (agentic pipeline monitoring, advanced RAG sytems for critical contexts, etc.) You can contact me at info@cert-framework.com if you want a participate or need my service as a specialized consultant. 
