@@ -2,8 +2,8 @@
 """
 Example 5: Testing with Real LLM APIs
 
-⚠️  COST WARNING: This makes 5 API calls (~$0.001-0.002)
-⚠️  SETUP REQUIRED: Set OPENAI_API_KEY or ANTHROPIC_API_KEY
+COST WARNING: This makes 5 API calls (check the cost with your LLM provider)
+SETUP REQUIRED: Set OPENAI_API_KEY or ANTHROPIC_API_KEY
 
 This example uses actual OpenAI/Anthropic APIs to demonstrate CERT
 with real non-deterministic LLM outputs.
@@ -14,10 +14,9 @@ import sys
 
 # Show cost warning BEFORE any imports or execution
 print("\n" + "=" * 70)
-print("⚠️  REAL LLM API TESTING")
+print("REAL LLM API TESTING")
 print("=" * 70)
 print("\nThis example makes 5 real API calls")
-print("Estimated cost: $0.001-0.002")
 print("Runtime: ~5 seconds\n")
 
 # Check for API keys BEFORE trying imports
@@ -25,7 +24,7 @@ has_openai_key = bool(os.getenv("OPENAI_API_KEY"))
 has_anthropic_key = bool(os.getenv("ANTHROPIC_API_KEY"))
 
 if not has_openai_key and not has_anthropic_key:
-    print("❌ ERROR: No API key found\n")
+    print(" ERROR: No API key found\n")
     print("Setup (choose one):")
     print("  export OPENAI_API_KEY='sk-...'")
     print("  export ANTHROPIC_API_KEY='sk-ant-...'\n")
@@ -49,7 +48,7 @@ if has_openai_key:
         API_KEY = os.getenv("OPENAI_API_KEY")
         print(f"✓ Using OpenAI (found OPENAI_API_KEY)")
     except ImportError:
-        print("❌ OPENAI_API_KEY found but openai package not installed")
+        print("  OPENAI_API_KEY found but openai package not installed")
         print("   Run: pip install openai\n")
         has_openai_key = False
 
@@ -61,11 +60,11 @@ if not LLM_PROVIDER and has_anthropic_key:
         API_KEY = os.getenv("ANTHROPIC_API_KEY")
         print(f"✓ Using Anthropic (found ANTHROPIC_API_KEY)")
     except ImportError:
-        print("❌ ANTHROPIC_API_KEY found but anthropic package not installed")
+        print("  ANTHROPIC_API_KEY found but anthropic package not installed")
         print("   Run: pip install anthropic\n")
 
 if not LLM_PROVIDER:
-    print("\n❌ ERROR: Could not load any LLM provider")
+    print("\n  ERROR: Could not load any LLM provider")
     print("\nInstall one of:")
     print("  pip install openai")
     print("  pip install anthropic\n")
@@ -192,11 +191,11 @@ def test_hallucination_detection():
     print(f"\nConfidence: {result.confidence:.0%}")
 
     if not result.matched:
-        print("✓ PASS: CERT correctly identified different answers")
+        print(" PASS: CERT correctly identified different answers")
         print("  → Framework catches hallucinations/wrong outputs")
         return True
     else:
-        print("✗ FAIL: CERT thinks these are equivalent")
+        print(" FAIL: CERT thinks these are equivalent")
         print("  → This shouldn't happen - outputs are clearly different")
         return False
 
@@ -220,11 +219,11 @@ if __name__ == "__main__":
         print("\n" + "=" * 70)
         print("SUMMARY")
         print("=" * 70)
-        print(f"\nConsistency Test: {'✓ PASSED' if test1_passed else '✗ FAILED'}")
-        print(f"Hallucination Test: {'✓ PASSED' if test2_passed else '✗ FAILED'}")
+        print(f"\nConsistency Test: {' PASSED' if test1_passed else ' FAILED'}")
+        print(f"Hallucination Test: {' PASSED' if test2_passed else ' FAILED'}")
 
         if test1_passed and test2_passed:
-            print("\n✓ CERT successfully validates real LLM outputs")
+            print("\n CERT successfully validates real LLM outputs")
             print("  → Ready to integrate into your testing pipeline")
         else:
             print("\n✗ Some tests failed - review outputs above")
@@ -233,7 +232,7 @@ if __name__ == "__main__":
         print("\n\nInterrupted by user")
         sys.exit(0)
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n  Error: {e}")
         print("\nTroubleshooting:")
         print("  - Check API key is valid")
         print("  - Verify you have API credits")
