@@ -1,5 +1,5 @@
 """
-Example 3: Model Regression Testing
+Example 3: Model Matching Testing
 
 Problem: Upgrading models (GPT-3.5 → GPT-4, model version bumps) can break outputs.
 Solution: CERT validates new model outputs match old model on test cases.
