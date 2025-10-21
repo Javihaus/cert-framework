@@ -1,5 +1,5 @@
 """
-Example 1: Testing Chatbot Response Consistency
+Example 1: Testing LLM Response Consistency
 
 Problem: LLMs are non-deterministic. Same question, different answers.
 Solution: CERT validates answers are semantically equivalent.
