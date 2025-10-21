@@ -1,6 +1,6 @@
 # CERT Framework
 
-##Context Entailment Reliability Testing for LLM Systems
+## Context Entailment Reliability Testing for LLM Systems
 
 CERT detects when LLM outputs contradict or aren't grounded in source context. 
 It combines NLI models, semantic embeddings, and grounding heuristics to verify 
