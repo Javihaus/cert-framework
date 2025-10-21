@@ -118,7 +118,7 @@ CERT uses a three-component "energy" function:
 
 E(c,a) = 1 - (α·s_semantic + β·s_nli + γ·s_grounding)
 
-with weights α + β + γ = 1$. Our default weights (semantic=0.25, 
+with weights α + β + γ = 1. Our default weights (semantic=0.25, 
 nli=0.55, grounding=0.20) were optimized  on a validation set of 500 RAG 
 examples (legal and financial contexts) with human annotated hallucinations.
 
@@ -195,7 +195,7 @@ scorer = ProductionEnergyScorer(
 
 CERT development included comparative testing of learned vs. rule-based approaches:
 
-**Experiment (100 RAG manually annotated examples from the document "Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024)" (known as EU AI Act): https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689**
+We have performed several experiments within the legal, financial and health-care context. Last experiment have been a 100 RAG manually annotated examples from the document "Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024)" (known as EU AI Act): https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
 
 Rule-based production energy scorer with:
 - NLI contradiction detection (microsoft/deberta-v3-base  with 90%+ MNLI accuracy)
