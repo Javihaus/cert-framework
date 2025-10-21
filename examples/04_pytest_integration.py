@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print()
     print("Method 1: Direct API Usage")
     print("-" * 70)
-    print("""
+
 from cert import compare
 
 def test_llm_consistency():
