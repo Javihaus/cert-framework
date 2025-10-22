@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cert-framework"
-version = "0.3.1"
-description = "A framework to test your LLM application for reliability"
+version = "1.1.0"
+description = "CERT Framework: Context Entailment Reliability Testing + Agentic Benchmarking for LLM Systems"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "ISC"}
@@ -33,6 +33,7 @@ dependencies = [
     "transformers>=4.30.0",
     "numpy>=1.21.0",
     "typing-extensions>=4.0.0",
+    "scipy>=1.7.0",  # For statistical analysis in benchmarking
 ]
 
 [project.optional-dependencies]
@@ -60,6 +61,14 @@ notebook = [
 llm-judge = [
     "anthropic>=0.18.0",
 ]
+benchmark = [
+    "anthropic>=0.25.0",  # For Anthropic provider benchmarking
+    "openai>=1.0.0",  # For OpenAI provider benchmarking
+    "google-generativeai>=0.3.0",  # For Google Gemini benchmarking
+    "matplotlib>=3.5.0",  # For visualization (optional)
+    "pandas>=1.3.0",  # For data analysis (optional)
+    "seaborn>=0.12.0",  # For advanced visualizations (optional)
+]
 all = [
     "flask>=2.0.0",
     "jinja2>=3.0.0",
@@ -67,7 +76,12 @@ all = [
     "langchain-core>=0.1.0",
     "ipython>=7.0.0",
     "ipywidgets>=8.0.0",
-    "anthropic>=0.18.0",
+    "anthropic>=0.25.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
+    "matplotlib>=3.5.0",
+    "pandas>=1.3.0",
+    "seaborn>=0.12.0",
 ]
 
 [project.urls]
