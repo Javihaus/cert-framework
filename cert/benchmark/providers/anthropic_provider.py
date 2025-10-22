@@ -1,7 +1,6 @@
 """Anthropic Claude provider implementation."""
 
 import time
-from typing import Optional
 
 from .base import ProviderInterface, ResponseMetadata
 

@@ -1,13 +1,12 @@
 """CERT Benchmark Engine - main orchestration logic."""
 
-import asyncio
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Dict
 
 from .config import BenchmarkConfig
 from .metrics.base import MetricRegistry
-from .providers.base import ProviderInterface, ResponseMetadata
+from .providers.base import ProviderInterface
 from .types import BenchmarkSummary
 
 

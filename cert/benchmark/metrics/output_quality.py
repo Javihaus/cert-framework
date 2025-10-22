@@ -3,7 +3,6 @@
 Analyzes response characteristics including length, diversity, and repetition patterns.
 """
 
-import re
 from collections import Counter
 
 import numpy as np
