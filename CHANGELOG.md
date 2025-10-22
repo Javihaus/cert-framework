@@ -94,6 +94,32 @@ from cert import compare, TestRunner
 from cert.benchmark import BenchmarkConfig, CERTBenchmarkEngine
 ```
 
+### Testing
+
+**Unit Tests Added**:
+- ✅ `test_latency_metric.py`: 12 test cases (percentiles, throughput, validation)
+- ✅ `test_consistency_metric.py`: 8 test cases (embedding-based consistency)
+- ✅ `test_robustness_metric.py`: 8 test cases (error classification, rates)
+- ✅ `test_config.py`: 13 test cases (configuration validation)
+- ✅ Test fixtures with mock response generators
+
+**Test Coverage**: Core metrics and configuration validated
+
+**Running Tests**:
+```bash
+pytest tests/unit/benchmark/ -v
+```
+
+### Documentation
+
+**New Documentation**:
+- ✅ `docs/METRICS_METHODOLOGY.md`: Comprehensive methodology guide
+  - Mathematical foundations for each metric
+  - Interpretation guidelines and thresholds
+  - Statistical confidence and sample sizes
+  - Reproducibility best practices
+  - Use case examples
+
 ### Known Limitations
 
 - Benchmark module requires provider API keys (Anthropic, OpenAI, Google, xAI)
