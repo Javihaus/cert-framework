@@ -5,10 +5,12 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
   
-## Context Entailment Reliability Testing for LLM Systems
+## Two Powerful Capabilities in One Framework
 
-CERT detects when LLM outputs contradict or aren't grounded in source context. 
-It combines NLI models, semantic embeddings, and grounding heuristics to verify 
+### 1. Context Entailment & RAG Testing
+
+CERT detects when LLM outputs contradict or aren't grounded in source context.
+It combines NLI models, semantic embeddings, and grounding heuristics to verify
 that generated text is logically entailed by provided context.
 
 **Key Features:**
@@ -17,11 +19,54 @@ that generated text is logically entailed by provided context.
 - Detects numeric contradictions, unit errors, invented facts
 - EU AI Act Article 15 compliant (audit trails, error detection)
 - No fine-tuning required - works out-of-the-box
+
+### 2. Agentic Benchmarking (NEW in v1.1!)
+
+Compare language models across multiple providers (Anthropic, OpenAI, Google, xAI)
+on key business dimensions:
+
+**Benchmark Metrics:**
+- **Consistency**: Behavioral reliability across multiple trials
+- **Performance**: Output quality across diverse prompts
+- **Latency**: Response time, P95/P99 percentiles, throughput
+- **Output Quality**: Length, diversity, repetition patterns
+- **Robustness**: Error rates, timeout handling, reliability
+
+**Quick Example:**
+```python
+from cert.benchmark import BenchmarkConfig, CERTBenchmarkEngine, AnthropicProvider, OpenAIProvider
+
+config = BenchmarkConfig(
+    consistency_trials=20,
+    providers={'anthropic': ['claude-3-5-haiku-20241022'], 'openai': ['gpt-4o-mini']}
+)
+
+providers = {
+    'anthropic': AnthropicProvider(api_key='...'),
+    'openai': OpenAIProvider(api_key='...'),
+}
+
+engine = CERTBenchmarkEngine(config, providers)
+summary = await engine.run_full_benchmark()
+
+# Access results
+for result in summary.consistency_results:
+    print(f"{result.provider}/{result.model}: {result.consistency_score:.3f}")
+```
+
+See `examples/benchmark_llm_providers.py` for complete example.
   
 ## Installation
 
 ```bash
+# Core installation (RAG testing only)
 pip install cert-framework
+
+# With benchmarking capabilities
+pip install cert-framework[benchmark]
+
+# Full installation (all features)
+pip install cert-framework[all]
 ```
 ## Requirements
 

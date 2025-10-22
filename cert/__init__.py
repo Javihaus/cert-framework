@@ -39,7 +39,7 @@ try:
 except ImportError:
     __all_llm_judge__ = []
 
-__version__ = "0.3.1"
+__version__ = "1.1.0"
 
 __all__ = (
     [
@@ -71,3 +71,6 @@ __all__ = (
     + __all_embeddings__
     + __all_llm_judge__
 )
+
+# Benchmark module is available as cert.benchmark
+# Example: from cert.benchmark import CERTBenchmarkEngine, BenchmarkConfig
