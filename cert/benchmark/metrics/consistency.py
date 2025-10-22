@@ -26,6 +26,9 @@ class ConsistencyMetric(MetricBase):
         Returns:
             ConsistencyResult
         """
+        if "responses" not in data:
+            raise ValueError("At least 2 valid responses required")
+
         responses = data["responses"]
         valid_responses = [r for r in responses if r and len(r.strip()) > 0]
 
