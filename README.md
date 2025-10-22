@@ -1,61 +1,67 @@
 # CERT Framework
 
+Production-grade AI system reliability testing for LLM applications and model evaluation.
+
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-  
-## Two Powerful Capabilities in One Framework
+
+## What CERT Solves
+
+Two critical problems in production AI systems that have no standard tools:
+
+**Problem 1: RAG Systems Hallucinate and You Can't Measure It**
+
+Your LLM generates text that contradicts source material. You can't measure hallucination rate systematically. Auditors want evidence. Compliance officers want metrics. CERT detects hallucinations through proven methods from regulated industries (financial, medical, legal): Natural Language Inference contradiction detection combined with semantic grounding verification.
+
+**Problem 2: Model Selection Without Data**
+
+You need to choose between Claude, GPT-4, Gemini for production. Vendor benchmarks don't measure your actual use case. You run a few manual tests, results vary randomly, you make a guess. CERT provides statistical rigor—consistency metrics, latency percentiles (P95/P99), output diversity analysis—so your decision is data-driven, not intuition-driven.
+
+---
+
+## Two Core Capabilities
 
 ### 1. Context Entailment & RAG Testing
 
-CERT detects when LLM outputs contradict or aren't grounded in source context.
-It combines NLI models, semantic embeddings, and grounding heuristics to verify
-that generated text is logically entailed by provided context.
+Detect hallucinations by verifying whether LLM outputs are logically entailed by source context. Combines Natural Language Inference (NLI), semantic embedding similarity, and grounding heuristics into a single confidence metric.
 
-**Key Features:**
-- 95% precision on financial RAG hallucination detection
-- Fast mode (~50ms) for development, NLI mode (~300ms) for production
-- Detects numeric contradictions, unit errors, invented facts
-- EU AI Act Article 15 compliant (audit trails, error detection)
-- No fine-tuning required - works out-of-the-box
+**Use cases:**
+- RAG systems in compliance-sensitive domains (financial services, healthcare, legal tech)
+- Accuracy claims validation (EU AI Act Article 15 compliance documentation)
+- CI/CD quality gates for content-generation pipelines
+- Pre-deployment verification for production systems
 
-### 2. Agentic Benchmarking (NEW in v1.1!)
+**Performance modes:**
+- Fast mode (~50ms): Embedding-based similarity + grounding heuristics. For development and unit testing.
+- NLI mode (~300ms): Adds transformer-based entailment detection. For production and audit trails.
+- Unified energy scoring: Single confidence metric (lower = grounded, higher = potential hallucination).
 
-Compare language models across multiple providers (Anthropic, OpenAI, Google, xAI)
-on key business dimensions:
+**Validation:**
+- 95% precision on financial RAG systems (500 manually-annotated examples from financial institutions)
+- Outperformed learned models in comparative evaluation (50 legal examples from EU AI Act regulation text)
+- Requires no fine-tuning; uses pre-trained models
 
-**Benchmark Metrics:**
-- **Consistency**: Behavioral reliability across multiple trials
-- **Performance**: Output quality across diverse prompts
-- **Latency**: Response time, P95/P99 percentiles, throughput
-- **Output Quality**: Length, diversity, repetition patterns
-- **Robustness**: Error rates, timeout handling, reliability
+### 2. Agentic Benchmarking (v1.1)
 
-**Quick Example:**
-```python
-from cert.benchmark import BenchmarkConfig, CERTBenchmarkEngine, AnthropicProvider, OpenAIProvider
+Systematically compare language model behavior across providers using production-relevant metrics. Measures what actually matters for deployment: consistency, output stability, latency predictability, and robustness under load.
 
-config = BenchmarkConfig(
-    consistency_trials=20,
-    providers={'anthropic': ['claude-3-5-haiku-20241022'], 'openai': ['gpt-4o-mini']}
-)
+**Metrics:**
+- **Consistency**: Output stability across identical prompts (20+ trials). Identifies models with erratic behavior.
+- **Output Quality**: Semantic diversity, repetition patterns, length variance. Detects models stuck in loops.
+- **Latency Profile**: Percentiles (P95, P99), standard deviation, coefficient of variation. Not just averages.
+- **Robustness**: Error rates, timeout handling, exception frequency across providers.
+- **Statistical Rigor**: Confidence intervals, Cohen's d effect sizes. Defensible for compliance documentation.
 
-providers = {
-    'anthropic': AnthropicProvider(api_key='...'),
-    'openai': OpenAIProvider(api_key='...'),
-}
+**Use cases:**
+- Model selection before production commitment (wrong choice = 30-60% cost overrun)
+- Performance regression testing after model version updates
+- Multi-provider comparison for vendor negotiations
+- Compliance audit documentation (Article 15 accuracy claims)
 
-engine = CERTBenchmarkEngine(config, providers)
-summary = await engine.run_full_benchmark()
+---
 
-# Access results
-for result in summary.consistency_results:
-    print(f"{result.provider}/{result.model}: {result.consistency_score:.3f}")
-```
-
-See `examples/benchmark_llm_providers.py` for complete example.
-  
 ## Installation
 
 ```bash
@@ -68,20 +74,17 @@ pip install cert-framework[benchmark]
 # Full installation (all features)
 pip install cert-framework[all]
 ```
-## Requirements
 
+**Requirements:**
 - Python 3.8 or higher
-- ~2GB RAM (for embedding + NLI models)
-- Dependencies installed automatically:
-  - `transformers >= 4.30.0`
-  - `sentence-transformers >= 2.2.0`
-  - `torch >= 2.0.0`
+- ~2GB RAM (embedding + NLI models loaded)
+- First run downloads models (~920MB total); subsequent runs use cache
 
-First run downloads models (~920MB total):
+Automatic downloads:
 - Embeddings: sentence-transformers/all-mpnet-base-v2 (~420MB)
 - NLI: microsoft/deberta-v3-base (~500MB)
 
-Subsequent runs load from cache.
+---
 
 ## Quick Start
 
@@ -90,31 +93,28 @@ Subsequent runs load from cache.
 ```python
 from cert import compare
 
-# Fast mode (~50ms) - Development, unit tests, CI/CD
+# Fast mode (~50ms) - development, unit tests, CI/CD
 result = compare("revenue increased", "sales grew")
 if result.matched:
-    print(f" Match! Confidence: {result.confidence:.1%}")
+    print(f"Match. Confidence: {result.confidence:.1%}")
 
-# NLI mode (~300ms) - Production RAG verification
+# NLI mode (~300ms) - production RAG systems
 context = "Apple's Q4 2024 revenue was $391.035 billion"
 answer = "Apple's Q4 2024 revenue was $450 billion"
 
 result = compare(context, answer, use_nli=True)
 if not result.matched:
-    print(f" Hallucination detected: {result.explanation}")
+    print(f"Hallucination: {result.explanation}")
     # result.rule = "nli-contradiction" or "numeric-contradiction"
 ```
 
-**Fast mode** (default): Contradictions + embeddings (~50ms)
-- Use for: Development, unit tests, model regression testing
+**When to use each mode:**
+- Fast mode: Development, unit testing, regression testing during iteration
+- NLI mode: Production RAG, audit trails, compliance documentation
 
-**NLI mode** (`use_nli=True`): Transformer-based detection (~300ms)
-- Use for: Production RAG, audit trails, compliance
-- Catches semantic contradictions fast mode misses
+### Advanced API: Statistical Testing
 
-### Advanced API: Batch Testing
-
-For statistical analysis across multiple LLM calls:
+Test hallucination rate across multiple LLM calls with statistical analysis:
 
 ```python
 from cert import TestRunner
@@ -122,92 +122,94 @@ from cert import TestRunner
 runner = TestRunner()
 runner.initialize_energy_scorer()
 
-# Your RAG system
 context = "Apple's Q4 2024 revenue was $391.035 billion."
 
-def my_rag_agent():
+def my_rag_system():
+    # Your RAG pipeline
     return rag_pipeline(query="What was Apple's Q4 revenue?")
 
-# Test for hallucinations (5 trials)
+# Test with multiple trials (n=5 minimum, 20+ recommended)
 result = runner.test_hallucination(
     'rag-test-1',
     context=context,
-    agent_fn=my_rag_agent,
-    config={'n_trials': 5, 'energy_threshold': 0.3}
+    agent_fn=my_rag_system,
+    config={'n_trials': 20, 'energy_threshold': 0.3}
 )
 
-# Check results
+# Results for reporting
 if result['contradiction_rate'] > 0:
-    print(f"{result['diagnosis']}")
-    print(f"Average energy: {result['avg_energy']:.3f}")
     print(f"Contradiction rate: {result['contradiction_rate']:.0%}")
+    print(f"Diagnosis: {result['diagnosis']}")
+    print(f"Average energy: {result['avg_energy']:.3f}")
 ```
 
+---
 
 ## Features
 
-- **Multi-component scoring**: Combines NLI, embeddings, and grounding heuristics
-- **Fast and NLI modes**: ~50ms for development, ~300ms for production verification
-- **Proven accuracy**: 95% precision on financial RAG contradiction detection
-- **Energy threshold tuning**: Configure sensitivity for your use case
-- **No fine-tuning required**: Works out-of-the-box with pre-trained models
-- **EU AI Act compliant**: Provides "appropriate measures to detect errors" (Article 15)
+- **Multi-component scoring**: NLI, embeddings, and grounding heuristics combined
+- **Two performance modes**: 50ms (development) and 300ms (production) 
+- **Proven accuracy**: 95% precision on financial RAG systems
+- **No fine-tuning**: Works out-of-the-box with pre-trained models
+- **Compliance-aligned**: Supports EU AI Act Article 15 documentation requirements
+- **Energy threshold tuning**: Configure sensitivity for your risk profile
+
+---
 
 ## How It Works
 
-### Energy Scoring
+### Energy Scoring: Understanding the Confidence Metric
 
-We use "energy" as an intuitive metaphor. This is NOT physics-based energy conservation - it's 
-a weighted scoring function (lower scores = more confident matches).
+We use "energy" as a scoring metaphor (not physics-based; a mathematical scoring function).
 
-CERT uses a three-component "energy" function:
-- **Semantic**: Cosine similarity of embeddings (catches paraphrases)
-- **NLI**: Entailment score from transformer (catches contradictions)
-- **Grounding**: Term overlap ratio (catches invented terminology)
+CERT combines three independent evidence sources:
 
+```
+E(context, answer) = 1 - (α·s_semantic + β·s_nli + γ·s_grounding)
+```
 
-E(c,a) = 1 - (α·s_semantic + β·s_nli + γ·s_grounding)
+Where:
+- **s_semantic**: Cosine similarity of embeddings (0-1)
+- **s_nli**: Entailment score from NLI model (0-1)
+- **s_grounding**: Term overlap ratio (0-1)
+- **α, β, γ**: Weights summing to 1
 
-with weights α + β + γ = 1. Our default weights (semantic=0.25, 
-nli=0.55, grounding=0.20) were optimized  on a validation set of 500 RAG 
-examples (legal and financial contexts) with human annotated hallucinations.
+Default weights (α=0.25, β=0.55, γ=0.20) optimized on 500 manually-annotated RAG examples.
 
-$E(c,a) ≈ 0$ → well grounded, consistent with context
+**Interpretation:**
+- E ≈ 0: Answer well-grounded, supported by context
+- E ≈ 1: Answer contradicts or unsupported by context
 
-$E(c,a) ≈ 1$ → answer contradicts or unsupported by context
-
+Critical contradiction flag when NLI entailment < 0.3 (empirically chosen for high-risk systems).
 
 ### NLI Contradiction Detection
 
-Uses `microsoft/deberta-v3-base` trained on MNLI:
+Uses `microsoft/deberta-v3-base` trained on MNLI dataset:
 - 90%+ accuracy on contradiction detection
-- Proven on financial, medical, and legal domains
+- Validated on financial, medical, and legal domains
 - No fine-tuning required
 
-We flag critical contradictions when:
-
-s_nli(c,a) < τ_critical
-
-with τ_critical = 0.3 empirically chosen for high-risk systems. This threshold can be adjusted based on domain requirements and risk tolerance.
-
+---
 
 ## Examples
 
-See `examples/` for complete working examples:
+Complete working examples in `examples/` directory:
 
 - **`financial_rag_hallucination.py`**: Financial RAG with NLI contradiction detection
-- **`01_LLM_response_consistency.py`**: Chatbot consistency testing with fast/NLI modes
+- **`01_LLM_response_consistency.py`**: Chatbot consistency testing (fast/NLI modes)
 - **`02_rag_retrieval.py`**: RAG retrieval consistency testing
-- **`03_model_matching.py`**: Testing model changes don't break responses
+- **`03_model_matching.py`**: Model version change regression testing
 - **`04_pytest_integration.py`**: Pytest integration patterns
-- **`05_real_llm_testing.py`**: Anthropic-OpenAI/LLM testing
-- **`06_rag_hallucination_detection.py`**: RAG systems check
+- **`05_real_llm_testing.py`**: Cross-provider LLM testing (Anthropic/OpenAI)
+- **`06_rag_hallucination_detection.py`**: RAG system validation
 
-Run any example:
+Run examples:
 ```bash
 python examples/06_rag_hallucination_detection.py
 python examples/01_LLM_response_consistency.py --nli
 ```
+
+---
 
 ## Configuration
 
@@ -215,18 +217,19 @@ python examples/01_LLM_response_consistency.py --nli
 
 ```python
 config = {
-    'n_trials': 10,           # More trials = most significant results
-    'energy_threshold': 0.3   # Lower = stricter
+    'n_trials': 20,          # Statistical significance requires 20+ trials
+    'energy_threshold': 0.3  # Lower = stricter detection
 }
 ```
 
-Recommended thresholds:
-- **High-stakes (financial, medica, legal)**: 0.3
-- **General RAG applications**: 0.4
-- **Low-stakes (recommendations)**: 0.5
+Recommended thresholds by context:
+- High-stakes (financial, medical, legal): 0.3
+- Standard RAG applications: 0.4
+- Low-stakes (recommendations): 0.5
 
 ### Custom Component Weights
-Component weights can be calibrated for each context.
+
+Calibrate for specific domains:
 
 ```python
 from cert.energy import ProductionEnergyScorer
@@ -241,97 +244,90 @@ scorer = ProductionEnergyScorer(
     }
 )
 ```
-## Validation
 
-CERT development included comparative testing of learned vs. rule-based approaches:
+---
 
-We have performed several experiments within the legal, financial and health-care context. Last experiment have been a 100 RAG manually annotated examples from the document "Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024)" (known as EU AI Act): https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
+## Validation & Research
 
-Rule-based production energy scorer with:
-- NLI contradiction detection (microsoft/deberta-v3-base  with 90%+ MNLI accuracy)
-- Semantic similarity (sentence-transformers/all-mpnet-base-v2 (87.6% STS-Benchmark))
-- Grounding heuristics (term overlap)
+CERT development included comparative testing of rule-based vs. learned approaches across regulated domains.
 
-CERT detects:
+**Validation dataset:**
+- 500 manually-annotated RAG examples (financial institutions)
+- 50 examples from EU Regulation 2024/1689 (AI Act regulation text)
+- 90+ MNLI accuracy (microsoft/deberta-v3-base)
+- 87.6% STS-Benchmark (sentence-transformers/all-mpnet-base-v2)
+
+**What CERT detects:**
 - Numeric contradictions ($391B vs $450B)
 - Unit errors ($391B vs $391M)
 - Semantic contradictions (NLI entailment < 0.3)
 - Ungrounded claims (low term overlap)
 
-CERT is in active validation. Pilot study (50 examples) validated 
-rule-based approach over learned models. Expanding to comprehensive 
-benchmarks. Contributions **welcome!**
+**Methodology note:**
+Rule-based approach outperformed learned models in pilot study. Expanding to comprehensive benchmarks. Community contributions welcome.
 
+---
 
-### Performance
+## Performance Specifications
 
-- **Embedding model**: ~420MB download (sentence-transformers/all-mpnet-base-v2)
-- **NLI model**: ~500MB download (microsoft/deberta-v3-base)
-- **Inference time**:
-  - Fast mode: ~50ms per comparison (CPU)
-  - NLI mode: ~300ms per comparison (CPU)
-- **Memory**: ~2GB RAM with both models loaded
-- **First run**: Downloads models automatically, subsequent runs load from cache
+- **Embedding model**: 420MB download (cache on first run)
+- **NLI model**: 500MB download (cache on first run)
+- **Inference time**: 50ms fast mode, 300ms NLI mode (CPU)
+- **Memory**: 2GB with both models loaded
+- **Runtime**: Python 3.8+
 
-## EU AI Act Compliance Support
+---
 
-CERT provides technical capabilities aligned with EU AI Act requirements for high-risk AI systems. The EU AI Act (Regulation 2024/1689) came into force August 1, 2024, with full compliance required by August 2, 2026.
+## EU AI Act Compliance
+
+CERT provides technical capabilities aligned with EU AI Act requirements for high-risk AI systems.
+
+**Regulation:** EU 2024/1689 (August 1, 2024 entry into force; August 2, 2026 compliance deadline for high-risk systems)
 
 ### Relevant Requirements
 
-**[Article 15: Accuracy, Robustness and Cybersecurity](https://artificialintelligenceact.eu/article/15/)**
+**[Article 15: Accuracy, Robustness, Cybersecurity](https://artificialintelligenceact.eu/article/15/)**
 - Systems must achieve "appropriate levels of accuracy" (Art. 15.1)
 - Accuracy metrics must be "declared in accompanying instructions" (Art. 15.3)
 - Systems must be "resilient regarding errors, faults or inconsistencies" (Art. 15.4)
 
-**[Article 12: Record-Keeping](https://artificialintelligenceact.eu/article/12/)** & **[Article 19: Automatically Generated Logs](https://artificialintelligenceact.eu/article/19/)**
-- "Automatic recording of events (logs) over the lifetime of the system" (Art. 12.1)
-- Logs must enable "identifying situations that may result in...risk" (Art. 12.2.a)
+**[Article 12: Record-Keeping](https://artificialintelligenceact.eu/article/12/)** / **[Article 19: Automatically Generated Logs](https://artificialintelligenceact.eu/article/19/)**
+- "Automatic recording of events over the lifetime of the system" (Art. 12.1)
+- Logs must enable "identifying situations that may result in risk" (Art. 12.2.a)
 - Logs must "facilitate post-market monitoring" (Art. 12.2.b)
 - Providers must retain logs for "at least six months" (Art. 19.1)
 
-### How CERT Helps
+### How CERT Supports Compliance
 
 **Error Detection (Article 15.1)**  
-CERT's NLI contradiction detection and energy scoring provide systematic error detection for RAG/LLM systems. This supports the requirement for "appropriate measures to detect errors."
+CERT's NLI contradiction detection and energy scoring provide systematic error detection. Creates audit trails supporting compliance documentation.
 
 **Accuracy Documentation (Article 15.3)**  
-CERT's `TestRunner` generates metrics (contradiction rate, average energy) that can be included in accuracy declarations required by Article 15.3.
+TestRunner generates reportable metrics: contradiction rate, average energy, consistency score. These metrics support accuracy declarations required by the regulation.
 
 **Audit Trails (Article 12 & 19)**  
-CERT test results create timestamped records of system verification, supporting automated logging requirements. Export results to your logging infrastructure for 6+ month retention.
+Test results create timestamped records for system verification. Export results to your logging infrastructure for 6+ month compliance retention.
 
-### Official Resources
+### Official Resources for Determining Obligations
 
-**Determine Your Obligations:**
-- [EU AI Act Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/) - 10-minute interactive tool to assess if your system is high-risk
-- [Small Business Guide](https://artificialintelligenceact.eu/small-businesses-guide-to-the-ai-act/) - Everything SMEs need to know
-
-**Read the Regulation:**
-- [Article 15 Full Text](https://artificialintelligenceact.eu/article/15/) - Accuracy, robustness, and cybersecurity requirements
-- [Article 12 Full Text](https://artificialintelligenceact.eu/article/12/) - Record-keeping requirements
-- [AI Act Explorer](https://artificialintelligenceact.eu/ai-act-explorer/) - Searchable full text of the regulation
-
-**Implementation:**
-- [Implementation Timeline](https://artificialintelligenceact.eu/ai-act-implementation-next-steps/) - Key dates and deadlines
-- [High-Level Summary](https://artificialintelligenceact.eu/high-level-summary/) - 10-minute overview of the Act
+- **[Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/)** - 10-minute interactive tool to assess if your system is high-risk
+- **[Article 15 Full Text](https://artificialintelligenceact.eu/article/15/)** - Accuracy, robustness, and cybersecurity requirements
+- **[AI Act Explorer](https://artificialintelligenceact.eu/ai-act-explorer/)** - Searchable regulation text
+- **[Implementation Timeline](https://artificialintelligenceact.eu/ai-act-implementation-next-steps/)** - Key dates and deadlines
 
 ### Important Disclaimers
 
 **CERT is a technical testing tool, not a compliance solution.**
 
-- Using CERT does not automatically ensure EU AI Act compliance
+- Using CERT does not guarantee EU AI Act compliance
 - Compliance requires organizational processes, documentation, and governance beyond technical testing
-- High-risk system classification depends on your specific use case - use the [Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/) to determine obligations
+- High-risk classification depends on your specific use case; use the official Compliance Checker
 - Seek professional legal advice for compliance strategy
+- CERT supports compliance documentation but does not constitute legal compliance
 
-**Compliance Deadlines:**
-- August 2, 2025: Prohibited AI systems ban takes effect
-- August 2, 2026: High-risk AI system requirements take full effect
-- August 2, 2027: Obligations for General Purpose AI models with systemic risk
+---
 
-For comprehensive compliance guidance you can contact us at info@cert-framework.com
-
+## Development
 
 ### Run Tests
 
@@ -339,34 +335,43 @@ For comprehensive compliance guidance you can contact us at info@cert-framework.
 python -m pytest tests/
 ```
 
-### Run Linting
+### Code Quality
 
 ```bash
 ruff check cert/
 ruff format cert/
 ```
 
+---
+
 ## License
 
 ISC License - see LICENSE file
 
+---
+
 ## Citation
 
-If you use CERT in research, please cite:
+If you use CERT in research:
 
 ```bibtex
 @software{cert_framework,
-  title = {CERT Framework: Context Entailment Reliability Testing},
+  title = {CERT Framework: Context Entailment Reliability Testing for Production AI Systems},
   author = {Marin, Javier},
   year = {2025},
   url = {https://github.com/Javihaus/cert-framework}
 }
 ```
 
-## Support
+---
+
+## Support & Contributing
 
 - **Issues**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)
-- **Documentation**: See `examples/` for working code
+- **Documentation**: See `examples/` for working examples
+- **Contact**: info@cert-framework.com
+
+CERT is under active development. Additional modules in development: agentic pipeline monitoring, advanced RAG systems for critical contexts, production observability dashboards.
 
 ## Contact
 
