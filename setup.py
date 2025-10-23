@@ -46,12 +46,22 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison (required)
+        # Core ML dependencies
+        "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison
         "torch>=1.11.0",  # PyTorch for embeddings and NLI
         "transformers>=4.30.0",  # NLI models for hallucination detection
-        "numpy>=1.21.0",  # Numerical operations (compatible with numpy 2.x)
+        "numpy>=1.21.0",  # Numerical operations
         "scipy>=1.7.0",  # Scientific computing for metrics
         "typing-extensions>=4.0.0",  # Type hints for older Python
+        # LLM Provider SDKs (for agents)
+        "anthropic>=0.18.0",  # Anthropic Claude API
+        "openai>=1.0.0",  # OpenAI GPT API (also used by xAI)
+        "google-generativeai>=0.3.0",  # Google Gemini API
+        # Agentic Frameworks
+        "langchain>=0.1.0",  # LangChain framework
+        "langchain-core>=0.1.0",  # LangChain core
+        "pyautogen>=0.2.0",  # AutoGen framework
+        "crewai>=0.1.0",  # CrewAI framework
     ],
     extras_require={
         "dev": [
@@ -67,36 +77,25 @@ setup(
             "flask>=2.0.0",  # Lightweight server for inspector UI
             "jinja2>=3.0.0",  # Template engine
         ],
-        "langchain": [
-            "langchain>=0.1.0",
-            "langchain-core>=0.1.0",
-        ],
         "notebook": [
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
         ],
-        "llm-judge": [
-            "anthropic>=0.18.0",
-        ],
-        "agents": [
-            "anthropic>=0.18.0",  # Anthropic Claude API
-            "openai>=1.0.0",  # OpenAI GPT API (also used by xAI)
-            "google-generativeai>=0.3.0",  # Google Gemini API
-            "pyautogen>=0.2.0",  # AutoGen framework
-            "crewai>=0.1.0",  # CrewAI framework
-        ],
         "all": [
+            # Dev tools
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.21.0",
+            "ruff>=0.1.0",
+            "mypy>=1.0.0",
+            "datasets>=2.0.0",
+            "pandas>=1.3.0",
+            "rapidfuzz>=3.0.0",
+            # Inspector UI
             "flask>=2.0.0",
             "jinja2>=3.0.0",
-            "langchain>=0.1.0",
-            "langchain-core>=0.1.0",
+            # Notebook support
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
-            "anthropic>=0.18.0",
-            "openai>=1.0.0",
-            "google-generativeai>=0.3.0",
-            "pyautogen>=0.2.0",
-            "crewai>=0.1.0",
         ],
     },
     entry_points={

@@ -212,17 +212,19 @@ for result in summary.consistency_results:
 ### From PyPI (Recommended)
 
 ```bash
-# Core installation (includes all three capabilities: single model, RAG, and agents framework)
-# Note: To use agents with real LLM providers, install [agents] or [all]
+# Standard installation - includes everything you need for all three capabilities
 pip install cert-framework
 
-# With LLM provider SDKs and agentic frameworks (anthropic, openai, google, autogen, crewai)
-pip install cert-framework[agents]
-
-# With development tools (pytest, ruff, mypy)
+# Optional: With development tools (pytest, ruff, mypy, datasets, pandas)
 pip install cert-framework[dev]
 
-# With all optional features (LLM providers, frameworks, dev tools, langchain, inspector)
+# Optional: With inspector UI (flask web dashboard)
+pip install cert-framework[inspector]
+
+# Optional: With notebook support (ipython, ipywidgets)
+pip install cert-framework[notebook]
+
+# Optional: With all extras (dev tools + inspector + notebook)
 pip install cert-framework[all]
 ```
 
@@ -248,33 +250,32 @@ pip install -e .
 
 ### Dependencies Included
 
-**Core (included with base install):**
-- sentence-transformers (semantic embeddings)
-- transformers (NLI models)
-- torch (deep learning backend)
-- numpy, scipy (numerical operations)
-- typing-extensions (type hints)
+**Standard Installation (`pip install cert-framework`):**
 
-**What's included in base install:**
-All three capabilities (single_model, rag, agents) are available, but to actually call LLM APIs in the agents module, you need to install provider SDKs separately.
+Everything you need for all three capabilities:
 
-**LLM Providers (with [agents] or [all]):**
-- anthropic (Claude API)
-- openai (GPT API, also used by xAI)
-- google-generativeai (Gemini API)
-- pyautogen (AutoGen framework)
-- crewai (CrewAI framework)
+- **Core ML Libraries:**
+  - sentence-transformers (semantic embeddings)
+  - transformers (NLI models)
+  - torch (deep learning backend)
+  - numpy, scipy (numerical operations)
 
-**Additional frameworks (with [all] only):**
-- langchain, langchain-core
-- flask, jinja2 (inspector UI)
-- ipython, ipywidgets (notebook support)
+- **LLM Provider SDKs:**
+  - anthropic (Claude API)
+  - openai (GPT and xAI APIs)
+  - google-generativeai (Gemini API)
 
-**Development tools (with [dev] or [all]):**
-- pytest, pytest-asyncio
-- ruff (linting and formatting)
-- mypy (type checking)
-- datasets, pandas, rapidfuzz (validation tools)
+- **Agentic Frameworks:**
+  - langchain, langchain-core (LangChain)
+  - pyautogen (AutoGen)
+  - crewai (CrewAI)
+
+**Optional Extras:**
+
+- **[dev]**: Development tools (pytest, ruff, mypy, datasets, pandas, rapidfuzz)
+- **[inspector]**: Web dashboard UI (flask, jinja2)
+- **[notebook]**: Jupyter notebook support (ipython, ipywidgets)
+- **[all]**: All optional extras combined
 
 ### Model Downloads
 
