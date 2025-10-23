@@ -48,7 +48,7 @@ try:
 except ImportError:
     __all_llm_judge__ = []
 
-__version__ = "1.1.0"
+__version__ = "0.3.0"
 
 __all__ = (
     [
