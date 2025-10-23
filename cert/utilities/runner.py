@@ -49,11 +49,11 @@ class TestRunner:
         runner = TestRunner()
 
         # Embedding-based comparison (slower, better semantic matching)
-        from cert.utilities.rag.embeddings import EmbeddingComparator
+        from cert.rag.embeddings import EmbeddingComparator
         runner = TestRunner(semantic_comparator=EmbeddingComparator())
 
         # LLM-as-judge (slowest, most robust)
-        from cert.utilities.llm_judge import LLMJudgeComparator
+        from cert.single_model.llm_judge import LLMJudgeComparator
         runner = TestRunner(semantic_comparator=LLMJudgeComparator(client=client))
     """
 

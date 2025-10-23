@@ -99,7 +99,7 @@ def main():
             return 1
 
     elif args.command == "validate":
-        from cert.utilities.rag.validation import quick_validation, run_sts_benchmark
+        from cert.rag.validation import quick_validation, run_sts_benchmark
 
         if args.quick:
             quick_validation()
