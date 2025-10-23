@@ -10,8 +10,8 @@ from .types import (
     TestStatus,
     Evidence,
 )
-from .consistency import measure_consistency, autodiagnose_variance
-from .semantic import SemanticComparator
+from cert.single_model.consistency import measure_consistency, autodiagnose_variance
+from cert.rag.semantic import SemanticComparator
 
 
 class ConsistencyError(Exception):
