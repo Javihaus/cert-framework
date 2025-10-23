@@ -1,13 +1,14 @@
-name: Benchmark Validation
+name: Benchmark Validation (Disabled - Tests Moved to .old_tests)
 
 on:
-  workflow_dispatch:  # Manual trigger
-  push:
-    branches: [master]
-    paths:
-      - 'cert/**'
-      - 'tests/test_benchmark_validation.py'
-      - 'tests/test_minimal_embedding.py'
+  workflow_dispatch:  # Manual trigger only
+  # Disabled automatic trigger during reorganization
+  # push:
+  #   branches: [master]
+  #   paths:
+  #     - 'cert/**'
+  #     - 'tests/test_benchmark_validation.py'
+  #     - 'tests/test_minimal_embedding.py'
 
 jobs:
   validate-embeddings:
