@@ -50,6 +50,7 @@ setup(
         "torch>=1.11.0",  # PyTorch for embeddings and NLI
         "transformers>=4.30.0",  # NLI models for hallucination detection
         "numpy>=1.21.0",  # Numerical operations (compatible with numpy 2.x)
+        "scipy>=1.7.0",  # Scientific computing for metrics
         "typing-extensions>=4.0.0",  # Type hints for older Python
     ],
     extras_require={
@@ -77,6 +78,13 @@ setup(
         "llm-judge": [
             "anthropic>=0.18.0",
         ],
+        "agents": [
+            "anthropic>=0.18.0",  # Anthropic Claude API
+            "openai>=1.0.0",  # OpenAI GPT API (also used by xAI)
+            "google-generativeai>=0.3.0",  # Google Gemini API
+            "pyautogen>=0.2.0",  # AutoGen framework
+            "crewai>=0.1.0",  # CrewAI framework
+        ],
         "all": [
             "flask>=2.0.0",
             "jinja2>=3.0.0",
@@ -85,6 +93,10 @@ setup(
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
             "anthropic>=0.18.0",
+            "openai>=1.0.0",
+            "google-generativeai>=0.3.0",
+            "pyautogen>=0.2.0",
+            "crewai>=0.1.0",
         ],
     },
     entry_points={
