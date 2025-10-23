@@ -1,0 +1,17 @@
+# CERT Framework - Core Dependencies
+# Install with: pip install -r requirements.txt
+
+# Semantic comparison (required)
+sentence-transformers>=2.2.0,<3.0.0
+
+# PyTorch for embeddings and NLI
+torch>=1.11.0
+
+# NLI models for hallucination detection
+transformers>=4.30.0
+
+# Numerical operations
+numpy>=1.21.0
+
+# Type hints for older Python versions
+typing-extensions>=4.0.0

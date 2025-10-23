@@ -1,0 +1,16 @@
+# CERT Framework - Agent Assessment Dependencies
+# Install with: pip install -r requirements-agents.txt
+# This includes dependencies for assessing LLM providers
+
+# First install core dependencies
+-r requirements.txt
+
+# LLM Provider SDKs for agent assessment
+anthropic>=0.18.0
+openai>=1.0.0
+google-generativeai>=0.3.0
+
+# Optional: Framework integrations
+# Uncomment if you need these integrations:
+# langchain>=0.1.0
+# langchain-core>=0.1.0

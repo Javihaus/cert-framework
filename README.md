@@ -134,10 +134,34 @@ if result['contradiction_rate'] > 0:
 ---
 ## Installation
 
+### From PyPI (Recommended)
+
 ```bash
-# Core installation (RAG testing only)
+# Core installation
 pip install cert-framework
 
+# With development tools
+pip install cert-framework[dev]
+
+# With all optional features
+pip install cert-framework[all]
+```
+
+### From Source
+
+```bash
+# Clone repository
+git clone https://github.com/Javihaus/cert-framework.git
+cd cert-framework
+
+# Install core dependencies
+pip install -r requirements.txt
+
+# OR install with development dependencies
+pip install -r requirements-dev.txt
+
+# OR install package in editable mode
+pip install -e .
 ```
 
 **Requirements:**
