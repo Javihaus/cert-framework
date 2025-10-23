@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Dict
 
 from .config import AssessmentConfig
-from ..providers.base import ProviderInterface
+from .providers.base import ProviderInterface
 from .metrics.base import MetricRegistry
 from .types import AssessmentSummary
 
