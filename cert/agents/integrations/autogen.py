@@ -8,11 +8,9 @@ import time
 from typing import Any, Dict, List, Optional, Union
 
 try:
-    from autogen import Agent, ConversableAgent, GroupChat
+    from autogen import Agent, ConversableAgent, GroupChat  # noqa: F401
 except ImportError:
-    raise ImportError(
-        "AutoGen not installed. Install with: pip install pyautogen"
-    )
+    raise ImportError("AutoGen not installed. Install with: pip install pyautogen")
 
 
 class CERTAutoGenMonitor:
@@ -107,13 +105,15 @@ class CERTAutoGenMonitor:
                 # Store data
                 self.responses.append(response_text)
                 self.timings.append(latency)
-                self.metadata_list.append({
-                    "latency": latency,
-                    "agent": agent.name,
-                    "sender": sender.name if sender else None,
-                    "timestamp": time.time(),
-                    "error": None,
-                })
+                self.metadata_list.append(
+                    {
+                        "latency": latency,
+                        "agent": agent.name,
+                        "sender": sender.name if sender else None,
+                        "timestamp": time.time(),
+                        "error": None,
+                    }
+                )
 
                 return reply
 
@@ -122,13 +122,15 @@ class CERTAutoGenMonitor:
                 error = str(e)
                 self.errors.append(error)
                 self.timings.append(latency)
-                self.metadata_list.append({
-                    "latency": latency,
-                    "agent": agent.name,
-                    "sender": sender.name if sender else None,
-                    "timestamp": time.time(),
-                    "error": error,
-                })
+                self.metadata_list.append(
+                    {
+                        "latency": latency,
+                        "agent": agent.name,
+                        "sender": sender.name if sender else None,
+                        "timestamp": time.time(),
+                        "error": error,
+                    }
+                )
                 raise
 
         # Store original and replace
@@ -163,13 +165,15 @@ class CERTAutoGenMonitor:
                 # Store data
                 self.responses.append(response_text)
                 self.timings.append(latency)
-                self.metadata_list.append({
-                    "latency": latency,
-                    "agent": agent.name,
-                    "sender": sender.name if sender else None,
-                    "timestamp": time.time(),
-                    "error": None,
-                })
+                self.metadata_list.append(
+                    {
+                        "latency": latency,
+                        "agent": agent.name,
+                        "sender": sender.name if sender else None,
+                        "timestamp": time.time(),
+                        "error": None,
+                    }
+                )
 
                 return reply
 
@@ -178,13 +182,15 @@ class CERTAutoGenMonitor:
                 error = str(e)
                 self.errors.append(error)
                 self.timings.append(latency)
-                self.metadata_list.append({
-                    "latency": latency,
-                    "agent": agent.name,
-                    "sender": sender.name if sender else None,
-                    "timestamp": time.time(),
-                    "error": error,
-                })
+                self.metadata_list.append(
+                    {
+                        "latency": latency,
+                        "agent": agent.name,
+                        "sender": sender.name if sender else None,
+                        "timestamp": time.time(),
+                        "error": error,
+                    }
+                )
                 raise
 
         # Store original and replace
@@ -253,11 +259,13 @@ class CERTAutoGenMonitor:
         if "consistency" in self._metric_instances and len(self.responses) >= 2:
             try:
                 metric = self._metric_instances["consistency"]
-                result = await metric.calculate({
-                    "responses": self.responses,
-                    "provider": "autogen",
-                    "model": "multi-agent",
-                })
+                result = await metric.calculate(
+                    {
+                        "responses": self.responses,
+                        "provider": "autogen",
+                        "model": "multi-agent",
+                    }
+                )
                 results["consistency"] = result.consistency_score
                 results["consistency_details"] = result
             except Exception:
@@ -267,12 +275,14 @@ class CERTAutoGenMonitor:
         if "latency" in self._metric_instances and self.timings:
             try:
                 metric = self._metric_instances["latency"]
-                result = await metric.calculate({
-                    "timings": self.timings,
-                    "tokens_output": [100] * len(self.timings),  # Estimate
-                    "provider": "autogen",
-                    "model": "multi-agent",
-                })
+                result = await metric.calculate(
+                    {
+                        "timings": self.timings,
+                        "tokens_output": [100] * len(self.timings),  # Estimate
+                        "provider": "autogen",
+                        "model": "multi-agent",
+                    }
+                )
                 results["latency_mean"] = result.mean_latency_seconds
                 results["latency_p95"] = result.p95_latency_seconds
                 results["latency_details"] = result
@@ -283,11 +293,13 @@ class CERTAutoGenMonitor:
         if "robustness" in self._metric_instances and self.metadata_list:
             try:
                 metric = self._metric_instances["robustness"]
-                result = await metric.calculate({
-                    "metadata_list": self.metadata_list,
-                    "provider": "autogen",
-                    "model": "multi-agent",
-                })
+                result = await metric.calculate(
+                    {
+                        "metadata_list": self.metadata_list,
+                        "provider": "autogen",
+                        "model": "multi-agent",
+                    }
+                )
                 results["error_rate"] = result.error_rate
                 results["robustness_details"] = result
             except Exception:
@@ -297,11 +309,13 @@ class CERTAutoGenMonitor:
         if "output_quality" in self._metric_instances and len(self.responses) >= 2:
             try:
                 metric = self._metric_instances["output_quality"]
-                result = await metric.calculate({
-                    "responses": self.responses,
-                    "provider": "autogen",
-                    "model": "multi-agent",
-                })
+                result = await metric.calculate(
+                    {
+                        "responses": self.responses,
+                        "provider": "autogen",
+                        "model": "multi-agent",
+                    }
+                )
                 results["output_quality"] = result.semantic_diversity_score
                 results["output_quality_details"] = result
             except Exception:
@@ -321,6 +335,7 @@ class CERTAutoGenMonitor:
         if loop.is_running():
             # Already in async context, need to use nest_asyncio
             import nest_asyncio
+
             nest_asyncio.apply()
 
         return loop.run_until_complete(self._calculate_metrics())

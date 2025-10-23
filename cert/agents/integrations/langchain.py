@@ -279,7 +279,9 @@ class CERTLangChainCallback:
     def on_llm_end(self, response: Any, **kwargs):
         """Called when LLM ends."""
         call_id = id(response)
-        start_time = self._call_start_times.get(call_id, asyncio.get_event_loop().time())
+        start_time = self._call_start_times.get(
+            call_id, asyncio.get_event_loop().time()
+        )
         latency = asyncio.get_event_loop().time() - start_time
 
         # Extract response text
@@ -287,11 +289,13 @@ class CERTLangChainCallback:
 
         self.responses.append(response_text)
         self.timings.append(latency)
-        self.metadata_list.append({
-            "latency": latency,
-            "timestamp": asyncio.get_event_loop().time(),
-            "error": None,
-        })
+        self.metadata_list.append(
+            {
+                "latency": latency,
+                "timestamp": asyncio.get_event_loop().time(),
+                "error": None,
+            }
+        )
 
         if call_id in self._call_start_times:
             del self._call_start_times[call_id]
@@ -300,11 +304,13 @@ class CERTLangChainCallback:
         """Called when LLM errors."""
         error_str = str(error)
         self.errors.append(error_str)
-        self.metadata_list.append({
-            "latency": 0,
-            "timestamp": asyncio.get_event_loop().time(),
-            "error": error_str,
-        })
+        self.metadata_list.append(
+            {
+                "latency": 0,
+                "timestamp": asyncio.get_event_loop().time(),
+                "error": error_str,
+            }
+        )
 
     def on_chain_start(self, serialized: dict, inputs: dict, **kwargs):
         """Called when chain starts."""
@@ -356,11 +362,13 @@ class CERTLangChainCallback:
         if "consistency" in self._metric_instances and len(self.responses) >= 2:
             try:
                 metric = self._metric_instances["consistency"]
-                result = await metric.calculate({
-                    "responses": self.responses,
-                    "provider": "langchain",
-                    "model": "chain",
-                })
+                result = await metric.calculate(
+                    {
+                        "responses": self.responses,
+                        "provider": "langchain",
+                        "model": "chain",
+                    }
+                )
                 results["consistency"] = result.consistency_score
                 results["consistency_details"] = result
             except Exception:
@@ -370,12 +378,14 @@ class CERTLangChainCallback:
         if "latency" in self._metric_instances and self.timings:
             try:
                 metric = self._metric_instances["latency"]
-                result = await metric.calculate({
-                    "timings": self.timings,
-                    "tokens_output": [100] * len(self.timings),
-                    "provider": "langchain",
-                    "model": "chain",
-                })
+                result = await metric.calculate(
+                    {
+                        "timings": self.timings,
+                        "tokens_output": [100] * len(self.timings),
+                        "provider": "langchain",
+                        "model": "chain",
+                    }
+                )
                 results["latency_mean"] = result.mean_latency_seconds
                 results["latency_p95"] = result.p95_latency_seconds
                 results["latency_details"] = result
@@ -386,11 +396,13 @@ class CERTLangChainCallback:
         if "robustness" in self._metric_instances and self.metadata_list:
             try:
                 metric = self._metric_instances["robustness"]
-                result = await metric.calculate({
-                    "metadata_list": self.metadata_list,
-                    "provider": "langchain",
-                    "model": "chain",
-                })
+                result = await metric.calculate(
+                    {
+                        "metadata_list": self.metadata_list,
+                        "provider": "langchain",
+                        "model": "chain",
+                    }
+                )
                 results["error_rate"] = result.error_rate
                 results["robustness_details"] = result
             except Exception:
@@ -403,6 +415,7 @@ class CERTLangChainCallback:
         loop = asyncio.get_event_loop()
         if loop.is_running():
             import nest_asyncio
+
             nest_asyncio.apply()
 
         return loop.run_until_complete(self._calculate_metrics())

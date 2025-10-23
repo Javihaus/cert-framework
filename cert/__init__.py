@@ -34,7 +34,7 @@ from .rag import (
 
 # Conditional import for LangChain integration
 try:
-    from .agents.integrations.langchain import wrap_chain, CertChainWrapper
+    from .agents.integrations.langchain import wrap_chain, CertChainWrapper  # noqa: F401
 
     __all_langchain__ = ["wrap_chain", "CertChainWrapper"]
 except ImportError:
@@ -42,7 +42,7 @@ except ImportError:
 
 # Conditional import for LLM Judge comparator
 try:
-    from .single_model.llm_judge import LLMJudgeComparator
+    from .single_model.llm_judge import LLMJudgeComparator  # noqa: F401
 
     __all_llm_judge__ = ["LLMJudgeComparator"]
 except ImportError:

@@ -12,7 +12,8 @@ from .protocols import ConsistencyProtocol
 
 # Conditional import for LLM Judge
 try:
-    from .llm_judge import LLMJudgeComparator
+    from .llm_judge import LLMJudgeComparator  # noqa: F401
+
     __all_llm__ = ["LLMJudgeComparator"]
 except ImportError:
     __all_llm__ = []

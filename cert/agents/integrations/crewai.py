@@ -10,9 +10,7 @@ from typing import Any, Dict, List, Optional
 try:
     from crewai import Agent, Crew, Task
 except ImportError:
-    raise ImportError(
-        "CrewAI not installed. Install with: pip install crewai"
-    )
+    raise ImportError("CrewAI not installed. Install with: pip install crewai")
 
 
 class CERTCrewAICallback:
@@ -108,13 +106,17 @@ class CERTCrewAICallback:
         # Store data
         self.task_responses.append(output_text)
         self.task_timings.append(latency)
-        self.task_metadata.append({
-            "latency": latency,
-            "task_description": task.description if hasattr(task, "description") else "",
-            "agent": task.agent.role if hasattr(task, "agent") else None,
-            "timestamp": time.time(),
-            "error": None,
-        })
+        self.task_metadata.append(
+            {
+                "latency": latency,
+                "task_description": task.description
+                if hasattr(task, "description")
+                else "",
+                "agent": task.agent.role if hasattr(task, "agent") else None,
+                "timestamp": time.time(),
+                "error": None,
+            }
+        )
 
         # Clean up
         if task_id in self._task_start_times:
@@ -135,13 +137,17 @@ class CERTCrewAICallback:
         error_str = str(error)
         self.task_errors.append(error_str)
         self.task_timings.append(latency)
-        self.task_metadata.append({
-            "latency": latency,
-            "task_description": task.description if hasattr(task, "description") else "",
-            "agent": task.agent.role if hasattr(task, "agent") else None,
-            "timestamp": time.time(),
-            "error": error_str,
-        })
+        self.task_metadata.append(
+            {
+                "latency": latency,
+                "task_description": task.description
+                if hasattr(task, "description")
+                else "",
+                "agent": task.agent.role if hasattr(task, "agent") else None,
+                "timestamp": time.time(),
+                "error": error_str,
+            }
+        )
 
         # Clean up
         if task_id in self._task_start_times:
@@ -229,11 +235,13 @@ class CERTCrewAICallback:
         if "consistency" in self._metric_instances and len(self.task_responses) >= 2:
             try:
                 metric = self._metric_instances["consistency"]
-                result = await metric.calculate({
-                    "responses": self.task_responses,
-                    "provider": "crewai",
-                    "model": "crew",
-                })
+                result = await metric.calculate(
+                    {
+                        "responses": self.task_responses,
+                        "provider": "crewai",
+                        "model": "crew",
+                    }
+                )
                 results["consistency"] = result.consistency_score
                 results["consistency_details"] = result
             except Exception:
@@ -243,12 +251,14 @@ class CERTCrewAICallback:
         if "latency" in self._metric_instances and self.task_timings:
             try:
                 metric = self._metric_instances["latency"]
-                result = await metric.calculate({
-                    "timings": self.task_timings,
-                    "tokens_output": [100] * len(self.task_timings),  # Estimate
-                    "provider": "crewai",
-                    "model": "crew",
-                })
+                result = await metric.calculate(
+                    {
+                        "timings": self.task_timings,
+                        "tokens_output": [100] * len(self.task_timings),  # Estimate
+                        "provider": "crewai",
+                        "model": "crew",
+                    }
+                )
                 results["latency_mean"] = result.mean_latency_seconds
                 results["latency_p95"] = result.p95_latency_seconds
                 results["latency_details"] = result
@@ -259,11 +269,13 @@ class CERTCrewAICallback:
         if "robustness" in self._metric_instances and self.task_metadata:
             try:
                 metric = self._metric_instances["robustness"]
-                result = await metric.calculate({
-                    "metadata_list": self.task_metadata,
-                    "provider": "crewai",
-                    "model": "crew",
-                })
+                result = await metric.calculate(
+                    {
+                        "metadata_list": self.task_metadata,
+                        "provider": "crewai",
+                        "model": "crew",
+                    }
+                )
                 results["error_rate"] = result.error_rate
                 results["success_rate"] = 100 - result.error_rate
                 results["robustness_details"] = result
@@ -280,11 +292,13 @@ class CERTCrewAICallback:
                     prompt = self.task_metadata[i].get("task_description", "Task")
                     pairs.append((prompt, response))
 
-                result = await metric.calculate({
-                    "prompt_response_pairs": pairs,
-                    "provider": "crewai",
-                    "model": "crew",
-                })
+                result = await metric.calculate(
+                    {
+                        "prompt_response_pairs": pairs,
+                        "provider": "crewai",
+                        "model": "crew",
+                    }
+                )
                 results["performance"] = result.mean_score
                 results["performance_details"] = result
             except Exception:
@@ -303,6 +317,7 @@ class CERTCrewAICallback:
         loop = asyncio.get_event_loop()
         if loop.is_running():
             import nest_asyncio
+
             nest_asyncio.apply()
 
         return loop.run_until_complete(self._calculate_metrics())

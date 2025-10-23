@@ -6,7 +6,6 @@ Supports both:
 """
 
 import time
-from typing import Optional
 
 from .base import ProviderInterface, ResponseMetadata
 
