@@ -212,20 +212,7 @@ for result in summary.consistency_results:
 ### From PyPI (Recommended)
 
 ```bash
-# Standard installation - includes everything you need for all three capabilities
 pip install cert-framework
-
-# Optional: With development tools (pytest, ruff, mypy, datasets, pandas)
-pip install cert-framework[dev]
-
-# Optional: With inspector UI (flask web dashboard)
-pip install cert-framework[inspector]
-
-# Optional: With notebook support (ipython, ipywidgets)
-pip install cert-framework[notebook]
-
-# Optional: With all extras (dev tools + inspector + notebook)
-pip install cert-framework[all]
 ```
 
 ### From Source
@@ -252,30 +239,14 @@ pip install -e .
 
 **Standard Installation (`pip install cert-framework`):**
 
-Everything you need for all three capabilities:
+Everything you need for all three capabilities.
 
-- **Core ML Libraries:**
-  - sentence-transformers (semantic embeddings)
-  - transformers (NLI models)
-  - torch (deep learning backend)
-  - numpy, scipy (numerical operations)
-
-- **LLM Provider SDKs:**
-  - anthropic (Claude API)
-  - openai (GPT and xAI APIs)
-  - google-generativeai (Gemini API)
-
-- **Agentic Frameworks:**
-  - langchain, langchain-core (LangChain)
-  - pyautogen (AutoGen)
-  - crewai (CrewAI)
-
-**Optional Extras:**
+**Optional Extras for Non-Core Features:**
 
 - **[dev]**: Development tools (pytest, ruff, mypy, datasets, pandas, rapidfuzz)
 - **[inspector]**: Web dashboard UI (flask, jinja2)
 - **[notebook]**: Jupyter notebook support (ipython, ipywidgets)
-- **[all]**: All optional extras combined
+
 
 ### Model Downloads
 
@@ -379,7 +350,7 @@ Uses an LLM (Claude) to judge semantic equivalence between outputs.
 
 **Parameters:**
 - `api_key` (str): Anthropic API key
-- `model` (str): Claude model to use (default: claude-3-5-haiku-20241022)
+- `model` (str): Claude model to use
 
 **Example:**
 
@@ -778,12 +749,6 @@ provider = AnthropicProvider(api_key='sk-ant-...')
 
 #### OpenAIProvider
 
-**Models:**
-- gpt-4o
-- gpt-4o-mini
-- gpt-4-turbo
-- gpt-3.5-turbo
-
 ```python
 from cert.agents.providers import OpenAIProvider
 
@@ -791,11 +756,6 @@ provider = OpenAIProvider(api_key='sk-...')
 ```
 
 #### GoogleProvider
-
-**Models:**
-- gemini-2.0-flash-exp
-- gemini-1.5-pro
-- gemini-1.5-flash
 
 ```python
 from cert.agents.providers import GoogleProvider
@@ -805,9 +765,6 @@ provider = GoogleProvider(api_key='...')
 
 #### XAIProvider
 
-**Models:**
-- grok-2-latest
-- grok-2-vision-latest
 
 ```python
 from cert.agents.providers import XAIProvider
