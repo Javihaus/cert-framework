@@ -3,7 +3,7 @@
 from .detectors import InputType, DetectionResult
 from .embeddings import EmbeddingComparator
 from .energy import ProductionEnergyScorer
-from .nli import NLIModel
+from .nli import NLIDetector, NLIResult
 from .semantic import SemanticComparator, ComparisonRule, ComparisonResult
 from .validation import validate_context, validate_response
 
@@ -12,7 +12,8 @@ __all__ = [
     "DetectionResult",
     "EmbeddingComparator",
     "ProductionEnergyScorer",
-    "NLIModel",
+    "NLIDetector",
+    "NLIResult",
     "SemanticComparator",
     "ComparisonRule",
     "ComparisonResult",

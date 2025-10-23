@@ -114,3 +114,6 @@ class EmbeddingComparator:
         return ComparisonResult(
             matched=matched, rule="embedding-similarity", confidence=similarity
         )
+
+
+__all__ = ["EmbeddingComparator", "ComparisonResult"]
