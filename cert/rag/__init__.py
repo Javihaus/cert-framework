@@ -5,7 +5,6 @@ from .embeddings import EmbeddingComparator
 from .energy import ProductionEnergyScorer
 from .nli import NLIDetector, NLIResult
 from .semantic import SemanticComparator, ComparisonRule, ComparisonResult
-from .validation import validate_context, validate_response
 
 __all__ = [
     "InputType",
@@ -17,6 +16,4 @@ __all__ = [
     "SemanticComparator",
     "ComparisonRule",
     "ComparisonResult",
-    "validate_context",
-    "validate_response",
 ]
