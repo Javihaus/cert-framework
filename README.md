@@ -837,9 +837,13 @@ Measures error handling and reliability.
 
 **Use:** Identify models with poor production reliability.
 
-### Framework Integrations
+## Agentic Frameworks Integrations
 
-#### LangChain Integration
+<div align="center">
+  <img src="docs/Logos1.png" alt="" width="800">
+</div>
+
+### LangChain Integration
 
 ```python
 from cert.agents.integrations.langchain import wrap_chain, CertChainWrapper
@@ -856,7 +860,7 @@ result = wrapped_chain.run(input_text)
 print(f"Consistency: {wrapped_chain.cert_results['consistency']}")
 ```
 
-#### AutoGen Integration
+### AutoGen Integration
 
 ```python
 from cert.agents.integrations.autogen import CertAutoGenWrapper
@@ -870,7 +874,7 @@ wrapped_agent = CertAutoGenWrapper(agent, cert_config=test_config)
 response = wrapped_agent.generate_reply(messages)
 ```
 
-#### CrewAI Integration
+### CrewAI Integration
 
 ```python
 from cert.agents.integrations.crewai import CertCrewWrapper
