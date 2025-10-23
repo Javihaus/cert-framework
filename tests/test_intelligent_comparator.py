@@ -1,8 +1,8 @@
 """Tests for intelligent comparator with automatic routing."""
 
 import pytest
-from cert.intelligent_comparator import IntelligentComparator
-from cert.detectors import InputType, detect_input_type
+from cert.single_model.intelligent_comparator import IntelligentComparator
+from cert.rag.detectors import InputType, detect_input_type
 
 
 def _embeddings_available() -> bool:

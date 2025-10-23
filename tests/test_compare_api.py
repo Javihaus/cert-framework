@@ -2,8 +2,8 @@
 
 import pytest
 from cert import compare
-from cert.types import ComparisonResult
-from cert.compare import reset
+from cert.utilities.types import ComparisonResult
+from cert.utilities.compare import reset
 
 
 class TestCompareAPI:
@@ -102,7 +102,7 @@ class TestCompareAPI:
 
     def test_lazy_loading(self):
         """Test that model is loaded lazily on first call."""
-        from cert.compare import _default_comparator
+        from cert.utilities.compare import _default_comparator
 
         # Should be None initially
         assert _default_comparator is None
@@ -111,7 +111,7 @@ class TestCompareAPI:
         compare("text1", "text2")
 
         # Now should be initialized
-        from cert.compare import _default_comparator
+        from cert.utilities.compare import _default_comparator
 
         assert _default_comparator is not None
 
@@ -194,13 +194,13 @@ class TestCompareConfiguration:
         reset()
 
         # Comparator should be None again
-        from cert.compare import _default_comparator
+        from cert.utilities.compare import _default_comparator
 
         assert _default_comparator is None
 
     def test_configure_sets_global(self):
         """Test that configure() sets global comparator."""
-        from cert.compare import configure
+        from cert.utilities.compare import configure
 
         configure(threshold=0.75)
 
