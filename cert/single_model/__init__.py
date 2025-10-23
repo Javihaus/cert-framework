@@ -8,7 +8,7 @@ This module provides tools for testing individual language models including:
 
 from .consistency import measure_consistency, autodiagnose_variance
 from .intelligent_comparator import IntelligentComparator
-from .protocols import ConsistencyProtocol
+from .protocols import ComparatorProtocol
 
 # Conditional import for LLM Judge
 try:
@@ -22,5 +22,5 @@ __all__ = [
     "measure_consistency",
     "autodiagnose_variance",
     "IntelligentComparator",
-    "ConsistencyProtocol",
+    "ComparatorProtocol",
 ] + __all_llm__
