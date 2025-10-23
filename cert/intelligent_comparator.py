@@ -2,8 +2,8 @@
 
 from typing import Optional
 from cert.types import ComparisonResult
-from cert.semantic import SemanticComparator
-from cert.detectors import detect_input_type, InputType, DetectionResult
+from cert.rag.semantic import SemanticComparator
+from cert.rag.detectors import detect_input_type, InputType, DetectionResult
 
 
 class IntelligentComparator:
@@ -75,7 +75,7 @@ class IntelligentComparator:
 
     def _load_embedding_comparator(self):
         """Load embedding comparator (REQUIRED)."""
-        from cert.embeddings import EmbeddingComparator
+        from cert.rag.embeddings import EmbeddingComparator
 
         self.embedding_comparator = EmbeddingComparator(
             threshold=self.embedding_threshold

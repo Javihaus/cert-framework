@@ -12,8 +12,8 @@ Progressive disclosure: simple by default, configurable for advanced use.
 """
 
 from typing import Optional
-from cert.embeddings import EmbeddingComparator, ComparisonResult
-from cert.fact_extractor import check_factual_contradiction
+from cert.rag.embeddings import EmbeddingComparator, ComparisonResult
+from cert.rag.fact_extractor import check_factual_contradiction
 
 # Global comparator with lazy initialization
 _default_comparator: Optional[EmbeddingComparator] = None
@@ -110,8 +110,8 @@ def compare(
         # Lazy initialization of NLI components
         if not hasattr(_default_comparator, "_nli_detector"):
             print("Loading NLI model (one-time, ~10 seconds)...")
-            from cert.nli import NLIDetector
-            from cert.energy import ProductionEnergyScorer
+            from cert.rag.nli import NLIDetector
+            from cert.rag.energy import ProductionEnergyScorer
 
             _default_comparator._nli_detector = NLIDetector()
             _default_comparator._energy_scorer = ProductionEnergyScorer(

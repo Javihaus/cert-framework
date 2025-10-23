@@ -13,20 +13,20 @@ from .types import (
 )
 from .runner import TestRunner, ConsistencyError, AccuracyError
 from .consistency import measure_consistency, autodiagnose_variance
-from .semantic import SemanticComparator, ComparisonRule, ComparisonResult
+from .rag.semantic import SemanticComparator, ComparisonRule, ComparisonResult
 from .intelligent_comparator import IntelligentComparator
-from .detectors import InputType, DetectionResult
+from .rag.detectors import InputType, DetectionResult
 
 # Conditional import for LangChain integration
 try:
-    from .langchain_integration import wrap_chain, CertChainWrapper  # noqa: F401
+    from .integrations.langchain import wrap_chain, CertChainWrapper  # noqa: F401
 
     __all_langchain__ = ["wrap_chain", "CertChainWrapper"]
 except ImportError:
     __all_langchain__ = []
 
 # Embedding comparator (REQUIRED)
-from .embeddings import EmbeddingComparator  # noqa: F401
+from .rag.embeddings import EmbeddingComparator  # noqa: F401
 from .compare import compare, configure  # noqa: F401
 
 __all_embeddings__ = ["EmbeddingComparator", "compare", "configure"]
@@ -72,5 +72,6 @@ __all__ = (
     + __all_llm_judge__
 )
 
-# Benchmark module is available as cert.benchmark
-# Example: from cert.benchmark import CERTBenchmarkEngine, BenchmarkConfig
+# Agent assessment module is available as cert.agents
+# Example: from cert.agents import CERTAgentEngine, AssessmentConfig
+# Backward compatibility: cert.benchmark still works but is deprecated
