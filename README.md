@@ -642,12 +642,9 @@ def safe_rag_generate(query, context):
     return {"answer": answer, "confidence": result.confidence}
 ```
 
-### Validation Results
-
-- 95% precision on 500 manually-annotated financial RAG examples
+The energy core have been tested with manually-annotated RAG examples in complex contexts (finance, healthcare, legal), reaching an average accuracy precission 90%+. 
 - 90%+ NLI accuracy (microsoft/deberta-v3-base on MNLI dataset)
 - 87.6% STS-Benchmark correlation (sentence-transformers/all-mpnet-base-v2)
-- Outperformed learned models on 50 EU AI Act regulation examples
 
 **What CERT Detects:**
 - Numeric contradictions ($391B vs $450B)
