@@ -7,7 +7,7 @@ try:
 except ImportError:
     ANTHROPIC_AVAILABLE = False
 
-from cert.types import ComparisonResult
+from cert.utilities.types import ComparisonResult
 
 
 class LLMJudgeComparator:

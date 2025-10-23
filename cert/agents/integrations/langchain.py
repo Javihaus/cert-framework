@@ -202,7 +202,7 @@ def wrap_chain(chain: Any, test_id: str = "langchain-test") -> CertChainWrapper:
     Example:
         ```python
         from langchain.chains import LLMChain
-        from cert.integrations.langchain import wrap_chain
+        from .integrations.langchain import wrap_chain
 
         chain = LLMChain(llm=llm, prompt=prompt)
         cert_chain = wrap_chain(chain, "my-chain-test")
@@ -232,7 +232,7 @@ class CERTLangChainCallback:
 
     Example:
         ```python
-        from cert.integrations.langchain import CERTLangChainCallback
+        from .integrations.langchain import CERTLangChainCallback
         from langchain.chains import LLMChain
 
         callback = CERTLangChainCallback(metrics=['consistency', 'latency'])

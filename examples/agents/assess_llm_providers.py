@@ -23,7 +23,7 @@ from cert.agents import (
     AssessmentConfig,
     CERTAgentEngine,
 )
-from cert.providers import (
+from cert.agents.providers import (
     AnthropicProvider,
     GoogleProvider,
     OpenAIProvider,

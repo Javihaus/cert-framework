@@ -87,7 +87,7 @@ def main():
 
     elif args.command == "inspect":
         try:
-            from cert.inspector import run_inspector
+            from cert.utilities.inspector import run_inspector
 
             print(f"🚀 Starting CERT Inspector on http://localhost:{args.port}")
             print("📝 Press Ctrl+C to stop")
@@ -99,7 +99,7 @@ def main():
             return 1
 
     elif args.command == "validate":
-        from cert.rag.validation import quick_validation, run_sts_benchmark
+        from cert.utilities.rag.validation import quick_validation, run_sts_benchmark
 
         if args.quick:
             quick_validation()

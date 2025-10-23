@@ -1,7 +1,7 @@
 """Protocols for pluggable components."""
 
 from typing import Protocol
-from cert.types import ComparisonResult
+from cert.utilities.types import ComparisonResult
 
 
 class ComparatorProtocol(Protocol):

@@ -1,9 +1,9 @@
 """Intelligent comparator with automatic routing based on input type detection."""
 
 from typing import Optional
-from cert.types import ComparisonResult
-from cert.rag.semantic import SemanticComparator
-from cert.rag.detectors import detect_input_type, InputType, DetectionResult
+from cert.utilities.types import ComparisonResult
+from cert.utilities.rag.semantic import SemanticComparator
+from cert.utilities.rag.detectors import detect_input_type, InputType, DetectionResult
 
 
 class IntelligentComparator:
@@ -75,7 +75,7 @@ class IntelligentComparator:
 
     def _load_embedding_comparator(self):
         """Load embedding comparator (REQUIRED)."""
-        from cert.rag.embeddings import EmbeddingComparator
+        from cert.utilities.rag.embeddings import EmbeddingComparator
 
         self.embedding_comparator = EmbeddingComparator(
             threshold=self.embedding_threshold
@@ -257,7 +257,7 @@ class IntelligentComparator:
             ImportError: If training module not available
         """
         try:
-            from cert.trained_comparator import TrainedComparator
+            from cert.utilities.trained_comparator import TrainedComparator
 
             self.domain_comparator = TrainedComparator(model_path=model_path)
         except ImportError:

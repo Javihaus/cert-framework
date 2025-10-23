@@ -23,7 +23,7 @@ class CERTCrewAICallback:
 
     Example (sync):
         ```python
-        from cert.integrations.crewai import CERTCrewAICallback
+        from .integrations.crewai import CERTCrewAICallback
         from crewai import Crew, Agent, Task
 
         callback = CERTCrewAICallback(metrics=['consistency', 'latency'])

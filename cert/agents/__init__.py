@@ -16,7 +16,7 @@ Example usage:
         AssessmentConfig,
         CERTAgentEngine,
     )
-    from cert.providers import AnthropicProvider, OpenAIProvider
+    from cert.agents.providers import AnthropicProvider, OpenAIProvider
 
     # Configure assessment
     config = AssessmentConfig(

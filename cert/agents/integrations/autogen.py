@@ -23,7 +23,7 @@ class CERTAutoGenMonitor:
 
     Example (sync):
         ```python
-        from cert.integrations.autogen import CERTAutoGenMonitor
+        from .integrations.autogen import CERTAutoGenMonitor
         from autogen import AssistantAgent, UserProxyAgent
 
         monitor = CERTAutoGenMonitor(metrics=['consistency', 'latency'])
