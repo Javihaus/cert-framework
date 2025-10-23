@@ -3,8 +3,8 @@
 import pytest
 import numpy as np
 
-from cert.benchmark.metrics.latency import LatencyMetric
-from cert.benchmark.types import LatencyResult
+from cert.agents.metrics.latency import LatencyMetric
+from cert.agents.types import LatencyResult
 
 
 class TestLatencyMetric:

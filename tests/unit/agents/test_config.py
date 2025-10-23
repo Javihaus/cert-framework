@@ -1,16 +1,16 @@
-"""Unit tests for BenchmarkConfig."""
+"""Unit tests for AssessmentConfig."""
 
 import pytest
 
-from cert.benchmark.config import BenchmarkConfig
+from cert.agents.config import AssessmentConfig
 
 
-class TestBenchmarkConfig:
-    """Test suite for BenchmarkConfig."""
+class TestAssessmentConfig:
+    """Test suite for AssessmentConfig."""
 
     def test_default_config(self):
         """Test default configuration values."""
-        config = BenchmarkConfig()
+        config = AssessmentConfig()
 
         assert config.consistency_trials == 20
         assert config.performance_trials == 15
@@ -21,7 +21,7 @@ class TestBenchmarkConfig:
 
     def test_custom_config(self):
         """Test custom configuration."""
-        config = BenchmarkConfig(
+        config = AssessmentConfig(
             consistency_trials=50,
             performance_trials=30,
             temperature=0.5,
@@ -35,46 +35,46 @@ class TestBenchmarkConfig:
     def test_invalid_consistency_trials(self):
         """Test validation of consistency trials."""
         with pytest.raises(ValueError, match="consistency_trials must be >= 10"):
-            BenchmarkConfig(consistency_trials=5)
+            AssessmentConfig(consistency_trials=5)
 
     def test_invalid_performance_trials(self):
         """Test validation of performance trials."""
         with pytest.raises(ValueError, match="performance_trials must be >= 5"):
-            BenchmarkConfig(performance_trials=2)
+            AssessmentConfig(performance_trials=2)
 
     def test_invalid_temperature(self):
         """Test validation of temperature."""
         with pytest.raises(ValueError, match="temperature must be between 0.0 and 1.0"):
-            BenchmarkConfig(temperature=1.5)
+            AssessmentConfig(temperature=1.5)
 
     def test_invalid_timeout(self):
         """Test validation of timeout."""
         with pytest.raises(ValueError, match="timeout must be positive"):
-            BenchmarkConfig(timeout=-5)
+            AssessmentConfig(timeout=-5)
 
     def test_invalid_max_tokens(self):
         """Test validation of max_tokens."""
         with pytest.raises(ValueError, match="max_tokens must be positive"):
-            BenchmarkConfig(max_tokens=0)
+            AssessmentConfig(max_tokens=0)
 
     def test_invalid_providers(self):
         """Test validation of providers."""
         with pytest.raises(ValueError, match="At least one provider must be configured"):
-            BenchmarkConfig(providers={})
+            AssessmentConfig(providers={})
 
     def test_empty_models_list(self):
         """Test validation of empty models list."""
         with pytest.raises(ValueError, match="has no models configured"):
-            BenchmarkConfig(providers={"anthropic": []})
+            AssessmentConfig(providers={"anthropic": []})
 
     def test_invalid_metric(self):
         """Test validation of invalid metric names."""
         with pytest.raises(ValueError, match="Invalid metric"):
-            BenchmarkConfig(enabled_metrics=["consistency", "invalid_metric"])
+            AssessmentConfig(enabled_metrics=["consistency", "invalid_metric"])
 
     def test_is_metric_enabled(self):
         """Test metric enabled checking."""
-        config = BenchmarkConfig(enabled_metrics=["consistency", "performance"])
+        config = AssessmentConfig(enabled_metrics=["consistency", "performance"])
 
         assert config.is_metric_enabled("consistency") is True
         assert config.is_metric_enabled("performance") is True
@@ -82,7 +82,7 @@ class TestBenchmarkConfig:
 
     def test_get_all_model_combinations(self):
         """Test getting all provider/model combinations."""
-        config = BenchmarkConfig(
+        config = AssessmentConfig(
             providers={
                 "anthropic": ["claude-3-5-haiku-20241022", "claude-3-5-sonnet-20241022"],
                 "openai": ["gpt-4o-mini"],

@@ -2,8 +2,8 @@
 
 import pytest
 
-from cert.benchmark.metrics.consistency import ConsistencyMetric
-from cert.benchmark.types import ConsistencyResult
+from cert.agents.metrics.consistency import ConsistencyMetric
+from cert.agents.types import ConsistencyResult
 
 
 class TestConsistencyMetric:

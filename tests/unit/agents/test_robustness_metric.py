@@ -2,8 +2,8 @@
 
 import pytest
 
-from cert.benchmark.metrics.robustness import RobustnessMetric
-from cert.benchmark.providers.base import ResponseMetadata
+from cert.agents.metrics.robustness import RobustnessMetric
+from cert.providers.base import ResponseMetadata
 
 
 class TestRobustnessMetric:
@@ -88,7 +88,7 @@ class TestRobustnessMetric:
 
     def test_validate_valid_result(self, metric):
         """Test validation of valid result."""
-        from cert.benchmark.types import RobustnessResult
+        from cert.agents.types import RobustnessResult
 
         result = RobustnessResult(
             provider="test",
@@ -106,7 +106,7 @@ class TestRobustnessMetric:
 
     def test_validate_invalid_rate(self, metric):
         """Test validation catches invalid rates."""
-        from cert.benchmark.types import RobustnessResult
+        from cert.agents.types import RobustnessResult
 
         result = RobustnessResult(
             provider="test",

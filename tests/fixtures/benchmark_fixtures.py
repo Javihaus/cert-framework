@@ -3,7 +3,7 @@
 import time
 from typing import List
 
-from cert.benchmark.providers.base import ResponseMetadata
+from cert.providers.base import ResponseMetadata
 
 
 def generate_mock_responses(count: int = 10, base_text: str = "Test response") -> List[str]:

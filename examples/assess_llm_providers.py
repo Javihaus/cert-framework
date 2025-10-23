@@ -1,6 +1,6 @@
-"""Example: Benchmark LLM providers using CERT Framework.
+"""Example: Assess LLM providers using CERT Framework.
 
-This script demonstrates how to use the CERT benchmark module to compare
+This script demonstrates how to use the CERT agents module to assess
 multiple language models across providers.
 
 Requirements:
@@ -11,6 +11,7 @@ Environment Variables:
     OPENAI_API_KEY - OpenAI API key
     GOOGLE_API_KEY - Google API key (optional)
     XAI_API_KEY - xAI API key (optional)
+    HF_TOKEN - HuggingFace API token (optional)
 """
 
 import asyncio
@@ -18,21 +19,24 @@ import json
 import os
 from datetime import datetime
 
-from cert.benchmark import (
+from cert.agents import (
+    AssessmentConfig,
+    CERTAgentEngine,
+)
+from cert.providers import (
     AnthropicProvider,
-    BenchmarkConfig,
-    CERTBenchmarkEngine,
     GoogleProvider,
     OpenAIProvider,
     XAIProvider,
+    HuggingFaceProvider,
 )
 
 
 async def main():
-    """Run benchmark comparing multiple LLM providers."""
+    """Run assessment comparing multiple LLM providers."""
 
     print("="*70)
-    print("CERT Framework - LLM Provider Benchmarking")
+    print("CERT Framework - Agentic System Assessment")
     print("="*70)
     print()
 
@@ -43,6 +47,7 @@ async def main():
         'openai': (OpenAIProvider, 'OPENAI_API_KEY'),
         'google': (GoogleProvider, 'GOOGLE_API_KEY'),
         'xai': (XAIProvider, 'XAI_API_KEY'),
+        'huggingface': (HuggingFaceProvider, 'HF_TOKEN'),
     }
 
     # Initialize available providers
@@ -65,6 +70,8 @@ async def main():
                     configured_models[provider_name] = ['gemini-2.0-flash-exp']
                 elif provider_name == 'xai':
                     configured_models[provider_name] = ['grok-2-latest']
+                elif provider_name == 'huggingface':
+                    configured_models[provider_name] = ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B']
 
             except Exception as e:
                 print(f"✗ Failed to initialize {provider_name}: {e}")
@@ -78,15 +85,15 @@ async def main():
 
     print()
 
-    # Configure benchmark
-    config = BenchmarkConfig(
+    # Configure assessment
+    config = AssessmentConfig(
         consistency_trials=10,  # Reduce for faster testing
         performance_trials=5,
         providers=configured_models,
         embedding_model_name='all-MiniLM-L6-v2',
         max_tokens=1024,
         temperature=0.7,
-        output_dir='./benchmark_results',
+        output_dir='./assessment_results',
         enabled_metrics=['consistency', 'performance', 'latency', 'output_quality', 'robustness'],
     )
 
@@ -97,14 +104,14 @@ async def main():
     print(f"  Output directory: {config.output_dir}")
     print()
 
-    # Initialize benchmark engine
-    engine = CERTBenchmarkEngine(config=config, providers=providers)
+    # Initialize assessment engine
+    engine = CERTAgentEngine(config=config, providers=providers)
 
-    # Run benchmark
-    print("Starting benchmark...")
+    # Run assessment
+    print("Starting assessment...")
     print()
 
-    summary = await engine.run_full_benchmark(
+    summary = await engine.run_full_assessment(
         test_consistency=True,
         test_performance=True,
         test_latency=True,
@@ -114,7 +121,7 @@ async def main():
 
     print()
     print("="*70)
-    print("BENCHMARK RESULTS")
+    print("ASSESSMENT RESULTS")
     print("="*70)
     print()
 
@@ -168,7 +175,7 @@ async def main():
 
     # Save results to JSON
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = os.path.join(config.output_dir, f"benchmark_summary_{timestamp}.json")
+    output_file = os.path.join(config.output_dir, f"assessment_summary_{timestamp}.json")
 
     with open(output_file, 'w') as f:
         json.dump(summary.to_dict(), f, indent=2)
