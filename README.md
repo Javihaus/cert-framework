@@ -1,27 +1,39 @@
 # CERT Framework
 
+[**What CERT Solves**](#What_CERT_Solves)
+| [**Core Capabilities**](#Core_Capabilities)
+| [**Quickstart**](#quickstart)
+| [**Installation**](#installation)
+| [**Examples**](#examples)
+| [**Configuration**](#configuration)
+| [**Validation**](#validation)
+| [**EU AI Act Compliance**](#EU_AI_Act_Compliance)
+| [**Citation**](#citation)
+| [**Contributing**](#contributing)
+
 Production-grade AI system reliability testing for LLM applications and model evaluation.
 
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
+![pytest](https://img.shields.io/badge/pytest-passing-green)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 ## What CERT Solves
 
-Two critical problems in production AI systems that have no standard tools:
+CERT is a framework to manage to critical friction in AI systems deployment that have no standarized tools:
 
-**Problem 1: RAG Systems Hallucinate and You Can't Measure It**
+**Problem 1: AI Systems Hallucinate and You Can't Measure It**
 
 Your LLM generates text that contradicts source material. You can't measure hallucination rate systematically. Auditors want evidence. Compliance officers want metrics. CERT detects hallucinations through proven methods from regulated industries (financial, medical, legal): Natural Language Inference contradiction detection combined with semantic grounding verification.
 
-**Problem 2: Model Selection Without Data**
+**Problem 2: Agentic Pipeline Assesment**
 
-You need to choose between Claude, GPT-4, Gemini for production. Vendor benchmarks don't measure your actual use case. You run a few manual tests, results vary randomly, you make a guess. CERT provides statistical rigor—consistency metrics, latency percentiles (P95/P99), output diversity analysis—so your decision is data-driven, not intuition-driven.
+You need to choose between Claude, GPT-4, Gemini or any SOTA model for production. Vendor benchmarks don't measure your actual use case. You run a few manual tests, results vary randomly, you make a guess. CERT provides statistical rigor—consistency metrics, latency percentiles (P95/P99), output diversity analysis—so your decision is data-driven, not intuition-driven.
 
 ---
 
-## Two Core Capabilities
+## Core Capabilities
 
 ### 1. Context Entailment & RAG Testing
 
@@ -43,9 +55,9 @@ Detect hallucinations by verifying whether LLM outputs are logically entailed by
 - Outperformed learned models in comparative evaluation (50 legal examples from EU AI Act regulation text)
 - Requires no fine-tuning; uses pre-trained models
 
-### 2. Agentic Benchmarking (v1.1)
+### 2. Agentic Pipeline Accuracy
 
-Systematically compare language model behavior across providers using production-relevant metrics. Measures what actually matters for deployment: consistency, output stability, latency predictability, and robustness under load.
+Systematically measures what actually matters for deployment: consistency, output stability, latency predictability, and robustness under load.
 
 **Metrics:**
 - **Consistency**: Output stability across identical prompts (20+ trials). Identifies models with erratic behavior.
@@ -57,34 +69,10 @@ Systematically compare language model behavior across providers using production
 **Use cases:**
 - Model selection before production commitment (wrong choice = 30-60% cost overrun)
 - Performance regression testing after model version updates
-- Multi-provider comparison for vendor negotiations
 - Compliance audit documentation (Article 15 accuracy claims)
 
 ---
 
-## Installation
-
-```bash
-# Core installation (RAG testing only)
-pip install cert-framework
-
-# With benchmarking capabilities
-pip install cert-framework[benchmark]
-
-# Full installation (all features)
-pip install cert-framework[all]
-```
-
-**Requirements:**
-- Python 3.8 or higher
-- ~2GB RAM (embedding + NLI models loaded)
-- First run downloads models (~920MB total); subsequent runs use cache
-
-Automatic downloads:
-- Embeddings: sentence-transformers/all-mpnet-base-v2 (~420MB)
-- NLI: microsoft/deberta-v3-base (~500MB)
-
----
 
 ## Quick Start
 
@@ -144,8 +132,26 @@ if result['contradiction_rate'] > 0:
 ```
 
 ---
+## Installation
 
-## Features
+```bash
+# Core installation (RAG testing only)
+pip install cert-framework
+
+```
+
+**Requirements:**
+- Python 3.8 or higher
+- ~2GB RAM (embedding + NLI models loaded)
+- First run downloads models (~920MB total); subsequent runs use cache
+
+Automatic downloads:
+- Embeddings: sentence-transformers/all-mpnet-base-v2 (~420MB)
+- NLI: microsoft/deberta-v3-base (~500MB)
+
+---
+
+### Features
 
 - **Multi-component scoring**: NLI, embeddings, and grounding heuristics combined
 - **Two performance modes**: 50ms (development) and 300ms (production) 
@@ -247,7 +253,7 @@ scorer = ProductionEnergyScorer(
 
 ---
 
-## Validation & Research
+## Validation
 
 CERT development included comparative testing of rule-based vs. learned approaches across regulated domains.
 
@@ -356,16 +362,19 @@ If you use CERT in research:
 
 ```bibtex
 @software{cert_framework,
-  title = {CERT Framework: Context Entailment Reliability Testing for Production AI Systems},
   author = {Marin, Javier},
-  year = {2025},
+  title = {CERT Framework: Context Entailment Reliability Testing for Production AI Systems},
   url = {https://github.com/Javihaus/cert-framework}
+  version = {0.33.0}
+  year = {2025}, 
 }
 ```
 
+In this bibtex entry, the version number is intended to be from cert/__init__.py, and the year corresponds to the project's open-source release.
+
 ---
 
-## Support & Contributing
+## Contributing
 
 - **Issues**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)
 - **Documentation**: See `examples/` for working examples
