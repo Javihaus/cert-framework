@@ -83,8 +83,8 @@ class CertChainWrapper:
             AccuracyError: If accuracy test fails
             ConsistencyError: If consistency test fails
         """
-        from cert.runner import TestRunner, ConsistencyError, AccuracyError
-        from cert.types import TestConfig, GroundTruth
+        from cert.utilities.runner import TestRunner, ConsistencyError, AccuracyError
+        from cert.utilities.types import TestConfig, GroundTruth
 
         runner = TestRunner()
 

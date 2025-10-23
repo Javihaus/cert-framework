@@ -11,7 +11,7 @@ from typing import Dict
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from numpy.typing import NDArray
-from cert.types import ComparisonResult
+from cert.utilities.types import ComparisonResult
 
 
 class EmbeddingComparator:
