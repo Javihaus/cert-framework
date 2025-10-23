@@ -201,18 +201,19 @@ Uses `microsoft/deberta-v3-base` trained on MNLI dataset:
 
 Complete working examples in `examples/` directory:
 
-- **`financial_rag_hallucination.py`**: Financial RAG with NLI contradiction detection
-- **`01_LLM_response_consistency.py`**: Chatbot consistency testing (fast/NLI modes)
-- **`02_rag_retrieval.py`**: RAG retrieval consistency testing
-- **`03_model_matching.py`**: Model version change regression testing
-- **`04_pytest_integration.py`**: Pytest integration patterns
-- **`05_real_llm_testing.py`**: Cross-provider LLM testing (Anthropic/OpenAI)
-- **`06_rag_hallucination_detection.py`**: RAG system validation
+- **`single_model/llm_response_consistency.py`**: Chatbot consistency testing (fast/NLI modes)
+- **`single_model/model_matching.py`**: Model version change regression testing
+- **`single_model/pytest_integration.py`**: Pytest integration patterns
+- **`single_model/real_llm_testing.py`**: Cross-provider LLM testing (Anthropic/OpenAI)
+- **`rag/rag_retrieval.py`**: RAG retrieval consistency testing
+- **`rag/rag_hallucination_detection.py`**: RAG system validation with NLI contradiction detection
+- **`agents/assess_llm_providers.py`**: Agentic pipeline assessment across multiple providers
 
 Run examples:
 ```bash
-python examples/06_rag_hallucination_detection.py
-python examples/01_LLM_response_consistency.py --nli
+python examples/rag/rag_hallucination_detection.py
+python examples/single_model/llm_response_consistency.py --nli
+python examples/agents/assess_llm_providers.py
 ```
 
 ---

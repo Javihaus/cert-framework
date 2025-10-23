@@ -8,7 +8,7 @@ This example shows:
 - Fast mode: compare() - for development and unit tests (~50ms)
 - NLI mode: compare(use_nli=True) - for production verification (~300ms)
 
-For live OpenAI integration, see: examples/05_real_llm_testing.py
+For live OpenAI integration, see: examples/single_model/real_llm_testing.py
 """
 
 from cert import compare
