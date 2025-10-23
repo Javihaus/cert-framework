@@ -1,5 +1,10 @@
 # CERT Framework
 
+<div align="center">
+  <img src="docs/CERT.png" alt="" width="800">
+</div>
+
+\
 [**What CERT Solves**](#What_CERT_Solves)
 | [**Core Capabilities**](#Core_Capabilities)
 | [**Quickstart**](#quickstart)
@@ -11,7 +16,7 @@
 | [**Citation**](#citation)
 | [**Contributing**](#contributing)
 
-Production-grade AI system reliability testing for LLM applications and model evaluation.
+CERT is a production-grade AI system reliability testing framework for LLM applications and model evaluation.
 
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 ![pytest](https://img.shields.io/badge/pytest-passing-green)
