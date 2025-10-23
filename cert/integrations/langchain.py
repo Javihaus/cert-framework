@@ -202,7 +202,7 @@ def wrap_chain(chain: Any, test_id: str = "langchain-test") -> CertChainWrapper:
     Example:
         ```python
         from langchain.chains import LLMChain
-        from cert.langchain_integration import wrap_chain
+        from cert.integrations.langchain import wrap_chain
 
         chain = LLMChain(llm=llm, prompt=prompt)
         cert_chain = wrap_chain(chain, "my-chain-test")
@@ -222,3 +222,199 @@ def wrap_chain(chain: Any, test_id: str = "langchain-test") -> CertChainWrapper:
         Wrapped chain with CERT capabilities
     """
     return CertChainWrapper(chain, test_id)
+
+
+class CERTLangChainCallback:
+    """CERT callback for LangChain chains and agents.
+
+    Monitors LangChain execution for agent assessment metrics.
+    Works with chains, agents, and AgentExecutor.
+
+    Example:
+        ```python
+        from cert.integrations.langchain import CERTLangChainCallback
+        from langchain.chains import LLMChain
+
+        callback = CERTLangChainCallback(metrics=['consistency', 'latency'])
+
+        chain = LLMChain(llm=llm, prompt=prompt, callbacks=[callback])
+        result = chain.invoke({"input": "Hello"})
+
+        report = callback.get_report()
+        print(f"Latency: {report['latency_mean']:.2f}s")
+        ```
+    """
+
+    def __init__(
+        self,
+        metrics: Optional[list] = None,
+        config: Optional[dict] = None,
+    ):
+        """Initialize LangChain callback.
+
+        Args:
+            metrics: List of metrics to track
+            config: Additional configuration
+        """
+        self.metrics = metrics or ["latency", "robustness"]
+        self.config = config or {}
+
+        # Storage
+        self.responses: list = []
+        self.timings: list = []
+        self.metadata_list: list = []
+        self.errors: list = []
+
+        # Track call start times
+        self._call_start_times: dict = {}
+
+        # Metrics instances (lazy loaded)
+        self._metric_instances = {}
+
+    def on_llm_start(self, serialized: dict, prompts: list[str], **kwargs):
+        """Called when LLM starts."""
+        call_id = id(prompts)
+        self._call_start_times[call_id] = asyncio.get_event_loop().time()
+
+    def on_llm_end(self, response: Any, **kwargs):
+        """Called when LLM ends."""
+        call_id = id(response)
+        start_time = self._call_start_times.get(call_id, asyncio.get_event_loop().time())
+        latency = asyncio.get_event_loop().time() - start_time
+
+        # Extract response text
+        response_text = self._extract_response(response)
+
+        self.responses.append(response_text)
+        self.timings.append(latency)
+        self.metadata_list.append({
+            "latency": latency,
+            "timestamp": asyncio.get_event_loop().time(),
+            "error": None,
+        })
+
+        if call_id in self._call_start_times:
+            del self._call_start_times[call_id]
+
+    def on_llm_error(self, error: Exception, **kwargs):
+        """Called when LLM errors."""
+        error_str = str(error)
+        self.errors.append(error_str)
+        self.metadata_list.append({
+            "latency": 0,
+            "timestamp": asyncio.get_event_loop().time(),
+            "error": error_str,
+        })
+
+    def on_chain_start(self, serialized: dict, inputs: dict, **kwargs):
+        """Called when chain starts."""
+        pass
+
+    def on_chain_end(self, outputs: dict, **kwargs):
+        """Called when chain ends."""
+        pass
+
+    def on_chain_error(self, error: Exception, **kwargs):
+        """Called when chain errors."""
+        self.errors.append(str(error))
+
+    def _extract_response(self, response: Any) -> str:
+        """Extract text from LangChain response."""
+        if isinstance(response, str):
+            return response
+        elif hasattr(response, "generations"):
+            # LLMResult
+            if response.generations and response.generations[0]:
+                return response.generations[0][0].text
+        elif hasattr(response, "content"):
+            return response.content
+        elif isinstance(response, dict):
+            return response.get("output", "") or str(response)
+        return str(response)
+
+    def _initialize_metrics(self):
+        """Lazy load metrics."""
+        if self._metric_instances:
+            return
+
+        from cert.agents.metrics import MetricRegistry
+
+        for metric_name in self.metrics:
+            try:
+                metric_class = MetricRegistry.get(metric_name)
+                self._metric_instances[metric_name] = metric_class(config=self.config)
+            except ValueError:
+                pass
+
+    async def _calculate_metrics(self) -> dict:
+        """Calculate all metrics from collected data."""
+        self._initialize_metrics()
+
+        results = {}
+
+        # Consistency
+        if "consistency" in self._metric_instances and len(self.responses) >= 2:
+            try:
+                metric = self._metric_instances["consistency"]
+                result = await metric.calculate({
+                    "responses": self.responses,
+                    "provider": "langchain",
+                    "model": "chain",
+                })
+                results["consistency"] = result.consistency_score
+                results["consistency_details"] = result
+            except Exception:
+                results["consistency"] = None
+
+        # Latency
+        if "latency" in self._metric_instances and self.timings:
+            try:
+                metric = self._metric_instances["latency"]
+                result = await metric.calculate({
+                    "timings": self.timings,
+                    "tokens_output": [100] * len(self.timings),
+                    "provider": "langchain",
+                    "model": "chain",
+                })
+                results["latency_mean"] = result.mean_latency_seconds
+                results["latency_p95"] = result.p95_latency_seconds
+                results["latency_details"] = result
+            except Exception:
+                results["latency_mean"] = None
+
+        # Robustness
+        if "robustness" in self._metric_instances and self.metadata_list:
+            try:
+                metric = self._metric_instances["robustness"]
+                result = await metric.calculate({
+                    "metadata_list": self.metadata_list,
+                    "provider": "langchain",
+                    "model": "chain",
+                })
+                results["error_rate"] = result.error_rate
+                results["robustness_details"] = result
+            except Exception:
+                results["error_rate"] = None
+
+        return results
+
+    def get_report(self) -> dict:
+        """Get metrics report (sync)."""
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            import nest_asyncio
+            nest_asyncio.apply()
+
+        return loop.run_until_complete(self._calculate_metrics())
+
+    async def get_report_async(self) -> dict:
+        """Get metrics report (async)."""
+        return await self._calculate_metrics()
+
+    def reset(self):
+        """Reset all collected data."""
+        self.responses = []
+        self.timings = []
+        self.metadata_list = []
+        self.errors = []
+        self._call_start_times = {}
