@@ -3,7 +3,7 @@
 import asyncio
 import json
 from typing import Any, Callable, List, Set
-from .types import ConsistencyResult, TestConfig
+from cert.utilities.types import ConsistencyResult, TestConfig
 
 
 async def measure_consistency(

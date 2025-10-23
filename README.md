@@ -154,13 +154,10 @@ pip install cert-framework[all]
 git clone https://github.com/Javihaus/cert-framework.git
 cd cert-framework
 
-# Install core dependencies
+# Install all dependencies (includes LLM providers and agentic frameworks)
 pip install -r requirements.txt
 
-# OR install with development dependencies
-pip install -r requirements-dev.txt
-
-# OR install package in editable mode
+# OR install package in editable mode with all dependencies
 pip install -e .
 ```
 
@@ -169,7 +166,14 @@ pip install -e .
 - ~2GB RAM (embedding + NLI models loaded)
 - First run downloads models (~920MB total); subsequent runs use cache
 
-Automatic downloads:
+**Dependencies included:**
+- Core: sentence-transformers, transformers, torch, numpy, scipy
+- LLM Providers: anthropic, openai, google-generativeai
+- Agentic Frameworks: langchain, autogen, crewai
+- Development: pytest, ruff, mypy
+- Optional: flask (for inspector UI)
+
+Automatic model downloads:
 - Embeddings: sentence-transformers/all-mpnet-base-v2 (~420MB)
 - NLI: microsoft/deberta-v3-base (~500MB)
 
