@@ -6,7 +6,6 @@ of LLM agents/models across multiple trials and metrics.
 
 import asyncio
 import logging
-import os
 import time
 from datetime import datetime
 from typing import List, Optional
