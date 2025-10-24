@@ -33,6 +33,9 @@ from .cost_decorator import (
 # ===== REPORTS & COMPLIANCE =====
 from .reports import export_report, show_report
 
+# ===== COORDINATION MONITORING =====
+from .coordination import measure_coordination, CoordinationResult
+
 # ===== ADVANCED API (Power Users) =====
 from .measure import measure
 from .cost_tracker import (
@@ -119,6 +122,8 @@ __all__ = (
         "get_cost_history",
         "export_report",
         "show_report",
+        "measure_coordination",
+        "CoordinationResult",
         "Preset",
         "get_preset",
         "list_presets",
