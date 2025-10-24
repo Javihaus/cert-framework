@@ -35,6 +35,7 @@ class TemperatureMode(Enum):
         - For testing creative/generative scenarios
         - Use when output variety is desired
     """
+
     DETERMINISTIC = 0.0
     FACTUAL = 0.3
     BALANCED = 0.7
@@ -222,7 +223,7 @@ class AssessmentConfig:
                 consistency_trials=10
             )
         """
-        kwargs['temperature'] = mode.value
+        kwargs["temperature"] = mode.value
         return cls(**kwargs)
 
 
