@@ -22,7 +22,6 @@
 | [**Citation**](#citation)
 | [**Contact**](#contact)
 
-CERT is a production-grade AI system reliability testing framework for LLM applications and model evaluation.
 
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 ![pytest](https://img.shields.io/badge/pytest-passing-green)
@@ -53,11 +52,9 @@ CERT Framework provides:
 ✓ **Plain-English reports** - Explain your AI system to compliance teams
 ✓ **Industry presets** - Pre-configured for finance, healthcare, general use
 
-**Time to setup: 60 seconds**
-
 ---
 
-## Quick Start (60 Seconds)
+## Quick Start 
 
 ### 1. Install
 ```bash
@@ -92,7 +89,7 @@ EU AI Act Article 15: Ready for compliance
 ============================================================
 
 After 100 requests:
-📊 Status Update - my_rag
+Status Update - my_rag
 ------------------------------------------------------------
 Total requests: 100
 Hallucination rate: 2.1%
