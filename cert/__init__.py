@@ -31,8 +31,7 @@ from .cost_decorator import (
 )
 
 # ===== REPORTS & COMPLIANCE =====
-# TODO: Implement in next phase
-# from .reports import export_report, show_report
+from .reports import export_report, show_report
 
 # ===== ADVANCED API (Power Users) =====
 from .measure import measure
@@ -118,6 +117,8 @@ __all__ = (
         "get_cost_summary",
         "reset_cost_tracker",
         "get_cost_history",
+        "export_report",
+        "show_report",
         "Preset",
         "get_preset",
         "list_presets",
