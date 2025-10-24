@@ -64,9 +64,7 @@ def get_preset(preset: Union[str, Preset]) -> Dict[str, float]:
 
     if preset not in PRESETS:
         valid_presets = ", ".join(PRESETS.keys())
-        raise ValueError(
-            f"Invalid preset '{preset}'. Valid presets: {valid_presets}"
-        )
+        raise ValueError(f"Invalid preset '{preset}'. Valid presets: {valid_presets}")
 
     return PRESETS[preset]
 

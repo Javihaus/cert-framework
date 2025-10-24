@@ -201,9 +201,7 @@ def monitor(
         return decorator(_func)
 
 
-def _detect_function_type(
-    func: Callable, args: tuple, kwargs: dict
-) -> str:
+def _detect_function_type(func: Callable, args: tuple, kwargs: dict) -> str:
     """Detect if function is RAG, single-model, or coordination.
 
     Returns:
@@ -282,9 +280,7 @@ def _measure_accuracy(
     ungrounded_terms = get_ungrounded_terms(context, answer)
 
     # Combined accuracy score (weighted average)
-    accuracy_score = (
-        0.3 * semantic_score + 0.5 * nli_score + 0.2 * grounding_score
-    )
+    accuracy_score = 0.3 * semantic_score + 0.5 * nli_score + 0.2 * grounding_score
 
     # Hallucination detection
     is_hallucination = (
@@ -295,10 +291,7 @@ def _measure_accuracy(
     )
 
     # Compliance check
-    is_compliant = (
-        accuracy_score >= config.accuracy_threshold
-        and not is_hallucination
-    )
+    is_compliant = accuracy_score >= config.accuracy_threshold and not is_hallucination
 
     return {
         "accuracy_score": accuracy_score,
@@ -357,12 +350,8 @@ def _alert_hallucination(
         f"NLI score: {accuracy_result['metrics']['nli_score']:.3f} "
         f"({'CONTRADICTION' if accuracy_result['metrics']['is_contradiction'] else 'OK'})"
     )
-    print(
-        f"Grounding score: {accuracy_result['metrics']['grounding_score']:.1%}"
-    )
-    print(
-        f"Ungrounded terms: {accuracy_result['metrics']['ungrounded_terms_count']}"
-    )
+    print(f"Grounding score: {accuracy_result['metrics']['grounding_score']:.1%}")
+    print(f"Ungrounded terms: {accuracy_result['metrics']['ungrounded_terms_count']}")
     print("!" * 60 + "\n")
 
 
@@ -374,12 +363,14 @@ def _show_status_update(function_name: str, config: MonitorConfig):
         else 0.0
     )
     compliance_rate = (
-        config.total_compliant / config.total_calls
-        if config.total_calls > 0
-        else 0.0
+        config.total_compliant / config.total_calls if config.total_calls > 0 else 0.0
     )
 
-    status = "✓ COMPLIANT" if hallucination_rate <= config.hallucination_tolerance else "✗ NON-COMPLIANT"
+    status = (
+        "✓ COMPLIANT"
+        if hallucination_rate <= config.hallucination_tolerance
+        else "✗ NON-COMPLIANT"
+    )
 
     print("\n" + "-" * 60)
     print(f"📊 Status Update - {function_name}")

@@ -171,9 +171,7 @@ def _establish_baseline(agent_func: Callable[[str], str], prompts: List[str]) ->
     return float(np.mean(scores))
 
 
-def _score_response_simple(
-    prompt: str, response: str, embedding_engine
-) -> float:
+def _score_response_simple(prompt: str, response: str, embedding_engine) -> float:
     """Simple response scoring (simplified from notebook's ResponseEvaluator).
 
     Measures:

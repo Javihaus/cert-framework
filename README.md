@@ -9,15 +9,31 @@
 
 ---
 
-## The Problem
+## Table of Contents
 
-**You're building LLMs in regulated industries (finance, healthcare, legal).**
+- [Introduction](#introduction)
+- [The Solution](#the-solution)
+- [Quick Start](#quick-start-60-seconds)
+- [Three Use Cases](#three-use-cases)
+- [Why CERT Framework](#why-cert-framework)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+- [EU AI Act Compliance](#eu-ai-act-compliance)
+- [Important Disclaimers](#important-disclaimers)
+- [Advanced Features](#advanced-features-power-users)
+- [Examples](#examples)
+- [Development](#development)
+- [Citation](#citation)
+- [License](#license)
+- [Contact](#contact)
 
-Your boss says: *"Make our AI compliant with EU AI Act Article 15 by Q2"*
+---
 
-You think: *"WTF does 'appropriate levels of accuracy' mean? What number do I need?"*
+## Introduction
 
-**The EU AI Act is vague. No standard metrics exist. You need to explain your AI system to non-technical compliance teams.**
+Organizations deploying large language models in regulated industries face a critical challenge: the EU AI Act mandates "appropriate levels of accuracy" for high-risk AI systems under Article 15, yet provides no standardized metrics or implementation guidance. Compliance teams require evidence of accuracy monitoring and audit trails, while engineering teams need practical tools to measure and document system performance.
+
+CERT Framework bridges this gap by providing automated accuracy monitoring, hallucination detection, and compliance documentation specifically designed for LLM systems operating under EU AI Act regulations. The framework addresses three primary compliance requirements: demonstrating appropriate accuracy levels (Article 15.1), ensuring system resilience (Article 15.4), and maintaining automatic audit logs (Article 19).
 
 ---
 
@@ -25,11 +41,11 @@ You think: *"WTF does 'appropriate levels of accuracy' mean? What number do I ne
 
 CERT Framework provides:
 
-✓ **Automatic accuracy measurement** - Monitor LLM accuracy with one decorator
-✓ **Hallucination detection** - Catch RAG hallucinations before production
-✓ **Audit trails** - Automatic logging for Article 19 compliance
-✓ **Plain-English reports** - Explain your AI system to compliance teams
-✓ **Industry presets** - Pre-configured for finance, healthcare, general use
+- **Automatic accuracy measurement** - Monitor LLM accuracy with one decorator
+- **Hallucination detection** - Catch RAG hallucinations before production
+- **Audit trails** - Automatic logging for Article 19 compliance
+- **Plain-English reports** - Explain your AI system to compliance teams
+- **Industry presets** - Pre-configured for finance, healthcare, general use
 
 **Time to setup: 60 seconds**
 
@@ -60,7 +76,7 @@ result = my_rag("What was Q4 revenue?")
 
 ### 4. See Compliance Status Automatically
 ```
-✓ CERT Framework Monitoring Enabled
+CERT Framework Monitoring Enabled
 ============================================================
 Function: my_rag
 Accuracy threshold: 90%
@@ -70,12 +86,12 @@ EU AI Act Article 15: Ready for compliance
 ============================================================
 
 After 100 requests:
-📊 Status Update - my_rag
+Status Update - my_rag
 ------------------------------------------------------------
 Total requests: 100
 Hallucination rate: 2.1%
 Compliance rate: 97.9%
-Status: ✓ COMPLIANT
+Status: COMPLIANT
 ------------------------------------------------------------
 ```
 
@@ -145,17 +161,43 @@ def customer_service_bot(user_message):
 
 ### 3. Multi-Agent Coordination Monitoring
 
-**Problem:** Multi-agent systems (LangChain, AutoGen, CrewAI) behave unpredictably. Are 3 agents better than 1?
+**Problem:** Multi-agent systems (LangChain, AutoGen, CrewAI) behave unpredictably. Are 2 agents better than 1?
 
-**Solution:** Measure coordination effectiveness
+**Solution:** Measure coordination effectiveness with gamma metric
 
 ```python
 import cert
 
-# Coming in Phase 2
-# Coordination monitoring with γ (gamma) metric
-# Measures: coordinated_performance / independent_performance
+# Define your agents
+def agent_a(prompt: str) -> str:
+    return model_a.generate(prompt)
+
+def agent_b(prompt: str) -> str:
+    return model_b.generate(prompt)
+
+# Define coordinated system
+def coordinated_system(prompt: str) -> str:
+    output_a = agent_a(prompt)
+    return agent_b(f"Refine: {output_a}")
+
+# Measure coordination effectiveness
+result = cert.measure_coordination(
+    agent_a=agent_a,
+    agent_b=agent_b,
+    coordinated_func=coordinated_system,
+    test_prompts=["Analyze X", "Evaluate Y"],
+    trials_per_agent=10
+)
+
+print(f"Gamma: {result.gamma:.3f}")
+print(result.recommendation)
+# Output: "Coordination is HELPING (+15% improvement)"
 ```
+
+**Gamma (γ) Interpretation:**
+- γ > 1.0: Coordination helps (keep multi-agent system)
+- γ < 1.0: Coordination hurts (use single agent instead)
+- γ ≈ 1.0: No coordination effect
 
 ---
 
@@ -187,7 +229,8 @@ import cert
 
 **Export compliance report:**
 ```python
-cert.export_report("compliance_report.pdf")
+cert.export_report("compliance_report.txt")
+# Supported formats: .txt, .json, .csv
 ```
 
 Generates:
@@ -201,17 +244,17 @@ ACCURACY METRICS (Article 15.1)
 - Semantic accuracy: 94.2%
 - Hallucination rate: 2.3%
 - Grounding score: 96.1%
-✓ COMPLIANT (above 90% threshold)
+COMPLIANT (above 90% threshold)
 
 ROBUSTNESS (Article 15.4)
 - Error rate: 0.8%
 - Timeout rate: 0.1%
-✓ COMPLIANT (below 5% threshold)
+COMPLIANT (below 5% threshold)
 
 AUDIT TRAIL (Article 19)
 - 45,231 requests logged
 - Retention: 6 months
-✓ COMPLIANT
+COMPLIANT
 ```
 
 ---
@@ -251,18 +294,26 @@ def financial_rag(query):
     accuracy_threshold=0.95,
     hallucination_tolerance=0.01,
     alert_on_hallucination=True,
+    audit_log="custom_audit.jsonl",
     explain=True  # Shows what each metric means
 )
 def custom_rag(query):
     return rag_pipeline(query)
 ```
 
-### View Statistics
+### Generate Compliance Reports
 ```python
-# Programmatic access (coming soon)
-stats = cert.get_statistics()
-print(f"Hallucination rate: {stats['hallucination_rate']:.1%}")
-print(f"Compliance rate: {stats['compliance_rate']:.1%}")
+import cert
+
+# Export compliance report (uses cert_audit.jsonl by default)
+cert.export_report(
+    output_path="compliance_report.txt",
+    system_name="Customer Service RAG",
+    format="txt"  # or "json", "csv"
+)
+
+# Show report in terminal
+cert.show_report()
 ```
 
 ---
@@ -274,28 +325,28 @@ CERT Framework aligns with EU AI Act requirements for high-risk AI systems:
 ### Article 15: Accuracy, Robustness, Cybersecurity
 
 **Article 15.1** - "Appropriate levels of accuracy"
-- ✓ CERT measures semantic accuracy, hallucination rate, grounding
-- ✓ Configurable thresholds (90%, 95%, 98%)
-- ✓ Automatic compliance status
+- CERT measures semantic accuracy, hallucination rate, grounding
+- Configurable thresholds (90%, 95%, 98%)
+- Automatic compliance status
 
 **Article 15.3** - "Accuracy metrics declared in instructions"
-- ✓ CERT generates plain-English accuracy reports
-- ✓ Exportable for documentation
+- CERT generates plain-English accuracy reports
+- Exportable for documentation
 
 **Article 15.4** - "Resilient regarding errors, faults, inconsistencies"
-- ✓ CERT tracks error rates, timeout rates
-- ✓ Robustness monitoring
+- CERT tracks error rates, timeout rates
+- Robustness monitoring
 
 ### Article 19: Automatically Generated Logs
 
 **Article 19.1** - "Automatic recording of events"
-- ✓ CERT logs every request to `cert_audit.jsonl`
-- ✓ Timestamped, immutable records
-- ✓ Minimum 6-month retention (configurable)
+- CERT logs every request to `cert_audit.jsonl`
+- Timestamped, immutable records
+- Minimum 6-month retention (configurable)
 
 **Article 19.2** - "Enable identifying situations that may result in risk"
-- ✓ CERT flags hallucinations, contradictions
-- ✓ Alerts on non-compliance
+- CERT flags hallucinations, contradictions
+- Alerts on non-compliance
 
 ---
 
@@ -334,38 +385,66 @@ print(f"Match: {result.matched}")
 print(f"Confidence: {result.confidence:.3f}")
 ```
 
-### Cost Tracking (Coming Soon)
+### Cost Tracking
 ```python
+import cert
+
 @cert.cost_tracker
 def my_llm_call(prompt):
-    return openai.chat.completions.create(...)
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response
 
-# Automatic token/cost tracking
+# Automatic token/cost extraction from response
+summary = cert.get_cost_summary()
+print(f"Total cost: ${summary['total_cost']:.4f}")
+print(f"Total tokens: {summary['total_input_tokens'] + summary['total_output_tokens']}")
 ```
 
-### Multi-Agent Coordination (Coming Soon)
+### Multi-Agent Coordination
 ```python
-from cert import coordinate_agents
+import cert
 
-result = coordinate_agents(
-    agents=[agent_a, agent_b, agent_c],
-    task="Analyze business scenario"
+# Define individual agents
+def agent_a(prompt: str) -> str:
+    return model_a.generate(prompt)
+
+def agent_b(prompt: str) -> str:
+    return model_b.generate(prompt)
+
+# Define coordinated system
+def coordinated_system(prompt: str) -> str:
+    output_a = agent_a(prompt)
+    return agent_b(f"Improve this: {output_a}")
+
+# Measure coordination effectiveness
+result = cert.measure_coordination(
+    agent_a=agent_a,
+    agent_b=agent_b,
+    coordinated_func=coordinated_system,
+    test_prompts=["Analyze X", "Evaluate Y"],
+    trials_per_agent=10
 )
 
-print(f"Coordination effect (γ): {result.gamma}")
-print(f"Emergence (Ω): {result.omega}")
+print(f"Gamma (γ): {result.gamma:.3f}")
+print(result.recommendation)
 ```
 
 ---
 
 ## Examples
 
-Complete examples in `examples/v2/`:
+Complete runnable examples in `examples/v2/`:
 
 - **quickstart_rag.py** - 60-second RAG monitoring quickstart
-- **example_measure.py** - Direct accuracy measurement
-- **example_cost_tracker.py** - Token usage tracking
-- **example_agent_monitor.py** - Single model monitoring
+- **quickstart_cost_tracking.py** - Automatic cost tracking
+- **quickstart_compliance_reports.py** - Generate compliance reports
+- **quickstart_coordination.py** - Multi-agent coordination monitoring
+- **example_measure.py** - Direct accuracy measurement API
+- **example_cost_tracker.py** - Advanced cost tracking patterns
+- **example_agent_monitor.py** - Single model monitoring patterns
 
 ---
 
