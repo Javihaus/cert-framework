@@ -44,7 +44,7 @@ Example usage:
     ```
 """
 
-from .config import AssessmentConfig, MetricConfig
+from .config import AssessmentConfig, MetricConfig, TemperatureMode
 from .engine import CERTAgentEngine
 from .metrics import (
     ConsistencyMetric,
@@ -71,6 +71,7 @@ __all__ = [
     # Configuration
     "AssessmentConfig",
     "MetricConfig",
+    "TemperatureMode",
     # Engine
     "CERTAgentEngine",
     # Metrics

@@ -92,7 +92,7 @@ async def main():
         providers=configured_models,
         embedding_model_name='all-MiniLM-L6-v2',
         max_tokens=1024,
-        temperature=0.7,
+        temperature=0.0,  # Deterministic for reproducible, fair model comparison
         output_dir='./assessment_results',
         enabled_metrics=['consistency', 'performance', 'latency', 'output_quality', 'robustness'],
     )

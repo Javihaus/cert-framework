@@ -1002,17 +1002,40 @@ config = TestConfig(
 ### AssessmentConfig (Agents)
 
 ```python
-from cert.agents import AssessmentConfig
+from cert.agents import AssessmentConfig, TemperatureMode
 
+# Option 1: Use default deterministic temperature (recommended for benchmarking)
 config = AssessmentConfig(
     consistency_trials=20,
     performance_trials=15,
-    temperature=0.7,
+    temperature=0.0,  # Default: deterministic for fair model comparison
     max_tokens=1024,
     timeout=30,
     enabled_metrics=['consistency', 'latency', 'robustness'],
 )
+
+# Option 2: Use temperature presets
+config = AssessmentConfig.from_temperature_mode(
+    TemperatureMode.DETERMINISTIC,  # 0.0 - recommended for benchmarking
+    # Other modes: FACTUAL (0.3), BALANCED (0.7), CREATIVE (1.0)
+    consistency_trials=20,
+    performance_trials=15,
+)
+
+# Option 3: Custom temperature
+config = AssessmentConfig(
+    temperature=0.5,  # Custom value (0.0-1.0)
+    consistency_trials=20,
+)
 ```
+
+**Temperature Guidance:**
+- **0.0 (DETERMINISTIC)**: Recommended for model comparison and benchmarking (reproducible, fair)
+- **0.3 (FACTUAL)**: For testing factual/Q&A tasks
+- **0.7 (BALANCED)**: For production simulation with typical diversity
+- **1.0 (CREATIVE)**: For testing creative/generative scenarios
+
+See [docs/TEMPERATURE_GUIDE.md](docs/TEMPERATURE_GUIDE.md) for detailed guidance.
 
 ### Custom Energy Weights (RAG)
 

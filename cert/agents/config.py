@@ -6,9 +6,39 @@ agentic system assessment execution.
 
 import os
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Dict, List
 
 import numpy as np
+
+
+class TemperatureMode(Enum):
+    """Temperature presets for different testing scenarios.
+
+    DETERMINISTIC: temperature=0.0
+        - For reproducible benchmarking and fair model comparison
+        - Industry standard for academic benchmarks
+        - Recommended for compliance/audit documentation
+
+    FACTUAL: temperature=0.3
+        - For testing factual/deterministic use cases
+        - Minimal creativity, high consistency
+        - Good for Q&A, classification, extraction tasks
+
+    BALANCED: temperature=0.7
+        - Balanced between consistency and diversity
+        - Good for general-purpose testing
+        - Default in many production applications
+
+    CREATIVE: temperature=1.0
+        - Maximum diversity in outputs
+        - For testing creative/generative scenarios
+        - Use when output variety is desired
+    """
+    DETERMINISTIC = 0.0
+    FACTUAL = 0.3
+    BALANCED = 0.7
+    CREATIVE = 1.0
 
 
 @dataclass
@@ -26,6 +56,12 @@ class AssessmentConfig:
         embedding_model_name: Sentence transformer model for semantic similarity
         max_tokens: Maximum tokens per response
         temperature: Sampling temperature (0.0-1.0)
+                    Default: 0.0 (deterministic, recommended for benchmarking)
+                    For different scenarios, use TemperatureMode enum or set manually:
+                    - 0.0: Reproducible benchmarking (RECOMMENDED)
+                    - 0.3: Factual/deterministic tasks
+                    - 0.7: Balanced testing
+                    - 1.0: Creative/diverse outputs
         timeout: Request timeout in seconds
 
         consistency_prompt: Prompt for consistency testing
@@ -57,7 +93,7 @@ class AssessmentConfig:
 
     # API parameters
     max_tokens: int = 1024
-    temperature: float = 0.7
+    temperature: float = 0.0  # Default to deterministic for reproducible benchmarking
     timeout: int = 30
 
     # Test prompts
@@ -168,6 +204,26 @@ class AssessmentConfig:
             for model in models:
                 combinations.append((provider, model))
         return combinations
+
+    @classmethod
+    def from_temperature_mode(cls, mode: TemperatureMode, **kwargs):
+        """Create config with temperature set from a TemperatureMode preset.
+
+        Args:
+            mode: TemperatureMode enum value
+            **kwargs: Additional configuration parameters
+
+        Returns:
+            AssessmentConfig with temperature set from mode
+
+        Example:
+            config = AssessmentConfig.from_temperature_mode(
+                TemperatureMode.DETERMINISTIC,
+                consistency_trials=10
+            )
+        """
+        kwargs['temperature'] = mode.value
+        return cls(**kwargs)
 
 
 @dataclass
