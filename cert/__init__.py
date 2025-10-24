@@ -1,15 +1,34 @@
-"""CERT Framework v2.0 - Simplified API for AI System Testing
+"""CERT Framework - EU AI Act Article 15 Compliance for LLM Systems
 
-Three core functions for comprehensive AI testing:
-1. measure() - Text reliability and similarity measurement
-2. cost_tracker() - Token usage and cost tracking
-3. agent_monitor() - Agent/model monitoring and assessment
+Automatic accuracy monitoring for LLM systems in regulated industries.
 
-This is the NEW v2.0 API with explicit parameters and simplified usage.
+Primary use case: RAG hallucination detection for EU AI Act compliance.
+
+Quick Start:
+    >>> import cert
+    >>> @cert.monitor
+    >>> def my_rag(query):
+    >>>     context = retrieve(query)
+    >>>     answer = llm(context, query)
+    >>>     return answer
+
+Three use cases:
+1. RAG hallucination detection (Article 15.1 + 15.4)
+2. Single model accuracy verification (Article 15.1)
+3. Multi-agent coordination monitoring (Article 15.4)
+
 For v1.x compatibility, the old API remains available but is deprecated.
 """
 
-# ===== V2.0 Core Functions (NEW - Recommended) =====
+# ===== PRIMARY API (User-Centric) =====
+from .monitor import monitor
+from .presets import Preset, get_preset, list_presets
+
+# ===== REPORTS & COMPLIANCE =====
+# TODO: Implement in next phase
+# from .reports import export_report, show_report
+
+# ===== ADVANCED API (Power Users) =====
 from .measure import measure
 from .cost_tracker import cost_tracker, cost_tracker_from_response, track_batch_costs
 from .agent_monitor import agent_monitor
@@ -83,7 +102,12 @@ __version__ = "2.0.0-beta"
 
 __all__ = (
     [
-        # ===== V2.0 Core Functions (NEW) =====
+        # ===== PRIMARY API (User-Centric) =====
+        "monitor",
+        "Preset",
+        "get_preset",
+        "list_presets",
+        # ===== ADVANCED API (Power Users) =====
         "measure",
         "cost_tracker",
         "cost_tracker_from_response",
