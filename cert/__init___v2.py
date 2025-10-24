@@ -11,6 +11,7 @@ This is the NEW v2.0 API. For v1.x compatibility, the old API is still available
 # V2.0 Core Functions (NEW - Simplified API)
 from .measure import measure
 from .cost_tracker import cost_tracker, cost_tracker_from_response, track_batch_costs
+from .agent_monitor import agent_monitor
 
 # V2.0 Core Types
 from .core.types import (
@@ -69,7 +70,7 @@ __all__ = [
     "cost_tracker",
     "cost_tracker_from_response",
     "track_batch_costs",
-    # "agent_monitor",  # Coming in Phase 4
+    "agent_monitor",
 
     # === V2.0 Core Types ===
     "MeasurementResult",
