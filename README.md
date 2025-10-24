@@ -32,13 +32,6 @@
 
 ## The Problem
 
-**You're building LLMs in regulated industries (finance, healthcare, legal).**
-
-Your boss says: *"Make our AI compliant with EU AI Act Article 15 by Q2"*
-
-You think: *"WTF does 'appropriate levels of accuracy' mean? What number do I need?"*
-
-**The EU AI Act is vague. No standard metrics exist. You need to explain your AI system to non-technical compliance teams.**
 
 ---
 
@@ -46,11 +39,11 @@ You think: *"WTF does 'appropriate levels of accuracy' mean? What number do I ne
 
 CERT Framework provides:
 
-✓ **Automatic accuracy measurement** - Monitor LLM accuracy with one decorator
-✓ **Hallucination detection** - Catch RAG hallucinations before production
-✓ **Audit trails** - Automatic logging for Article 19 compliance
-✓ **Plain-English reports** - Explain your AI system to compliance teams
-✓ **Industry presets** - Pre-configured for finance, healthcare, general use
+- **Automatic accuracy measurement** - Monitor LLM accuracy with one decorator
+- **Hallucination detection** - Catch RAG hallucinations before production
+- **Audit trails** - Automatic logging for Article 19 compliance
+- **Plain-English reports** - Explain your AI system to compliance teams
+- **Industry presets** - Pre-configured for finance, healthcare, general use
 
 ---
 
@@ -305,16 +298,46 @@ CERT Framework aligns with EU AI Act requirements for high-risk AI systems:
 - ✓ CERT tracks error rates, timeout rates
 - ✓ Robustness monitoring
 
+
+
+
+## EU AI Act Compliance
+
+CERT provides technical capabilities aligned with EU AI Act requirements for high-risk AI systems.
+
+**Regulation:** EU 2024/1689 (August 1, 2024 entry into force; August 2, 2026 compliance deadline for high-risk systems)
+
+
+### [Article 15: Accuracy, Robustness, Cybersecurity](https://artificialintelligenceact.eu/article/15/)**
+- Systems must achieve "appropriate levels of accuracy" (Art. 15.1)
+- Accuracy metrics must be "declared in accompanying instructions" (Art. 15.3)
+- Systems must be "resilient regarding errors, faults or inconsistencies" (Art. 15.4)
+
+**Error Detection (Article 15.1)**
+CERT's NLI contradiction detection and energy scoring provide systematic error detection. Creates audit trails supporting compliance documentation.
+
+**Accuracy Documentation (Article 15.3)**
+TestRunner and CERTAgentEngine generate reportable metrics: contradiction rate, consistency score, latency profiles. These metrics support accuracy declarations required by the regulation.
+
+### [Article 12: Record-Keeping](https://artificialintelligenceact.eu/article/12/)** / **[Article 19: Automatically Generated Logs](https://artificialintelligenceact.eu/article/19/)**
+- "Automatic recording of events over the lifetime of the system" (Art. 12.1)
+- Logs must enable "identifying situations that may result in risk" (Art. 12.2.a)
+- Logs must "facilitate post-market monitoring" (Art. 12.2.b)
+- Providers must retain logs for "at least six months" (Art. 19.1)
+
 ### Article 19: Automatically Generated Logs
 
 **Article 19.1** - "Automatic recording of events"
-- ✓ CERT logs every request to `cert_audit.jsonl`
-- ✓ Timestamped, immutable records
-- ✓ Minimum 6-month retention (configurable)
+* CERT logs every request to `cert_audit.jsonl`
+* Timestamped, immutable records
+* Minimum 6-month retention (configurable)
 
 **Article 19.2** - "Enable identifying situations that may result in risk"
 - ✓ CERT flags hallucinations, contradictions
 - ✓ Alerts on non-compliance
+
+**Audit Trails (Article 12 & 19)**
+Test results create timestamped records for system verification. Export results to your logging infrastructure for 6+ month compliance retention.
 
 ---
 
@@ -380,7 +403,7 @@ print(f"Emergence (Ω): {result.omega}")
 
 Complete examples in `examples/v2/`:
 
-- **quickstart_rag.py** - 60-second RAG monitoring quickstart
+- **quickstart_rag.py** - RAG monitoring quickstart
 - **example_measure.py** - Direct accuracy measurement
 - **example_cost_tracker.py** - Token usage tracking
 - **example_agent_monitor.py** - Single model monitoring
