@@ -729,6 +729,34 @@ summary = asyncio.run(engine.run_full_assessment())
 print(f"Total models tested: {len(summary.consistency_results)}")
 ```
 
+For Model Benchmarking 
+```python
+from cert.agents import AssessmentConfig
+
+config = AssessmentConfig(
+    consistency_trials=20,
+    temperature=0.0,  # Default - deterministic, fair comparison
+)
+```
+
+Using Temperature Presets
+```python
+from cert.agents import AssessmentConfig, TemperatureMode
+
+config = AssessmentConfig.from_temperature_mode(
+    TemperatureMode.DETERMINISTIC,
+    consistency_trials=20
+)
+```
+
+For Production Simulation
+```python
+config = AssessmentConfig.from_temperature_mode(
+    TemperatureMode.BALANCED,  # temperature=0.7
+    consistency_trials=30  # More trials needed for higher temp
+)
+```
+
 ### Supported Providers
 
 #### AnthropicProvider
