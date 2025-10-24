@@ -105,10 +105,10 @@ Status: ✓ COMPLIANT
 ```python
 import cert
 
-@cert.monitor(preset="financial")  # Strict: 95% accuracy, <1% hallucinations
+@cert.monitor(preset="financial")  # Stricter thresholds for financial compliance
 def financial_rag(query):
     context = vector_db.retrieve(query)
-    answer = llm.generate(context=context, query=query)
+    answer = llm.generate(context=context, query=query, temperature=0.0)
     return {"context": context, "answer": answer}
 
 # Automatic hallucination detection
@@ -124,10 +124,13 @@ def financial_rag(query):
 
 **Industry Presets:**
 ```python
-@cert.monitor(preset="financial")   # 95% accuracy, <1% hallucinations, 7yr retention
-@cert.monitor(preset="healthcare")  # 98% accuracy, <0.5% hallucinations, 10yr retention
-@cert.monitor(preset="general")     # 90% accuracy, <5% hallucinations, 6mo retention
+@cert.monitor(preset="financial")   # Stricter thresholds, 7yr audit retention
+@cert.monitor(preset="healthcare")  # Strictest thresholds, 10yr audit retention
+@cert.monitor(preset="general")     # Balanced thresholds, 6mo audit retention
 ```
+
+Preset thresholds are configurable starting points based on regulatory requirements.
+Accuracy thresholds should be validated through testing on your specific use case.
 
 ---
 

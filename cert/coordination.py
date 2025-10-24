@@ -61,12 +61,18 @@ def measure_coordination(
     Returns:
         CoordinationResult with gamma metric and baselines
 
+    Important:
+        Temperature control must be implemented in your agent functions.
+        For reproducible coordination testing, use temperature=0.0 in all
+        model calls. For production systems, match your deployment temperature.
+
     Example:
         >>> def agent_a(prompt):
-        ...     return model_a.generate(prompt)
+        ...     # IMPORTANT: Set temperature in model call
+        ...     return model_a.generate(prompt, temperature=0.0)
         >>>
         >>> def agent_b(prompt):
-        ...     return model_b.generate(prompt)
+        ...     return model_b.generate(prompt, temperature=0.0)
         >>>
         >>> def coordinated(prompt):
         ...     output_a = agent_a(prompt)
@@ -102,24 +108,24 @@ def measure_coordination(
     if expected_independent == 0:
         gamma = 0.0
         recommendation = (
-            "⚠ Cannot calculate coordination effect (baseline performance is zero)"
+            "Cannot calculate coordination effect (baseline performance is zero)"
         )
     else:
         gamma = coordinated_perf / expected_independent
 
         if gamma > 1.1:
             recommendation = (
-                f"✓ Coordination is HELPING (+{(gamma - 1.0) * 100:.1f}% improvement). "
+                f"Coordination is HELPING (+{(gamma - 1.0) * 100:.1f}% improvement). "
                 "The coordinated system performs better than independent agents."
             )
         elif gamma < 0.9:
             recommendation = (
-                f"✗ Coordination is HURTING ({(1.0 - gamma) * 100:.1f}% degradation). "
+                f"Coordination is HURTING ({(1.0 - gamma) * 100:.1f}% degradation). "
                 "Consider using single agent instead."
             )
         else:
             recommendation = (
-                "≈ Coordination has NO significant effect. "
+                "Coordination has NO significant effect. "
                 "Coordinated performance similar to independent agents."
             )
 

@@ -84,18 +84,25 @@ def monitor(
     Returns:
         Decorated function with automatic monitoring
 
+    Important:
+        Temperature control is your responsibility. For reproducible compliance
+        testing, use temperature=0.0 in your LLM calls. For production diversity,
+        use temperature=0.7-1.0. CERT monitors outputs regardless of temperature.
+
     Examples:
         # Zero config (smart defaults)
         @cert.monitor
         def my_rag(query):
             context = retrieve(query)
-            answer = llm(context, query)
+            # Set temperature in your LLM call
+            answer = llm(context, query, temperature=0.0)
             return answer
 
         # With preset
         @cert.monitor(preset="financial")
         def my_rag(query):
-            return rag_pipeline(query)
+            # For compliance, use deterministic temperature
+            return rag_pipeline(query, temperature=0.0)
 
         # Custom config
         @cert.monitor(
@@ -103,7 +110,7 @@ def monitor(
             alert_on_hallucination=True
         )
         def my_rag(query):
-            return rag_pipeline(query)
+            return rag_pipeline(query, temperature=0.7)
     """
 
     def decorator(func: Callable) -> Callable:

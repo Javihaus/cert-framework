@@ -10,6 +10,10 @@ Measures coordination effectiveness using gamma (γ) metric:
 Use case: Multi-agent systems (LangChain, AutoGen, CrewAI)
 
 Time to run: ~1 minute
+
+IMPORTANT: Temperature Control
+- For reproducible coordination testing: use temperature=0.0 in all agent model calls
+- For production systems: match your deployment temperature setting
 """
 
 import cert
@@ -24,7 +28,7 @@ def agent_a(prompt: str) -> str:
     """Agent A - First stage analyzer.
 
     In production, this would be:
-    return model_a.generate(prompt)
+    return model_a.generate(prompt, temperature=0.0)
     """
     # Simulate Agent A (simple analysis)
     return f"Agent A analyzed: {prompt}. Key factors identified."
@@ -34,7 +38,7 @@ def agent_b(prompt: str) -> str:
     """Agent B - Second stage refiner.
 
     In production, this would be:
-    return model_b.generate(prompt)
+    return model_b.generate(prompt, temperature=0.0)
     """
     # Simulate Agent B (refinement)
     return f"Agent B refined: {prompt}. Detailed evaluation provided."

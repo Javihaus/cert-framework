@@ -4,6 +4,11 @@ This is the PRIMARY use case for CERT Framework:
 Automatic hallucination detection for RAG systems (EU AI Act Article 15 compliance)
 
 Time to setup: < 60 seconds
+
+IMPORTANT: Temperature Control
+- For compliance testing: use temperature=0.0 (deterministic, reproducible)
+- For production diversity: use temperature=0.7-1.0
+- CERT monitors outputs regardless of temperature setting
 """
 
 import cert
@@ -22,7 +27,11 @@ def my_rag_system(query: str) -> str:
 
     # In production, this would be:
     # context = vector_db.retrieve(query)
-    # answer = llm.generate(context=context, query=query)
+    # answer = llm.generate(
+    #     context=context,
+    #     query=query,
+    #     temperature=0.0  # IMPORTANT: Set temperature for reproducibility
+    # )
 
     # For demo, return a dict with context and answer
     return {

@@ -1,6 +1,15 @@
 """Industry presets for CERT monitoring.
 
 Provides pre-configured settings for different regulatory environments.
+
+NOTE: Accuracy thresholds are configurable starting points based on regulatory
+strictness requirements. These values should be validated through testing on
+your specific use case and adjusted as needed.
+
+Audit retention periods are based on actual regulatory requirements:
+- Financial: 7 years (SEC, FINRA requirements)
+- Healthcare: 10 years (HIPAA minimum for medical records)
+- General: 6 months (EU AI Act Article 19 minimum)
 """
 
 from enum import Enum
@@ -17,22 +26,22 @@ class Preset(str, Enum):
 
 PRESETS: Dict[str, Dict[str, float]] = {
     "financial": {
-        "accuracy_threshold": 0.95,  # Very strict for financial services
-        "hallucination_tolerance": 0.01,  # <1% hallucination rate
-        "audit_retention_months": 84,  # 7 years (regulatory requirement)
-        "description": "Strict accuracy for financial services (95% threshold, <1% hallucination)",
+        "accuracy_threshold": 0.95,  # Stricter threshold for financial services
+        "hallucination_tolerance": 0.01,  # Lower tolerance for financial compliance
+        "audit_retention_months": 84,  # 7 years (SEC, FINRA requirements)
+        "description": "Stricter thresholds for financial services with 7-year audit retention (SEC/FINRA)",
     },
     "healthcare": {
-        "accuracy_threshold": 0.98,  # Extremely strict for healthcare
-        "hallucination_tolerance": 0.005,  # <0.5% hallucination rate
-        "audit_retention_months": 120,  # 10 years (HIPAA/GDPR)
-        "description": "Very strict accuracy for healthcare (98% threshold, <0.5% hallucination)",
+        "accuracy_threshold": 0.98,  # Strictest threshold for healthcare
+        "hallucination_tolerance": 0.005,  # Lowest tolerance for patient safety
+        "audit_retention_months": 120,  # 10 years (HIPAA minimum)
+        "description": "Strictest thresholds for healthcare with 10-year audit retention (HIPAA)",
     },
     "general": {
-        "accuracy_threshold": 0.90,  # Balanced for general use
-        "hallucination_tolerance": 0.05,  # <5% hallucination rate
-        "audit_retention_months": 6,  # EU AI Act minimum
-        "description": "Balanced accuracy for general use (90% threshold, <5% hallucination)",
+        "accuracy_threshold": 0.90,  # Balanced threshold for general use
+        "hallucination_tolerance": 0.05,  # Standard tolerance for general applications
+        "audit_retention_months": 6,  # 6 months (EU AI Act Article 19 minimum)
+        "description": "Balanced thresholds for general use with 6-month audit retention (EU AI Act)",
     },
 }
 
