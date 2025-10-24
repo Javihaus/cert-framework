@@ -2,11 +2,33 @@
 
 **EU AI Act Article 15 Compliance for LLM Systems**
 
+# CERT Framework
+
+<div align="center">
+  <img src="docs/CERT.png" alt="" width="800">
+</div>
+
+\
+[**What CERT Solves**](#the-problem)
+| [**Quick Start**](#quick-start)
+| [**Use cases**](#three-use-cases)
+| [**Why CERT?**](#why-cert-framework)
+| [**Installation**](#installation)
+| [**Examples**](#examples)
+| [**EU AI Act Compliance**](#eu-ai-act-compliance)
+| [**Important Disclaimers**](#important-disclaimers)
+| [**Advanced Features**](#advanced_feature)
+| [**Development**](#development)
+| [**Citation**](#citation)
+| [**Contact**](#contact)
+
+CERT is a production-grade AI system reliability testing framework for LLM applications and model evaluation.
+
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 ![pytest](https://img.shields.io/badge/pytest-passing-green)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 ---
 
 ## The Problem
@@ -229,7 +251,7 @@ pip install cert-framework
 
 ---
 
-## Usage Examples
+## Examples
 
 ### Zero Config (Smart Defaults)
 ```python
@@ -358,7 +380,6 @@ print(f"Emergence (Ω): {result.omega}")
 
 ---
 
-## Examples
 
 Complete examples in `examples/v2/`:
 
