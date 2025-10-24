@@ -114,7 +114,10 @@ def get_embedding_engine(model_name: str = "all-MiniLM-L6-v2") -> EmbeddingEngin
     """
     global _GLOBAL_EMBEDDING_ENGINE
 
-    if _GLOBAL_EMBEDDING_ENGINE is None or _GLOBAL_EMBEDDING_ENGINE.model_name != model_name:
+    if (
+        _GLOBAL_EMBEDDING_ENGINE is None
+        or _GLOBAL_EMBEDDING_ENGINE.model_name != model_name
+    ):
         _GLOBAL_EMBEDDING_ENGINE = EmbeddingEngine(model_name=model_name)
 
     return _GLOBAL_EMBEDDING_ENGINE

@@ -134,15 +134,11 @@ def _score_response(
         # 3. Structure (20%)
         # Check for bullets, numbering, paragraphs, colons
         has_structure = 0.5  # Default
-        if any(marker in response for marker in ['.', '\n', ':', '-', '•', '1.', '2.']):
+        if any(marker in response for marker in [".", "\n", ":", "-", "•", "1.", "2."]):
             has_structure = 1.0
 
         # Weighted score
-        score = (
-            relevance * 0.5 +
-            completeness * 0.3 +
-            has_structure * 0.2
-        )
+        score = relevance * 0.5 + completeness * 0.3 + has_structure * 0.2
 
         return float(score)
 

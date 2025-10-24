@@ -227,8 +227,12 @@ def cost_tracker_from_response(
         elif provider_lower == "google":
             # Google Gemini (if usage info available)
             if hasattr(response, "usage_metadata"):
-                tokens_input = getattr(response.usage_metadata, "prompt_token_count", None)
-                tokens_output = getattr(response.usage_metadata, "candidates_token_count", None)
+                tokens_input = getattr(
+                    response.usage_metadata, "prompt_token_count", None
+                )
+                tokens_output = getattr(
+                    response.usage_metadata, "candidates_token_count", None
+                )
             else:
                 raise AttributeError("No usage metadata in Google response")
 

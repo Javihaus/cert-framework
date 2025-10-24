@@ -62,9 +62,7 @@ def calculate_consistency(
             f"got {len(valid_responses)}"
         )
 
-    logger.debug(
-        f"Calculating consistency for {len(valid_responses)} responses"
-    )
+    logger.debug(f"Calculating consistency for {len(valid_responses)} responses")
 
     # Get embedding engine
     embedding_engine = get_embedding_engine(model_name=embedding_model)
@@ -78,7 +76,7 @@ def calculate_consistency(
     embeddings_array = np.array(embeddings)
 
     # Calculate pairwise cosine distances
-    distances = pdist(embeddings_array, metric='cosine')
+    distances = pdist(embeddings_array, metric="cosine")
 
     if len(distances) == 0:
         # Only one unique embedding (all responses identical)

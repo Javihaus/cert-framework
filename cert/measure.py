@@ -104,7 +104,9 @@ def measure(
 
     # Validate at least one component enabled
     if not (use_semantic or use_nli or use_grounding):
-        raise ValueError("At least one component (semantic, nli, grounding) must be enabled")
+        raise ValueError(
+            "At least one component (semantic, nli, grounding) must be enabled"
+        )
 
     # Normalize weights
     enabled_weights = []
@@ -159,9 +161,7 @@ def measure(
             nli_result = nli_engine.check_entailment(context=text2, answer=text1)
             nli_score = nli_result.entailment_score
             components_used.append("nli")
-            logger.debug(
-                f"NLI: {nli_result.label} (score: {nli_score:.3f})"
-            )
+            logger.debug(f"NLI: {nli_result.label} (score: {nli_score:.3f})")
         except Exception as e:
             logger.error(f"NLI failed: {e}")
             nli_score = 0.5  # Neutral on error

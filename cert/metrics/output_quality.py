@@ -65,9 +65,7 @@ def calculate_output_quality(
     mean_length = float(np.mean(lengths))
 
     # 2. Semantic diversity
-    semantic_diversity = _calculate_semantic_diversity(
-        valid_responses, embedding_model
-    )
+    semantic_diversity = _calculate_semantic_diversity(valid_responses, embedding_model)
 
     # 3. Repetition score
     repetition_score = _calculate_repetition_score(valid_responses)
@@ -118,7 +116,7 @@ def _calculate_semantic_diversity(
         embeddings_array = np.array(embeddings)
 
         # Calculate pairwise cosine distances
-        distances = pdist(embeddings_array, metric='cosine')
+        distances = pdist(embeddings_array, metric="cosine")
 
         # Diversity = mean distance
         # Higher distance = more diverse

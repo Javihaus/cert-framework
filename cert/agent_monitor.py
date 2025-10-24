@@ -121,22 +121,29 @@ def agent_monitor(
             f"got {consistency_trials}"
         )
     if performance_trials < 5:
-        raise ValueError(
-            f"performance_trials must be >= 5, got {performance_trials}"
-        )
+        raise ValueError(f"performance_trials must be >= 5, got {performance_trials}")
 
     # Default enabled metrics
     if enabled_metrics is None:
-        enabled_metrics = ["consistency", "performance", "latency",
-                          "output_quality", "robustness"]
+        enabled_metrics = [
+            "consistency",
+            "performance",
+            "latency",
+            "output_quality",
+            "robustness",
+        ]
 
     # Validate metrics
-    valid_metrics = {"consistency", "performance", "latency", "output_quality", "robustness"}
+    valid_metrics = {
+        "consistency",
+        "performance",
+        "latency",
+        "output_quality",
+        "robustness",
+    }
     for metric in enabled_metrics:
         if metric not in valid_metrics:
-            raise ValueError(
-                f"Invalid metric '{metric}'. Valid: {valid_metrics}"
-            )
+            raise ValueError(f"Invalid metric '{metric}'. Valid: {valid_metrics}")
 
     # Default prompts
     if consistency_prompt is None:
@@ -274,7 +281,9 @@ async def _run_monitoring(
                 )
 
                 if response_metadata.error:
-                    logger.warning(f"Trial {trial + 1} failed: {response_metadata.error}")
+                    logger.warning(
+                        f"Trial {trial + 1} failed: {response_metadata.error}"
+                    )
                     total_errors += 1
                     error_messages.append(response_metadata.error)
                     if response_metadata.timeout:
@@ -305,9 +314,7 @@ async def _run_monitoring(
 
         # Calculate latency from consistency trials
         if "latency" in enabled_metrics and consistency_latencies:
-            latency_metric = calculate_latency(
-                latencies_seconds=consistency_latencies
-            )
+            latency_metric = calculate_latency(latencies_seconds=consistency_latencies)
             results["latency"] = latency_metric
             logger.info(f"Latency: mean={latency_metric.mean_ms:.1f}ms")
 
@@ -341,7 +348,9 @@ async def _run_monitoring(
                 )
 
                 if response_metadata.error:
-                    logger.warning(f"Trial {trial + 1} failed: {response_metadata.error}")
+                    logger.warning(
+                        f"Trial {trial + 1} failed: {response_metadata.error}"
+                    )
                     total_errors += 1
                     error_messages.append(response_metadata.error)
                     if response_metadata.timeout:
@@ -380,6 +389,8 @@ async def _run_monitoring(
                 error_messages=error_messages,
             )
             results["robustness"] = robustness_metric
-            logger.info(f"Robustness: success_rate={robustness_metric.success_rate:.1%}")
+            logger.info(
+                f"Robustness: success_rate={robustness_metric.success_rate:.1%}"
+            )
 
     return results

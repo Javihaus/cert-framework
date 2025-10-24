@@ -10,7 +10,9 @@ from typing import List, Set
 logger = logging.getLogger(__name__)
 
 
-def compute_grounding_score(context: str, answer: str, min_term_length: int = 4) -> float:
+def compute_grounding_score(
+    context: str, answer: str, min_term_length: int = 4
+) -> float:
     """Compute grounding score between context and answer.
 
     Checks if key terms from answer appear in context. This catches cases
@@ -54,7 +56,7 @@ def extract_terms(text: str, min_length: int = 4) -> List[str]:
         List of terms (lowercased, punctuation stripped)
     """
     # Strip common punctuation
-    punctuation = ".,!?;:\""
+    punctuation = '.,!?;:"'
     terms = []
 
     for word in text.split():
@@ -65,7 +67,9 @@ def extract_terms(text: str, min_length: int = 4) -> List[str]:
     return terms
 
 
-def get_ungrounded_terms(context: str, answer: str, min_term_length: int = 4) -> Set[str]:
+def get_ungrounded_terms(
+    context: str, answer: str, min_term_length: int = 4
+) -> Set[str]:
     """Get terms from answer that don't appear in context.
 
     Useful for debugging and explaining why grounding score is low.
