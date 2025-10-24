@@ -9,7 +9,7 @@
 </div>
 
 \
-[**What CERT Solves**](#the-problem)
+[**What is CERT**](#what-is-cert)
 | [**Quick Start**](#quick-start)
 | [**Use cases**](#three-use-cases)
 | [**Why CERT?**](#why-cert-framework)
@@ -30,12 +30,11 @@
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 ---
 
-## The Problem
 
 
 ---
 
-## The Solution
+## What is CERT
 
 CERT Framework provides:
 
