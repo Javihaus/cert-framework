@@ -1,29 +1,60 @@
-"""
-CERT Framework - Three Core Capabilities for LLM Systems
+"""CERT Framework v2.0 - Simplified API for AI System Testing
 
-1. Single Model Testing: Individual model evaluation and consistency
-2. RAG Systems: Hallucination detection and context grounding
-3. Agent Pipelines: Multi-agent system assessment and monitoring
+Three core functions for comprehensive AI testing:
+1. measure() - Text reliability and similarity measurement
+2. cost_tracker() - Token usage and cost tracking
+3. agent_monitor() - Agent/model monitoring and assessment
+
+This is the NEW v2.0 API with explicit parameters and simplified usage.
+For v1.x compatibility, the old API remains available but is deprecated.
 """
 
-# Utilities (shared across all three capabilities)
+# ===== V2.0 Core Functions (NEW - Recommended) =====
+from .measure import measure
+from .cost_tracker import cost_tracker, cost_tracker_from_response, track_batch_costs
+from .agent_monitor import agent_monitor
+
+# ===== V2.0 Core Types =====
+from .core.types import (
+    # Result types
+    MeasurementResult,
+    CostResult,
+    CostTrackerAccumulator,
+    AgentMonitorResult,
+    # Metric types
+    ConsistencyMetric,
+    PerformanceMetric,
+    LatencyMetric,
+    OutputQualityMetric,
+    RobustnessMetric,
+)
+
+# ===== V2.0 Provider Utilities =====
+from .core.providers import (
+    get_provider,
+    AnthropicProvider,
+    OpenAIProvider,
+    GoogleProvider,
+    XAIProvider,
+    HuggingFaceProvider,
+)
+
+# ===== V1.x Legacy API (DEPRECATED - will be removed in v3.0) =====
 from .utilities import (
-    compare,
-    configure,
+    compare as compare_v1,  # Deprecated: use measure() instead
+    configure,  # Deprecated: pass params directly to measure()
     TestRunner,
     ConsistencyError,
     AccuracyError,
     ComparisonResult,
 )
 
-# Single Model Testing
 from .single_model import (
     measure_consistency,
     autodiagnose_variance,
     IntelligentComparator,
 )
 
-# RAG Systems
 from .rag import (
     InputType,
     DetectionResult,
@@ -48,22 +79,46 @@ try:
 except ImportError:
     __all_llm_judge__ = []
 
-__version__ = "1.0.0"
+__version__ = "2.0.0-beta"
 
 __all__ = (
     [
-        # Utilities
-        "compare",
+        # ===== V2.0 Core Functions (NEW) =====
+        "measure",
+        "cost_tracker",
+        "cost_tracker_from_response",
+        "track_batch_costs",
+        "agent_monitor",
+
+        # ===== V2.0 Core Types =====
+        "MeasurementResult",
+        "CostResult",
+        "CostTrackerAccumulator",
+        "AgentMonitorResult",
+        "ConsistencyMetric",
+        "PerformanceMetric",
+        "LatencyMetric",
+        "OutputQualityMetric",
+        "RobustnessMetric",
+
+        # ===== V2.0 Providers =====
+        "get_provider",
+        "AnthropicProvider",
+        "OpenAIProvider",
+        "GoogleProvider",
+        "XAIProvider",
+        "HuggingFaceProvider",
+
+        # ===== V1.x Legacy (DEPRECATED) =====
+        "compare_v1",
         "configure",
         "TestRunner",
         "ConsistencyError",
         "AccuracyError",
         "ComparisonResult",
-        # Single Model
         "measure_consistency",
         "autodiagnose_variance",
         "IntelligentComparator",
-        # RAG
         "InputType",
         "DetectionResult",
         "SemanticComparator",
@@ -73,10 +128,3 @@ __all__ = (
     + __all_langchain__
     + __all_llm_judge__
 )
-
-# Three core modules available as subpackages:
-# - cert.single_model: Individual model testing
-# - cert.rag: RAG system testing
-# - cert.agents: Agent pipeline assessment
-#   - cert.agents.providers: LLM providers (Anthropic, OpenAI, Google, xAI, HuggingFace)
-#   - cert.agents.integrations: Framework integrations (LangChain, AutoGen, CrewAI)
