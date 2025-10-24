@@ -28,6 +28,55 @@ CERT is a production-grade AI system reliability testing framework for LLM appli
 
 ---
 
+## New in v2.0: Simplified API
+
+CERT v2.0 introduces a radically simplified API with three core functions:
+
+```python
+import cert
+
+# 1. measure() - Text reliability and similarity
+result = cert.measure(
+    "Apple's Q1 revenue was $117B",
+    "Apple reported $150B in Q1",  # Hallucination
+    use_semantic=True, semantic_weight=0.3,
+    use_nli=True, nli_weight=0.5,
+    use_grounding=True, grounding_weight=0.2
+)
+print(f"Matched: {result.matched}, Confidence: {result.confidence:.3f}")
+
+# 2. cost_tracker() - Token usage and cost tracking
+cost = cert.cost_tracker(
+    tokens_input=1000,
+    tokens_output=500,
+    provider="openai",
+    model="gpt-4o"
+)
+print(f"Total cost: ${cost.cost_total:.6f}")
+
+# 3. agent_monitor() - Comprehensive LLM monitoring
+monitor = cert.agent_monitor(
+    provider="openai",
+    model="gpt-4o",
+    consistency_trials=20,
+    temperature=0.0
+)
+print(f"Consistency: {monitor.consistency.score:.3f}")
+print(f"Latency: {monitor.latency.mean_ms:.1f}ms")
+```
+
+**Key Improvements:**
+- No hidden configuration - all parameters explicit
+- One function for all text comparison (replaces compare(), configure(), RAG utilities)
+- Structured result types with full typing support
+- Unified provider interface for all LLM APIs
+
+**See:** [examples/v2/](examples/v2/) for comprehensive v2.0 examples
+
+**Migration:** v1.x API remains available for backward compatibility (see below)
+
+---
+
 ## What CERT Solves
 
 CERT addresses critical friction in AI systems deployment that lacks standardized tools:
@@ -100,10 +149,13 @@ Systematically assess multi-agent systems and compare LLM providers across opera
 
 ## Quick Start
 
-### Basic Example: Semantic Comparison
+> **Note:** The examples below use the v1.x API for backward compatibility.
+> For the new v2.0 API, see the [v2.0 section](#new-in-v20-simplified-api) above or [examples/v2/](examples/v2/).
+
+### Basic Example: Semantic Comparison (v1.x)
 
 ```python
-from cert import compare
+from cert import compare_v1 as compare
 
 # Compare two texts for semantic similarity
 result = compare("revenue increased", "sales grew")
