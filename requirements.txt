@@ -1,5 +1,11 @@
-# CERT Framework - Complete Dependencies
+# CERT Framework - Core Dependencies
 # Install with: pip install -r requirements.txt
+#
+# For optional features, use:
+#   pip install cert-framework[dev]          # Development tools
+#   pip install cert-framework[inspector]    # Web UI inspector
+#   pip install cert-framework[langchain]    # LangChain integration
+#   pip install cert-framework[all]          # All optional features
 
 # ============================================================================
 # Core Dependencies (Required)
@@ -8,7 +14,7 @@
 # Semantic comparison and embeddings
 sentence-transformers>=2.2.0,<3.0.0
 
-# PyTorch for embeddings and NLI models
+# PyTorch backend for transformers
 torch>=1.11.0
 
 # NLI models for hallucination detection
@@ -22,56 +28,41 @@ scipy>=1.7.0
 typing-extensions>=4.0.0
 
 # ============================================================================
-# LLM Provider SDKs (Required for Agents)
+# Development Dependencies (Optional)
+# Install with: pip install -r requirements-dev.txt
 # ============================================================================
 
-# Anthropic Claude API
-anthropic>=0.18.0
-
-# OpenAI GPT API (also used by xAI)
-openai>=1.0.0
-
-# Google Gemini API
-google-generativeai>=0.3.0
-
-# ============================================================================
-# Agentic Framework Integrations (Optional)
-# ============================================================================
-
-# LangChain integration
-langchain>=0.1.0
-langchain-core>=0.1.0
-
-# AutoGen integration
-pyautogen>=0.2.0
-
-# CrewAI integration
-crewai>=0.1.0
+# Uncomment the following for development:
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# ruff>=0.1.0
+# mypy>=1.0.0
+# datasets>=2.0.0
+# pandas>=1.3.0
+# rapidfuzz>=3.0.0
 
 # ============================================================================
-# Development Tools (Optional, for development only)
+# Optional Feature Dependencies
+# Install specific features with: pip install cert-framework[feature]
 # ============================================================================
 
-# Testing
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
+# LLM Provider SDKs (optional - only needed if using those providers)
+# anthropic>=0.25.0         # For Anthropic Claude
+# openai>=1.0.0             # For OpenAI GPT / xAI Grok
+# google-generativeai>=0.3.0  # For Google Gemini
 
-# Linting and formatting
-ruff>=0.1.0
+# Framework Integrations (optional)
+# langchain>=0.1.0          # For LangChain integration
+# langchain-core>=0.1.0
+# pyautogen>=0.2.0          # For AutoGen integration
+# crewai>=0.1.0             # For CrewAI integration
 
-# Type checking
-mypy>=1.0.0
+# Web UI Inspector (optional)
+# flask>=2.0.0
+# jinja2>=3.0.0
 
-# Validation datasets
-datasets>=2.0.0
-pandas>=1.3.0
+# Text matching for RAG (optional)
+# rapidfuzz>=3.0.0
 
-# Text matching
-rapidfuzz>=3.0.0
-
-# ============================================================================
-# Optional Dependencies
-# ============================================================================
-
-# Inspector UI (optional web dashboard)
-flask>=2.0.0
+# Data analysis (optional)
+# pandas>=1.3.0
