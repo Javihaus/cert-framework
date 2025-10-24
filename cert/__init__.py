@@ -23,6 +23,12 @@ For v1.x compatibility, the old API remains available but is deprecated.
 # ===== PRIMARY API (User-Centric) =====
 from .monitor import monitor
 from .presets import Preset, get_preset, list_presets
+from .cost_decorator import (
+    cost_tracker,
+    get_cost_summary,
+    reset_cost_tracker,
+    get_cost_history,
+)
 
 # ===== REPORTS & COMPLIANCE =====
 # TODO: Implement in next phase
@@ -30,7 +36,11 @@ from .presets import Preset, get_preset, list_presets
 
 # ===== ADVANCED API (Power Users) =====
 from .measure import measure
-from .cost_tracker import cost_tracker, cost_tracker_from_response, track_batch_costs
+from .cost_tracker import (
+    cost_tracker_from_response,
+    track_batch_costs,
+    cost_tracker as cost_tracker_manual,
+)
 from .agent_monitor import agent_monitor
 
 # ===== V2.0 Core Types =====
@@ -104,12 +114,16 @@ __all__ = (
     [
         # ===== PRIMARY API (User-Centric) =====
         "monitor",
+        "cost_tracker",
+        "get_cost_summary",
+        "reset_cost_tracker",
+        "get_cost_history",
         "Preset",
         "get_preset",
         "list_presets",
         # ===== ADVANCED API (Power Users) =====
         "measure",
-        "cost_tracker",
+        "cost_tracker_manual",
         "cost_tracker_from_response",
         "track_batch_costs",
         "agent_monitor",
