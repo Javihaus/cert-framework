@@ -1,171 +1,49 @@
-"""CERT Framework - EU AI Act Article 15 Compliance for LLM Systems
+"""
+CERT Framework v3.0
+===================
 
-Automatic accuracy monitoring for LLM systems in regulated industries.
+EU AI Act Article 15 Compliance Framework for LLM Systems
 
-Primary use case: RAG hallucination detection for EU AI Act compliance.
+Clean, simple API for consistency measurement and monitoring.
 
-Quick Start:
-    >>> import cert
-    >>> @cert.monitor
-    >>> def my_rag(query):
-    >>>     context = retrieve(query)
-    >>>     answer = llm(context, query)
-    >>>     return answer
+Public API:
+    - measure(): Measure consistency between two texts
+    - monitor(): Decorator for monitoring LLM outputs
+    - Preset: Industry preset configurations
+    - PRESETS: Available preset definitions
 
-Three use cases:
-1. RAG hallucination detection (Article 15.1 + 15.4)
-2. Single model accuracy verification (Article 15.1)
-3. Multi-agent coordination monitoring (Article 15.4)
+Example Usage:
+    >>> from cert import measure, monitor
+    >>>
+    >>> # Measure consistency
+    >>> result = measure(
+    ...     text1="Revenue was $5M in Q4",
+    ...     text2="Q4 revenue reached $5M"
+    ... )
+    >>> print(f"Confidence: {result.confidence}")
+    >>>
+    >>> # Monitor with preset
+    >>> @monitor(preset="healthcare")
+    ... def my_rag_pipeline(query):
+    ...     context = retrieve(query)
+    ...     answer = llm(context, query)
+    ...     return answer
 
-For v1.x compatibility, the old API remains available but is deprecated.
+For detailed documentation, see: https://github.com/Javihaus/cert-framework
 """
 
-# ===== PRIMARY API (User-Centric) =====
-from .monitor import monitor
-from .presets import Preset, get_preset, list_presets
-from .cost_decorator import (
-    cost_tracker,
-    get_cost_summary,
-    reset_cost_tracker,
-    get_cost_history,
-)
+__version__ = "3.0.0"
+__author__ = "Javier Marin"
+__license__ = "MIT"
 
-# ===== REPORTS & COMPLIANCE =====
-from .reports import export_report, show_report
+# Public API - This is all users need to import
+from cert.api.measure import measure
+from cert.api.monitor import monitor
+from cert.presets.definitions import Preset, PRESETS
 
-# ===== COORDINATION MONITORING =====
-from .coordination import measure_coordination, CoordinationResult
-
-# ===== ADVANCED API (Power Users) =====
-from .measure import measure
-from .cost_tracker import (
-    cost_tracker_from_response,
-    track_batch_costs,
-    cost_tracker as cost_tracker_manual,
-)
-from .agent_monitor import agent_monitor
-
-# ===== V2.0 Core Types =====
-from .core.types import (
-    # Result types
-    MeasurementResult,
-    CostResult,
-    CostTrackerAccumulator,
-    AgentMonitorResult,
-    # Metric types
-    ConsistencyMetric,
-    PerformanceMetric,
-    LatencyMetric,
-    OutputQualityMetric,
-    RobustnessMetric,
-)
-
-# ===== V2.0 Provider Utilities =====
-from .core.providers import (
-    get_provider,
-    AnthropicProvider,
-    OpenAIProvider,
-    GoogleProvider,
-    XAIProvider,
-    HuggingFaceProvider,
-)
-
-# ===== V1.x Legacy API (DEPRECATED - will be removed in v3.0) =====
-from .utilities import (
-    compare as compare_v1,  # Deprecated: use measure() instead
-    configure,  # Deprecated: pass params directly to measure()
-    TestRunner,
-    ConsistencyError,
-    AccuracyError,
-    ComparisonResult,
-)
-
-from .single_model import (
-    measure_consistency,
-    autodiagnose_variance,
-    IntelligentComparator,
-)
-
-from .rag import (
-    InputType,
-    DetectionResult,
-    SemanticComparator,
-    ComparisonRule,
-    EmbeddingComparator,
-)
-
-# Conditional import for LangChain integration
-try:
-    from .agents.integrations.langchain import wrap_chain, CertChainWrapper  # noqa: F401
-
-    __all_langchain__ = ["wrap_chain", "CertChainWrapper"]
-except ImportError:
-    __all_langchain__ = []
-
-# Conditional import for LLM Judge comparator
-try:
-    from .single_model.llm_judge import LLMJudgeComparator  # noqa: F401
-
-    __all_llm_judge__ = ["LLMJudgeComparator"]
-except ImportError:
-    __all_llm_judge__ = []
-
-__version__ = "2.0.0-beta"
-
-__all__ = (
-    [
-        # ===== PRIMARY API (User-Centric) =====
-        "monitor",
-        "cost_tracker",
-        "get_cost_summary",
-        "reset_cost_tracker",
-        "get_cost_history",
-        "export_report",
-        "show_report",
-        "measure_coordination",
-        "CoordinationResult",
-        "Preset",
-        "get_preset",
-        "list_presets",
-        # ===== ADVANCED API (Power Users) =====
-        "measure",
-        "cost_tracker_manual",
-        "cost_tracker_from_response",
-        "track_batch_costs",
-        "agent_monitor",
-        # ===== V2.0 Core Types =====
-        "MeasurementResult",
-        "CostResult",
-        "CostTrackerAccumulator",
-        "AgentMonitorResult",
-        "ConsistencyMetric",
-        "PerformanceMetric",
-        "LatencyMetric",
-        "OutputQualityMetric",
-        "RobustnessMetric",
-        # ===== V2.0 Providers =====
-        "get_provider",
-        "AnthropicProvider",
-        "OpenAIProvider",
-        "GoogleProvider",
-        "XAIProvider",
-        "HuggingFaceProvider",
-        # ===== V1.x Legacy (DEPRECATED) =====
-        "compare_v1",
-        "configure",
-        "TestRunner",
-        "ConsistencyError",
-        "AccuracyError",
-        "ComparisonResult",
-        "measure_consistency",
-        "autodiagnose_variance",
-        "IntelligentComparator",
-        "InputType",
-        "DetectionResult",
-        "SemanticComparator",
-        "ComparisonRule",
-        "EmbeddingComparator",
-    ]
-    + __all_langchain__
-    + __all_llm_judge__
-)
+__all__ = [
+    "measure",
+    "monitor",
+    "Preset",
+    "PRESETS",
+]
