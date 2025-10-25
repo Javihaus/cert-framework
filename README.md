@@ -1,6 +1,6 @@
 # CERT Framework
 
-**EU AI Act Compliance Platform for LLM Systems**
+**EU AI Act Compliance Tools for AI Systems**
 
 <div align="center">
   <img src="docs/CERT.png" alt="CERT Framework" width="800">
