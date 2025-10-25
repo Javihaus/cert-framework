@@ -30,7 +30,7 @@
 
 ## Mission
 
-CERT Framework empowers organizations to deploy AI systems with confidence by addressing the most significant barriers to production deployment: regulatory compliance, accuracy verification, and operational transparency. We provide the technical foundation for organizations to meet EU AI Act requirements while maintaining the agility needed for rapid AI system development.
+CERT is a platform to empower organizations to deploy AI systems with confidence by addressing the most significant barriers to production deployment: regulatory compliance, accuracy verification, and operational transparency. We provide the technical foundation for organizations to meet EU AI Act requirements while maintaining the agility needed for rapid AI system development.
 
 ---
 
