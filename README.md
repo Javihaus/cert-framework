@@ -48,13 +48,318 @@ The framework provides:
 
 ### Technical Architecture
 
-CERT employs a composite accuracy measurement approach combining:
+CERT is a **comprehensive compliance platform** providing multiple tools for EU AI Act compliance, accuracy measurement, and continuous monitoring of AI systems. The platform consists of five integrated tools:
 
-1. **Semantic Similarity Analysis** (30% weight): Embedding-based semantic alignment between context and output
-2. **Natural Language Inference** (50% weight): Logical entailment verification to detect contradictions
-3. **Grounding Analysis** (20% weight): Term-level verification that outputs are grounded in provided context
+#### Platform Overview
 
-The framework generates a unified accuracy score and maintains comprehensive audit logs for regulatory review.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                       CERT Platform                             │
+│         EU AI Act Compliance Tools for AI Systems               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+  ┌──────────┐         ┌──────────┐         ┌──────────┐
+  │ measure()│         │ monitor()│         │ Presets  │
+  │   Tool   │         │   Tool   │         │   Tool   │
+  └──────────┘         └──────────┘         └──────────┘
+        │                     │                     │
+        │                     │                     │
+        └─────────────────────┴─────────────────────┘
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │  export_report() │
+                    │       Tool       │
+                    └──────────────────┘
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │ coordinate_agents│
+                    │  (Coming Soon)   │
+                    └──────────────────┘
+```
+
+---
+
+#### Tool 1: `measure()` - Direct Accuracy Measurement
+
+**Purpose**: On-demand measurement of consistency between two texts
+
+**Architecture**: Composite accuracy measurement combining three detection methods:
+
+1. **Semantic Similarity Analysis** (30% weight)
+   - Embedding-based semantic alignment using sentence transformers
+   - Fast paraphrase and meaning equivalence detection
+   - Model: `all-MiniLM-L6-v2` (default, configurable)
+
+2. **Natural Language Inference** (50% weight)
+   - Logical entailment verification to detect contradictions
+   - Most critical for hallucination detection
+   - Model: `microsoft/deberta-v3-base` (default, configurable)
+
+3. **Grounding Analysis** (20% weight)
+   - Term-level verification that outputs are grounded in context
+   - Catches fabricated entities, numbers, and claims
+   - Rule-based lexical matching
+
+**Output**: Unified confidence score (0.0-1.0) with detailed component scores
+
+**Use Case**: Direct API for batch processing, testing, and custom workflows
+
+```python
+from cert import measure
+
+result = measure(
+    text1="Revenue was $500M in Q4",
+    text2="Q4 revenue reached $500M",
+    semantic_weight=0.3,
+    nli_weight=0.5,
+    grounding_weight=0.2
+)
+
+print(f"Confidence: {result.confidence}")  # 0.95
+print(f"Matched: {result.matched}")        # True
+```
+
+---
+
+#### Tool 2: `@monitor()` - Continuous LLM Monitoring
+
+**Purpose**: Decorator-based continuous monitoring of LLM function outputs
+
+**Architecture**: Real-time accuracy verification with statistical tracking
+
+**How It Works**:
+
+1. **Function Interception**
+   - Wraps target function using Python decorator pattern
+   - Extracts context and answer from function calls
+   - Transparent to application code (no refactoring needed)
+
+2. **Accuracy Measurement**
+   - Uses `measure()` tool internally for each request
+   - Applies same composite scoring (semantic + NLI + grounding)
+   - Compares actual output against provided context
+
+3. **Statistics Aggregation**
+   - Tracks total requests, hallucinations, compliance rate
+   - Calculates aggregate metrics (hallucination rate, mean accuracy)
+   - Shows periodic status updates (every 100 requests)
+
+4. **Compliance Determination**
+   - **Per-request**: Checks if `accuracy_score >= accuracy_threshold`
+   - **System-wide**: Checks if `hallucination_rate <= hallucination_tolerance`
+   - Flags non-compliant requests in audit log
+
+5. **Audit Trail Generation**
+   - Logs every request to JSONL file (Article 19 compliance)
+   - Records: timestamp, context, answer, scores, compliance status
+   - Immutable append-only format
+
+**Configuration Options**:
+- **Industry Presets**: Pre-configured thresholds (healthcare, financial, legal, general)
+- **Custom Thresholds**: Accuracy threshold (per-request) and hallucination tolerance (aggregate)
+- **Alert System**: Optional console alerts on hallucination detection
+- **Audit Log Path**: Configurable audit trail location
+
+**Use Case**: Production monitoring, RAG systems, compliance tracking
+
+```python
+from cert import monitor
+
+@monitor(preset="financial")
+def financial_rag(query):
+    context = retrieve_documents(query)
+    answer = llm.generate(context, query)
+    return {"context": context, "answer": answer}
+```
+
+---
+
+#### Tool 3: `export_report()` - Compliance Documentation
+
+**Purpose**: Generate EU AI Act compliance reports from audit logs
+
+**Architecture**: Multi-format report generation with regulatory citations
+
+**Report Structure**:
+
+1. **System Identification** (Annex IV)
+   - System name, monitoring period, data span
+   - Reference to relevant EU AI Act articles
+
+2. **Article 15.1 - Accuracy Requirements**
+   - Overall accuracy score with component breakdown
+   - Hallucination detection rate
+   - Compliance determination (PASS/FAIL)
+   - Full regulatory text citations
+
+3. **Article 15.4 - Robustness & Resilience**
+   - System error rate
+   - Success rate metrics
+   - Resilience evidence
+
+4. **Article 19 - Audit Trail Compliance**
+   - Automatic logging confirmation
+   - Retention period verification
+   - Log format documentation
+
+5. **Annex IV - Technical Documentation**
+   - Performance metrics summary
+   - Risk management evidence
+   - Post-market monitoring status
+
+6. **Overall Compliance Determination**
+   - Pass/Fail status for each article
+   - Overall compliance status
+   - Visual status indicators
+
+7. **Recommendations**
+   - Action items for non-compliant metrics
+   - Continuous improvement suggestions
+
+8. **Disclaimers & Certifications**
+   - Legal disclaimers
+   - Certification authority references
+   - Official EU AI Act resource links
+
+**Output Formats**:
+- **TXT**: Human-readable plain text with tables and formatting
+- **JSON**: Machine-readable structured data
+- **CSV**: Spreadsheet-compatible metrics export
+
+**Use Case**: Regulatory submissions, audit documentation, compliance review
+
+```python
+from cert import export_report
+
+# Generate compliance report
+export_report(
+    output_path="compliance_report.txt",
+    system_name="Financial Services RAG",
+    format="txt"
+)
+```
+
+---
+
+#### Tool 4: `Preset` & `PRESETS` - Industry Configurations
+
+**Purpose**: Pre-configured monitoring thresholds based on industry regulations
+
+**Architecture**: Evidence-based heuristics derived from regulatory requirements
+
+**Available Presets**:
+
+| Preset | Accuracy Threshold | Hallucination Tolerance | Retention | Regulatory Basis |
+|--------|-------------------|------------------------|-----------|------------------|
+| **Healthcare** | 95% | 2% | 10 years | HIPAA § 164.530(j)(2), FDA 21 CFR Part 11 |
+| **Financial** | 90% | 5% | 7 years | SEC Rule 17a-4, SOX Section 802 |
+| **Legal** | 92% | 3% | 7 years | State bar ethics rules, ABA Model Rules 1.1 & 1.6 |
+| **General** | 80% | 10% | 6 months | EU AI Act Article 19 minimum |
+
+**How Presets Were Derived**:
+1. Literature review of acceptable error rates in each domain
+2. Experimental validation on domain-specific test datasets
+3. Risk assessment based on consequence severity
+4. Conservative margin of safety above minimum performance
+
+**Preset Configuration**:
+```python
+from cert import PRESETS, Preset
+
+# View preset details
+config = PRESETS["healthcare"]
+print(config["accuracy_threshold"])      # 0.95
+print(config["regulatory_basis"])        # "HIPAA § 164.530(j)(2)..."
+
+# Use preset in monitoring
+@monitor(preset="healthcare")
+def medical_rag(query):
+    return pipeline(query)
+
+# Override preset values
+@monitor(preset="financial", accuracy_threshold=0.95)
+def strict_financial_rag(query):
+    return pipeline(query)
+```
+
+**Use Case**: Quick-start compliance, industry-standard configurations, baseline thresholds
+
+---
+
+#### Tool 5: `coordinate_agents()` - Multi-Agent Coordination (Planned)
+
+**Purpose**: Measure and monitor coordination effectiveness in multi-agent systems
+
+**Status**: To be implemented in Phase 2
+
+**Planned Architecture**:
+
+1. **Coordination Metrics**
+   - **Gamma (γ)**: Coordination effect = coordinated_performance / independent_performance
+   - **Omega (Ω)**: Emergence indicator = performance gained from coordination
+   - **Consensus Rate**: Agreement between agent outputs
+
+2. **Multi-Agent Monitoring**
+   - Track individual agent outputs
+   - Measure coordination effectiveness
+   - Detect coordination failures
+   - Compare against baseline (independent operation)
+
+3. **Framework Support**
+   - LangChain multi-agent systems
+   - AutoGen agent orchestration
+   - CrewAI agent coordination
+   - Custom agent frameworks
+
+**Planned Usage**:
+```python
+from cert import coordinate_agents  # Coming in Phase 2
+
+result = coordinate_agents(
+    agents=[agent_a, agent_b, agent_c],
+    task="Complex analysis task"
+)
+
+print(f"Coordination effect (γ): {result.gamma}")
+print(f"Emergence (Ω): {result.omega}")
+print(f"Consensus rate: {result.consensus_rate}")
+```
+
+**Use Case**: Multi-agent RAG, agent orchestration, coordination quality assurance
+
+---
+
+### How The Tools Work Together
+
+1. **Core Engine**: `measure()` provides the foundational accuracy measurement algorithm
+2. **Production Monitoring**: `@monitor()` uses `measure()` internally for continuous tracking
+3. **Configuration**: `Presets` provide industry-specific thresholds for `monitor()`
+4. **Documentation**: `export_report()` analyzes audit logs generated by `monitor()`
+5. **Future Integration**: `coordinate_agents()` will extend platform to multi-agent systems
+
+**Data Flow**:
+```
+Your LLM Function
+       │
+       ▼
+  @monitor()  ────► measure() ────► Accuracy Score
+       │                                  │
+       ▼                                  │
+  Audit Log                               │
+       │                                  │
+       ▼                                  ▼
+export_report() ◄──────── Statistics & Compliance Status
+       │
+       ▼
+ EU AI Act Compliance Report
+```
+
+This integrated platform approach ensures comprehensive compliance coverage while maintaining simplicity through clean, composable APIs.
 
 ---
 
