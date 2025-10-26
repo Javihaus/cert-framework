@@ -1,24 +1,10 @@
 # CERT Framework
 
-**EU AI Act Compliance Tools for AI Systems**
+Production-ready accuracy monitoring for LLM systems. Automated compliance documentation for EU AI Act Article 15.
 
 <div align="center">
   <img src="docs/CERT.png" alt="CERT Framework" width="1000">
 </div>
-
-\
-[**What is CERT**](#what-is-cert)
-| [**Why CERT Matters**](#why-cert-matters)
-| [**Which Tool Do I Need?**](#which-tool-do-i-need)
-| [**Quick Start**](#quick-start)
-| [**Production Tools**](#production-tools)
-| [**Experimental Tools**](#experimental-tools)
-| [**Installation**](#installation)
-| [**EU AI Act Compliance**](#eu-ai-act-compliance)
-| [**Implementation Services**](#implementation-services)
-| [**Development**](#development)
-| [**Citation**](#citation)
-| [**Contact**](#contact)
 
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 ![pytest](https://img.shields.io/badge/pytest-passing-green)
@@ -28,124 +14,126 @@
 
 ---
 
-## What is CERT
+## Installation & Quickstart
 
-CERT (Consistency Evaluation for Reliable Text) is an EU AI Act compliance library that provides measurement tools for verifying LLM system accuracy according to Article 15 requirements.
+### Installation
 
-**The core problem**: The EU AI Act requires organizations deploying high-risk AI systems to prove accuracy, maintain audit trails, and demonstrate robustness. Penalties for non-compliance reach €35M or 7% of global turnover. The August 2026 deadline for high-risk systems is approaching.
+```bash
+# Basic installation
+pip install cert-framework
 
-**What CERT provides**: Technical measurement infrastructure that generates the documentation needed for regulatory compliance. Instead of manually collecting evidence, you instrument your AI systems with CERT tools and automatically generate audit trails and compliance reports.
+# With trajectory analysis (experimental)
+pip install cert-framework[trajectory]
 
----
-
-## Why CERT Matters
-
-### The Compliance Gap
-
-Most organizations face two problems simultaneously:
-1. **Technical challenge**: "Is our LLM system actually accurate and reliable?"
-2. **Regulatory challenge**: "Can we prove it to auditors?"
-
-Traditional monitoring tools address the first problem but ignore the second. CERT addresses both.
-
-### The Business Risk
-
-Without compliance infrastructure:
--  No defensible evidence for Article 15 (Accuracy) requirements
--  No audit trail for Article 19 (Record-keeping) requirements  
--  No robustness documentation for Article 15.4
--  Certification delays or rejections from Notified Bodies
--  Exposure to enforcement actions and fines
-
-With CERT:
--  Automated accuracy measurement with regulatory-grade documentation
--  Immutable audit logs in compliance format
--  Plain-language reports citing specific EU AI Act articles
--  Continuous monitoring without architectural changes
--  Industry-specific thresholds (Healthcare, Financial, Legal)
-
-### The August 2026 Deadline
-
-High-risk AI systems must comply with EU AI Act requirements by August 2026. Organizations need:
-- 6-12 months for technical implementation
-- 3-6 months for documentation and certification preparation
-- Buffer time for addressing findings
-
-**If you're deploying high-risk AI systems, you need compliance infrastructure now.**
-
----
-
-## Which Tool Do I Need?
-
-CERT provides different measurement tools for different AI system architectures. Choose based on what you're monitoring:
-
-```mermaid
-graph TD
-    A[What are you monitoring?] --> B{System Type}
-    
-    B -->|Single-model<br/>RAG system| C[measure + monitor]
-    B -->|Real-time generation<br/>quality| D[analyze_trajectory]
-    B -->|Multi-hop reasoning<br/>chains| E[Hamiltonian Analysis<br/>EXPERIMENTAL]
-    B -->|Multi-agent<br/>pipeline| F[Coordination Monitor<br/>EXPERIMENTAL]
-    
-    C --> G[Article 15: Accuracy<br/>Article 19: Audit Trail]
-    D --> H[Article 15: Accuracy<br/>Real-time monitoring]
-    E --> I[Research: Reasoning<br/>chain quality]
-    F --> J[Research: Agent<br/>coordination effects]
-    
-    style C fill:#90EE90,stroke:#000000,stroke-width:2px
-    style D fill:#90EE90,stroke:#000000,stroke-width:2px
-    style E fill:#FFD700,stroke:#000000,stroke-width:2px,stroke-dasharray: 5 5
-    style F fill:#FFD700,stroke:#000000,stroke-width:2px,stroke-dasharray: 5 5
-    style A fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+# From source
+git clone https://github.com/Javihaus/cert-framework
+cd cert-framework
+pip install -e .
 ```
 
-### Tool Selection Guide
+### Quickstart
 
-| **If your AI system is...** | **Use this tool** | **Status** |
-|------------------------------|-------------------|------------|
-| RAG system with context + answer outputs | `@monitor()` decorator |  Production |
-| Any LLM where you need to compare two texts | `measure()` API |  Production |
-| LLM generating text and you want quality tracking | `analyze_trajectory()` |  Production |
-| Multi-hop reasoning (question→fact→fact→answer) | Hamiltonian Analysis |  Experimental |
-| Multi-agent system with coordination patterns | Coordination Monitor |  Experimental |
-
-**Start with production tools** (`measure`, `monitor`, `analyze_trajectory`) for immediate compliance needs. Experimental tools are available for organizations conducting research on advanced AI system observability.
-
----
-
-## Quick Start
-
-### For RAG Systems (Most Common)
+Three lines of code to add accuracy monitoring:
 
 ```python
 from cert import monitor
 
-@monitor(preset="financial")  # or "healthcare", "legal", "general"
+@monitor(preset="healthcare")  # or "financial", "legal", "general"
 def your_rag_pipeline(query):
     context = retrieve_documents(query)
     answer = llm.generate(context, query)
     return {"context": context, "answer": answer}
 
-# Use normally - monitoring happens automatically
 result = your_rag_pipeline("What was Q4 revenue?")
+# Automatically generates audit log in cert_audit.jsonl
+```
 
-# Generate compliance report
+Generate compliance report:
+
+```python
 from cert import export_report
+
 export_report(
     audit_log_path="cert_audit.jsonl",
-    system_name="Financial RAG System",
-    format="txt"  # or "json", "markdown"
+    system_name="Production RAG System",
+    format="txt"  # or "json", "markdown", "html", "pdf"
 )
 ```
 
-**That's it.** You now have:
-- Automated accuracy verification on every request
-- Immutable audit trail (Article 19 compliance)
-- Compliance report citing EU AI Act articles
-- Hallucination detection and tracking
+**See `examples/` for complete working examples.**
 
-### For Direct Text Comparison
+### Run Examples
+
+```bash
+# Basic examples (no setup required)
+python examples/01_quickstart.py
+python examples/02_rag_monitoring.py
+python examples/03_model_comparison.py
+python examples/04_compliance_reports.py
+
+# Advanced examples (require cert-framework[trajectory])
+python examples/05_trajectory_analysis.py
+python examples/06_coordination_monitor.py
+```
+
+All examples run in < 10 seconds with zero setup.
+
+---
+
+## API Reference
+
+### measure()
+
+Compare two texts for semantic consistency.
+
+**Signature:**
+
+```python
+def measure(
+    text1: str,
+    text2: str,
+    *,
+    use_semantic: bool = True,
+    semantic_weight: float = 0.3,
+    use_nli: bool = True,
+    nli_weight: float = 0.5,
+    use_grounding: bool = True,
+    grounding_weight: float = 0.2,
+    threshold: float = 0.7,
+    embedding_model: str = "all-MiniLM-L6-v2",
+    nli_model: str = "microsoft/deberta-v3-base"
+) -> MeasurementResult
+```
+
+**Purpose:**
+Measures semantic similarity, contradiction, and grounding between two texts using three components: embedding similarity (semantic), natural language inference (NLI), and term grounding.
+
+**Parameters:**
+
+- `text1` (str): First text, typically model output or answer
+- `text2` (str): Second text, typically context or ground truth
+- `use_semantic` (bool): Enable embedding-based similarity [default: True]
+- `semantic_weight` (float): Weight for semantic component [default: 0.3]
+- `use_nli` (bool): Enable natural language inference [default: True]
+- `nli_weight` (float): Weight for NLI component [default: 0.5]
+- `use_grounding` (bool): Enable term grounding check [default: True]
+- `grounding_weight` (float): Weight for grounding component [default: 0.2]
+- `threshold` (float): Confidence threshold for match [default: 0.7]
+- `embedding_model` (str): SentenceTransformer model name [default: "all-MiniLM-L6-v2"]
+- `nli_model` (str): NLI model from HuggingFace [default: "microsoft/deberta-v3-base"]
+
+**Returns:**
+
+`MeasurementResult` with fields:
+
+- `matched` (bool): Whether texts match (confidence >= threshold)
+- `confidence` (float): Overall score 0.0-1.0
+- `semantic_score` (float | None): Embedding similarity
+- `nli_score` (float | None): Entailment score
+- `grounding_score` (float | None): Term grounding score
+- `components_used` (list[str]): List of enabled components
+
+**Example:**
 
 ```python
 from cert import measure
@@ -156,662 +144,705 @@ result = measure(
 )
 
 print(f"Confidence: {result.confidence:.3f}")  # 0.95
-print(f"Matched: {result.matched}")            # True
+print(f"Matched: {result.matched}")  # True
+print(f"Semantic: {result.semantic_score:.3f}")
+print(f"NLI: {result.nli_score:.3f}")
+print(f"Grounding: {result.grounding_score:.3f}")
 ```
 
-### For Generation Quality Tracking
+**Notes:**
 
-```python
-from cert import analyze_trajectory
-
-# Monitor generation in real-time
-trajectory = analyze_trajectory(
-    model=your_model,
-    prompt="Explain quantum computing",
-    max_tokens=500
-)
-
-print(f"Mean perplexity: {trajectory['mean_perplexity']:.2f}")
-print(f"Entropy trend: {trajectory['entropy_trend']}")
-```
+- Weights auto-normalize to sum to 1.0
+- All three components enabled by default (best accuracy)
+- Use `use_semantic=True, use_nli=False, use_grounding=False` for fast mode (1-2ms)
+- Models cached after first use (~200MB memory)
+- Thread-safe for concurrent requests
 
 ---
 
-## Production Tools
+### monitor()
 
-Production tools are fully tested, documented, and ready for deployment in regulated environments. They generate EU AI Act compliance documentation.
+Decorator for continuous monitoring of LLM functions with automatic audit logging.
 
-### Tool 1: `measure()` - Direct Text Comparison
-
-**Use when**: You need to verify if two texts are semantically consistent (typical for testing, validation, or one-off comparisons).
-
-**How it works**: Combines three detection methods to produce a composite confidence score:
-
-1. **Semantic Similarity** (30% weight) - Embedding-based meaning alignment
-2. **Natural Language Inference** (50% weight) - Logical contradiction detection  
-3. **Grounding Analysis** (20% weight) - Term-level verification
-
-**Example**:
+**Signature:**
 
 ```python
-from cert import measure
-
-result = measure(
-    text1="The patient has hypertension",
-    text2="Blood pressure is elevated"
-)
-
-# Access results
-print(f"Overall confidence: {result.confidence:.3f}")
-print(f"Texts match: {result.matched}")
-print(f"Semantic score: {result.semantic_score:.3f}")
-print(f"NLI score: {result.nli_score:.3f}")
-print(f"Grounding score: {result.grounding_score:.3f}")
+def monitor(
+    preset: str = "general",
+    *,
+    threshold: float | None = None,
+    use_semantic: bool = True,
+    use_nli: bool = True,
+    use_grounding: bool = True,
+    log_path: str = "cert_audit.jsonl",
+    enabled: bool = True
+) -> Callable
 ```
 
-**Configuration**:
+**Purpose:**
+Wraps a function to automatically measure accuracy between context and answer, log results, and generate compliance documentation.
+
+**Parameters:**
+
+- `preset` (str): Industry preset configuration ["general", "healthcare", "financial", "legal"] [default: "general"]
+- `threshold` (float | None): Override preset threshold (0.0-1.0) [default: None]
+- `use_semantic` (bool): Enable semantic similarity [default: True]
+- `use_nli` (bool): Enable NLI [default: True]
+- `use_grounding` (bool): Enable grounding [default: True]
+- `log_path` (str): Path to audit log file [default: "cert_audit.jsonl"]
+- `enabled` (bool): Toggle monitoring on/off [default: True]
+
+**Returns:**
+Decorated function that logs measurements to audit file.
+
+**Example:**
 
 ```python
-result = measure(
-    text1="Context text",
-    text2="LLM output",
-    
-    # Enable/disable components
-    use_semantic=True,
-    use_nli=True,
-    use_grounding=True,
-    
-    # Adjust weights (auto-normalized to sum to 1.0)
-    semantic_weight=0.3,
-    nli_weight=0.5,
-    grounding_weight=0.2,
-    
-    # Set match threshold
-    threshold=0.7,  # 0.7 = balanced, 0.9 = strict, 0.5 = lenient
-    
-    # Customize models
-    embedding_model="all-MiniLM-L6-v2",
-    nli_model="microsoft/deberta-v3-base"
-)
-```
+from cert import monitor
 
-**When to adjust weights**:
-- **Hallucination-critical systems** (healthcare, legal): Increase `nli_weight` to 0.7
-- **Performance-critical systems**: Use `use_semantic=True, use_nli=False, use_grounding=False` (fastest)
-- **High-precision requirements**: Set `threshold=0.9` and increase `grounding_weight`
-
----
-
-### Tool 2: `@monitor()` - Continuous System Monitoring
-
-**Use when**: You have a production function that processes requests and you need continuous accuracy verification with automatic audit logging.
-
-**How it works**: 
-1. Decorator wraps your function (no code changes required)
-2. Extracts `context` and `answer` from return value
-3. Runs `measure()` on each request
-4. Logs results to immutable audit trail (JSONL format)
-5. Tracks aggregate statistics
-6. Generates compliance reports
-
-**Example**:
-
-```python
-from cert import monitor, PRESETS
-
-# Use industry preset
 @monitor(preset="healthcare")
-def clinical_rag(query):
-    context = search_medical_literature(query)
-    answer = llm.generate(context, query)
+def medical_qa(query: str):
+    context = retrieval_system(query)
+    answer = medical_llm.generate(context, query)
     return {"context": context, "answer": answer}
 
-# Or use custom thresholds
-@monitor(
-    accuracy_threshold=0.9,           # Per-request minimum confidence
-    hallucination_tolerance=0.01,      # Maximum 1% hallucination rate
-    audit_log_path="custom_audit.jsonl",
-    alert_on_hallucination=True
-)
-def financial_rag(query):
-    # Implementation
-    return {"context": context, "answer": answer}
+# Automatically measured and logged
+result = medical_qa("What are the patient's symptoms?")
 ```
 
-**Industry Presets**:
+**Expected Return Format:**
 
-| Preset | Accuracy Threshold | Hallucination Tolerance | Use Case |
-|--------|-------------------|------------------------|----------|
-| `healthcare` | 0.95 | 0.01 (1%) | Medical information, clinical decision support |
-| `financial` | 0.90 | 0.02 (2%) | Financial advice, regulatory reporting |
-| `legal` | 0.90 | 0.02 (2%) | Legal research, contract analysis |
-| `general` | 0.80 | 0.05 (5%) | General-purpose applications |
-
-**View preset details**:
+The monitored function must return a dict with:
 
 ```python
-from cert import PRESETS
-
-config = PRESETS["healthcare"]
-print(f"Accuracy threshold: {config['accuracy_threshold']}")
-print(f"Hallucination tolerance: {config['hallucination_tolerance']}")
-print(f"Regulatory basis: {config['regulatory_basis']}")
+{
+    "context": str,  # Source text / ground truth
+    "answer": str    # Model-generated text
+}
 ```
 
-**Monitoring output**:
+**Presets:**
 
-```
-[CERT Monitor] Starting monitoring: financial_rag_pipeline
-[CERT Monitor] Configuration: financial preset (accuracy>=0.90, hallucination<=2%)
-[CERT Monitor] Audit log: cert_audit.jsonl
+| Preset      | Threshold | Use Case                     |
+|-------------|-----------|------------------------------|
+| general     | 0.70      | General-purpose applications |
+| healthcare  | 0.85      | Medical AI systems           |
+| financial   | 0.80      | Financial services           |
+| legal       | 0.80      | Legal document processing    |
 
-Request #1: ✓ COMPLIANT (accuracy: 0.94)
-Request #2: ✓ COMPLIANT (accuracy: 0.91)
-Request #3: ⚠ HALLUCINATION DETECTED (accuracy: 0.67)
+**Notes:**
 
-[CERT Monitor] Status (100 requests):
-  - Total requests: 100
-  - Hallucinations detected: 3
-  - Hallucination rate: 3.00%
-  - Mean accuracy: 0.89
-  - Compliance: ✗ FAILED (hallucination rate exceeds 2% tolerance)
-```
+- Audit logs written as JSON Lines (`.jsonl`) format
+- Each entry includes: timestamp, accuracy score, matched status, input/output
+- Logs are append-only (immutable audit trail)
+- Use `enabled=False` to disable monitoring without removing decorator
+- Thread-safe for concurrent requests
 
 ---
 
-### Tool 3: `analyze_trajectory()` - Real-Time Generation Monitoring
+### export_report()
 
-**Use when**: You want to monitor LLM generation quality in real-time during text production (useful for detecting degradation, monitoring confidence, or analyzing generation patterns).
+Generate EU AI Act compliance reports from audit logs.
 
-**How it works**: Tracks perplexity and entropy at each generation step, providing insights into model confidence and output quality as text is being generated.
-
-**Example**:
+**Signature:**
 
 ```python
-from cert import analyze_trajectory
-
-trajectory = analyze_trajectory(
-    model=your_transformers_model,
-    tokenizer=your_tokenizer,
-    prompt="Explain the European Green Deal",
-    max_tokens=500,
-    temperature=0.7
-)
-
-# Access trajectory metrics
-print(f"Mean perplexity: {trajectory['mean_perplexity']:.2f}")
-print(f"Perplexity std dev: {trajectory['perplexity_std']:.2f}")
-print(f"Mean entropy: {trajectory['mean_entropy']:.3f}")
-print(f"Entropy trend: {trajectory['entropy_trend']}")  # 'increasing', 'decreasing', 'stable'
-
-# Detect quality issues
-if trajectory['mean_perplexity'] > 50:
-    print("⚠ High perplexity detected - model uncertain about output")
-
-if trajectory['entropy_trend'] == 'increasing':
-    print("⚠ Increasing entropy - output becoming less focused")
+def export_report(
+    audit_log_path: str = "cert_audit.jsonl",
+    *,
+    system_name: str = "AI System",
+    system_version: str = "1.0.0",
+    risk_level: str = "high",
+    format: str = "txt",
+    output_path: str | None = None
+) -> None
 ```
 
-**Use cases**:
-- **Quality gating**: Reject high-perplexity outputs before showing to users
-- **A/B testing**: Compare generation quality across model versions
-- **Debugging**: Identify which prompts cause unstable generation
-- **Compliance**: Document generation confidence for audit purposes
+**Purpose:**
+Analyzes audit logs and generates compliance documentation citing EU AI Act Article 15 (Accuracy) and Article 19 (Logging).
 
-**Metrics explained**:
-- **Perplexity**: How "surprised" the model is by its own output (lower = more confident)
-- **Entropy**: Randomness in token probability distribution (lower = more focused)
-- **Trend analysis**: Whether quality is improving/degrading during generation
+**Parameters:**
 
----
+- `audit_log_path` (str): Path to CERT audit log [default: "cert_audit.jsonl"]
+- `system_name` (str): Name of AI system for report [default: "AI System"]
+- `system_version` (str): Version identifier [default: "1.0.0"]
+- `risk_level` (str): Risk classification ["high", "limited", "minimal"] [default: "high"]
+- `format` (str): Output format ["txt", "json", "markdown", "html", "pdf"] [default: "txt"]
+- `output_path` (str | None): Custom output path [default: None]
 
-### Tool 4: `export_report()` - Compliance Documentation
+**Returns:**
+None (writes report to file)
 
-**Use when**: You need to generate compliance reports for auditors, Notified Bodies, or internal governance.
-
-**How it works**: Analyzes audit logs and generates structured reports citing specific EU AI Act articles with evidence of compliance.
-
-**Example**:
+**Example:**
 
 ```python
 from cert import export_report
 
-# Generate compliance report
 export_report(
     audit_log_path="cert_audit.jsonl",
-    system_name="Clinical Decision Support RAG",
-    output_path="compliance_report.txt",
-    format="txt"  # Options: "txt", "json", "markdown"
+    system_name="Healthcare RAG System",
+    system_version="2.1.0",
+    risk_level="high",
+    format="pdf",
+    output_path="compliance_report_q4_2024.pdf"
 )
 ```
 
-**Report structure**:
+**Report Contents:**
 
-1. **System Identification** (Annex IV compliance)
-   - System name, monitoring period, request count
-2. **Article 15.1 - Accuracy Requirements**
-   - Overall accuracy score with statistical breakdown
-   - Hallucination rate with threshold comparison
-   - Component scores (semantic, NLI, grounding)
-   - PASS/FAIL determination with full regulatory text
-3. **Article 15.4 - Robustness & Resilience**
-   - Error handling verification
-   - System stability metrics
-4. **Article 19 - Audit Trail Compliance**
-   - Automatic logging confirmation
-   - Retention policy documentation
-5. **Annex IV - Technical Documentation**
-   - Performance metrics summary
-   - Risk management evidence
-6. **Overall Compliance Status**
-   - Visual status indicators for each article
-   - Actionable recommendations for non-compliant metrics
-7. **Disclaimers & Certifications**
-   - Legal disclaimers
-   - References to certification authorities
+- System identification and version
+- Accuracy metrics summary (mean, median, min, max)
+- Pass/fail rate against threshold
+- Compliance statement citing EU AI Act articles
+- Audit log statistics
+- Timestamp and report metadata
 
-**Sample output excerpt**:
+**Supported Formats:**
 
-```
-═══════════════════════════════════════════════════════════
-EU AI ACT COMPLIANCE REPORT
-System: Clinical Decision Support RAG
-Generated: 2025-10-26 14:32:15 UTC
-═══════════════════════════════════════════════════════════
+- `txt`: Plain text (human-readable)
+- `json`: Machine-readable structured data
+- `markdown`: GitHub-flavored markdown
+- `html`: Self-contained HTML report
+- `pdf`: PDF document (requires `weasyprint`)
 
-ARTICLE 15.1 - ACCURACY REQUIREMENTS
+**Notes:**
 
-Performance Metrics:
-  Overall Accuracy: 0.94 ✓
-  Hallucination Rate: 0.8% ✓
-  Total Requests: 1,247
-  
-Component Scores:
-  Semantic Similarity: 0.91
-  Natural Language Inference: 0.96
-  Grounding Analysis: 0.93
-
-Regulatory Requirement:
-"High-risk AI systems shall be designed and developed in such a 
-way that they achieve appropriate levels of accuracy, robustness, 
-and cybersecurity..."
-
-Status: ✓ COMPLIANT
-Justification: System accuracy (0.94) exceeds healthcare industry
-threshold (0.95) and hallucination rate (0.8%) is well below
-tolerance (1%).
-```
+- PDF generation requires: `pip install weasyprint`
+- Reports reference specific EU AI Act articles
+- Suitable for submission to auditors
+- Generated reports are reproducible from audit logs
 
 ---
 
-## Experimental Tools
+### Preset / PRESETS
 
-Experimental tools are research-grade implementations for organizations exploring advanced AI system observability. They provide insights beyond basic accuracy measurement but may require customization for specific use cases.
+Industry-specific configuration presets for accuracy monitoring.
 
-**Status**: These tools are functional but not yet packaged for one-command installation. They represent research-to-production pathways for advanced compliance scenarios.
-
-### Experimental Tool 1: Hamiltonian Reasoning Analysis
-
-**Use when**: You need to analyze multi-hop reasoning chains where the AI system processes a sequence of facts to reach a conclusion (e.g., question → fact1 → fact2 → answer).
-
-**What it measures**: Quality of reasoning trajectories using physics-inspired metrics:
-
-- **Kinetic Energy (T)**: Magnitude of change between reasoning steps
-- **Potential Energy (V)**: Relevance of each step to the original question
-- **Hamiltonian (H)**: Balance between change and relevance
-- **Energy Conservation**: Stability of the reasoning process
-
-**Why this matters for compliance**: EU AI Act Article 15.4 requires systems to be "resilient as regards errors, faults or inconsistencies." For reasoning systems, unstable trajectories indicate unreliable logic chains that could lead to incorrect conclusions in high-risk scenarios.
-
-**Research basis**: Based on "Optimizing AI Reasoning: A Hamiltonian Dynamics Approach to Multi-Hop Question Answering" (Marín, 2024).
-
-**Architecture**:
+**Usage:**
 
 ```python
-# Conceptual example (implementation in Hamiltonian_final_version.ipynb)
+from cert import Preset, PRESETS
 
-def analyze_reasoning_chain(question, fact1, fact2, answer):
-    # Compute embeddings for each reasoning step
-    embeddings = [
-        get_embedding(question),
-        get_embedding(fact1),
-        get_embedding(fact2),
-        get_embedding(answer)
-    ]
-    
-    # Analyze trajectory properties
-    T = kinetic_energy(embeddings)      # Change between steps
-    V = potential_energy(embeddings)    # Relevance to question
-    H = hamiltonian(T, V)              # Total energy
-    
-    conservation = energy_conservation_score(T, V)
-    
-    return {
-        "kinetic_energy": T,
-        "potential_energy": V,
-        "hamiltonian": H,
-        "conservation_score": conservation,
-        "trajectory_quality": "stable" if conservation > 0.8 else "unstable"
-    }
+# Use preset with monitor
+@monitor(preset="healthcare")
+def medical_rag(query):
+    # ...
+
+# Access preset configuration
+config = PRESETS["healthcare"]
+print(config.threshold)  # 0.85
 ```
 
-**Use cases**:
-- **Research systems**: Question-answering systems with explicit reasoning chains
-- **Explainable AI**: Verify that reasoning paths are coherent and stable
-- **High-risk systems**: Detect when AI reasoning becomes unstable before errors occur
-
-**Status**: Functional research implementation. Contact for integration assistance.
-
----
-
-### Experimental Tool 2: Multi-Agent Coordination Monitoring
-
-**Use when**: You have multiple AI agents working together in a pipeline and need to measure coordination effectiveness, detect behavioral drift, or quantify emergence effects.
-
-**What it measures**:
-
-1. **Behavioral Consistency (γ)**: How consistently each agent performs in isolation
-2. **Coordination Effect (Γ)**: Whether agents perform better together than independently
-3. **Emergence (Ω)**: Whether the multi-agent system produces capabilities beyond individual agents
-4. **Information Quality**: Density, specificity, and completeness of agent outputs
-5. **Task Fitness**: Appropriateness of responses for specific coordination patterns
-
-**Why this matters for compliance**: As organizations deploy increasingly complex multi-agent systems, the EU AI Act's accuracy and robustness requirements apply to the *system-level* behavior, not just individual components. This tool measures system-level properties that can't be assessed by monitoring agents in isolation.
-
-**Architecture**:
+**Available Presets:**
 
 ```python
-# Conceptual example (implementation in Coordination_Observability_Infrastructure.ipynb)
-
-from cert.experimental import CoordinationAnalyzer
-
-analyzer = CoordinationAnalyzer()
-
-# Step 1: Establish individual agent baselines
-baseline_a = analyzer.establish_baseline(
-    agent_id="analyst",
-    task_category="analysis",
-    agent_func=agent_a.run,
-    trials=20
-)
-
-baseline_b = analyzer.establish_baseline(
-    agent_id="synthesizer",
-    task_category="reasoning",
-    agent_func=agent_b.run,
-    trials=20
-)
-
-# Step 2: Measure coordination effect
-def coordinated_pipeline(prompt):
-    analysis = agent_a.run(prompt)
-    synthesis = agent_b.run(analysis)
-    return synthesis
-
-gamma = analyzer.measure_coordination_effect(
-    agent_pair=["analyst", "synthesizer"],
-    task="complex_reasoning",
-    coordination_func=coordinated_pipeline,
-    trials=15
-)
-
-print(f"Coordination effect: {gamma:.2f}")
-# γ > 1.0: Positive coordination (agents enhance each other)
-# γ ≈ 1.0: Neutral (no coordination benefit)
-# γ < 1.0: Negative coordination (interference effects)
+PRESETS = {
+    "general": Preset(
+        threshold=0.70,
+        use_semantic=True,
+        use_nli=True,
+        use_grounding=True
+    ),
+    "healthcare": Preset(
+        threshold=0.85,  # Strictest
+        use_semantic=True,
+        use_nli=True,
+        use_grounding=True
+    ),
+    "financial": Preset(
+        threshold=0.80,
+        use_semantic=True,
+        use_nli=True,
+        use_grounding=True
+    ),
+    "legal": Preset(
+        threshold=0.80,
+        use_semantic=True,
+        use_nli=True,
+        use_grounding=True
+    )
+}
 ```
 
-**Metrics explanation**:
+**Preset Fields:**
 
-- **γ (Gamma) - Coordination Effect**: `observed_performance / expected_independent`
-  - Measures whether agents perform better together than separately
-  - Used to justify multi-agent architectures in compliance documentation
+- `threshold` (float): Accuracy threshold (0.0-1.0)
+- `use_semantic` (bool): Enable semantic similarity
+- `use_nli` (bool): Enable NLI
+- `use_grounding` (bool): Enable term grounding
 
-- **Behavioral Consistency**: Standard deviation of agent responses to similar prompts
-  - Low consistency = high variance = reliability risk for Article 15.4
-  - Tracked per agent to identify drift over time
+**Custom Presets:**
 
-- **Information Quality Score**: Composite of density, specificity, and completeness
-  - Ensures agent outputs contain substantive, specific information
-  - Prevents agents from producing vague or generic responses
+```python
+from cert import monitor
 
-- **Task Fitness**: Pattern matching for task-appropriate language
-  - Analysis tasks should use analytical language
-  - Reasoning tasks should use logical connectors
-  - Creative tasks should use solution-oriented language
+# Override preset threshold
+@monitor(preset="healthcare", threshold=0.90)
+def critical_medical_system(query):
+    # ...
 
-**Use cases**:
-- **Multi-agent RAG**: Separate retrieval, analysis, and synthesis agents
-- **Sequential workflows**: Agent A → Agent B → Agent C pipelines
-- **Hierarchical systems**: Supervisor agents coordinating worker agents
-- **Compliance documentation**: Prove system-level performance meets EU AI Act requirements
-
-**Status**: Functional research implementation. Requires customization for specific agent architectures.
+# Disable specific components
+@monitor(preset="general", use_grounding=False)
+def fast_rag(query):
+    # ...
+```
 
 ---
 
-## Installation
+### analyze_trajectory() (Experimental)
 
-### Standard Installation
+Analyze LLM generation quality in real-time using trajectory monitoring.
 
-```bash
-pip install cert-framework
+**Signature:**
+
+```python
+def analyze_trajectory(
+    model,
+    tokenizer,
+    prompt: str,
+    config: TrajectoryConfig | None = None
+) -> TrajectoryAnalysis
 ```
 
-### Development Installation
+**Purpose:**
+Monitors per-token metrics (perplexity, entropy) during LLM generation to detect low-quality or hallucinated outputs before they complete.
 
-```bash
-git clone https://github.com/Javihaus/cert-framework.git
-cd cert-framework
-pip install -e ".[dev]"
+**Parameters:**
+
+- `model`: HuggingFace model (AutoModelForCausalLM)
+- `tokenizer`: Corresponding tokenizer
+- `prompt` (str): Input prompt for generation
+- `config` (TrajectoryConfig | None): Optional configuration [default: None]
+
+**Returns:**
+`TrajectoryAnalysis` with fields:
+
+- `generated_text` (str): Generated output
+- `mean_perplexity` (float): Average perplexity across tokens
+- `mean_entropy` (float): Average entropy across tokens
+- `passed_quality_check` (bool): Whether quality thresholds met
+- `trajectory_metrics` (list): Per-token metrics
+
+**Example:**
+
+```python
+from cert import analyze_trajectory, TrajectoryConfig, load_model_for_monitoring
+
+# Load model
+model, tokenizer = load_model_for_monitoring("gpt2")
+
+# Configure analysis
+config = TrajectoryConfig(
+    perplexity_threshold=50.0,
+    entropy_threshold=2.5,
+    max_new_tokens=100
+)
+
+# Analyze generation
+analysis = analyze_trajectory(model, tokenizer, "Explain AI safety", config)
+
+print(f"Generated: {analysis.generated_text}")
+print(f"Mean perplexity: {analysis.mean_perplexity:.2f}")
+print(f"Quality: {'PASSED' if analysis.passed_quality_check else 'FAILED'}")
 ```
 
-### Requirements
+**TrajectoryConfig:**
 
-- Python 3.8+
-- PyTorch (for embedding models)
-- Transformers (for NLI models)
-- Sentence-Transformers
-- NumPy, Pandas
+```python
+from cert import TrajectoryConfig
 
-**Note**: First run will download models (~400MB):
-- `all-MiniLM-L6-v2` (semantic similarity)
-- `microsoft/deberta-v3-base` (natural language inference)
+config = TrajectoryConfig(
+    perplexity_threshold=50.0,  # Max perplexity
+    entropy_threshold=2.5,       # Max entropy
+    surprise_threshold=10.0,     # Max surprise
+    max_new_tokens=150,          # Generation length
+    temperature=0.7,             # Sampling temperature
+    top_k=10                     # Top-k sampling
+)
+```
+
+**Notes:**
+
+- Requires: `pip install cert-framework[trajectory]`
+- Dependencies: torch, transformers
+- GPU recommended for large models
+- Supports 8-bit quantization for memory efficiency
+- Experimental - use in research/development, not production
+
+---
+
+### load_model_for_monitoring()
+
+Load HuggingFace model for trajectory analysis.
+
+**Signature:**
+
+```python
+def load_model_for_monitoring(
+    model_name: str,
+    device: str = "auto",
+    use_8bit: bool = True
+) -> tuple[AutoModelForCausalLM, AutoTokenizer]
+```
+
+**Purpose:**
+Loads a model and tokenizer with optimizations for trajectory monitoring.
+
+**Parameters:**
+
+- `model_name` (str): HuggingFace model identifier (e.g., "gpt2", "Qwen/Qwen2.5-7B")
+- `device` (str): Device placement ["auto", "cuda", "cpu"] [default: "auto"]
+- `use_8bit` (bool): Enable 8-bit quantization (saves GPU memory) [default: True]
+
+**Returns:**
+Tuple of (model, tokenizer)
+
+**Example:**
+
+```python
+from cert import load_model_for_monitoring, unload_model
+
+# Load model
+model, tokenizer = load_model_for_monitoring("gpt2")
+
+# Use for analysis
+# ...
+
+# Cleanup
+unload_model(model)
+```
+
+**Notes:**
+
+- 8-bit quantization reduces memory by ~4x
+- Automatic device placement (GPU if available, else CPU)
+- Models cached in `~/.cache/huggingface/`
+
+---
+
+### unload_model()
+
+Unload model from memory.
+
+**Signature:**
+
+```python
+def unload_model(model) -> None
+```
+
+**Purpose:**
+Explicitly free model from GPU/CPU memory.
+
+**Parameters:**
+
+- `model`: Model instance to unload
+
+**Example:**
+
+```python
+from cert import load_model_for_monitoring, unload_model
+
+model, tokenizer = load_model_for_monitoring("gpt2")
+# ... use model ...
+unload_model(model)
+```
+
+---
+
+### CERTTrajectoryAnalyzer (Advanced)
+
+Production-ready trajectory monitoring with resource management.
+
+**Signature:**
+
+```python
+class CERTTrajectoryAnalyzer:
+    def __init__(
+        self,
+        model_name: str = "gpt2",
+        config: TrajectoryConfig | None = None
+    )
+
+    def __enter__(self) -> "CERTTrajectoryAnalyzer"
+    def __exit__(self, *args) -> None
+
+    def analyze(self, prompt: str) -> TrajectoryAnalysis
+```
+
+**Purpose:**
+Context manager for trajectory analysis with automatic resource cleanup.
+
+**Example:**
+
+```python
+from cert import CERTTrajectoryAnalyzer, TrajectoryConfig
+
+config = TrajectoryConfig(max_new_tokens=50)
+
+with CERTTrajectoryAnalyzer("gpt2", config) as analyzer:
+    result1 = analyzer.analyze("Explain photosynthesis")
+    result2 = analyzer.analyze("Describe quantum computing")
+    # Automatic cleanup on exit
+
+print(f"Result 1: {result1.passed_quality_check}")
+print(f"Result 2: {result2.passed_quality_check}")
+```
+
+**Notes:**
+
+- Recommended for production use
+- Handles model lifecycle automatically
+- Thread-safe for concurrent requests
+- Experimental - API may change
+
+---
+
+### HamiltonianMonitor (Advanced)
+
+Production-ready trajectory monitoring with comprehensive error handling.
+
+**Signature:**
+
+```python
+class HamiltonianMonitor:
+    def __init__(
+        self,
+        model_name: str = "gpt2",
+        preload: bool = True,
+        use_8bit: bool = True
+    )
+
+    def analyze(
+        self,
+        prompt: str,
+        timeout: float = 30.0
+    ) -> TrajectoryAnalysis | AnalysisError
+
+    async def analyze_async(
+        self,
+        prompt: str,
+        timeout: float = 30.0
+    ) -> TrajectoryAnalysis | AnalysisError
+
+    def analyze_batch(
+        self,
+        prompts: list[str],
+        timeout: float = 60.0
+    ) -> list[TrajectoryAnalysis | AnalysisError]
+```
+
+**Purpose:**
+Production-grade trajectory monitor with sync/async APIs, batching, caching, and error handling.
+
+**Example:**
+
+```python
+from cert.trajectory import HamiltonianMonitor
+
+# Initialize with model preloading
+monitor = HamiltonianMonitor("gpt2", preload=True)
+
+# Synchronous analysis
+result = monitor.analyze("Explain AI safety")
+
+if result.is_valid():
+    print(f"Quality: {result.passed_quality_check}")
+else:
+    print(f"Error: {result.error_type}")
+
+# Batch processing
+prompts = ["Prompt 1", "Prompt 2", "Prompt 3"]
+results = monitor.analyze_batch(prompts)
+```
+
+**Notes:**
+
+- Requires: `pip install cert-framework[trajectory]`
+- Includes LRU caching (1000 entries)
+- GPU OOM fallback to CPU
+- Input validation and timeout handling
+- Experimental - API may change
+
+---
+
+## Production Deployment
+
+### Docker
+
+Run CERT in a container:
+
+```bash
+# Build image
+docker build -t cert-framework -f deployments/docker/Dockerfile .
+
+# Run with volume for audit logs
+docker run -v $(pwd)/logs:/logs cert-framework
+
+# Using docker-compose (includes Prometheus monitoring)
+cd deployments/docker
+docker-compose up
+```
+
+See `deployments/docker/` for:
+
+- `Dockerfile` - Production image
+- `docker-compose.yml` - Full stack with monitoring
+
+### Kubernetes
+
+Deploy to K8s cluster:
+
+```bash
+# Apply all manifests
+kubectl apply -f deployments/kubernetes/
+
+# Check deployment
+kubectl get pods -l app=cert-framework
+kubectl logs -f deployment/cert-framework
+```
+
+Includes:
+
+- Deployment with resource limits (CPU, memory, GPU)
+- Service for metrics endpoint (`:9090/metrics`)
+- PersistentVolumeClaim for audit logs
+- Liveness and readiness probes
+
+### Monitoring
+
+CERT exposes Prometheus metrics at `/metrics` endpoint:
+
+**Request Metrics:**
+
+- `cert_requests_total` - Total monitored requests by service and status
+- `cert_request_duration_seconds` - Request latency histogram
+- `cert_request_errors_total` - Error count by service and error type
+
+**Accuracy Metrics:**
+
+- `cert_accuracy_score` - Accuracy score distribution (histogram)
+- `cert_hallucinations_total` - Hallucination count by service
+- `cert_quality_checks_total` - Quality check results (pass/fail)
+
+**Trajectory Metrics (if enabled):**
+
+- `cert_hamiltonian_perplexity` - Perplexity distribution
+- `cert_hamiltonian_entropy` - Entropy distribution
+- `cert_hamiltonian_quality_checks_total` - Trajectory quality results
+
+**Cache Metrics:**
+
+- `cert_cache_hits_total` - Cache hits by cache type
+- `cert_cache_misses_total` - Cache misses by cache type
+
+**Setup Prometheus:**
+
+```yaml
+# deployments/prometheus/prometheus.yml
+scrape_configs:
+  - job_name: 'cert-framework'
+    static_configs:
+      - targets: ['localhost:9090']
+```
+
+**Grafana Dashboard:**
+
+See `deployments/prometheus/dashboards/cert-overview.json` for pre-built Grafana dashboard.
+
+### Production Checklist
+
+Before deploying to production:
+
+- [ ] Set appropriate accuracy thresholds for your risk level
+- [ ] Configure audit log rotation (default: 30 days retention)
+- [ ] Monitor `cert_hallucinations_total` metric for anomalies
+- [ ] Set up alerts for compliance violations (accuracy < threshold)
+- [ ] Test with production-like traffic patterns
+- [ ] Document threshold justification for auditors
+- [ ] Verify audit logs are immutable (append-only)
+- [ ] Set up log backup and archival
+- [ ] Configure resource limits for trajectory monitoring (GPU memory)
+- [ ] Test circuit breaker behavior under load
+
+**Example Alert (Prometheus):**
+
+```yaml
+# deployments/prometheus/alerts.yml
+- alert: HighHallucination Rate
+  expr: rate(cert_hallucinations_total[5m]) > 0.05
+  for: 10m
+  annotations:
+    summary: "High hallucination rate detected"
+
+- alert: LowAccuracy
+  expr: histogram_quantile(0.95, rate(cert_accuracy_score_bucket[5m])) < 0.7
+  for: 15m
+  annotations:
+    summary: "Accuracy below acceptable threshold"
+```
 
 ---
 
 ## EU AI Act Compliance
 
-CERT is designed specifically to address EU AI Act requirements for high-risk AI systems. Here's how each tool maps to regulatory obligations:
+CERT provides technical measurement infrastructure for EU AI Act compliance. It is **not** a complete compliance solution.
 
-### Article 15 - Accuracy, Robustness, Cybersecurity
+### What CERT Provides
 
-**Article 15.1**: *"High-risk AI systems shall be designed and developed in such a way that they achieve appropriate levels of accuracy, robustness, and cybersecurity..."*
+**Article 15 (Accuracy):**
 
-**CERT tools that address this**:
--  `measure()` - Direct accuracy measurement with configurable thresholds
--  `@monitor()` - Continuous accuracy verification in production
--  `analyze_trajectory()` - Real-time quality monitoring during generation
--  `export_report()` - Documents accuracy metrics with regulatory citations
+- Automated accuracy measurement for LLM outputs
+- Configurable thresholds by risk level
+- Statistical accuracy reporting (mean, variance, percentiles)
 
-**Evidence provided**:
-- Quantitative accuracy scores for each system output
-- Statistical aggregates (mean accuracy, hallucination rate)
-- Component breakdowns (semantic, NLI, grounding scores)
-- Industry-appropriate thresholds with regulatory justification
+**Article 19 (Logging):**
 
-**Article 15.4**: *"High-risk AI systems shall be resilient as regards errors, faults or inconsistencies..."*
+- Immutable audit logs in JSON Lines format
+- Timestamp, input, output, accuracy score per request
+- Tamper-evident append-only format
 
-**CERT tools that address this**:
--  `@monitor()` - Tracks error rates and system stability
--  `export_report()` - Documents resilience evidence
--  Hamiltonian Analysis - Detects unstable reasoning trajectories (experimental)
+**Compliance Reports:**
 
-### Article 19 - Automatically Generated Logs
+- Automated report generation citing EU AI Act articles
+- Human-readable (TXT, PDF) and machine-readable (JSON) formats
+- Statistical summaries suitable for auditor review
 
-**Article 19.1**: *"High-risk AI systems shall technically allow for the automatic recording of events ('logs') over the lifetime of the system."*
+### What You Still Need
 
-**CERT implementation**:
--  Immutable JSONL audit logs generated automatically
--  Each request logged with timestamp, inputs, outputs, scores
--  Append-only format prevents tampering
--  Structured format suitable for regulatory review
+CERT handles **technical measurement**. You are responsible for:
 
-**Log format example**:
+- **Risk Classification** - Determine if your system is high-risk, limited-risk, or minimal-risk
+- **Quality Management System (QMS)** - ISO 13485 or equivalent documentation
+- **Post-Market Monitoring** - Procedures for ongoing surveillance
+- **Threshold Justification** - Document why you chose specific accuracy thresholds
+- **Human Oversight** - Procedures for human review of high-stakes decisions
+- **Transparency** - User-facing documentation of AI system capabilities and limitations
 
-```json
-{
-  "timestamp": "2025-10-26T14:32:15.123Z",
-  "request_id": "req_abc123",
-  "context": "Revenue in Q4 was $500M...",
-  "answer": "The Q4 revenue reached $500M...",
-  "accuracy_score": 0.94,
-  "semantic_score": 0.91,
-  "nli_score": 0.96,
-  "grounding_score": 0.93,
-  "hallucination_detected": false,
-  "compliant": true,
-  "threshold": 0.90
-}
-```
+### Compliance Workflow
 
-### Annex IV - Technical Documentation
+1. **Instrument your system** with `@monitor` decorator
+2. **Run in production** to collect audit logs
+3. **Generate reports** quarterly or as required
+4. **Submit to auditors** with QMS documentation
+5. **Iterate thresholds** based on post-market monitoring
 
-**Requirement**: *"Detailed description of the elements of the AI system and of the process for its development, including... the methods and steps performed for... testing, validation and, where applicable, the metrics used to measure accuracy, robustness, cybersecurity..."*
+### Compliance Consulting
 
-**CERT provides**:
--  Complete methodology documentation for accuracy measurement
--  Statistical performance metrics with confidence intervals
--  Testing protocols (industry presets document threshold rationale)
--  Validation approach (semantic + NLI + grounding composite scoring)
+For assistance with full EU AI Act compliance (risk assessment, QMS documentation, auditor liaison):
 
-### Risk Management System (Article 9)
-
-**Requirement**: *"The testing procedures shall be appropriate to achieve the intended purpose of the AI system and need not be in line with the established common specifications..."*
-
-**CERT approach**:
-- Industry-specific presets reflect risk-appropriate thresholds
-- Healthcare systems (highest risk) use 95% accuracy, 1% hallucination tolerance
-- General systems (lower risk) use 80% accuracy, 5% hallucination tolerance
-- Organizations can customize thresholds based on risk assessment
-
-### Preparing for Certification
-
-Organizations using CERT should:
-
-1. **Configure appropriate thresholds** based on risk classification
-2. **Monitor production systems** continuously with `@monitor()`
-3. **Generate compliance reports** quarterly or as required
-4. **Maintain audit logs** for required retention period (typically 6 months to 2 years)
-5. **Document any threshold adjustments** with risk management justification
-
-**CERT provides the technical foundation. Organizations still need**:
-- Risk classification for their specific system
-- Quality management system (ISO 13485 for medical, etc.)
-- Post-market monitoring procedures
-- Incident response protocols
+**Email:** info@cert-framework.com
 
 ---
 
-## Implementation Services
+## License & Citation
 
-CERT provides the technical infrastructure for EU AI Act compliance. But going from "library installed" to "ready for certification" requires:
+### License
 
-### What the Library Provides
+Apache License 2.0 - See [LICENSE](LICENSE) file
 
-- Automated accuracy measurement  
-- Audit trail generation  
-- Compliance report generation
-- Industry-specific presets
-- Continuous monitoring infrastructure  
+### Citation
 
-### What Organizations Still Need
-
-Most organizations need help with:
-
-1. **Risk Classification**
-   - Determining if your AI system is high-risk under EU AI Act Annex III
-   - Mapping your system to EU AI Act categories
-   - Documenting risk classification rationale
-
-2. **Threshold Calibration**
-   - Setting appropriate accuracy thresholds for your specific use case
-   - Balancing compliance requirements with business needs
-   - A/B testing different threshold configurations
-
-3. **Integration Architecture**
-   - Instrumenting existing pipelines with minimal disruption
-   - Handling multi-model systems and agent architectures
-   - Scaling monitoring infrastructure for production traffic
-
-4. **Documentation & Processes**
-   - Creating Technical Documentation (Annex IV)
-   - Establishing Quality Management System
-   - Designing post-market monitoring procedures
-   - Preparing for Notified Body assessment
-
-5. **Advanced Use Cases**
-   - Multi-agent coordination monitoring
-   - Reasoning chain analysis for explainability
-   - Custom detection methods for domain-specific requirements
-
-### Consulting Services
-
-We provide implementation consulting for organizations that need:
-
-- **Technical integration**: Deploy CERT in production environments with custom MLOps pipelines
-- **Compliance strategy**: Navigate EU AI Act requirements and prepare for certification
-- **Custom tooling**: Extend CERT for specialized AI architectures (multi-agent, reasoning systems)
-
-**Not selling**: Generic AI compliance advice. We focus on organizations with specific technical implementations that need production observability and regulatory documentation.
-
-**Contact**: info@cert-framework.com for implementation consulting inquiries.
-
----
-
-## Development
-
-### Running Tests
-
-```bash
-python -m pytest tests/ -v
-```
-
-### Code Quality
-
-```bash
-ruff check cert/
-ruff format cert/
-```
-
-### Project Structure
-
-```
-cert/
-├── __init__.py              # Public API exports
-├── api/                     # User-facing functions
-│   ├── measure.py          # measure() function
-│   ├── monitor.py          # @monitor() decorator
-│   └── trajectory.py       # analyze_trajectory()
-├── core/                    # Detection algorithms
-│   ├── embeddings.py       # Semantic similarity
-│   ├── nli.py             # Natural language inference
-│   ├── grounding.py       # Term grounding analysis
-│   └── types.py           # Shared data types
-├── presets/                 # Industry configurations
-│   └── definitions.py      # PRESETS dictionary
-├── reporting/               # Compliance reports
-│   └── export.py          # export_report()
-└── experimental/            # Research implementations
-    ├── hamiltonian.py      # Reasoning chain analysis
-    └── coordination.py     # Multi-agent monitoring
-```
-
----
-
-## Citation
-
-If you use CERT Framework in research or production systems:
+If you use CERT Framework in academic work, please cite:
 
 ```bibtex
 @software{cert_framework,
@@ -823,93 +854,101 @@ If you use CERT Framework in research or production systems:
 }
 ```
 
-For the Hamiltonian reasoning analysis methodology:
+### Contact
 
-```bibtex
-@article{marin2025hamiltonian,
-  author = {Marín, Javier},
-  title = {Optimizing AI Reasoning: A Hamiltonian Dynamics Approach to Multi-Hop Question Answering},
-  year = {2025}
-}
+- **Issues**: https://github.com/Javihaus/cert-framework/issues
+- **Email**: info@cert-framework.com
+- **Documentation**: https://github.com/Javihaus/cert-framework
+- **PyPI**: https://pypi.org/project/cert-framework/
+
+---
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/Javihaus/cert-framework
+cd cert-framework
+
+# Install in editable mode with all dependencies
+pip install -e ".[trajectory]"
+
+# Install development dependencies
+pip install pytest ruff
+
+# Run tests
+pytest tests/
+
+# Run linting
+ruff check cert/
+ruff format cert/
 ```
 
----
+### Project Structure
 
-## Important Disclaimers
+```
+cert/
+├── __init__.py              # Public API exports
+├── measure/                 # measure() implementation
+│   ├── semantic.py         # Embedding similarity
+│   ├── nli.py              # Natural language inference
+│   └── grounding.py        # Term grounding
+├── monitor/                 # @monitor decorator
+│   └── decorator.py        # Monitoring logic
+├── trajectory/              # Trajectory analysis (experimental)
+│   ├── monitor.py          # ReasoningTrajectoryMonitor
+│   ├── analyzer.py         # CERTTrajectoryAnalyzer
+│   ├── api.py              # HamiltonianMonitor
+│   └── engine.py           # HamiltonianEngine
+├── coordination/            # Multi-agent coordination (experimental)
+│   ├── orchestrator.py     # CoordinationOrchestrator
+│   ├── evaluator.py        # QualityEvaluator
+│   └── baseline.py         # BaselineMeasurer
+├── core/                    # Production infrastructure
+│   ├── errors.py           # Exception hierarchy
+│   ├── retry.py            # Retry decorator
+│   ├── circuit_breaker.py  # Circuit breaker
+│   └── resources.py        # Resource management
+├── observability/           # Monitoring infrastructure
+│   ├── logging.py          # Structured logging
+│   └── metrics.py          # Prometheus metrics
+└── utils/                   # Utilities
+    ├── presets.py          # Industry presets
+    ├── audit.py            # Audit logging
+    └── report.py           # Compliance reports
+```
 
-### Regulatory Compliance
+### Running Tests
 
-CERT provides **technical measurement infrastructure** for EU AI Act compliance. It does not:
--  Provide legal compliance advice
--  Guarantee certification approval
--  Replace risk assessment or quality management systems
--  Substitute for consultation with Notified Bodies
+```bash
+# Run all tests
+pytest tests/
 
-**Organizations are responsible for**:
-- Determining if their system is high-risk
-- Setting appropriate thresholds based on risk assessment
-- Maintaining complete technical documentation
-- Establishing quality management and post-market monitoring
+# Run specific test file
+pytest tests/unit/core/test_errors.py
 
-### Certification Process
+# Run with coverage
+pytest --cov=cert tests/
 
-Using CERT does not guarantee EU AI Act certification. Certification requires:
-1. Complete Technical Documentation (Annex IV)
-2. Quality Management System
-3. Assessment by Notified Body
-4. Ongoing post-market monitoring
+# Run with verbose output
+pytest -v tests/
+```
 
-CERT addresses the technical measurement and documentation requirements but cannot guarantee certification outcomes.
+### Contributing
 
-### Accuracy Measurement Limitations
+Contributions welcome! Please:
 
-CERT's accuracy measurement is based on:
-- Semantic similarity (embedding models)
-- Natural language inference (entailment models)
-- Lexical grounding (term matching)
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Run linting (`ruff check` + `ruff format`)
+6. Submit pull request
 
-**These methods cannot detect**:
-- Factual errors requiring external knowledge
-- Subtle logical fallacies in complex reasoning
-- Domain-specific inaccuracies (medical, legal, financial specifics)
-
-Organizations deploying CERT in high-risk scenarios should:
-- Combine CERT with domain-specific validation
-- Conduct regular human audits of flagged outputs
-- Implement additional verification for critical decisions
-
-### Model Dependencies
-
-CERT relies on third-party models (HuggingFace transformers). Users should:
-- Review model licenses for commercial use
-- Understand model limitations and biases
-- Consider regulatory requirements for model documentation
-
----
-
-## Official EU AI Act Resources
-
-- [EU AI Act Full Text](https://artificialintelligenceact.eu/)
-- [Article 15 - Accuracy Requirements](https://artificialintelligenceact.eu/article/15/)
-- [Article 19 - Logging Requirements](https://artificialintelligenceact.eu/article/19/)
-- [Annex III - High-Risk AI Systems](https://artificialintelligenceact.eu/annex/3/)
-- [Annex IV - Technical Documentation](https://artificialintelligenceact.eu/annex/4/)
-- [EU AI Act Compliance Checker](https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/)
-
----
-
-## License
-
-Apache License Version 2.0 - See LICENSE file for details.
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community guidelines.
 
 ---
 
-## Contact
-
-**General Inquiries**: info@cert-framework.com  
-**Technical Support**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)  
-**Implementation Consulting**: info@cert-framework.com
-
----
-
-**Built for organizations that need production AI systems to work reliably AND meet regulatory requirements.**
+**CERT Framework** - Production-ready LLM accuracy monitoring for EU AI Act compliance.
