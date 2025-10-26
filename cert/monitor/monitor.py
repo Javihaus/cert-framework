@@ -36,7 +36,8 @@ class MonitorConfig:
             preset_config = get_preset(preset)
             self.accuracy_threshold = preset_config["accuracy_threshold"]
             self.hallucination_tolerance = preset_config["hallucination_tolerance"]
-            self.audit_retention_months = preset_config["audit_retention_months"]
+            # Convert days to months for internal storage
+            self.audit_retention_months = preset_config["audit_retention_days"] / 30
         else:
             self.accuracy_threshold = accuracy_threshold
             self.hallucination_tolerance = hallucination_tolerance

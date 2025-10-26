@@ -20,6 +20,10 @@ torch>=1.11.0
 # NLI models for hallucination detection
 transformers>=4.30.0
 
+# Tokenization and protobuf support for transformers
+tiktoken>=0.5.0
+protobuf>=3.20.0
+
 # Numerical operations and scientific computing
 numpy>=1.21.0
 scipy>=1.7.0
