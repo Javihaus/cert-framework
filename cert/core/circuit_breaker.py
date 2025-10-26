@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 class CircuitBreakerState(Enum):
     """Circuit breaker states."""
+
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
@@ -82,8 +83,10 @@ class CircuitBreaker:
         with self._lock:
             if self._state == CircuitBreakerState.OPEN:
                 # Check if recovery timeout elapsed
-                if (self._last_failure_time and
-                    time.time() - self._last_failure_time > self._recovery_timeout):
+                if (
+                    self._last_failure_time
+                    and time.time() - self._last_failure_time > self._recovery_timeout
+                ):
                     self._state = CircuitBreakerState.HALF_OPEN
                     self._success_count = 0
                     logger.info(
@@ -106,9 +109,7 @@ class CircuitBreaker:
                 if self._success_count >= self._success_threshold:
                     self._state = CircuitBreakerState.CLOSED
                     self._failure_count = 0
-                    logger.info(
-                        f"Circuit breaker '{self._name}' CLOSED (recovered)"
-                    )
+                    logger.info(f"Circuit breaker '{self._name}' CLOSED (recovered)")
             elif self._state == CircuitBreakerState.CLOSED:
                 # Reset failure count on success
                 self._failure_count = 0
@@ -159,7 +160,7 @@ class CircuitBreaker:
             result = func(*args, **kwargs)
             self.record_success()
             return result
-        except Exception as e:
+        except Exception:
             self.record_failure()
             raise
 
@@ -185,7 +186,7 @@ class CircuitBreaker:
             result = await func(*args, **kwargs)
             self.record_success()
             return result
-        except Exception as e:
+        except Exception:
             self.record_failure()
             raise
 

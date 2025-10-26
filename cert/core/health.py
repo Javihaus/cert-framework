@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class HealthStatus(Enum):
     """Service health status."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
@@ -26,6 +27,7 @@ class HealthStatus(Enum):
 @dataclass
 class HealthCheckResult:
     """Result of health check."""
+
     status: HealthStatus
     message: str
     checks: Dict[str, bool]

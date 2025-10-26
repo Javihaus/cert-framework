@@ -42,6 +42,7 @@ def retry(
             # May fail with timeout or connection error
             return fetch_data()
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -55,8 +56,7 @@ def retry(
 
                     # Calculate backoff with jitter
                     backoff = min(
-                        backoff_base ** attempt + random.uniform(0, 1),
-                        max_backoff
+                        backoff_base**attempt + random.uniform(0, 1), max_backoff
                     )
 
                     # Call retry callback if provided
@@ -64,9 +64,7 @@ def retry(
                         try:
                             on_retry(attempt, backoff, e)
                         except Exception as callback_error:
-                            logger.warning(
-                                f"Retry callback failed: {callback_error}"
-                            )
+                            logger.warning(f"Retry callback failed: {callback_error}")
 
                     logger.warning(
                         f"Retry {attempt + 1}/{max_retries} after {backoff:.2f}s",
@@ -77,7 +75,7 @@ def retry(
                             "backoff_s": backoff,
                             "error": str(e),
                             "error_type": type(e).__name__,
-                        }
+                        },
                     )
 
                     time.sleep(backoff)
@@ -86,6 +84,7 @@ def retry(
             raise MaxRetriesExceeded(max_retries)
 
         return wrapper
+
     return decorator
 
 
@@ -112,6 +111,7 @@ def async_retry(
             # May fail with timeout
             return await fetch_data_async()
     """
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -127,8 +127,7 @@ def async_retry(
 
                     # Calculate backoff with jitter
                     backoff = min(
-                        backoff_base ** attempt + random.uniform(0, 1),
-                        max_backoff
+                        backoff_base**attempt + random.uniform(0, 1), max_backoff
                     )
 
                     # Call retry callback if provided
@@ -139,9 +138,7 @@ def async_retry(
                             else:
                                 on_retry(attempt, backoff, e)
                         except Exception as callback_error:
-                            logger.warning(
-                                f"Retry callback failed: {callback_error}"
-                            )
+                            logger.warning(f"Retry callback failed: {callback_error}")
 
                     logger.warning(
                         f"Async retry {attempt + 1}/{max_retries} after {backoff:.2f}s",
@@ -152,7 +149,7 @@ def async_retry(
                             "backoff_s": backoff,
                             "error": str(e),
                             "error_type": type(e).__name__,
-                        }
+                        },
                     )
 
                     await asyncio.sleep(backoff)
@@ -161,4 +158,5 @@ def async_retry(
             raise MaxRetriesExceeded(max_retries)
 
         return wrapper
+
     return decorator

@@ -10,9 +10,7 @@ from typing import Tuple
 
 
 def load_model_for_monitoring(
-    model_name: str,
-    use_8bit: bool = True,
-    device: str = "cuda"
+    model_name: str, use_8bit: bool = True, device: str = "cuda"
 ) -> Tuple:
     """
     Load model efficiently for trajectory monitoring.
@@ -29,10 +27,7 @@ def load_model_for_monitoring(
 
     print(f"Loading {model_name}...")
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name,
-        trust_remote_code=True
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     if use_8bit and device == "cuda":
         model = AutoModelForCausalLM.from_pretrained(
@@ -40,21 +35,21 @@ def load_model_for_monitoring(
             device_map="auto",
             load_in_8bit=True,
             torch_dtype=torch.float16,
-            trust_remote_code=True
+            trust_remote_code=True,
         )
     else:
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto" if device == "cuda" else None,
             torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-            trust_remote_code=True
+            trust_remote_code=True,
         )
 
     # Set padding token
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    print(f"✓ Model loaded successfully")
+    print("✓ Model loaded successfully")
     return model, tokenizer
 
 

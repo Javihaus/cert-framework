@@ -61,8 +61,9 @@ from cert.trajectory import (
     TrajectoryAnalysis,
     HamiltonianVisualizer,
     load_model_for_monitoring,
-    unload_model
+    unload_model,
 )
+
 
 # Convenience function for simple trajectory analysis
 def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig = None):
@@ -84,8 +85,10 @@ def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig =
         >>> print(f"Passed: {analysis.passed_quality_check}")
     """
     from cert.trajectory import ReasoningTrajectoryMonitor
+
     monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
     return monitor.monitor_generation(prompt)
+
 
 __all__ = [
     # v3.0 API
@@ -94,7 +97,6 @@ __all__ = [
     "Preset",
     "PRESETS",
     "export_report",
-
     # v3.1.0 API - Trajectory monitoring
     "analyze_trajectory",
     "CERTTrajectoryAnalyzer",

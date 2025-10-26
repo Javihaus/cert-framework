@@ -9,7 +9,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from cert.coordination.types import AgentResponse, BaselineMeasurement
 from cert.coordination.client import AnthropicClientWithResilience
@@ -148,7 +148,7 @@ class BaselineMeasurer:
                         agent_id=r["agent_id"],
                         response=r["response"],
                         metadata=r.get("metadata", {}),
-                        timestamp=datetime.fromisoformat(r["timestamp"])
+                        timestamp=datetime.fromisoformat(r["timestamp"]),
                     )
                     for r in cached["agent_responses"]
                 ]
@@ -162,7 +162,7 @@ class BaselineMeasurer:
 
         logger.info(
             f"Measuring baseline for {num_agents} agents",
-            extra={"task_length": len(task), "num_agents": num_agents}
+            extra={"task_length": len(task), "num_agents": num_agents},
         )
 
         # Query each agent independently
@@ -211,7 +211,7 @@ class BaselineMeasurer:
                 "num_agents": num_agents,
                 "mean_quality": mean_quality,
                 "quality_range": (min(quality_scores), max(quality_scores)),
-            }
+            },
         )
 
         return measurement

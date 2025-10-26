@@ -15,6 +15,7 @@ from typing import Any, Dict, List
 @dataclass
 class AgentResponse:
     """Response from a single agent."""
+
     agent_id: str
     response: str
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -33,6 +34,7 @@ class AgentResponse:
 @dataclass
 class BaselineMeasurement:
     """Baseline quality measurement for independent agents."""
+
     agent_responses: List[AgentResponse]
     quality_scores: List[float]
     mean_quality: float

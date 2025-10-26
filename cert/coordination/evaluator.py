@@ -45,7 +45,7 @@ class DriftDetector:
 
         # Keep only recent samples
         if len(self._samples[task]) > self._window_size:
-            self._samples[task] = self._samples[task][-self._window_size:]
+            self._samples[task] = self._samples[task][-self._window_size :]
 
     def detect_drift(self, task: str, threshold: float = 0.1) -> bool:
         """
@@ -79,7 +79,7 @@ class DriftDetector:
                     "historical_mean": historical_mean,
                     "drift": drift,
                     "threshold": threshold,
-                }
+                },
             )
             return True
 
@@ -150,8 +150,7 @@ class QualityEvaluator:
         """
         # Build evaluation prompt
         criteria_str = "\n".join(
-            f"- {name}: {desc}"
-            for name, desc in self._criteria.items()
+            f"- {name}: {desc}" for name, desc in self._criteria.items()
         )
 
         prompt = f"""Evaluate the following response to a task:
@@ -198,12 +197,12 @@ Respond ONLY with valid JSON."""
             self._drift_detector.add_sample(task[:100], score)
 
             logger.debug(
-                f"Quality evaluation complete",
+                "Quality evaluation complete",
                 extra={
                     "task_length": len(task),
                     "response_length": len(response),
                     "score": score,
-                }
+                },
             )
 
             return score
@@ -211,7 +210,7 @@ Respond ONLY with valid JSON."""
         except (json.JSONDecodeError, KeyError, ValueError) as e:
             logger.warning(
                 f"Failed to parse evaluation response: {e}",
-                extra={"response": eval_response[:200]}
+                extra={"response": eval_response[:200]},
             )
             # Default to neutral score
             return 0.5

@@ -18,11 +18,12 @@ class ReasoningMetrics:
     Technical: These measure token prediction confidence
     Marketing: "Reasoning trajectory state variables"
     """
+
     step: int
     token: str
     perplexity: float
     top_k_entropy: float  # Distribution spread
-    logit_gap: float      # Top-2 confidence difference
+    logit_gap: float  # Top-2 confidence difference
     cumulative_surprise: float  # Running sum of low-prob tokens
 
     def to_dict(self) -> Dict:
@@ -38,6 +39,7 @@ class TrajectoryAnalysis:
     Marketing: "Hamiltonian trajectory quality assessment"
     Reality: "Confidence metrics with pass/fail thresholds"
     """
+
     model_name: str
     prompt: str
     generated_text: str
@@ -63,25 +65,25 @@ class TrajectoryAnalysis:
     def to_dict(self) -> Dict:
         """Convert to dictionary for export."""
         return {
-            'model_name': self.model_name,
-            'prompt': self.prompt,
-            'generated_text': self.generated_text,
-            'passed_quality_check': self.passed_quality_check,
-            'summary': {
-                'avg_perplexity': self.avg_perplexity,
-                'max_perplexity': self.max_perplexity,
-                'avg_entropy': self.avg_entropy,
-                'max_entropy': self.max_entropy,
-                'final_surprise': self.final_surprise,
-                'generation_steps': self.generation_steps
+            "model_name": self.model_name,
+            "prompt": self.prompt,
+            "generated_text": self.generated_text,
+            "passed_quality_check": self.passed_quality_check,
+            "summary": {
+                "avg_perplexity": self.avg_perplexity,
+                "max_perplexity": self.max_perplexity,
+                "avg_entropy": self.avg_entropy,
+                "max_entropy": self.max_entropy,
+                "final_surprise": self.final_surprise,
+                "generation_steps": self.generation_steps,
             },
-            'thresholds': {
-                'perplexity': self.perplexity_threshold,
-                'entropy': self.entropy_threshold,
-                'surprise': self.surprise_threshold
+            "thresholds": {
+                "perplexity": self.perplexity_threshold,
+                "entropy": self.entropy_threshold,
+                "surprise": self.surprise_threshold,
             },
-            'metrics': [m.to_dict() for m in self.metrics],
-            'timestamp': self.timestamp
+            "metrics": [m.to_dict() for m in self.metrics],
+            "timestamp": self.timestamp,
         }
 
 
@@ -91,8 +93,8 @@ class TrajectoryConfig:
 
     # Quality thresholds (tune per use case)
     perplexity_threshold: float = 50.0  # Higher = more uncertain
-    entropy_threshold: float = 2.5       # Higher = more scattered
-    surprise_threshold: float = 10.0     # Cumulative surprise budget
+    entropy_threshold: float = 2.5  # Higher = more scattered
+    surprise_threshold: float = 10.0  # Cumulative surprise budget
 
     # Generation parameters
     max_new_tokens: int = 150

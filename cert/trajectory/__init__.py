@@ -20,11 +20,7 @@ License: MIT
 __version__ = "2.0.0"
 
 # Public API exports
-from cert.trajectory.types import (
-    ReasoningMetrics,
-    TrajectoryAnalysis,
-    TrajectoryConfig
-)
+from cert.trajectory.types import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
 
 from cert.trajectory.monitor import ReasoningTrajectoryMonitor
 
@@ -32,10 +28,7 @@ from cert.trajectory.visualizer import HamiltonianVisualizer
 
 from cert.trajectory.analyzer import CERTTrajectoryAnalyzer
 
-from cert.trajectory.utils import (
-    load_model_for_monitoring,
-    unload_model
-)
+from cert.trajectory.utils import load_model_for_monitoring, unload_model
 
 # Production API (v2.0+)
 from cert.trajectory.api import HamiltonianMonitor
@@ -47,21 +40,16 @@ __all__ = [
     "ReasoningMetrics",
     "TrajectoryAnalysis",
     "TrajectoryConfig",
-
     # Core monitoring (legacy)
     "ReasoningTrajectoryMonitor",
-
     # Production API (v2.0+)
     "HamiltonianMonitor",
     "HamiltonianEngine",
     "HamiltonianModelResource",
-
     # Visualization
     "HamiltonianVisualizer",
-
     # CERT integration
     "CERTTrajectoryAnalyzer",
-
     # Utilities
     "load_model_for_monitoring",
     "unload_model",

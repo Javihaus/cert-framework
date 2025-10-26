@@ -8,8 +8,7 @@ Specialized model resources for Hamiltonian trajectory analysis with:
 """
 
 import logging
-import time
-from typing import Any, Optional, Tuple
+from typing import Any, Tuple
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -65,8 +64,7 @@ class HamiltonianModelResource(ModelResource):
             # Load tokenizer
             logger.debug(f"Loading tokenizer: {self._model_name}")
             self._tokenizer = AutoTokenizer.from_pretrained(
-                self._model_name,
-                trust_remote_code=self._trust_remote_code
+                self._model_name, trust_remote_code=self._trust_remote_code
             )
 
             # Set padding token if not set
@@ -84,7 +82,7 @@ class HamiltonianModelResource(ModelResource):
                     device_map="auto",
                     load_in_8bit=True,
                     torch_dtype=torch.float16,
-                    trust_remote_code=self._trust_remote_code
+                    trust_remote_code=self._trust_remote_code,
                 )
                 logger.info("Model loaded with 8-bit quantization")
             else:
@@ -92,8 +90,10 @@ class HamiltonianModelResource(ModelResource):
                 model = AutoModelForCausalLM.from_pretrained(
                     self._model_name,
                     device_map="auto" if self._device == "cuda" else None,
-                    torch_dtype=torch.float16 if self._device == "cuda" else torch.float32,
-                    trust_remote_code=self._trust_remote_code
+                    torch_dtype=torch.float16
+                    if self._device == "cuda"
+                    else torch.float32,
+                    trust_remote_code=self._trust_remote_code,
                 )
                 logger.info("Model loaded in standard precision")
 
@@ -107,13 +107,12 @@ class HamiltonianModelResource(ModelResource):
             logger.error(f"GPU out of memory loading {self._model_name}")
             raise GPUOutOfMemoryError(
                 f"GPU memory exhausted loading model: {self._model_name}",
-                context={"model": self._model_name, "use_8bit": self._use_8bit}
+                context={"model": self._model_name, "use_8bit": self._use_8bit},
             ) from e
         except Exception as e:
             logger.error(f"Failed to load model {self._model_name}: {e}")
             raise ResourceLoadError(
-                f"Model loading failed: {e}",
-                context={"model": self._model_name}
+                f"Model loading failed: {e}", context={"model": self._model_name}
             ) from e
 
     def unload(self) -> None:
@@ -140,6 +139,7 @@ class HamiltonianModelResource(ModelResource):
 
                 # Force garbage collection
                 import gc
+
                 gc.collect()
 
                 self._loaded = False
@@ -186,9 +186,7 @@ class HamiltonianModelResource(ModelResource):
         """
         with self._lock:
             return (
-                self._loaded and
-                self._model is not None and
-                self._tokenizer is not None
+                self._loaded and self._model is not None and self._tokenizer is not None
             )
 
     def test_inference(self, test_prompt: str = "Test") -> bool:
@@ -206,8 +204,10 @@ class HamiltonianModelResource(ModelResource):
 
         try:
             with torch.no_grad():
-                inputs = self._tokenizer(test_prompt, return_tensors="pt").to(self._device)
-                outputs = self._model.generate(
+                inputs = self._tokenizer(test_prompt, return_tensors="pt").to(
+                    self._device
+                )
+                self._model.generate(
                     inputs.input_ids,
                     max_new_tokens=5,
                     do_sample=False,

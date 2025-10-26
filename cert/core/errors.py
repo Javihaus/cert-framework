@@ -44,10 +44,7 @@ class ResourceError(CERTError):
 
     def __init__(self, message: str, **kwargs):
         super().__init__(
-            message,
-            error_type="ResourceError",
-            recoverable=True,
-            **kwargs
+            message, error_type="ResourceError", recoverable=True, **kwargs
         )
 
 
@@ -77,7 +74,7 @@ class EmbeddingTimeoutError(CERTError):
             error_type="EmbeddingTimeoutError",
             recoverable=True,
             retry_after=2.0,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -90,7 +87,7 @@ class CircuitBreakerOpen(CERTError):
             error_type="CircuitBreakerOpen",
             recoverable=True,
             retry_after=30.0,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -99,10 +96,7 @@ class InvalidInputError(CERTError):
 
     def __init__(self, message: str, **kwargs):
         super().__init__(
-            message,
-            error_type="InvalidInputError",
-            recoverable=False,
-            **kwargs
+            message, error_type="InvalidInputError", recoverable=False, **kwargs
         )
 
 
@@ -114,25 +108,16 @@ class MaxRetriesExceeded(CERTError):
             f"Failed after {retries} retries",
             error_type="MaxRetriesExceeded",
             recoverable=False,
-            **kwargs
+            **kwargs,
         )
 
 
 class AnalysisError(CERTError):
     """Error during analysis (Hamiltonian, Coordination, etc.)."""
 
-    def __init__(
-        self,
-        error_type: str,
-        message: str,
-        recoverable: bool,
-        **kwargs
-    ):
+    def __init__(self, error_type: str, message: str, recoverable: bool, **kwargs):
         super().__init__(
-            message,
-            error_type=error_type,
-            recoverable=recoverable,
-            **kwargs
+            message, error_type=error_type, recoverable=recoverable, **kwargs
         )
 
     def is_valid(self) -> bool:

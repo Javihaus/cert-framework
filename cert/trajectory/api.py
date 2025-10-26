@@ -18,7 +18,7 @@ from cert.trajectory.engine import HamiltonianEngine
 from cert.trajectory.resources import HamiltonianModelResource
 from cert.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
 from cert.core.errors import AnalysisError
-from cert.core.health import HealthChecker, HealthCheckResult, HealthStatus
+from cert.core.health import HealthChecker, HealthCheckResult
 from cert.observability.metrics import MetricsCollector
 from cert.observability.logging import correlation_id_context
 
@@ -56,13 +56,13 @@ class HamiltonianMonitor:
 
         # Initialize model resource
         logger.info(
-            f"Initializing HamiltonianMonitor",
+            "Initializing HamiltonianMonitor",
             extra={
                 "model": model_name,
                 "preload": preload,
                 "use_8bit": use_8bit,
                 "device": device,
-            }
+            },
         )
 
         self._model_resource = HamiltonianModelResource(
@@ -124,7 +124,7 @@ class HamiltonianMonitor:
                     "correlation_id": correlation_id,
                     "prompt_length": len(prompt),
                     "max_new_tokens": max_new_tokens or self._config.max_new_tokens,
-                }
+                },
             )
 
             result = self._engine.analyze(
@@ -142,16 +142,18 @@ class HamiltonianMonitor:
                         "error_type": result.error_type,
                         "message": result.message,
                         "recoverable": result.recoverable,
-                    }
+                    },
                 )
             else:
                 logger.info(
                     "Trajectory analysis completed",
                     extra={
                         "correlation_id": correlation_id,
-                        "quality": "passed" if result.passed_quality_check else "failed",
+                        "quality": "passed"
+                        if result.passed_quality_check
+                        else "failed",
                         "tokens_generated": result.generation_steps,
-                    }
+                    },
                 )
 
             return result
@@ -218,16 +220,13 @@ class HamiltonianMonitor:
             prompts = ["Explain AI", "What is ML?", "Define NLP"]
             results = monitor.analyze_batch(prompts)
         """
-        logger.info(
-            f"Starting batch analysis",
-            extra={"num_prompts": len(prompts)}
-        )
+        logger.info("Starting batch analysis", extra={"num_prompts": len(prompts)})
 
         results = []
         per_prompt_timeout = timeout / len(prompts) if prompts else timeout
 
         for i, prompt in enumerate(prompts):
-            logger.debug(f"Analyzing prompt {i+1}/{len(prompts)}")
+            logger.debug(f"Analyzing prompt {i + 1}/{len(prompts)}")
 
             result = self.analyze(
                 prompt=prompt,
@@ -241,9 +240,11 @@ class HamiltonianMonitor:
             "Batch analysis complete",
             extra={
                 "num_prompts": len(prompts),
-                "num_success": sum(1 for r in results if isinstance(r, TrajectoryAnalysis)),
+                "num_success": sum(
+                    1 for r in results if isinstance(r, TrajectoryAnalysis)
+                ),
                 "num_errors": sum(1 for r in results if isinstance(r, AnalysisError)),
-            }
+            },
         )
 
         return results

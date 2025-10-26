@@ -15,6 +15,7 @@ from typing import Optional
 @dataclass
 class LoggingConfig:
     """Logging configuration."""
+
     level: str = "INFO"
     format: str = "json"  # "json" or "human"
     output: str = "stdout"  # "stdout", "file", or "both"
@@ -34,6 +35,7 @@ class LoggingConfig:
 @dataclass
 class MetricsConfig:
     """Metrics configuration."""
+
     enabled: bool = True
     namespace: str = "cert"
     port: int = 9090
@@ -53,6 +55,7 @@ class MetricsConfig:
 @dataclass
 class ResourceConfig:
     """Resource management configuration."""
+
     preload_models: bool = True
     device: str = "auto"  # "auto", "cuda", "cpu"
     max_memory_gb: Optional[float] = None
@@ -71,6 +74,7 @@ class ResourceConfig:
 @dataclass
 class CERTConfig:
     """Main CERT Framework configuration."""
+
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     metrics: MetricsConfig = field(default_factory=MetricsConfig)
     resources: ResourceConfig = field(default_factory=ResourceConfig)

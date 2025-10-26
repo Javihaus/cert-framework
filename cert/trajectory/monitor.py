@@ -31,11 +31,7 @@ class ReasoningTrajectoryMonitor:
     """
 
     def __init__(
-        self,
-        model,
-        tokenizer,
-        config: TrajectoryConfig = None,
-        device: str = "cuda"
+        self, model, tokenizer, config: TrajectoryConfig = None, device: str = "cuda"
     ):
         """
         Initialize monitor.
@@ -57,7 +53,7 @@ class ReasoningTrajectoryMonitor:
         self,
         prompt: str,
         max_new_tokens: Optional[int] = None,
-        temperature: Optional[float] = None
+        temperature: Optional[float] = None,
     ) -> TrajectoryAnalysis:
         """
         Generate text while monitoring confidence metrics.
@@ -90,7 +86,7 @@ class ReasoningTrajectoryMonitor:
                 do_sample=True,
                 return_dict_in_generate=True,
                 output_scores=True,
-                pad_token_id=self.tokenizer.eos_token_id
+                pad_token_id=self.tokenizer.eos_token_id,
             )
 
         generated_ids = outputs.sequences[0][input_length:]
@@ -99,13 +95,15 @@ class ReasoningTrajectoryMonitor:
         # Calculate per-step metrics
         cumulative_surprise = 0.0
 
-        for step_idx, (token_id, scores) in enumerate(zip(generated_ids, outputs.scores)):
+        for step_idx, (token_id, scores) in enumerate(
+            zip(generated_ids, outputs.scores)
+        ):
             # Probability distribution
             probs = torch.softmax(scores[0], dim=-1)
 
             # Token-level metrics
             token_prob = probs[token_id].item()
-            perplexity = 1.0 / token_prob if token_prob > 0 else float('inf')
+            perplexity = 1.0 / token_prob if token_prob > 0 else float("inf")
 
             # Top-k entropy (standard measure of distribution spread)
             top_k_probs, top_k_indices = torch.topk(probs, k=self.config.top_k)
@@ -132,27 +130,28 @@ class ReasoningTrajectoryMonitor:
                     perplexity=perplexity,
                     top_k_entropy=top_k_entropy,
                     logit_gap=logit_gap,
-                    cumulative_surprise=cumulative_surprise
+                    cumulative_surprise=cumulative_surprise,
                 )
             )
 
         # Quality assessment
         valid_perplexities = [
-            m.perplexity for m in self.metrics_history
-            if m.perplexity != float('inf')
+            m.perplexity for m in self.metrics_history if m.perplexity != float("inf")
         ]
 
-        avg_perplexity = np.mean(valid_perplexities) if valid_perplexities else float('inf')
-        max_perplexity = max(valid_perplexities) if valid_perplexities else float('inf')
+        avg_perplexity = (
+            np.mean(valid_perplexities) if valid_perplexities else float("inf")
+        )
+        max_perplexity = max(valid_perplexities) if valid_perplexities else float("inf")
         avg_entropy = np.mean([m.top_k_entropy for m in self.metrics_history])
         max_entropy = max([m.top_k_entropy for m in self.metrics_history])
         final_surprise = cumulative_surprise
 
         # Pass/fail decision
         passed = (
-            avg_perplexity < self.config.perplexity_threshold and
-            max_entropy < self.config.entropy_threshold and
-            final_surprise < self.config.surprise_threshold
+            avg_perplexity < self.config.perplexity_threshold
+            and max_entropy < self.config.entropy_threshold
+            and final_surprise < self.config.surprise_threshold
         )
 
         # Create analysis result
@@ -170,5 +169,5 @@ class ReasoningTrajectoryMonitor:
             generation_steps=len(self.metrics_history),
             perplexity_threshold=self.config.perplexity_threshold,
             entropy_threshold=self.config.entropy_threshold,
-            surprise_threshold=self.config.surprise_threshold
+            surprise_threshold=self.config.surprise_threshold,
         )

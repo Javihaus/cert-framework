@@ -44,11 +44,27 @@ class JsonFormatter(logging.Formatter):
         if hasattr(record, "__dict__"):
             for key, value in record.__dict__.items():
                 if key not in [
-                    "name", "msg", "args", "created", "filename", "funcName",
-                    "levelname", "levelno", "lineno", "module", "msecs",
-                    "message", "pathname", "process", "processName",
-                    "relativeCreated", "stack_info", "thread", "threadName",
-                    "exc_info", "exc_text",
+                    "name",
+                    "msg",
+                    "args",
+                    "created",
+                    "filename",
+                    "funcName",
+                    "levelname",
+                    "levelno",
+                    "lineno",
+                    "module",
+                    "msecs",
+                    "message",
+                    "pathname",
+                    "process",
+                    "processName",
+                    "relativeCreated",
+                    "stack_info",
+                    "thread",
+                    "threadName",
+                    "exc_info",
+                    "exc_text",
                 ]:
                     log_data[key] = value
 
@@ -61,7 +77,9 @@ class JsonFormatter(logging.Formatter):
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__ if record.exc_info[0] else None,
                 "message": str(record.exc_info[1]) if record.exc_info[1] else None,
-                "traceback": self.formatException(record.exc_info) if record.exc_info else None,
+                "traceback": self.formatException(record.exc_info)
+                if record.exc_info
+                else None,
             }
 
         return json.dumps(log_data, default=str)
@@ -73,7 +91,7 @@ class HumanReadableFormatter(logging.Formatter):
     def __init__(self):
         super().__init__(
             fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
 
 
@@ -138,7 +156,7 @@ def configure_logging(
             "format": format,
             "output": output,
             "log_file": log_file,
-        }
+        },
     )
 
 

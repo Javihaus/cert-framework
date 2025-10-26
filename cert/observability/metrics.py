@@ -21,6 +21,7 @@ try:
         generate_latest,
         REGISTRY,
     )
+
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     logger.warning(
@@ -168,10 +169,9 @@ class MetricsCollector:
         self.requests_total.labels(service=service, status=status).inc()
 
         if duration is not None and operation is not None:
-            self.request_duration.labels(
-                service=service,
-                operation=operation
-            ).observe(duration)
+            self.request_duration.labels(service=service, operation=operation).observe(
+                duration
+            )
 
     def record_error(self, service: str, error_type: str):
         """
@@ -184,12 +184,11 @@ class MetricsCollector:
         if not self.enabled:
             return
 
-        self.request_errors.labels(
-            service=service,
-            error_type=error_type
-        ).inc()
+        self.request_errors.labels(service=service, error_type=error_type).inc()
 
-    def record_model_load(self, model_name: str, duration: float, memory_bytes: Optional[int], device: str):
+    def record_model_load(
+        self, model_name: str, duration: float, memory_bytes: Optional[int], device: str
+    ):
         """
         Record model loading metrics.
 
@@ -205,10 +204,9 @@ class MetricsCollector:
         self.model_load_duration.labels(model_name=model_name).observe(duration)
 
         if memory_bytes is not None:
-            self.model_memory_usage.labels(
-                model_name=model_name,
-                device=device
-            ).set(memory_bytes)
+            self.model_memory_usage.labels(model_name=model_name, device=device).set(
+                memory_bytes
+            )
 
     def record_cache_hit(self, cache_type: str):
         """Record cache hit."""

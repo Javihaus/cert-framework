@@ -23,9 +23,12 @@ logger = logging.getLogger(__name__)
 # Try to import anthropic
 try:
     import anthropic
+
     ANTHROPIC_AVAILABLE = True
 except ImportError:
-    logger.warning("anthropic package not available. Install with: pip install anthropic")
+    logger.warning(
+        "anthropic package not available. Install with: pip install anthropic"
+    )
     ANTHROPIC_AVAILABLE = False
 
 
@@ -52,10 +55,7 @@ class RateLimiter:
             elapsed = now - self._last_update
 
             # Refill tokens
-            self._tokens = min(
-                self._max_tokens,
-                self._tokens + elapsed * self._rate
-            )
+            self._tokens = min(self._max_tokens, self._tokens + elapsed * self._rate)
             self._last_update = now
 
             # Wait if no tokens available
@@ -74,7 +74,7 @@ class CostTracker:
     # Claude pricing (as of 2024)
     PRICING = {
         "claude-3-5-sonnet-20241022": {
-            "input": 0.003 / 1000,   # $3 per 1M tokens
+            "input": 0.003 / 1000,  # $3 per 1M tokens
             "output": 0.015 / 1000,  # $15 per 1M tokens
         },
         "claude-3-sonnet-20240229": {
@@ -105,10 +105,7 @@ class CostTracker:
             Cost in USD
         """
         pricing = self.PRICING.get(model, {"input": 0, "output": 0})
-        cost = (
-            input_tokens * pricing["input"] +
-            output_tokens * pricing["output"]
-        )
+        cost = input_tokens * pricing["input"] + output_tokens * pricing["output"]
         return cost
 
 
@@ -141,9 +138,7 @@ class AnthropicClientWithResilience:
 
         self._client = anthropic.Anthropic(api_key=api_key)
         self._circuit = circuit_breaker or CircuitBreaker(
-            failure_threshold=5,
-            recovery_timeout=30.0,
-            name="anthropic_api"
+            failure_threshold=5, recovery_timeout=30.0, name="anthropic_api"
         )
         self._rate_limiter = RateLimiter(requests_per_minute=requests_per_minute)
         self._metrics = metrics or MetricsCollector()
@@ -203,8 +198,7 @@ class AnthropicClientWithResilience:
         # Check circuit breaker
         if self._circuit.is_open():
             self._metrics.coordination_api_calls.labels(
-                agent=agent_id or "unknown",
-                status="circuit_breaker_open"
+                agent=agent_id or "unknown", status="circuit_breaker_open"
             ).inc()
             raise CircuitBreakerOpen(service="anthropic_api")
 
@@ -227,9 +221,9 @@ class AnthropicClientWithResilience:
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                     temperature=temperature,
-                    **kwargs
+                    **kwargs,
                 ),
-                timeout=timeout
+                timeout=timeout,
             )
 
             # Extract response text
@@ -238,8 +232,7 @@ class AnthropicClientWithResilience:
             # Record success
             self._circuit.record_success()
             self._metrics.coordination_api_calls.labels(
-                agent=agent_id or "unknown",
-                status="success"
+                agent=agent_id or "unknown", status="success"
             ).inc()
 
             # Track cost
@@ -249,9 +242,9 @@ class AnthropicClientWithResilience:
                 output_tokens=response.usage.output_tokens,
             )
             self._hourly_cost += cost
-            self._metrics.coordination_cost.labels(
-                agent=agent_id or "unknown"
-            ).inc(cost)
+            self._metrics.coordination_cost.labels(agent=agent_id or "unknown").inc(
+                cost
+            )
 
             # Log
             logger.info(
@@ -263,16 +256,15 @@ class AnthropicClientWithResilience:
                     "output_tokens": response.usage.output_tokens,
                     "cost_usd": cost,
                     "duration_s": time.time() - start,
-                }
+                },
             )
 
             return response_text
 
-        except asyncio.TimeoutError as e:
+        except asyncio.TimeoutError:
             self._circuit.record_failure()
             self._metrics.coordination_api_calls.labels(
-                agent=agent_id or "unknown",
-                status="timeout"
+                agent=agent_id or "unknown", status="timeout"
             ).inc()
             logger.warning(f"Claude API timeout after {timeout}s")
             raise
@@ -282,8 +274,7 @@ class AnthropicClientWithResilience:
             error_type = type(e).__name__
 
             self._metrics.coordination_api_calls.labels(
-                agent=agent_id or "unknown",
-                status="error"
+                agent=agent_id or "unknown", status="error"
             ).inc()
 
             logger.error(
@@ -291,7 +282,7 @@ class AnthropicClientWithResilience:
                 extra={
                     "agent": agent_id,
                     "error_type": error_type,
-                }
+                },
             )
             raise
 

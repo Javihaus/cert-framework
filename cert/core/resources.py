@@ -15,7 +15,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 from cert.core.errors import ResourceLoadError
-from cert.core.health import HealthStatus
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +108,7 @@ class ModelResource(ResourceManager):
         if device == "auto":
             try:
                 import torch
+
                 if torch.cuda.is_available():
                     return "cuda"
             except ImportError:
@@ -136,17 +136,18 @@ class ModelResource(ResourceManager):
                         "model": self._model_name,
                         "device": self._device,
                         "load_time_s": self._load_time,
-                        "memory_mb": self._memory_usage / 1024 / 1024 if self._memory_usage else None,
-                    }
+                        "memory_mb": self._memory_usage / 1024 / 1024
+                        if self._memory_usage
+                        else None,
+                    },
                 )
             except Exception as e:
                 logger.error(
-                    f"Failed to load model '{self._model_name}': {e}",
-                    exc_info=True
+                    f"Failed to load model '{self._model_name}': {e}", exc_info=True
                 )
                 raise ResourceLoadError(
                     f"Model load failed: {e}",
-                    context={"model": self._model_name, "device": self._device}
+                    context={"model": self._model_name, "device": self._device},
                 ) from e
 
     def _load_model(self) -> Any:
@@ -200,6 +201,7 @@ class ModelResource(ResourceManager):
                 if self._device == "cuda":
                     try:
                         import torch
+
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
                             logger.debug("GPU cache cleared")

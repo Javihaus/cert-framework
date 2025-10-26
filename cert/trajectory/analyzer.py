@@ -29,11 +29,7 @@ class CERTTrajectoryAnalyzer:
         self.monitors = {}  # Cache monitors per model
 
     def analyze_model(
-        self,
-        model,
-        tokenizer,
-        test_prompts: List[str],
-        device: str = "cuda"
+        self, model, tokenizer, test_prompts: List[str], device: str = "cuda"
     ) -> Dict[str, TrajectoryAnalysis]:
         """
         Analyze a model across multiple test prompts.
@@ -52,10 +48,7 @@ class CERTTrajectoryAnalyzer:
         # Create or retrieve monitor
         if model_id not in self.monitors:
             self.monitors[model_id] = ReasoningTrajectoryMonitor(
-                model=model,
-                tokenizer=tokenizer,
-                config=self.config,
-                device=device
+                model=model, tokenizer=tokenizer, config=self.config, device=device
             )
 
         monitor = self.monitors[model_id]
@@ -69,8 +62,7 @@ class CERTTrajectoryAnalyzer:
         return results
 
     def get_summary_statistics(
-        self,
-        results: Dict[str, TrajectoryAnalysis]
+        self, results: Dict[str, TrajectoryAnalysis]
     ) -> Dict[str, float]:
         """
         Calculate aggregate statistics across multiple analyses.
@@ -84,20 +76,17 @@ class CERTTrajectoryAnalyzer:
         analyses = list(results.values())
 
         return {
-            'pass_rate': sum(a.passed_quality_check for a in analyses) / len(analyses),
-            'avg_perplexity': np.mean([a.avg_perplexity for a in analyses]),
-            'avg_entropy': np.mean([a.avg_entropy for a in analyses]),
-            'avg_surprise': np.mean([a.final_surprise for a in analyses]),
-            'total_tests': len(analyses),
-            'passed_tests': sum(a.passed_quality_check for a in analyses),
-            'failed_tests': sum(not a.passed_quality_check for a in analyses)
+            "pass_rate": sum(a.passed_quality_check for a in analyses) / len(analyses),
+            "avg_perplexity": np.mean([a.avg_perplexity for a in analyses]),
+            "avg_entropy": np.mean([a.avg_entropy for a in analyses]),
+            "avg_surprise": np.mean([a.final_surprise for a in analyses]),
+            "total_tests": len(analyses),
+            "passed_tests": sum(a.passed_quality_check for a in analyses),
+            "failed_tests": sum(not a.passed_quality_check for a in analyses),
         }
 
     def export_results(
-        self,
-        results: Dict[str, TrajectoryAnalysis],
-        output_dir: str,
-        model_name: str
+        self, results: Dict[str, TrajectoryAnalysis], output_dir: str, model_name: str
     ) -> None:
         """
         Export results in CERT-compatible format.
@@ -110,27 +99,25 @@ class CERTTrajectoryAnalyzer:
         os.makedirs(output_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        safe_model_name = model_name.replace('/', '_')
+        safe_model_name = model_name.replace("/", "_")
 
         # Export JSON
         json_path = os.path.join(
-            output_dir,
-            f"trajectory_analysis_{safe_model_name}_{timestamp}.json"
+            output_dir, f"trajectory_analysis_{safe_model_name}_{timestamp}.json"
         )
-        with open(json_path, 'w') as f:
+        with open(json_path, "w") as f:
             json.dump(
                 {prompt: analysis.to_dict() for prompt, analysis in results.items()},
                 f,
-                indent=2
+                indent=2,
             )
         print(f"Results exported to: {json_path}")
 
         # Export summary statistics
         summary = self.get_summary_statistics(results)
         summary_path = os.path.join(
-            output_dir,
-            f"trajectory_summary_{safe_model_name}_{timestamp}.json"
+            output_dir, f"trajectory_summary_{safe_model_name}_{timestamp}.json"
         )
-        with open(summary_path, 'w') as f:
+        with open(summary_path, "w") as f:
             json.dump(summary, f, indent=2)
         print(f"Summary exported to: {summary_path}")

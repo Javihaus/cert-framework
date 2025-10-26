@@ -12,7 +12,6 @@ Extracted from notebooks with:
 
 import logging
 import time
-from functools import lru_cache
 from typing import Optional, Union
 import hashlib
 import json
@@ -24,11 +23,8 @@ from cert.trajectory.types import TrajectoryAnalysis, TrajectoryConfig, Reasonin
 from cert.trajectory.resources import HamiltonianModelResource
 from cert.core.errors import (
     AnalysisError,
-    InvalidInputError,
     GPUOutOfMemoryError,
-    EmbeddingTimeoutError,
 )
-from cert.core.retry import retry
 from cert.observability.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)
@@ -54,7 +50,9 @@ class EmbeddingCache:
         key_data = f"{prompt}:{config_str}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    def get(self, prompt: str, config: TrajectoryConfig) -> Optional[TrajectoryAnalysis]:
+    def get(
+        self, prompt: str, config: TrajectoryConfig
+    ) -> Optional[TrajectoryAnalysis]:
         """Get cached result."""
         key = self._compute_key(prompt, config)
         if key in self._cache:
@@ -201,16 +199,18 @@ class HamiltonianEngine:
                     extra={
                         "prompt_length": len(prompt),
                         "generated_tokens": result.generation_steps,
-                        "quality": "passed" if result.passed_quality_check else "failed",
+                        "quality": "passed"
+                        if result.passed_quality_check
+                        else "failed",
                         "avg_perplexity": result.avg_perplexity,
                         "avg_entropy": result.avg_entropy,
                         "duration_s": duration,
-                    }
+                    },
                 )
 
             return result
 
-        except GPUOutOfMemoryError as e:
+        except GPUOutOfMemoryError:
             logger.warning("GPU OOM in trajectory analysis, falling back to CPU")
             self._metrics.record_error("hamiltonian", "gpu_oom")
 
@@ -250,7 +250,10 @@ class HamiltonianEngine:
                 error_type="PromptTooLong",
                 message=f"Prompt exceeds maximum length ({self._max_prompt_length})",
                 recoverable=False,
-                context={"prompt_length": len(prompt), "max_length": self._max_prompt_length},
+                context={
+                    "prompt_length": len(prompt),
+                    "max_length": self._max_prompt_length,
+                },
             )
 
         return None
@@ -303,7 +306,7 @@ class HamiltonianEngine:
                     do_sample=True,
                     return_dict_in_generate=True,
                     output_scores=True,
-                    pad_token_id=tokenizer.eos_token_id
+                    pad_token_id=tokenizer.eos_token_id,
                 )
 
             # Check timeout
@@ -323,13 +326,15 @@ class HamiltonianEngine:
             metrics_history = []
             cumulative_surprise = 0.0
 
-            for step_idx, (token_id, scores) in enumerate(zip(generated_ids, outputs.scores)):
+            for step_idx, (token_id, scores) in enumerate(
+                zip(generated_ids, outputs.scores)
+            ):
                 # Probability distribution
                 probs = torch.softmax(scores[0], dim=-1)
 
                 # Token-level metrics
                 token_prob = probs[token_id].item()
-                perplexity = 1.0 / token_prob if token_prob > 0 else float('inf')
+                perplexity = 1.0 / token_prob if token_prob > 0 else float("inf")
 
                 # Top-k entropy
                 top_k_probs, _ = torch.topk(probs, k=self._config.top_k)
@@ -356,26 +361,29 @@ class HamiltonianEngine:
                         perplexity=perplexity,
                         top_k_entropy=top_k_entropy,
                         logit_gap=logit_gap,
-                        cumulative_surprise=cumulative_surprise
+                        cumulative_surprise=cumulative_surprise,
                     )
                 )
 
             # Quality assessment
             valid_perplexities = [
-                m.perplexity for m in metrics_history
-                if m.perplexity != float('inf')
+                m.perplexity for m in metrics_history if m.perplexity != float("inf")
             ]
 
-            avg_perplexity = np.mean(valid_perplexities) if valid_perplexities else float('inf')
-            max_perplexity = max(valid_perplexities) if valid_perplexities else float('inf')
+            avg_perplexity = (
+                np.mean(valid_perplexities) if valid_perplexities else float("inf")
+            )
+            max_perplexity = (
+                max(valid_perplexities) if valid_perplexities else float("inf")
+            )
             avg_entropy = np.mean([m.top_k_entropy for m in metrics_history])
             max_entropy = max([m.top_k_entropy for m in metrics_history])
 
             # Pass/fail decision
             passed = (
-                avg_perplexity < self._config.perplexity_threshold and
-                max_entropy < self._config.entropy_threshold and
-                cumulative_surprise < self._config.surprise_threshold
+                avg_perplexity < self._config.perplexity_threshold
+                and max_entropy < self._config.entropy_threshold
+                and cumulative_surprise < self._config.surprise_threshold
             )
 
             # Create analysis result

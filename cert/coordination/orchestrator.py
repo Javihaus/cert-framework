@@ -73,7 +73,7 @@ class CoordinationOrchestrator:
                 "task_length": len(task),
                 "num_agents": num_agents,
                 "strategy": strategy,
-            }
+            },
         )
 
         start = time.time()
@@ -143,7 +143,7 @@ class CoordinationOrchestrator:
                 "coordination_effective": metrics.is_coordination_effective(),
                 "emergence_detected": metrics.has_emergence(),
                 "duration_s": duration,
-            }
+            },
         )
 
         return metrics
@@ -279,7 +279,7 @@ Provide your response:"""
 Multiple agents have provided responses. Your job is to synthesize them into a single high-quality response.
 
 Agent responses:
-{chr(10).join(f"Agent {i+1}: {r.response}" for i, r in enumerate(responses))}
+{chr(10).join(f"Agent {i + 1}: {r.response}" for i, r in enumerate(responses))}
 
 Synthesize these responses into a single, comprehensive answer that combines the best insights from all agents:"""
 
@@ -312,7 +312,9 @@ Synthesize these responses into a single, comprehensive answer that combines the
         Returns:
             Tuple of (final_response, agent_responses)
         """
-        logger.debug(f"Running debate coordination with {num_agents} agents for {rounds} rounds")
+        logger.debug(
+            f"Running debate coordination with {num_agents} agents for {rounds} rounds"
+        )
 
         all_responses = []
 
