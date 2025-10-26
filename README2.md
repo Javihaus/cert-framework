@@ -51,18 +51,18 @@ Traditional monitoring tools address the first problem but ignore the second. CE
 ### The Business Risk
 
 Without compliance infrastructure:
-- ❌ No defensible evidence for Article 15 (Accuracy) requirements
-- ❌ No audit trail for Article 19 (Record-keeping) requirements  
-- ❌ No robustness documentation for Article 15.4
-- ❌ Certification delays or rejections from Notified Bodies
-- ❌ Exposure to enforcement actions and fines
+-  No defensible evidence for Article 15 (Accuracy) requirements
+-  No audit trail for Article 19 (Record-keeping) requirements  
+-  No robustness documentation for Article 15.4
+-  Certification delays or rejections from Notified Bodies
+-  Exposure to enforcement actions and fines
 
 With CERT:
-- ✅ Automated accuracy measurement with regulatory-grade documentation
-- ✅ Immutable audit logs in compliance format
-- ✅ Plain-language reports citing specific EU AI Act articles
-- ✅ Continuous monitoring without architectural changes
-- ✅ Industry-specific thresholds (Healthcare, Financial, Legal)
+-  Automated accuracy measurement with regulatory-grade documentation
+-  Immutable audit logs in compliance format
+-  Plain-language reports citing specific EU AI Act articles
+-  Continuous monitoring without architectural changes
+-  Industry-specific thresholds (Healthcare, Financial, Legal)
 
 ### The August 2026 Deadline
 
@@ -104,11 +104,11 @@ graph TD
 
 | **If your AI system is...** | **Use this tool** | **Status** |
 |------------------------------|-------------------|------------|
-| RAG system with context + answer outputs | `@monitor()` decorator | ✅ Production |
-| Any LLM where you need to compare two texts | `measure()` API | ✅ Production |
-| LLM generating text and you want quality tracking | `analyze_trajectory()` | ✅ Production |
-| Multi-hop reasoning (question→fact→fact→answer) | Hamiltonian Analysis | 🔬 Experimental |
-| Multi-agent system with coordination patterns | Coordination Monitor | 🔬 Experimental |
+| RAG system with context + answer outputs | `@monitor()` decorator |  Production |
+| Any LLM where you need to compare two texts | `measure()` API |  Production |
+| LLM generating text and you want quality tracking | `analyze_trajectory()` |  Production |
+| Multi-hop reasoning (question→fact→fact→answer) | Hamiltonian Analysis |  Experimental |
+| Multi-agent system with coordination patterns | Coordination Monitor |  Experimental |
 
 **Start with production tools** (`measure`, `monitor`, `analyze_trajectory`) for immediate compliance needs. Experimental tools are available for organizations conducting research on advanced AI system observability.
 
