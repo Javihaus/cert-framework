@@ -5,158 +5,285 @@ not just that imports succeed.
 """
 
 import pytest
+from pathlib import Path
+import tempfile
 
 
-class TestComparisonResult:
-    """Test ComparisonResult type."""
+class TestMeasureFunction:
+    """Test measure() function."""
 
-    def test_create_comparison_result(self):
-        """Test that ComparisonResult can be instantiated."""
-        from cert.utilities.types import ComparisonResult
+    def test_measure_identical_texts(self):
+        """Test measuring identical texts."""
+        from cert import measure
 
-        result = ComparisonResult(
-            matched=True,
-            rule="test-rule",
-            confidence=0.95,
-            explanation="test explanation"
+        result = measure(
+            text1="The revenue was $500M in Q4",
+            text2="The revenue was $500M in Q4"
         )
-
-        assert result.matched is True
-        assert result.rule == "test-rule"
-        assert result.confidence == 0.95
-        assert result.explanation == "test explanation"
-
-    def test_comparison_result_bool(self):
-        """Test ComparisonResult boolean evaluation."""
-        from cert.utilities.types import ComparisonResult
-
-        result_match = ComparisonResult(
-            matched=True, rule="test", confidence=0.9
-        )
-        result_no_match = ComparisonResult(
-            matched=False, rule="test", confidence=0.3
-        )
-
-        assert bool(result_match) is True
-        assert bool(result_no_match) is False
-
-
-class TestSemanticComparator:
-    """Test SemanticComparator basic functionality."""
-
-    def test_instantiate_semantic_comparator(self):
-        """Test SemanticComparator can be created."""
-        from cert.rag import SemanticComparator
-
-        comparator = SemanticComparator()
-        assert comparator is not None
-
-    def test_semantic_compare_identical(self):
-        """Test comparing identical strings."""
-        from cert.rag import SemanticComparator
-
-        comparator = SemanticComparator()
-        result = comparator.compare("hello", "hello")
 
         assert result is not None
         assert result.matched is True
         assert result.confidence >= 0.9
+        assert isinstance(result.confidence, float)
 
+    def test_measure_similar_texts(self):
+        """Test measuring semantically similar texts."""
+        from cert import measure
 
-class TestIntelligentComparator:
-    """Test IntelligentComparator basic functionality."""
+        result = measure(
+            text1="Revenue was $500M in Q4",
+            text2="Q4 revenue reached $500 million"
+        )
 
-    def test_instantiate_intelligent_comparator(self):
-        """Test IntelligentComparator can be created."""
-        from cert.single_model import IntelligentComparator
+        assert result is not None
+        assert isinstance(result.confidence, float)
+        assert 0.0 <= result.confidence <= 1.0
 
-        comparator = IntelligentComparator()
-        assert comparator is not None
+    def test_measure_custom_weights(self):
+        """Test measure with custom component weights."""
+        from cert import measure
 
-    def test_intelligent_compare_identical(self):
-        """Test comparing identical strings."""
-        from cert.single_model import IntelligentComparator
-
-        comparator = IntelligentComparator()
-        result = comparator.compare("test", "test")
+        result = measure(
+            text1="Test text",
+            text2="Test text",
+            semantic_weight=0.4,
+            nli_weight=0.4,
+            grounding_weight=0.2
+        )
 
         assert result is not None
         assert result.matched is True
 
+    def test_measure_semantic_only(self):
+        """Test measure with only semantic similarity."""
+        from cert import measure
 
-class TestAssessmentConfig:
-    """Test AssessmentConfig."""
-
-    def test_create_default_config(self):
-        """Test creating default AssessmentConfig."""
-        from cert.agents import AssessmentConfig
-
-        config = AssessmentConfig()
-        assert config.consistency_trials == 20
-        assert config.performance_trials == 15
-        assert config.temperature == 0.0  # Default is now deterministic
-
-    def test_create_custom_config(self):
-        """Test creating custom AssessmentConfig."""
-        from cert.agents import AssessmentConfig
-
-        config = AssessmentConfig(
-            consistency_trials=10,
-            temperature=0.5,
-            providers={"anthropic": ["claude-3-5-haiku-20241022"]}
+        result = measure(
+            text1="Test text",
+            text2="Test text",
+            use_semantic=True,
+            use_nli=False,
+            use_grounding=False
         )
 
-        assert config.consistency_trials == 10
-        assert config.temperature == 0.5
-        assert "anthropic" in config.providers
+        assert result is not None
+        assert result.semantic_score is not None
+        assert result.nli_score is None
+        assert result.grounding_score is None
 
-    def test_temperature_mode_enum(self):
-        """Test TemperatureMode enum values."""
-        from cert.agents import TemperatureMode
+    def test_measure_custom_threshold(self):
+        """Test measure with custom threshold."""
+        from cert import measure
 
-        assert TemperatureMode.DETERMINISTIC.value == 0.0
-        assert TemperatureMode.FACTUAL.value == 0.3
-        assert TemperatureMode.BALANCED.value == 0.7
-        assert TemperatureMode.CREATIVE.value == 1.0
-
-    def test_config_from_temperature_mode(self):
-        """Test creating config from TemperatureMode."""
-        from cert.agents import AssessmentConfig, TemperatureMode
-
-        # Test DETERMINISTIC mode
-        config_det = AssessmentConfig.from_temperature_mode(
-            TemperatureMode.DETERMINISTIC,
-            consistency_trials=10
+        result = measure(
+            text1="Test",
+            text2="Test",
+            threshold=0.95
         )
-        assert config_det.temperature == 0.0
-        assert config_det.consistency_trials == 10
 
-        # Test BALANCED mode
-        config_bal = AssessmentConfig.from_temperature_mode(
-            TemperatureMode.BALANCED
+        assert result is not None
+        assert result.threshold_used == 0.95
+
+    def test_measurement_result_type(self):
+        """Test MeasurementResult type properties."""
+        from cert import measure
+
+        result = measure(text1="test", text2="test")
+
+        # Check all expected attributes exist
+        assert hasattr(result, "matched")
+        assert hasattr(result, "confidence")
+        assert hasattr(result, "semantic_score")
+        assert hasattr(result, "nli_score")
+        assert hasattr(result, "grounding_score")
+        assert hasattr(result, "threshold_used")
+        assert hasattr(result, "rule")
+        assert hasattr(result, "components_used")
+
+
+class TestMonitorDecorator:
+    """Test @monitor() decorator."""
+
+    def test_monitor_basic_function(self):
+        """Test monitor decorator on simple function."""
+        from cert import monitor
+
+        @monitor
+        def test_function(query):
+            return {"context": "test context", "answer": "test answer"}
+
+        # Function should still work normally
+        result = test_function("test query")
+        assert result is not None
+        assert "context" in result
+        assert "answer" in result
+
+    def test_monitor_with_preset(self):
+        """Test monitor with industry preset."""
+        from cert import monitor
+
+        @monitor(preset="general")
+        def test_function(query):
+            return {"context": "test context", "answer": "test answer"}
+
+        result = test_function("test query")
+        assert result is not None
+
+    def test_monitor_custom_threshold(self):
+        """Test monitor with custom thresholds."""
+        from cert import monitor
+
+        @monitor(
+            accuracy_threshold=0.85,
+            hallucination_tolerance=0.10
         )
-        assert config_bal.temperature == 0.7
+        def test_function(query):
+            return {"context": "test context", "answer": "test answer"}
 
-        # Test CREATIVE mode
-        config_cre = AssessmentConfig.from_temperature_mode(
-            TemperatureMode.CREATIVE
-        )
-        assert config_cre.temperature == 1.0
+        result = test_function("test query")
+        assert result is not None
 
-    def test_temperature_validation(self):
-        """Test temperature validation."""
-        from cert.agents import AssessmentConfig
 
-        # Valid temperatures
-        config_low = AssessmentConfig(temperature=0.0)
-        assert config_low.temperature == 0.0
+class TestPresets:
+    """Test Preset and PRESETS functionality."""
 
-        config_high = AssessmentConfig(temperature=1.0)
-        assert config_high.temperature == 1.0
+    def test_presets_dict_structure(self):
+        """Test PRESETS dictionary structure."""
+        from cert import PRESETS
 
-        # Invalid temperatures should raise ValueError
-        with pytest.raises(ValueError, match="temperature must be between"):
-            AssessmentConfig(temperature=-0.1)
+        required_keys = [
+            "accuracy_threshold",
+            "hallucination_tolerance",
+            "audit_retention_days",
+            "description",
+            "regulatory_basis"
+        ]
 
-        with pytest.raises(ValueError, match="temperature must be between"):
-            AssessmentConfig(temperature=1.1)
+        for preset_name, config in PRESETS.items():
+            for key in required_keys:
+                assert key in config, f"Missing key '{key}' in preset '{preset_name}'"
+
+    def test_preset_enum(self):
+        """Test Preset enum."""
+        from cert import Preset
+
+        assert hasattr(Preset, "HEALTHCARE")
+        assert hasattr(Preset, "FINANCIAL")
+        assert hasattr(Preset, "LEGAL")
+        assert hasattr(Preset, "GENERAL")
+
+    def test_get_preset_function(self):
+        """Test get_preset() function."""
+        from cert.utils import get_preset
+
+        config = get_preset("healthcare")
+        assert config is not None
+        assert config["accuracy_threshold"] == 0.95
+        assert config["hallucination_tolerance"] == 0.02
+
+    def test_get_preset_invalid(self):
+        """Test get_preset() with invalid preset name."""
+        from cert.utils import get_preset
+
+        with pytest.raises(ValueError, match="Invalid preset"):
+            get_preset("invalid_preset")
+
+
+class TestExportReport:
+    """Test export_report() functionality."""
+
+    def test_export_report_no_audit_log(self):
+        """Test export_report when no audit log exists."""
+        from cert import export_report
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "test_report.txt"
+
+            # Should work even with no audit log
+            result = export_report(
+                output_path=str(output_path),
+                audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
+                system_name="Test System"
+            )
+
+            assert result is not None
+            assert Path(result).exists()
+
+    def test_export_report_json_format(self):
+        """Test export_report with JSON format."""
+        from cert import export_report
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "test_report.json"
+
+            result = export_report(
+                output_path=str(output_path),
+                audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
+                system_name="Test System",
+                format="json"
+            )
+
+            assert result is not None
+            assert Path(result).exists()
+
+    def test_export_report_csv_format(self):
+        """Test export_report with CSV format."""
+        from cert import export_report
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "test_report.csv"
+
+            result = export_report(
+                output_path=str(output_path),
+                audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
+                system_name="Test System",
+                format="csv"
+            )
+
+            assert result is not None
+            assert Path(result).exists()
+
+
+class TestAuditLogger:
+    """Test AuditLogger functionality."""
+
+    def test_audit_logger_creation(self):
+        """Test AuditLogger can be created."""
+        from cert.utils import AuditLogger
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_path = Path(tmpdir) / "test_audit.jsonl"
+            logger = AuditLogger(str(log_path))
+
+            assert logger is not None
+
+    def test_audit_logger_log_request(self):
+        """Test logging a request."""
+        from cert.utils import AuditLogger
+        import json
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_path = Path(tmpdir) / "test_audit.jsonl"
+            logger = AuditLogger(str(log_path))
+
+            logger.log_request(
+                function_name="test_function",
+                context="test context",
+                answer="test answer",
+                accuracy_score=0.95,
+                hallucination_detected=False,
+                is_compliant=True,
+                metrics={"semantic_score": 0.9},
+                timestamp="2025-01-01T00:00:00",
+                duration_ms=100.0
+            )
+
+            # Verify log was written
+            assert log_path.exists()
+
+            with open(log_path) as f:
+                line = f.readline()
+                entry = json.loads(line)
+                assert entry["type"] == "request"
+                assert entry["function_name"] == "test_function"
+                assert entry["accuracy_score"] == 0.95
