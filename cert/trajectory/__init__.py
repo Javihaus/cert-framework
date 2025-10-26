@@ -24,7 +24,11 @@ from cert.trajectory.types import ReasoningMetrics, TrajectoryAnalysis, Trajecto
 
 from cert.trajectory.monitor import ReasoningTrajectoryMonitor
 
-from cert.trajectory.visualizer import HamiltonianVisualizer
+# Lazy import for optional dependencies
+try:
+    from cert.trajectory.visualizer import HamiltonianVisualizer
+except ImportError:
+    HamiltonianVisualizer = None
 
 from cert.trajectory.analyzer import CERTTrajectoryAnalyzer
 
@@ -46,7 +50,7 @@ __all__ = [
     "HamiltonianMonitor",
     "HamiltonianEngine",
     "HamiltonianModelResource",
-    # Visualization
+    # Visualization (optional, requires matplotlib)
     "HamiltonianVisualizer",
     # CERT integration
     "CERTTrajectoryAnalyzer",
@@ -54,3 +58,7 @@ __all__ = [
     "load_model_for_monitoring",
     "unload_model",
 ]
+
+# Add to __all__ only if successfully imported
+if HamiltonianVisualizer is None:
+    __all__.remove("HamiltonianVisualizer")

@@ -59,10 +59,15 @@ from cert.trajectory import (
     CERTTrajectoryAnalyzer,
     TrajectoryConfig,
     TrajectoryAnalysis,
-    HamiltonianVisualizer,
     load_model_for_monitoring,
     unload_model,
 )
+
+# Optional visualization (requires matplotlib)
+try:
+    from cert.trajectory import HamiltonianVisualizer
+except (ImportError, AttributeError):
+    HamiltonianVisualizer = None
 
 
 # Convenience function for simple trajectory analysis
@@ -106,3 +111,7 @@ __all__ = [
     "load_model_for_monitoring",
     "unload_model",
 ]
+
+# Remove HamiltonianVisualizer from __all__ if matplotlib is not available
+if HamiltonianVisualizer is None:
+    __all__.remove("HamiltonianVisualizer")

@@ -1,5 +1,7 @@
 """Test trajectory module imports."""
 
+import pytest
+
 
 def test_import_trajectory_module():
     """Test trajectory module can be imported."""
@@ -28,7 +30,8 @@ def test_import_trajectory_monitor():
 
 
 def test_import_trajectory_visualizer():
-    """Test trajectory visualizer can be imported."""
+    """Test trajectory visualizer can be imported (requires matplotlib)."""
+    pytest.importorskip("matplotlib")
     from cert.trajectory import HamiltonianVisualizer
 
     assert HamiltonianVisualizer is not None
@@ -55,7 +58,6 @@ def test_import_from_cert_package():
         analyze_trajectory,
         TrajectoryConfig,
         TrajectoryAnalysis,
-        HamiltonianVisualizer,
         load_model_for_monitoring,
         unload_model
     )
@@ -63,9 +65,16 @@ def test_import_from_cert_package():
     assert analyze_trajectory is not None
     assert TrajectoryConfig is not None
     assert TrajectoryAnalysis is not None
-    assert HamiltonianVisualizer is not None
     assert load_model_for_monitoring is not None
     assert unload_model is not None
+
+
+def test_import_visualizer_from_cert_package():
+    """Test HamiltonianVisualizer can be imported from main cert package (requires matplotlib)."""
+    pytest.importorskip("matplotlib")
+    from cert import HamiltonianVisualizer
+
+    assert HamiltonianVisualizer is not None
 
 
 def test_trajectory_config_defaults():
