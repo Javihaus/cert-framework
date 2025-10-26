@@ -37,13 +37,14 @@ __author__ = "Javier Marin"
 __license__ = "MIT"
 
 # Public API - This is all users need to import
-from cert.api.measure import measure
-from cert.api.monitor import monitor
-from cert.presets.definitions import Preset, PRESETS
+from cert.measure import measure
+from cert.monitor import monitor
+from cert.utils import Preset, PRESETS, export_report
 
 __all__ = [
     "measure",
     "monitor",
     "Preset",
     "PRESETS",
+    "export_report",
 ]

@@ -1,9 +1,14 @@
-"""Utility functions for CERT framework.
+"""Utils module - Presets, audit, and reports."""
 
-This module provides shared utilities:
-- Logging configuration
-- Validation helpers
-- Export utilities (CSV, JSON)
-"""
+from cert.utils.audit import AuditLogger
+from cert.utils.presets import Preset, PRESETS, get_preset
+from cert.utils.reports import export_report, show_report
 
-__all__ = []
+__all__ = [
+    "AuditLogger",
+    "Preset",
+    "PRESETS",
+    "get_preset",
+    "export_report",
+    "show_report",
+]
