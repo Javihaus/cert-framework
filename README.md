@@ -900,7 +900,7 @@ CERT relies on third-party models (HuggingFace transformers). Users should:
 
 ## License
 
-ISC License - See LICENSE file for details.
+Apache License Version 2.0 - See LICENSE file for details.
 
 ---
 
