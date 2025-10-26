@@ -3,7 +3,7 @@
 **EU AI Act Compliance Tools for AI Systems**
 
 <div align="center">
-  <img src="docs/CERT.png" alt="CERT Framework" width="800">
+  <img src="docs/CERT.png" alt="CERT Framework" width="1000">
 </div>
 
 \
