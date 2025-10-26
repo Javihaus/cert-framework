@@ -70,10 +70,10 @@ graph TD
 
     style G fill:#f9f,stroke:#333,stroke-dasharray: 5 5
     style A fill:#e1f5ff,stroke:#01579b,stroke-width:3px
-    style B fill:#c8e6c9,stroke:#2e7d32
-    style C fill:#c8e6c9,stroke:#2e7d32
-    style D fill:#c8e6c9,stroke:#2e7d32
-    style E fill:#c8e6c9,stroke:#2e7d32
+    style B fill:#c8e6c9,stroke:#000000
+    style C fill:#c8e6c9,stroke:#000000
+    style D fill:#c8e6c9,stroke:#000000
+    style E fill:#c8e6c9,stroke:#000000
     style F fill:#ffeb3b,stroke:#f57f17,stroke-width:2px
 ```
 
