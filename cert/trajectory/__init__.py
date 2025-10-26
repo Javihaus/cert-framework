@@ -17,7 +17,7 @@ Version: 1.0.0
 License: MIT
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 # Public API exports
 from cert.trajectory.types import (
@@ -37,14 +37,24 @@ from cert.trajectory.utils import (
     unload_model
 )
 
+# Production API (v2.0+)
+from cert.trajectory.api import HamiltonianMonitor
+from cert.trajectory.engine import HamiltonianEngine
+from cert.trajectory.resources import HamiltonianModelResource
+
 __all__ = [
     # Data structures
     "ReasoningMetrics",
     "TrajectoryAnalysis",
     "TrajectoryConfig",
 
-    # Core monitoring
+    # Core monitoring (legacy)
     "ReasoningTrajectoryMonitor",
+
+    # Production API (v2.0+)
+    "HamiltonianMonitor",
+    "HamiltonianEngine",
+    "HamiltonianModelResource",
 
     # Visualization
     "HamiltonianVisualizer",

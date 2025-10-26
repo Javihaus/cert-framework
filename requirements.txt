@@ -38,6 +38,10 @@ bitsandbytes>=0.41.0
 # Type hints for older Python versions
 typing-extensions>=4.0.0
 
+# Observability and Monitoring (Production Infrastructure v4.0+)
+prometheus-client>=0.19.0  # Prometheus metrics export
+flask>=2.0.0              # Metrics HTTP server (optional)
+
 # ============================================================================
 # Development Dependencies (Optional)
 # Install with: pip install -r requirements-dev.txt

@@ -1,0 +1,95 @@
+groups:
+  - name: cert_framework_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(cert_request_errors_total[5m])) by (service)
+          /
+          sum(rate(cert_requests_total[5m])) by (service)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate in {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} (>5%) for the past 5 minutes"
+
+      # High latency
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(cert_request_duration_seconds_bucket[5m])) by (le, service)
+          ) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency in {{ $labels.service }}"
+          description: "P95 latency is {{ $value }}s (>10s) for the past 5 minutes"
+
+      # Cost limit approaching
+      - alert: CostLimitApproaching
+        expr: |
+          cert_coordination_cost_usd > 8
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API cost approaching hourly limit"
+          description: "Current hourly cost is ${{ $value }} (limit: $10/hour)"
+
+      # Model OOM frequent
+      - alert: FrequentGPUOOM
+        expr: |
+          sum(rate(cert_request_errors_total{error_type="gpu_oom"}[10m])) > 0.1
+        for: 5m
+        labels:
+          severity: error
+        annotations:
+          summary: "Frequent GPU out of memory errors"
+          description: "GPU OOM errors occurring at {{ $value }} per second"
+
+      # Circuit breaker open
+      - alert: CircuitBreakerOpen
+        expr: |
+          sum(rate(cert_coordination_api_calls_total{status="circuit_breaker_open"}[1m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker open for {{ $labels.agent }}"
+          description: "API circuit breaker is open, requests failing fast"
+
+      # Low cache hit rate
+      - alert: LowCacheHitRate
+        expr: |
+          sum(rate(cert_cache_hits_total[10m])) by (cache_type)
+          /
+          (
+            sum(rate(cert_cache_hits_total[10m])) by (cache_type)
+            +
+            sum(rate(cert_cache_misses_total[10m])) by (cache_type)
+          )
+          < 0.5
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low cache hit rate for {{ $labels.cache_type }}"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (<50%)"
+
+      # Quality check failure rate high
+      - alert: HighQualityFailureRate
+        expr: |
+          sum(rate(cert_hamiltonian_quality_checks_total{result="failed"}[5m]))
+          /
+          sum(rate(cert_hamiltonian_quality_checks_total[5m]))
+          > 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High quality check failure rate"
+          description: "Quality failure rate is {{ $value | humanizePercentage }} (>20%)"
