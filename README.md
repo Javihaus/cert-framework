@@ -48,39 +48,39 @@ The framework provides:
 
 ### Technical Architecture
 
-CERT is a **comprehensive compliance platform** providing multiple tools for EU AI Act compliance, accuracy measurement, and continuous monitoring of AI systems. The platform consists of five integrated tools:
+CERT is a **comprehensive compliance platform** providing multiple tools for EU AI Act compliance, accuracy measurement, and continuous monitoring of AI systems.
 
 #### Platform Overview
 
+```mermaid
+graph TD
+    A[CERT Platform<br/>EU AI Act Compliance Tools] --> B[measure<br/>Direct Accuracy Measurement]
+    A --> C[monitor<br/>Continuous LLM Monitoring]
+    A --> D[export_report<br/>Compliance Documentation]
+    A --> E[Presets<br/>Industry Configurations]
+    A --> F[coordinate_agents<br/>Multi-Agent Coordination<br/><i>Coming Soon</i>]
+
+    C -->|uses internally| B
+    C -->|generates| G[Audit Logs]
+    D -->|analyzes| G
+    E -->|configures| C
+
+    style F fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style A fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style B fill:#c8e6c9,stroke:#2e7d32
+    style C fill:#c8e6c9,stroke:#2e7d32
+    style D fill:#c8e6c9,stroke:#2e7d32
+    style E fill:#c8e6c9,stroke:#2e7d32
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                       CERT Platform                             │
-│         EU AI Act Compliance Tools for AI Systems               │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-        ▼                     ▼                     ▼
-  ┌──────────┐         ┌──────────┐         ┌──────────┐
-  │ measure()│         │ monitor()│         │ Presets  │
-  │   Tool   │         │   Tool   │         │   Tool   │
-  └──────────┘         └──────────┘         └──────────┘
-        │                     │                     │
-        │                     │                     │
-        └─────────────────────┴─────────────────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │  export_report() │
-                    │       Tool       │
-                    └──────────────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │ coordinate_agents│
-                    │  (Coming Soon)   │
-                    └──────────────────┘
-```
+
+**Current Tools (v3.0)**:
+- **measure()** - Direct accuracy measurement API
+- **@monitor()** - Decorator for continuous monitoring
+- **export_report()** - Compliance report generation
+- **Presets** - Industry-specific configurations (Healthcare, Financial, Legal, General)
+
+**Planned Tools (Phase 2)**:
+- **coordinate_agents()** - Multi-agent coordination and effectiveness measurement
 
 ---
 
