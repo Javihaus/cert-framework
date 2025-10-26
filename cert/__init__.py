@@ -1,19 +1,26 @@
 """
-CERT Framework v3.0
-===================
+CERT Framework v3.1.0
+======================
 
 EU AI Act Article 15 Compliance Framework for LLM Systems
 
-Clean, simple API for consistency measurement and monitoring.
+Comprehensive platform with 6 integrated tools for AI quality assurance:
+- Consistency measurement (measure)
+- Continuous monitoring (monitor)
+- Trajectory analysis (analyze_trajectory)
+- Compliance reporting (export_report)
+- Industry presets (Preset, PRESETS)
 
 Public API:
     - measure(): Measure consistency between two texts
     - monitor(): Decorator for monitoring LLM outputs
+    - analyze_trajectory(): Real-time LLM generation quality monitoring
+    - export_report(): Generate EU AI Act compliance reports
     - Preset: Industry preset configurations
     - PRESETS: Available preset definitions
 
 Example Usage:
-    >>> from cert import measure, monitor
+    >>> from cert import measure, monitor, analyze_trajectory
     >>>
     >>> # Measure consistency
     >>> result = measure(
@@ -28,11 +35,17 @@ Example Usage:
     ...     context = retrieve(query)
     ...     answer = llm(context, query)
     ...     return answer
+    >>>
+    >>> # Analyze reasoning trajectory
+    >>> from cert.trajectory import load_model_for_monitoring, TrajectoryConfig
+    >>> model, tokenizer = load_model_for_monitoring("model-name")
+    >>> analysis = analyze_trajectory(model, tokenizer, "Your prompt here")
+    >>> print(f"Quality: {'PASSED' if analysis.passed_quality_check else 'FAILED'}")
 
 For detailed documentation, see: https://github.com/Javihaus/cert-framework
 """
 
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 __author__ = "Javier Marin"
 __license__ = "MIT"
 
@@ -41,10 +54,53 @@ from cert.measure import measure
 from cert.monitor import monitor
 from cert.utils import Preset, PRESETS, export_report
 
+# Trajectory monitoring (Tool #6 - NEW in v3.1.0)
+from cert.trajectory import (
+    CERTTrajectoryAnalyzer,
+    TrajectoryConfig,
+    TrajectoryAnalysis,
+    HamiltonianVisualizer,
+    load_model_for_monitoring,
+    unload_model
+)
+
+# Convenience function for simple trajectory analysis
+def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig = None):
+    """
+    Analyze a single generation with trajectory monitoring.
+
+    Args:
+        model: HuggingFace model
+        tokenizer: Corresponding tokenizer
+        prompt: Input prompt
+        config: Optional TrajectoryConfig (uses defaults if None)
+
+    Returns:
+        TrajectoryAnalysis with quality metrics
+
+    Example:
+        >>> model, tokenizer = load_model_for_monitoring("Qwen/Qwen2.5-7B")
+        >>> analysis = analyze_trajectory(model, tokenizer, "Explain AI safety")
+        >>> print(f"Passed: {analysis.passed_quality_check}")
+    """
+    from cert.trajectory import ReasoningTrajectoryMonitor
+    monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
+    return monitor.monitor_generation(prompt)
+
 __all__ = [
+    # v3.0 API
     "measure",
     "monitor",
     "Preset",
     "PRESETS",
     "export_report",
+
+    # v3.1.0 API - Trajectory monitoring
+    "analyze_trajectory",
+    "CERTTrajectoryAnalyzer",
+    "TrajectoryConfig",
+    "TrajectoryAnalysis",
+    "HamiltonianVisualizer",
+    "load_model_for_monitoring",
+    "unload_model",
 ]

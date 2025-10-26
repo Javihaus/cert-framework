@@ -58,26 +58,31 @@ graph TD
     A --> C[monitor<br/>Continuous LLM Monitoring]
     A --> D[export_report<br/>Compliance Documentation]
     A --> E[Presets<br/>Industry Configurations]
-    A --> F[coordinate_agents<br/>Multi-Agent Coordination<br/><i>Coming Soon</i>]
+    A --> F[analyze_trajectory<br/>Real-Time Generation Monitoring<br/><b>NEW in v3.1</b>]
+    A --> G[coordinate_agents<br/>Multi-Agent Coordination<br/><i>Coming Soon</i>]
 
     C -->|uses internally| B
-    C -->|generates| G[Audit Logs]
-    D -->|analyzes| G
+    C -->|generates| H[Audit Logs]
+    D -->|analyzes| H
     E -->|configures| C
+    F -->|generates| I[Trajectory Analysis<br/>& Visualizations]
+    F -->|uses| J[HuggingFace Models]
 
-    style F fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style G fill:#f9f,stroke:#333,stroke-dasharray: 5 5
     style A fill:#e1f5ff,stroke:#01579b,stroke-width:3px
     style B fill:#c8e6c9,stroke:#2e7d32
     style C fill:#c8e6c9,stroke:#2e7d32
     style D fill:#c8e6c9,stroke:#2e7d32
     style E fill:#c8e6c9,stroke:#2e7d32
+    style F fill:#ffeb3b,stroke:#f57f17,stroke-width:2px
 ```
 
-**Current Tools (v3.0)**:
+**Current Tools (v3.1.0)**:
 - **measure()** - Direct accuracy measurement API
 - **@monitor()** - Decorator for continuous monitoring
 - **export_report()** - Compliance report generation
 - **Presets** - Industry-specific configurations (Healthcare, Financial, Legal, General)
+- **analyze_trajectory()** - Real-time LLM generation quality monitoring ✨ **NEW**
 
 **Planned Tools (Phase 2)**:
 - **coordinate_agents()** - Multi-agent coordination and effectiveness measurement
@@ -291,7 +296,162 @@ def strict_financial_rag(query):
 
 ---
 
-#### Tool 5: `coordinate_agents()` - Multi-Agent Coordination (Planned)
+#### Tool 6: `analyze_trajectory()` - Real-Time Generation Monitoring ✨ **NEW**
+
+**Purpose**: Monitor LLM generation quality in real-time with per-token confidence tracking
+
+**Marketing Position**: "Hamiltonian Trajectory Analysis for Production LLM Monitoring"
+
+**Technical Reality**: Per-token perplexity and entropy tracking with configurable quality thresholds
+
+**Architecture**: Physics-inspired monitoring framework with three core metrics:
+
+1. **Perplexity Tracking** ("Potential Energy")
+   - Measures `1 / P(token)` at each generation step
+   - Tracks model confidence/uncertainty
+   - Threshold: Default 50.0 (configurable)
+   - Lower values = higher confidence
+
+2. **Entropy Monitoring** ("Kinetic Energy")
+   - Top-k distribution spread measurement
+   - Formula: `-Σ(p_i * log(p_i))` for top-10 tokens
+   - Threshold: Default 2.5 (configurable)
+   - Lower values = more focused token selection
+
+3. **Cumulative Surprise** ("Hallucination Risk")
+   - Accumulates `-log(P(token))` for low-probability tokens (P < 0.1)
+   - Flags unexpected token choices
+   - Threshold: Default 10.0 (configurable)
+   - Lower values = fewer surprising tokens
+
+**Quality Assessment**:
+```python
+passed = (
+    avg_perplexity < perplexity_threshold AND
+    max_entropy < entropy_threshold AND
+    cumulative_surprise < surprise_threshold
+)
+```
+
+**Output Artifacts**:
+
+1. **Trajectory Visualizations** (4-panel plots):
+   - Perplexity over time (Potential Energy)
+   - Entropy over time (Kinetic Energy)
+   - Combined metric (Total Hamiltonian Energy)
+   - Cumulative surprise (Hallucination Risk Indicator)
+
+2. **Compliance Reports**:
+   - Pass/fail quality determination
+   - Detailed metric breakdowns
+   - EU AI Act Article 15 compliance notes
+   - Deployment recommendations
+
+3. **JSON Results**:
+   - Per-token metrics
+   - Summary statistics
+   - Threshold comparisons
+   - Timestamp and model metadata
+
+**Memory Management**:
+- 8-bit quantization for efficient loading (7B+ models)
+- Automatic GPU cache clearing
+- Model unloading utilities
+- Supports: Qwen, DeepSeek, Llama, Mistral, etc.
+
+**Use Case**: Production deployment gates, quality assurance, hallucination detection
+
+**Basic Usage**:
+```python
+from cert import analyze_trajectory, load_model_for_monitoring
+
+# Load model with 8-bit quantization
+model, tokenizer = load_model_for_monitoring(
+    "Qwen/Qwen2.5-7B-Instruct",
+    use_8bit=True
+)
+
+# Analyze generation quality
+analysis = analyze_trajectory(
+    model,
+    tokenizer,
+    "Explain quantum computing in simple terms"
+)
+
+# Check results
+print(f"Status: {'✓ PASSED' if analysis.passed_quality_check else '✗ FAILED'}")
+print(f"Avg Perplexity: {analysis.avg_perplexity:.2f}")
+print(f"Max Entropy: {analysis.max_entropy:.2f}")
+print(f"Final Surprise: {analysis.final_surprise:.2f}")
+```
+
+**Advanced Usage with Visualization**:
+```python
+from cert.trajectory import (
+    CERTTrajectoryAnalyzer,
+    HamiltonianVisualizer,
+    TrajectoryConfig
+)
+
+# Configure thresholds
+config = TrajectoryConfig(
+    perplexity_threshold=40.0,  # Stricter than default
+    entropy_threshold=2.0,
+    surprise_threshold=8.0,
+    max_new_tokens=200
+)
+
+# Create analyzer
+analyzer = CERTTrajectoryAnalyzer(config=config)
+
+# Analyze model on multiple prompts
+test_prompts = [
+    "What causes climate change?",
+    "Explain photosynthesis.",
+    "How do vaccines work?"
+]
+
+results = analyzer.analyze_model(
+    model=model,
+    tokenizer=tokenizer,
+    test_prompts=test_prompts
+)
+
+# Generate visualizations
+for prompt, analysis in results.items():
+    HamiltonianVisualizer.plot_trajectory(
+        analysis,
+        save_path=f"trajectory_{analysis.generation_steps}.png"
+    )
+
+    # Generate compliance report
+    report = HamiltonianVisualizer.generate_compliance_report(
+        analysis,
+        save_path=f"compliance_{analysis.generation_steps}.txt"
+    )
+
+# Export results
+analyzer.export_results(results, output_dir="./trajectory_results", model_name="Qwen2.5-7B")
+
+# Summary statistics
+summary = analyzer.get_summary_statistics(results)
+print(f"Pass Rate: {summary['pass_rate']*100:.1f}%")
+print(f"Avg Perplexity: {summary['avg_perplexity']:.2f}")
+```
+
+**Business Value**:
+- Catches hallucinations before production deployment
+- Provides quantitative quality gates for automated systems
+- Generates visual artifacts for stakeholder presentations
+- Creates EU AI Act compliance documentation
+- Differentiates from commodity logging tools
+
+**Technical Honesty Note**:
+This tool monitors token prediction confidence, not "reasoning" in the cognitive sense. The Hamiltonian terminology is a visualization metaphor that maps perplexity to "potential energy" and entropy to "kinetic energy" - this creates intuitive, memorable plots for stakeholders while providing solid engineering metrics underneath.
+
+---
+
+#### Tool 7: `coordinate_agents()` - Multi-Agent Coordination (Planned)
 
 **Purpose**: Measure and monitor coordination effectiveness in multi-agent systems
 
@@ -340,24 +500,49 @@ print(f"Consensus rate: {result.consensus_rate}")
 2. **Production Monitoring**: `@monitor()` uses `measure()` internally for continuous tracking
 3. **Configuration**: `Presets` provide industry-specific thresholds for `monitor()`
 4. **Documentation**: `export_report()` analyzes audit logs generated by `monitor()`
-5. **Future Integration**: `coordinate_agents()` will extend platform to multi-agent systems
+5. **Real-Time Quality**: `analyze_trajectory()` monitors per-token generation quality ✨ **NEW**
+6. **Future Integration**: `coordinate_agents()` will extend platform to multi-agent systems
 
 **Data Flow**:
 ```
-Your LLM Function
-       │
-       ▼
-  @monitor()  ────► measure() ────► Accuracy Score
-       │                                  │
-       ▼                                  │
-  Audit Log                               │
-       │                                  │
-       ▼                                  ▼
+Your LLM Function                    HuggingFace Model
+       │                                    │
+       ▼                                    ▼
+  @monitor()  ────► measure() ───► analyze_trajectory()
+       │              │                     │
+       │              │                     │
+       ▼              ▼                     ▼
+  Audit Log    Accuracy Score    Trajectory Analysis
+       │              │                     │
+       │              │                     ├──► Visualizations
+       │              │                     │    (4-panel plots)
+       │              │                     │
+       │              │                     └──► Compliance Reports
+       │              │                          (Pass/Fail gates)
+       ▼              ▼
 export_report() ◄──────── Statistics & Compliance Status
        │
        ▼
  EU AI Act Compliance Report
 ```
+
+**Tool Integration Patterns**:
+
+- **measure() + monitor()**: Continuous post-hoc analysis of existing outputs
+- **analyze_trajectory()**: Real-time monitoring during generation (requires model access)
+- **export_report()**: Aggregates data from monitor() for compliance documentation
+- **Presets**: Configure thresholds for both monitor() and analyze_trajectory()
+
+**When to Use Which Tool**:
+
+| Scenario | Recommended Tool(s) |
+|----------|-------------------|
+| Monitor production RAG system | `@monitor()` |
+| Gate model deployments | `analyze_trajectory()` |
+| Compare two specific texts | `measure()` |
+| Generate compliance docs | `export_report()` |
+| Industry-standard config | `Presets` |
+| Multi-agent coordination | `coordinate_agents()` (coming soon) |
 
 This integrated platform approach ensures comprehensive compliance coverage while maintaining simplicity through clean, composable APIs.
 
