@@ -313,8 +313,14 @@ class TestAuditLogger:
             assert log_path.exists()
 
             with open(log_path) as f:
-                line = f.readline()
-                entry = json.loads(line)
+                # Skip header line (first entry is header)
+                header_line = f.readline()
+                header = json.loads(header_line)
+                assert header["type"] == "header"
+
+                # Read request entry (second line)
+                request_line = f.readline()
+                entry = json.loads(request_line)
                 assert entry["type"] == "request"
                 assert entry["function"] == "test_function"
                 assert entry["accuracy_score"] == 0.95
