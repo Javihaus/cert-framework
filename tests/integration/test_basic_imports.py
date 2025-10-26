@@ -151,6 +151,7 @@ class TestConfiguration:
     def test_metrics_config(self):
         """Test metrics configuration."""
         from cert.observability import MetricsCollector
+        from cert.observability.metrics import PROMETHEUS_AVAILABLE
 
         metrics = MetricsCollector(
             namespace="test",
@@ -158,4 +159,8 @@ class TestConfiguration:
         )
 
         assert metrics.namespace == "test"
-        assert metrics.enabled is True
+        # Metrics are only enabled if prometheus_client is available
+        if PROMETHEUS_AVAILABLE:
+            assert metrics.enabled is True
+        else:
+            assert metrics.enabled is False

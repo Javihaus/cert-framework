@@ -52,17 +52,36 @@ class ResourceLoadError(ResourceError):
     """Failed to load resource (model, API client)."""
 
     def __init__(self, message: str, **kwargs):
-        kwargs.setdefault("error_type", "ResourceLoadError")
-        super().__init__(message, **kwargs)
+        # Don't pass error_type in kwargs - set it directly in CERTError
+        recoverable = kwargs.pop("recoverable", True)
+        retry_after = kwargs.pop("retry_after", None)
+        context = kwargs.pop("context", None)
+        CERTError.__init__(
+            self,
+            message,
+            error_type="ResourceLoadError",
+            recoverable=recoverable,
+            retry_after=retry_after,
+            context=context,
+        )
 
 
 class GPUOutOfMemoryError(ResourceError):
     """GPU memory exhausted."""
 
     def __init__(self, message: str = "GPU memory exhausted", **kwargs):
-        kwargs.setdefault("error_type", "GPUOutOfMemoryError")
-        kwargs.setdefault("recoverable", True)
-        super().__init__(message, **kwargs)
+        # Don't pass error_type in kwargs - set it directly in CERTError
+        recoverable = kwargs.pop("recoverable", True)
+        retry_after = kwargs.pop("retry_after", None)
+        context = kwargs.pop("context", None)
+        CERTError.__init__(
+            self,
+            message,
+            error_type="GPUOutOfMemoryError",
+            recoverable=recoverable,
+            retry_after=retry_after,
+            context=context,
+        )
 
 
 class EmbeddingTimeoutError(CERTError):
