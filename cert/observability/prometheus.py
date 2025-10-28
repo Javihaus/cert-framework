@@ -269,7 +269,7 @@ def export_metrics_from_audit_log(
                     time.time()
                 )
 
-            except (json.JSONDecodeError, KeyError) as e:
+            except (json.JSONDecodeError, KeyError):
                 # Skip malformed entries
                 continue
 

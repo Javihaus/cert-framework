@@ -13,7 +13,6 @@ Usage:
 """
 
 from typing import Any, Dict, Optional, Union
-import functools
 
 from cert import monitor
 

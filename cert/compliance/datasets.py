@@ -5,7 +5,7 @@ with gold-standard answers for benchmarking accuracy over time.
 """
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
