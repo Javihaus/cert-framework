@@ -2,9 +2,11 @@
 
 **Future Enhancement: Professional EU AI Act Compliance Reports**
 
-Version: 3.0.0
-Last Updated: 2025-10-26
+Version: 2.0.0
+Last Updated: 2025-10-28
 Status: Implementation Guide (Not Yet Implemented)
+
+**Note**: As of v2.0.0, text reports now include Section 7: Failure Analysis with detailed explanations for non-compliant requests.
 
 ---
 
@@ -25,12 +27,18 @@ Status: Implementation Guide (Not Yet Implemented)
 
 ## Overview
 
-### Current State (v3.0)
+### Current State (v2.0.0)
 
 CERT Framework currently generates compliance reports in three formats:
-- **Text (.txt)**: Plain-text with ASCII art borders
+- **Text (.txt)**: Plain-text with ASCII art borders (includes Section 7: Failure Analysis)
 - **JSON (.json)**: Machine-readable structured data
 - **CSV (.csv)**: Spreadsheet-compatible tabular data
+
+**Current Features (v2.0.0)**:
+- Section 7: Failure Analysis with human-readable explanations
+- Evidence-based failure reasons (contradiction, hallucination, off-topic)
+- Severity assessment (high/medium/low)
+- Actionable recommendations for each failure
 
 **Enhancement Need**: Professional PDF reports with:
 - Proper visual design and typography
@@ -352,10 +360,63 @@ cert-framework/
     </div>
 </section>
 
-<!-- Section 7: Recommendations -->
+<!-- Section 7: Failure Analysis -->
 <section class="report-section" id="section-7">
     <h1 class="section-header">
         <span class="section-number">Section 7</span>
+        Failure Analysis
+    </h1>
+
+    {% if failure_explanations %}
+    <p>This section provides detailed analysis of non-compliant requests with actionable recommendations for improvement.</p>
+
+    <p><strong>Total Non-Compliant Requests:</strong> {{ failure_explanations|length }}</p>
+
+    {% for failure in failure_explanations[-5:] %}
+    <div class="failure-box">
+        <h3>Failure #{{ loop.index }}</h3>
+        <div class="failure-meta">
+            <span><strong>Timestamp:</strong> {{ failure.timestamp }}</span>
+            <span><strong>Function:</strong> {{ failure.function }}</span>
+        </div>
+
+        <p><strong>Reason:</strong> {{ failure.explanation.reason }}</p>
+        <p><strong>Severity:</strong> <span class="severity-{{ failure.explanation.severity }}">{{ failure.explanation.severity|upper }}</span></p>
+
+        <div class="evidence-section">
+            <strong>Evidence:</strong>
+            <ul>
+                {% for evidence in failure.explanation.evidence %}
+                <li>{{ evidence }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="recommendation-box">
+            <strong>Recommendation:</strong>
+            <p>{{ failure.explanation.recommendation }}</p>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if failure_explanations|length > 5 %}
+    <p class="note">(Showing 5 most recent failures. Total: {{ failure_explanations|length }})</p>
+    {% endif %}
+
+    {% else %}
+    <p>No failure explanations available. This indicates either:</p>
+    <ul>
+        <li>All requests are compliant (100% compliance rate)</li>
+        <li>Monitoring has just been enabled</li>
+        <li>Audit log does not yet contain detailed failure data</li>
+    </ul>
+    {% endif %}
+</section>
+
+<!-- Section 8: Recommendations -->
+<section class="report-section" id="section-8">
+    <h1 class="section-header">
+        <span class="section-number">Section 8</span>
         Recommendations & Continuous Improvement
     </h1>
 
@@ -372,7 +433,7 @@ cert-framework/
     {% endif %}
 </section>
 
-<!-- Section 8: Disclaimers -->
+<!-- Section 9: Disclaimers -->
 {% include 'components/disclaimers.html' %}
 
 {% endblock %}
@@ -628,6 +689,72 @@ table tbody tr:nth-child(even) {
 
 .reference-box li {
     margin: 0.3em 0;
+}
+
+/* === FAILURE ANALYSIS === */
+.failure-box {
+    background: #fff;
+    border: 2px solid #ddd;
+    border-left: 4px solid #dc3545;
+    border-radius: 4px;
+    padding: 1.5em;
+    margin: 1em 0;
+    page-break-inside: avoid;
+}
+
+.failure-box h3 {
+    color: #dc3545;
+    margin-top: 0;
+}
+
+.failure-meta {
+    display: flex;
+    gap: 2em;
+    font-size: 9pt;
+    color: #666;
+    margin-bottom: 1em;
+}
+
+.severity-high {
+    color: #dc3545;
+    font-weight: 700;
+}
+
+.severity-medium {
+    color: #fd7e14;
+    font-weight: 600;
+}
+
+.severity-low {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.evidence-section {
+    background: #f8f9fa;
+    border-left: 3px solid #6c757d;
+    padding: 0.75em 1em;
+    margin: 1em 0;
+}
+
+.evidence-section ul {
+    margin: 0.5em 0 0 1.5em;
+}
+
+.evidence-section li {
+    margin: 0.3em 0;
+}
+
+.recommendation-box {
+    background: #e7f3ff;
+    border-left: 3px solid #0056b3;
+    padding: 0.75em 1em;
+    margin: 1em 0 0 0;
+}
+
+.recommendation-box p {
+    margin: 0.3em 0 0 0;
+    color: #004085;
 }
 
 /* === DISCLAIMERS === */
@@ -1127,7 +1254,7 @@ export_pdf_report(
 
 **Questions?**
 - GitHub Issues: https://github.com/Javihaus/cert-framework/issues
-- Email: info@cert-framework.com
 
-**Document Version**: 1.0
-**Last Updated**: 2025-10-26
+**Document Version**: 1.1
+**Last Updated**: 2025-10-28
+**Changes in v1.1**: Updated for Phase 2 (Explanation System) - Added Section 7: Failure Analysis
