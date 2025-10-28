@@ -12,5 +12,5 @@ __all__ = [
     "PRESETS",
     "get_preset",
     "export_report",  # Re-exported from cert.compliance
-    "show_report",    # Re-exported from cert.compliance
+    "show_report",  # Re-exported from cert.compliance
 ]

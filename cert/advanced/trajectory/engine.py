@@ -19,7 +19,11 @@ import json
 import torch
 import numpy as np
 
-from cert.advanced.trajectory.types import TrajectoryAnalysis, TrajectoryConfig, ReasoningMetrics
+from cert.advanced.trajectory.types import (
+    TrajectoryAnalysis,
+    TrajectoryConfig,
+    ReasoningMetrics,
+)
 from cert.advanced.trajectory.resources import HamiltonianModelResource
 from cert.core.errors import (
     AnalysisError,

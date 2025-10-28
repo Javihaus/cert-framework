@@ -20,7 +20,11 @@ License: MIT
 __version__ = "2.0.0"
 
 # Public API exports
-from cert.advanced.trajectory.types import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
+from cert.advanced.trajectory.types import (
+    ReasoningMetrics,
+    TrajectoryAnalysis,
+    TrajectoryConfig,
+)
 
 from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
 
@@ -61,6 +65,7 @@ def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig =
     """
     monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
     return monitor.monitor_generation(prompt)
+
 
 __all__ = [
     # Data structures

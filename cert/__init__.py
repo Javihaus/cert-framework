@@ -63,14 +63,20 @@ def __getattr__(name):
     import warnings
 
     # Trajectory imports moved to advanced
-    if name in ["analyze_trajectory", "CERTTrajectoryAnalyzer", "TrajectoryConfig",
-                "TrajectoryAnalysis", "load_model_for_monitoring", "unload_model",
-                "HamiltonianVisualizer"]:
+    if name in [
+        "analyze_trajectory",
+        "CERTTrajectoryAnalyzer",
+        "TrajectoryConfig",
+        "TrajectoryAnalysis",
+        "load_model_for_monitoring",
+        "unload_model",
+        "HamiltonianVisualizer",
+    ]:
         warnings.warn(
             f"Importing '{name}' from cert is deprecated. "
             f"Use: from cert.advanced.trajectory import {name}",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         # Import from new location
@@ -83,12 +89,15 @@ def __getattr__(name):
                 DEPRECATED: Import from cert.advanced.trajectory instead.
                 """
                 from cert.advanced.trajectory import ReasoningTrajectoryMonitor
+
                 monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
                 return monitor.monitor_generation(prompt)
+
             return analyze_trajectory
         else:
             # Import other trajectory components
             from cert.advanced import trajectory
+
             return getattr(trajectory, name)
 
     # Coordination imports moved to advanced
@@ -97,9 +106,10 @@ def __getattr__(name):
             f"Importing '{name}' from cert is deprecated. "
             f"Use: from cert.advanced.coordination import {name}",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
         from cert.advanced import coordination
+
         return getattr(coordination, name)
 
     raise AttributeError(f"module 'cert' has no attribute '{name}'")
