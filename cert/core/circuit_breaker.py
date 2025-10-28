@@ -1,7 +1,22 @@
 """
 Circuit breaker pattern for external service calls.
 
-Prevents cascading failures when services are degraded.
+Prevents cascading failures when external services are degraded.
+
+WHEN TO USE:
+- External API calls (Anthropic, OpenAI, etc.)
+- Database connections
+- Network requests
+- Any remote service that can fail
+
+WHEN NOT TO USE:
+- Local model inference (embeddings, NLI)
+- File I/O operations
+- In-memory computation
+- Fast local operations that fail deterministically
+
+Circuit breakers add latency and complexity. Use them only where cascading
+failures are possible (Service A down → Circuit opens → Service B doesn't wait).
 
 States:
 - CLOSED: Normal operation, all requests pass through
@@ -13,6 +28,15 @@ Transitions:
 - OPEN → HALF_OPEN: After recovery_timeout
 - HALF_OPEN → CLOSED: After success_threshold consecutive successes
 - HALF_OPEN → OPEN: On any failure
+
+Example:
+    >>> from cert.core.circuit_breaker import CircuitBreaker
+    >>>
+    >>> # Protect external API calls
+    >>> breaker = CircuitBreaker(failure_threshold=5, name="anthropic_api")
+    >>>
+    >>> def call_external_api():
+    >>>     return breaker.call(lambda: anthropic.complete(...))
 """
 
 import logging
