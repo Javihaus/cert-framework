@@ -1,6 +1,7 @@
 """Tests for compliance experiments module."""
 
 import json
+import pytest
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +11,19 @@ from cert.compliance.experiments import (
     run_experiment,
     compare_experiments,
     load_experiments_from_directory,
+)
+
+# Check if required dependencies are available for NLI-based experiments
+try:
+    import protobuf  # noqa: F401
+    import tiktoken  # noqa: F401
+    NLI_DEPS_AVAILABLE = True
+except ImportError:
+    NLI_DEPS_AVAILABLE = False
+
+requires_nli_deps = pytest.mark.skipif(
+    not NLI_DEPS_AVAILABLE,
+    reason="NLI dependencies (protobuf, tiktoken) not available"
 )
 
 
@@ -55,6 +69,7 @@ def test_experiment_run_save_and_load(tmp_path):
     assert loaded.results == original.results
 
 
+@requires_nli_deps
 def test_run_experiment_basic():
     """Test running a basic experiment."""
     # Create test dataset
@@ -96,6 +111,7 @@ def test_run_experiment_basic():
     assert run.results["pass_rate"] == 1.0
 
 
+@requires_nli_deps
 def test_run_experiment_with_failures():
     """Test experiment with some failures."""
     dataset = EvaluationDataset(
