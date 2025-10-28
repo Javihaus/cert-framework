@@ -24,13 +24,17 @@ class TestImports:
         assert HealthChecker is not None
 
     def test_observability_imports(self):
-        """Test observability imports."""
+        """Test observability imports (Prometheus integration)."""
         from cert.observability import (
-            configure_logging,
-            MetricsCollector,
+            export_metrics_from_audit_log,
+            start_metrics_server,
+            get_metrics_text,
+            create_grafana_dashboard_json,
         )
-        assert configure_logging is not None
-        assert MetricsCollector is not None
+        assert export_metrics_from_audit_log is not None
+        assert start_metrics_server is not None
+        assert get_metrics_text is not None
+        assert create_grafana_dashboard_json is not None
 
     def test_trajectory_imports(self):
         """Test trajectory (Hamiltonian) imports."""
@@ -134,33 +138,30 @@ class TestConfiguration:
         config_dict = config.to_dict()
         assert config_dict["perplexity_threshold"] == 100.0
 
-    def test_logging_config(self):
-        """Test logging configuration."""
-        from cert.observability import configure_logging
+    def test_prometheus_dashboard_creation(self):
+        """Test Grafana dashboard JSON creation."""
+        from cert.observability import create_grafana_dashboard_json
 
-        # Should configure without errors
-        configure_logging(
-            level="INFO",
-            format="human",
-            output="stdout",
-        )
+        # Should create dashboard without errors
+        dashboard = create_grafana_dashboard_json(system_name="test")
 
-        # Test passes if no exception
-        assert True
+        # Basic validation
+        assert isinstance(dashboard, dict)
+        assert "dashboard" in dashboard
+        assert "panels" in dashboard["dashboard"]
+        assert len(dashboard["dashboard"]["panels"]) > 0
 
-    def test_metrics_config(self):
-        """Test metrics configuration."""
-        from cert.observability import MetricsCollector
-        from cert.observability.metrics import PROMETHEUS_AVAILABLE
+    def test_prometheus_metrics_export(self):
+        """Test Prometheus metrics text export."""
+        try:
+            from cert.observability import get_metrics_text
 
-        metrics = MetricsCollector(
-            namespace="test",
-            enabled=True,
-        )
+            # Should get metrics text without errors
+            metrics_text = get_metrics_text()
 
-        assert metrics.namespace == "test"
-        # Metrics are only enabled if prometheus_client is available
-        if PROMETHEUS_AVAILABLE:
-            assert metrics.enabled is True
-        else:
-            assert metrics.enabled is False
+            assert isinstance(metrics_text, str)
+            # Should contain HELP and TYPE declarations
+            assert "# HELP" in metrics_text or "# TYPE" in metrics_text
+        except ImportError:
+            # prometheus_client not installed - skip test
+            pytest.skip("prometheus_client not available")
