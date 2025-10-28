@@ -272,7 +272,9 @@ def create_monitored_openai_stream(
                     if isinstance(content, str):
                         context_parts.append(f"{role}: {content}")
 
-                context = "\n\n".join(context_parts) if context_parts else "(no context)"
+                context = (
+                    "\n\n".join(context_parts) if context_parts else "(no context)"
+                )
 
                 answer = ""
                 if hasattr(response, "choices") and response.choices:

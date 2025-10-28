@@ -83,7 +83,9 @@ def wrap_langchain_chain(
 
         # Extract answer
         if isinstance(result, dict):
-            answer = result.get("result") or result.get("answer") or result.get("output", "")
+            answer = (
+                result.get("result") or result.get("answer") or result.get("output", "")
+            )
         else:
             answer = str(result)
 
@@ -188,7 +190,7 @@ def wrap_langchain_agent(
         context = ""
         if isinstance(result, dict) and "intermediate_steps" in result:
             steps = result["intermediate_steps"]
-            context = "\n".join(f"Step {i+1}: {step}" for i, step in enumerate(steps))
+            context = "\n".join(f"Step {i + 1}: {step}" for i, step in enumerate(steps))
 
         # Extract answer
         if isinstance(result, dict):
