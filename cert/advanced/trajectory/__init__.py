@@ -1,19 +1,34 @@
 """
 Reasoning Trajectory Monitor for CERT Framework.
 
-MARKETING POSITION:
-"Physics-inspired Hamiltonian trajectory analysis for production LLM monitoring"
+⚠️ EXPERIMENTAL RESEARCH TOOL ⚠️
 
-ENGINEERING REALITY:
-Per-token perplexity and entropy tracking with quality thresholds for:
-- Hallucination detection
-- Quality assurance gates
-- EU AI Act compliance documentation
+This module provides per-token perplexity and entropy tracking for LLM generation
+quality monitoring. It is NOT optimized for production scale.
 
-This extends CERT Framework's Trustworthiness (T) dimension as Tool #6.
+WHAT THIS IS:
+- Research tool for trajectory analysis
+- Per-token metrics (perplexity, entropy, surprise)
+- Quality threshold detection
+- Useful for debugging and model evaluation
+
+WHAT THIS IS NOT:
+- Production monitoring system (use cert.monitor instead)
+- High-throughput analysis (no batch optimization)
+- GPU-optimized (runs on whatever torch defaults to)
+
+PERFORMANCE CHARACTERISTICS:
+- Model loading: 5-30 seconds (depends on model size)
+- Analysis per prompt: 1-10 seconds (depends on generation length)
+- Memory: ~500MB-4GB (depends on model)
+- Recommended for: Offline analysis, debugging, research
+- Not recommended for: Real-time monitoring, high-throughput serving
+
+For production accuracy monitoring, use:
+    from cert import measure, monitor
 
 Author: Javier Marín
-Version: 1.0.0
+Version: 2.0.0 (Experimental)
 License: MIT
 """
 
