@@ -6,6 +6,10 @@ Tests the wrapping of Anthropic clients and streaming support.
 
 import pytest
 from unittest.mock import Mock, MagicMock
+
+# Skip all tests if anthropic not installed
+pytest.importorskip("anthropic")
+
 from cert.integrations.anthropic import (
     wrap_anthropic_client,
     wrap_anthropic_completion,

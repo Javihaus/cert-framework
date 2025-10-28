@@ -6,6 +6,10 @@ Tests the wrapping of LlamaIndex query engines, chat engines, and agents.
 
 import pytest
 from unittest.mock import Mock, MagicMock
+
+# Skip all tests if llama_index not installed
+pytest.importorskip("llama_index")
+
 from cert.integrations.llamaindex import (
     wrap_llamaindex_engine,
     wrap_llamaindex_agent,
@@ -101,8 +105,12 @@ class TestLlamaIndexIntegration:
 
     def test_wrap_query_engine_response_string(self):
         """Test handling when response doesn't have .response attribute."""
-        mock_response = Mock(spec=[])
-        mock_response.__str__ = lambda: "String response"
+        # Create a custom class that returns string when converted
+        class StringResponse:
+            def __str__(self):
+                return "String response"
+
+        mock_response = StringResponse()
 
         mock_engine = Mock()
         mock_engine.query = Mock(return_value=mock_response)

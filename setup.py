@@ -50,9 +50,13 @@ setup(
         "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison
         "torch>=1.11.0",  # PyTorch for embeddings and NLI
         "transformers>=4.30.0",  # NLI models for hallucination detection
+        "tiktoken>=0.5.0",  # Tokenization support for transformers
+        "protobuf>=3.20.0",  # Protobuf support for transformers
         "numpy>=1.21.0",  # Numerical operations
         "scipy>=1.7.0",  # Scientific computing for metrics
         "typing-extensions>=4.0.0",  # Type hints for older Python
+        # Observability and Monitoring
+        "prometheus-client>=0.19.0",  # Prometheus metrics export
         # LLM Provider SDKs (for agents)
         "anthropic>=0.18.0",  # Anthropic Claude API
         "openai>=1.0.0",  # OpenAI GPT API (also used by xAI)

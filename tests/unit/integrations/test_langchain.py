@@ -6,6 +6,10 @@ Tests the wrapping of LangChain chains, agents, and callbacks.
 
 import pytest
 from unittest.mock import Mock, MagicMock
+
+# Skip all tests if langchain not installed
+pytest.importorskip("langchain")
+
 from cert.integrations.langchain import (
     wrap_langchain_chain,
     wrap_langchain_agent,
