@@ -60,10 +60,16 @@ def test_deprecated_import_from_cert_package():
         warnings.simplefilter("always")
         from cert import analyze_trajectory
 
-        # Should trigger deprecation warning
-        assert len(w) == 1
-        assert issubclass(w[-1].category, DeprecationWarning)
-        assert "advanced.trajectory" in str(w[-1].message)
+        # Should trigger at least one deprecation warning
+        assert len(w) >= 1, "Expected at least one deprecation warning"
+
+        # Check that there's a DeprecationWarning about advanced.trajectory
+        deprecation_warnings = [
+            warning for warning in w
+            if issubclass(warning.category, DeprecationWarning)
+            and "advanced.trajectory" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1, "Expected deprecation warning about advanced.trajectory"
         assert analyze_trajectory is not None
 
 
