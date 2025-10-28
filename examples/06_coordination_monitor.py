@@ -10,7 +10,11 @@ Dependencies: cert-framework
 """
 
 try:
-    from cert.coordination import CoordinationOrchestrator, QualityEvaluator, BaselineMeasurer
+    from cert.advanced.coordination import (
+        CoordinationOrchestrator,
+        QualityEvaluator,
+        BaselineMeasurer
+    )
     COORDINATION_AVAILABLE = True
 except ImportError:
     COORDINATION_AVAILABLE = False

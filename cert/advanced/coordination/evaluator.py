@@ -12,7 +12,7 @@ import logging
 import numpy as np
 from typing import Dict, List, Optional
 
-from cert.coordination.client import AnthropicClientWithResilience
+from cert.advanced.coordination.client import AnthropicClientWithResilience
 
 logger = logging.getLogger(__name__)
 

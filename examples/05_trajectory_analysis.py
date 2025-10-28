@@ -10,7 +10,12 @@ Dependencies: cert-framework[trajectory]
 """
 
 try:
-    from cert import analyze_trajectory, TrajectoryConfig, load_model_for_monitoring, unload_model
+    from cert.advanced.trajectory import (
+        analyze_trajectory,
+        TrajectoryConfig,
+        load_model_for_monitoring,
+        unload_model
+    )
     TRAJECTORY_AVAILABLE = True
 except ImportError:
     TRAJECTORY_AVAILABLE = False

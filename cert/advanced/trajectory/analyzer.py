@@ -11,8 +11,8 @@ import os
 from datetime import datetime
 from typing import List, Dict
 
-from cert.trajectory.monitor import ReasoningTrajectoryMonitor
-from cert.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
+from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
+from cert.advanced.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
 
 
 class CERTTrajectoryAnalyzer:

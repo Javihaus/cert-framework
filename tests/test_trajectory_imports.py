@@ -5,13 +5,13 @@ import pytest
 
 def test_import_trajectory_module():
     """Test trajectory module can be imported."""
-    import cert.trajectory
-    assert cert.trajectory.__version__ is not None
+    import cert.advanced.trajectory
+    assert cert.advanced.trajectory.__version__ is not None
 
 
 def test_import_trajectory_types():
     """Test trajectory types can be imported."""
-    from cert.trajectory import (
+    from cert.advanced.trajectory import (
         ReasoningMetrics,
         TrajectoryAnalysis,
         TrajectoryConfig
@@ -24,7 +24,7 @@ def test_import_trajectory_types():
 
 def test_import_trajectory_monitor():
     """Test trajectory monitor can be imported."""
-    from cert.trajectory import ReasoningTrajectoryMonitor
+    from cert.advanced.trajectory import ReasoningTrajectoryMonitor
 
     assert ReasoningTrajectoryMonitor is not None
 
@@ -32,54 +32,44 @@ def test_import_trajectory_monitor():
 def test_import_trajectory_visualizer():
     """Test trajectory visualizer can be imported (requires matplotlib)."""
     pytest.importorskip("matplotlib")
-    from cert.trajectory import HamiltonianVisualizer
+    from cert.advanced.trajectory import HamiltonianVisualizer
 
     assert HamiltonianVisualizer is not None
 
 
 def test_import_trajectory_analyzer():
     """Test trajectory analyzer can be imported."""
-    from cert.trajectory import CERTTrajectoryAnalyzer
+    from cert.advanced.trajectory import CERTTrajectoryAnalyzer
 
     assert CERTTrajectoryAnalyzer is not None
 
 
 def test_import_trajectory_utils():
     """Test trajectory utils can be imported."""
-    from cert.trajectory import load_model_for_monitoring, unload_model
+    from cert.advanced.trajectory import load_model_for_monitoring, unload_model
 
     assert load_model_for_monitoring is not None
     assert unload_model is not None
 
 
-def test_import_from_cert_package():
-    """Test trajectory can be imported from main cert package."""
-    from cert import (
-        analyze_trajectory,
-        TrajectoryConfig,
-        TrajectoryAnalysis,
-        load_model_for_monitoring,
-        unload_model
-    )
+def test_deprecated_import_from_cert_package():
+    """Test deprecated trajectory imports from main cert package still work with warning."""
+    import warnings
 
-    assert analyze_trajectory is not None
-    assert TrajectoryConfig is not None
-    assert TrajectoryAnalysis is not None
-    assert load_model_for_monitoring is not None
-    assert unload_model is not None
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        from cert import analyze_trajectory
 
-
-def test_import_visualizer_from_cert_package():
-    """Test HamiltonianVisualizer can be imported from main cert package (requires matplotlib)."""
-    pytest.importorskip("matplotlib")
-    from cert import HamiltonianVisualizer
-
-    assert HamiltonianVisualizer is not None
+        # Should trigger deprecation warning
+        assert len(w) == 1
+        assert issubclass(w[-1].category, DeprecationWarning)
+        assert "advanced.trajectory" in str(w[-1].message)
+        assert analyze_trajectory is not None
 
 
 def test_trajectory_config_defaults():
     """Test TrajectoryConfig has correct defaults."""
-    from cert.trajectory import TrajectoryConfig
+    from cert.advanced.trajectory import TrajectoryConfig
 
     config = TrajectoryConfig()
 
@@ -94,7 +84,7 @@ def test_trajectory_config_defaults():
 
 def test_trajectory_config_custom():
     """Test TrajectoryConfig accepts custom values."""
-    from cert.trajectory import TrajectoryConfig
+    from cert.advanced.trajectory import TrajectoryConfig
 
     config = TrajectoryConfig(
         perplexity_threshold=40.0,
@@ -113,7 +103,7 @@ def test_trajectory_config_custom():
 
 def test_reasoning_metrics_creation():
     """Test ReasoningMetrics can be created."""
-    from cert.trajectory import ReasoningMetrics
+    from cert.advanced.trajectory import ReasoningMetrics
 
     metrics = ReasoningMetrics(
         step=0,
@@ -134,7 +124,7 @@ def test_reasoning_metrics_creation():
 
 def test_reasoning_metrics_to_dict():
     """Test ReasoningMetrics can be converted to dict."""
-    from cert.trajectory import ReasoningMetrics
+    from cert.advanced.trajectory import ReasoningMetrics
 
     metrics = ReasoningMetrics(
         step=0,

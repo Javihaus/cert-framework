@@ -13,10 +13,10 @@ import time
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from cert.coordination.types import AgentResponse, CoordinationMetrics
-from cert.coordination.client import AnthropicClientWithResilience
-from cert.coordination.baseline import BaselineMeasurer
-from cert.coordination.evaluator import QualityEvaluator
+from cert.advanced.coordination.types import AgentResponse, CoordinationMetrics
+from cert.advanced.coordination.client import AnthropicClientWithResilience
+from cert.advanced.coordination.baseline import BaselineMeasurer
+from cert.advanced.coordination.evaluator import QualityEvaluator
 from cert.observability.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)

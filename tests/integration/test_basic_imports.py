@@ -34,7 +34,7 @@ class TestImports:
 
     def test_trajectory_imports(self):
         """Test trajectory (Hamiltonian) imports."""
-        from cert.trajectory import (
+        from cert.advanced.trajectory import (
             HamiltonianMonitor,
             HamiltonianEngine,
             HamiltonianModelResource,
@@ -47,7 +47,7 @@ class TestImports:
 
     def test_coordination_imports(self):
         """Test coordination imports."""
-        from cert.coordination import (
+        from cert.advanced.coordination import (
             AgentResponse,
             CoordinationMetrics,
             AnthropicClientWithResilience,
@@ -64,7 +64,7 @@ class TestImports:
 
     def test_backward_compatibility(self):
         """Test v3.x API still available."""
-        from cert.trajectory import (
+        from cert.advanced.trajectory import (
             ReasoningTrajectoryMonitor,
             load_model_for_monitoring,
         )
@@ -77,7 +77,7 @@ class TestAPIAvailability:
 
     def test_trajectory_api(self):
         """Test trajectory API instantiation."""
-        from cert.trajectory import HamiltonianMonitor, TrajectoryConfig
+        from cert.advanced.trajectory import HamiltonianMonitor, TrajectoryConfig
 
         config = TrajectoryConfig(
             perplexity_threshold=50.0,
@@ -97,7 +97,7 @@ class TestAPIAvailability:
 
     def test_coordination_types(self):
         """Test coordination types."""
-        from cert.coordination import AgentResponse, CoordinationMetrics
+        from cert.advanced.coordination import AgentResponse, CoordinationMetrics
         from datetime import datetime
 
         response = AgentResponse(
@@ -118,7 +118,7 @@ class TestConfiguration:
 
     def test_trajectory_config(self):
         """Test trajectory configuration."""
-        from cert.trajectory import TrajectoryConfig
+        from cert.advanced.trajectory import TrajectoryConfig
 
         config = TrajectoryConfig(
             perplexity_threshold=100.0,

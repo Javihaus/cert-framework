@@ -14,9 +14,9 @@ import logging
 import uuid
 from typing import List, Optional, Union
 
-from cert.trajectory.engine import HamiltonianEngine
-from cert.trajectory.resources import HamiltonianModelResource
-from cert.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
+from cert.advanced.trajectory.engine import HamiltonianEngine
+from cert.advanced.trajectory.resources import HamiltonianModelResource
+from cert.advanced.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
 from cert.core.errors import AnalysisError
 from cert.core.health import HealthChecker, HealthCheckResult
 from cert.observability.metrics import MetricsCollector

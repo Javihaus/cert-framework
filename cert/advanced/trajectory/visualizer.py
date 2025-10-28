@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import Optional
 
-from cert.trajectory.types import TrajectoryAnalysis
+from cert.advanced.trajectory.types import TrajectoryAnalysis
 
 
 class HamiltonianVisualizer:

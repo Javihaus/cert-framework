@@ -1,26 +1,19 @@
 """
-CERT Framework v3.1.0
+CERT Framework v2.0.0
 ======================
 
 EU AI Act Article 15 Compliance Framework for LLM Systems
 
-Comprehensive platform with 6 integrated tools for AI quality assurance:
-- Consistency measurement (measure)
-- Continuous monitoring (monitor)
-- Trajectory analysis (analyze_trajectory)
-- Compliance reporting (export_report)
-- Industry presets (Preset, PRESETS)
+Production-ready accuracy monitoring with automated compliance documentation.
 
 Public API:
     - measure(): Measure consistency between two texts
     - monitor(): Decorator for monitoring LLM outputs
-    - analyze_trajectory(): Real-time LLM generation quality monitoring
     - export_report(): Generate EU AI Act compliance reports
-    - Preset: Industry preset configurations
-    - PRESETS: Available preset definitions
+    - PRESETS: Industry preset configurations
 
 Example Usage:
-    >>> from cert import measure, monitor, analyze_trajectory
+    >>> from cert import measure, monitor, export_report
     >>>
     >>> # Measure consistency
     >>> result = measure(
@@ -34,84 +27,79 @@ Example Usage:
     ... def my_rag_pipeline(query):
     ...     context = retrieve(query)
     ...     answer = llm(context, query)
-    ...     return answer
-    >>>
-    >>> # Analyze reasoning trajectory
-    >>> from cert.trajectory import load_model_for_monitoring, TrajectoryConfig
-    >>> model, tokenizer = load_model_for_monitoring("model-name")
-    >>> analysis = analyze_trajectory(model, tokenizer, "Your prompt here")
-    >>> print(f"Quality: {'PASSED' if analysis.passed_quality_check else 'FAILED'}")
+    ...     return {"context": context, "answer": answer}
+
+Advanced Features (Experimental):
+    For trajectory analysis and coordination monitoring, use:
+    >>> from cert.advanced.trajectory import analyze_trajectory
+    >>> from cert.advanced.coordination import CoordinationOrchestrator
 
 For detailed documentation, see: https://github.com/Javihaus/cert-framework
 """
 
-__version__ = "3.1.0"
+__version__ = "2.0.0"
 __author__ = "Javier Marin"
 __license__ = "MIT"
 
-# Public API - This is all users need to import
+# Public API - Production-ready monitoring
 from cert.measure import measure
 from cert.monitor import monitor
-from cert.utils import Preset, PRESETS, export_report
-
-# Trajectory monitoring (Tool #6 - NEW in v3.1.0)
-from cert.trajectory import (
-    CERTTrajectoryAnalyzer,
-    TrajectoryConfig,
-    TrajectoryAnalysis,
-    load_model_for_monitoring,
-    unload_model,
-)
-
-# Optional visualization (requires matplotlib)
-try:
-    from cert.trajectory import HamiltonianVisualizer
-except (ImportError, AttributeError):
-    HamiltonianVisualizer = None
-
-
-# Convenience function for simple trajectory analysis
-def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig = None):
-    """
-    Analyze a single generation with trajectory monitoring.
-
-    Args:
-        model: HuggingFace model
-        tokenizer: Corresponding tokenizer
-        prompt: Input prompt
-        config: Optional TrajectoryConfig (uses defaults if None)
-
-    Returns:
-        TrajectoryAnalysis with quality metrics
-
-    Example:
-        >>> model, tokenizer = load_model_for_monitoring("Qwen/Qwen2.5-7B")
-        >>> analysis = analyze_trajectory(model, tokenizer, "Explain AI safety")
-        >>> print(f"Passed: {analysis.passed_quality_check}")
-    """
-    from cert.trajectory import ReasoningTrajectoryMonitor
-
-    monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
-    return monitor.monitor_generation(prompt)
-
+from cert.compliance import export_report
+from cert.utils import Preset, PRESETS
 
 __all__ = [
-    # v3.0 API
+    # Core API
     "measure",
     "monitor",
+    "export_report",
     "Preset",
     "PRESETS",
-    "export_report",
-    # v3.1.0 API - Trajectory monitoring
-    "analyze_trajectory",
-    "CERTTrajectoryAnalyzer",
-    "TrajectoryConfig",
-    "TrajectoryAnalysis",
-    "HamiltonianVisualizer",
-    "load_model_for_monitoring",
-    "unload_model",
 ]
 
-# Remove HamiltonianVisualizer from __all__ if matplotlib is not available
-if HamiltonianVisualizer is None:
-    __all__.remove("HamiltonianVisualizer")
+
+# Deprecation warnings for v1.x imports
+def __getattr__(name):
+    """Handle deprecated imports with warnings."""
+    import warnings
+
+    # Trajectory imports moved to advanced
+    if name in ["analyze_trajectory", "CERTTrajectoryAnalyzer", "TrajectoryConfig",
+                "TrajectoryAnalysis", "load_model_for_monitoring", "unload_model",
+                "HamiltonianVisualizer"]:
+        warnings.warn(
+            f"Importing '{name}' from cert is deprecated. "
+            f"Use: from cert.advanced.trajectory import {name}",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
+        # Import from new location
+        if name == "analyze_trajectory":
+            # Provide convenience function
+            def analyze_trajectory(model, tokenizer, prompt: str, config=None):
+                """
+                Analyze a single generation with trajectory monitoring.
+
+                DEPRECATED: Import from cert.advanced.trajectory instead.
+                """
+                from cert.advanced.trajectory import ReasoningTrajectoryMonitor
+                monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
+                return monitor.monitor_generation(prompt)
+            return analyze_trajectory
+        else:
+            # Import other trajectory components
+            from cert.advanced import trajectory
+            return getattr(trajectory, name)
+
+    # Coordination imports moved to advanced
+    if name in ["CoordinationOrchestrator", "CoordinationMetrics", "QualityEvaluator"]:
+        warnings.warn(
+            f"Importing '{name}' from cert is deprecated. "
+            f"Use: from cert.advanced.coordination import {name}",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        from cert.advanced import coordination
+        return getattr(coordination, name)
+
+    raise AttributeError(f"module 'cert' has no attribute '{name}'")

@@ -16,7 +16,7 @@ import torch
 import numpy as np
 from typing import Optional, List
 
-from cert.trajectory.types import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
+from cert.advanced.trajectory.types import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
 
 
 class ReasoningTrajectoryMonitor:

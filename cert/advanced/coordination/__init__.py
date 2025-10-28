@@ -15,15 +15,15 @@ License: MIT
 
 __version__ = "1.0.0"
 
-from cert.coordination.types import (
+from cert.advanced.coordination.types import (
     AgentResponse,
     BaselineMeasurement,
     CoordinationMetrics,
 )
-from cert.coordination.client import AnthropicClientWithResilience
-from cert.coordination.orchestrator import CoordinationOrchestrator
-from cert.coordination.evaluator import QualityEvaluator
-from cert.coordination.baseline import BaselineMeasurer, BaselineCache
+from cert.advanced.coordination.client import AnthropicClientWithResilience
+from cert.advanced.coordination.orchestrator import CoordinationOrchestrator
+from cert.advanced.coordination.evaluator import QualityEvaluator
+from cert.advanced.coordination.baseline import BaselineMeasurer, BaselineCache
 
 __all__ = [
     # Data structures
