@@ -32,8 +32,9 @@ These thresholds represent suggested starting points:
 - Lower values = More permissive (accept more outputs)
 """
 
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Union
+from typing import Any, Dict, List, Union
 
 
 class Preset(str, Enum):
@@ -45,6 +46,221 @@ class Preset(str, Enum):
     GENERAL = "general"
 
 
+@dataclass
+class ComplianceRequirement:
+    """Single compliance requirement mapped to regulatory article.
+
+    Attributes:
+        article: Regulatory article reference (e.g., "Article 15.1")
+        description: What this requirement ensures
+        metric: Which measurement metric satisfies this requirement
+        threshold: Required threshold value
+        severity: Importance level ('mandatory', 'recommended')
+    """
+
+    article: str
+    description: str
+    metric: str
+    threshold: float
+    severity: str  # 'mandatory', 'recommended'
+
+
+@dataclass
+class IndustryPreset:
+    """Enhanced industry preset with EU AI Act compliance mapping.
+
+    Attributes:
+        name: Preset name
+        description: Industry description
+        measure_config: Measurement configuration dict
+        compliance_requirements: List of compliance requirements
+        risk_level: EU AI Act risk level ('high', 'limited', 'minimal')
+    """
+
+    name: str
+    description: str
+    measure_config: Dict[str, Any]
+    compliance_requirements: List[ComplianceRequirement]
+    risk_level: str
+
+    def check_compliance(self, measurement_result) -> Dict[str, bool]:
+        """Check if measurement meets compliance requirements.
+
+        Args:
+            measurement_result: Result from measure() call
+
+        Returns:
+            Dictionary mapping article to compliance status (True/False)
+
+        Example:
+            >>> preset = get_industry_preset("healthcare")
+            >>> result = measure(text1, text2)
+            >>> compliance = preset.check_compliance(result)
+            >>> compliance["Article 15.1"]
+            True
+        """
+        compliance_status = {}
+
+        for req in self.compliance_requirements:
+            if req.metric == "accuracy":
+                met = measurement_result.confidence >= req.threshold
+            elif req.metric == "grounding":
+                ungrounded = getattr(measurement_result, "ungrounded_terms", [])
+                met = len(ungrounded) == 0
+            elif req.metric == "nli":
+                nli_score = getattr(measurement_result, "nli_score", 0.0)
+                met = nli_score >= req.threshold
+            elif req.metric == "semantic":
+                semantic = getattr(measurement_result, "semantic_score", 0.0)
+                met = semantic >= req.threshold
+            else:
+                met = False
+
+            compliance_status[req.article] = met
+
+        return compliance_status
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "name": self.name,
+            "description": self.description,
+            "measure_config": self.measure_config,
+            "compliance_requirements": [
+                {
+                    "article": req.article,
+                    "description": req.description,
+                    "metric": req.metric,
+                    "threshold": req.threshold,
+                    "severity": req.severity,
+                }
+                for req in self.compliance_requirements
+            ],
+            "risk_level": self.risk_level,
+        }
+
+
+# Enhanced Industry Presets with EU AI Act Compliance Mapping
+
+HEALTHCARE_PRESET = IndustryPreset(
+    name="healthcare",
+    description="Healthcare AI systems (EU AI Act High-Risk)",
+    measure_config={
+        "use_semantic": True,
+        "semantic_weight": 0.3,
+        "use_nli": True,
+        "nli_weight": 0.5,
+        "use_grounding": True,
+        "grounding_weight": 0.2,
+        "threshold": 0.85,
+    },
+    compliance_requirements=[
+        ComplianceRequirement(
+            article="Article 15.1",
+            description="High level of accuracy for patient safety",
+            metric="accuracy",
+            threshold=0.85,
+            severity="mandatory",
+        ),
+        ComplianceRequirement(
+            article="Article 15.4",
+            description="Resilience against errors and hallucinations",
+            metric="grounding",
+            threshold=1.0,
+            severity="mandatory",
+        ),
+    ],
+    risk_level="high",
+)
+
+FINANCIAL_PRESET = IndustryPreset(
+    name="financial",
+    description="Financial services AI (EU AI Act High-Risk)",
+    measure_config={
+        "use_semantic": True,
+        "semantic_weight": 0.4,
+        "use_nli": True,
+        "nli_weight": 0.4,
+        "use_grounding": True,
+        "grounding_weight": 0.2,
+        "threshold": 0.80,
+    },
+    compliance_requirements=[
+        ComplianceRequirement(
+            article="Article 15.1",
+            description="Appropriate level of accuracy for financial decisions",
+            metric="accuracy",
+            threshold=0.80,
+            severity="mandatory",
+        ),
+    ],
+    risk_level="high",
+)
+
+LEGAL_PRESET = IndustryPreset(
+    name="legal",
+    description="Legal AI systems (EU AI Act High-Risk)",
+    measure_config={
+        "use_semantic": True,
+        "semantic_weight": 0.3,
+        "use_nli": True,
+        "nli_weight": 0.4,
+        "use_grounding": True,
+        "grounding_weight": 0.3,
+        "threshold": 0.80,
+    },
+    compliance_requirements=[
+        ComplianceRequirement(
+            article="Article 15.1",
+            description="Appropriate level of accuracy for legal advice",
+            metric="accuracy",
+            threshold=0.80,
+            severity="mandatory",
+        ),
+        ComplianceRequirement(
+            article="Article 15.4",
+            description="Resilience against manipulation and errors",
+            metric="grounding",
+            threshold=1.0,
+            severity="mandatory",
+        ),
+    ],
+    risk_level="high",
+)
+
+GENERAL_PRESET = IndustryPreset(
+    name="general",
+    description="General-purpose AI systems (Low-Risk)",
+    measure_config={
+        "use_semantic": True,
+        "semantic_weight": 0.4,
+        "use_nli": True,
+        "nli_weight": 0.4,
+        "use_grounding": True,
+        "grounding_weight": 0.2,
+        "threshold": 0.70,
+    },
+    compliance_requirements=[
+        ComplianceRequirement(
+            article="Article 52",
+            description="Transparency obligations for general AI",
+            metric="accuracy",
+            threshold=0.70,
+            severity="recommended",
+        ),
+    ],
+    risk_level="minimal",
+)
+
+# Main presets dictionary mapping names to IndustryPreset objects
+INDUSTRY_PRESETS: Dict[str, IndustryPreset] = {
+    "healthcare": HEALTHCARE_PRESET,
+    "financial": FINANCIAL_PRESET,
+    "legal": LEGAL_PRESET,
+    "general": GENERAL_PRESET,
+}
+
+# Legacy PRESETS dict for backward compatibility (simple config dicts)
 PRESETS: Dict[str, Dict[str, float]] = {
     "healthcare": {
         "accuracy_threshold": 0.95,
@@ -81,15 +297,47 @@ PRESETS: Dict[str, Dict[str, float]] = {
 }
 
 
+def get_industry_preset(preset: Union[str, Preset]) -> IndustryPreset:
+    """Get enhanced industry preset with compliance requirements.
+
+    Args:
+        preset: Preset name or Preset enum value
+
+    Returns:
+        IndustryPreset object with compliance mapping
+
+    Raises:
+        ValueError: If preset name is invalid
+
+    Examples:
+        >>> preset = get_industry_preset("healthcare")
+        >>> preset.risk_level
+        'high'
+        >>> len(preset.compliance_requirements)
+        2
+    """
+    if isinstance(preset, Preset):
+        preset = preset.value
+
+    if preset not in INDUSTRY_PRESETS:
+        valid = ", ".join(INDUSTRY_PRESETS.keys())
+        raise ValueError(f"Invalid preset '{preset}'. Valid presets: {valid}")
+
+    return INDUSTRY_PRESETS[preset]
+
+
 def get_preset(preset: Union[str, Preset]) -> Dict[str, float]:
-    """Get preset configuration by name.
+    """Get legacy preset configuration by name.
+
+    Note: For new code, prefer get_industry_preset() which includes
+    compliance requirements. This function maintained for backward compatibility.
 
     Args:
         preset: Preset name or Preset enum value
 
     Returns:
         Configuration dictionary with accuracy_threshold, hallucination_tolerance,
-        audit_retention_months
+        audit_retention_days
 
     Raises:
         ValueError: If preset name is invalid
@@ -97,11 +345,11 @@ def get_preset(preset: Union[str, Preset]) -> Dict[str, float]:
     Examples:
         >>> config = get_preset("financial")
         >>> config["accuracy_threshold"]
-        0.95
+        0.90
 
         >>> config = get_preset(Preset.HEALTHCARE)
         >>> config["hallucination_tolerance"]
-        0.005
+        0.02
     """
     if isinstance(preset, Preset):
         preset = preset.value
@@ -123,8 +371,8 @@ def list_presets() -> Dict[str, str]:
         >>> presets = list_presets()
         >>> for name, desc in presets.items():
         ...     print(f"{name}: {desc}")
-        financial: Strict accuracy for financial services...
-        healthcare: Very strict accuracy for healthcare...
-        general: Balanced accuracy for general use...
+        financial: Financial services AI (EU AI Act High-Risk)
+        healthcare: Healthcare AI systems (EU AI Act High-Risk)
+        ...
     """
-    return {name: config["description"] for name, config in PRESETS.items()}
+    return {name: preset.description for name, preset in INDUSTRY_PRESETS.items()}

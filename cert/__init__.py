@@ -45,15 +45,28 @@ __license__ = "MIT"
 from cert.measure import measure
 from cert.monitor import monitor
 from cert.compliance import export_report
-from cert.utils import Preset, PRESETS
+from cert.utils import (
+    Preset,
+    PRESETS,
+    IndustryPreset,
+    ComplianceRequirement,
+    INDUSTRY_PRESETS,
+    get_industry_preset,
+)
 
 __all__ = [
     # Core API
     "measure",
     "monitor",
     "export_report",
+    # Presets (legacy)
     "Preset",
     "PRESETS",
+    # Enhanced presets with EU AI Act compliance mapping
+    "IndustryPreset",
+    "ComplianceRequirement",
+    "INDUSTRY_PRESETS",
+    "get_industry_preset",
 ]
 
 
