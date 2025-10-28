@@ -165,6 +165,11 @@ def monitor(
                 config=config,
             )
 
+            # Generate explanation if failed
+            explanation = None
+            if not accuracy_result["is_compliant"]:
+                explanation = _generate_explanation(accuracy_result, answer, context)
+
             # Update statistics
             config.total_calls += 1
             if accuracy_result["is_hallucination"]:
@@ -172,7 +177,7 @@ def monitor(
             if accuracy_result["is_compliant"]:
                 config.total_compliant += 1
 
-            # Log to audit trail
+            # Log to audit trail (with explanation if available)
             config.audit_logger.log_request(
                 function_name=func.__name__,
                 context=context,
@@ -183,6 +188,7 @@ def monitor(
                 metrics=accuracy_result["metrics"],
                 timestamp=timestamp,
                 duration_ms=(time.time() - start_time) * 1000,
+                explanation=explanation.to_dict() if explanation else None,
             )
 
             # Alert if hallucination detected
@@ -311,8 +317,40 @@ def _measure_accuracy(
             "grounding_score": grounding_score,
             "is_contradiction": is_contradiction,
             "ungrounded_terms_count": len(ungrounded_terms),
+            "ungrounded_terms": ungrounded_terms,
         },
     }
+
+
+def _generate_explanation(accuracy_result: Dict[str, Any], answer: str, context: str):
+    """Generate human-readable explanation for measurement failure.
+
+    Args:
+        accuracy_result: Result from _measure_accuracy()
+        answer: The model's answer
+        context: The source context
+
+    Returns:
+        FailureExplanation object
+    """
+    from cert.compliance.explanations import explain_measurement_failure
+
+    # Create a simple object wrapper to match explain_measurement_failure's expected interface
+    class MeasurementResult:
+        def __init__(self, result_dict):
+            self.confidence = result_dict["accuracy_score"]
+            self.semantic_score = result_dict["metrics"]["semantic_score"]
+            self.nli_score = result_dict["metrics"]["nli_score"]
+            self.nli_label = (
+                "contradiction"
+                if result_dict["metrics"]["is_contradiction"]
+                else "entailment"
+            )
+            self.grounding_score = result_dict["metrics"]["grounding_score"]
+            self.ungrounded_terms = result_dict["metrics"].get("ungrounded_terms", [])
+
+    measurement_obj = MeasurementResult(accuracy_result)
+    return explain_measurement_failure(measurement_obj, answer, context)
 
 
 def _print_startup_message(function_name: str, config: MonitorConfig):

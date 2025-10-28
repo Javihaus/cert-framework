@@ -99,6 +99,7 @@ def _load_audit_statistics(audit_log: str) -> Dict:
             "period_start": None,
             "period_end": None,
             "audit_retention_days": 0,
+            "failure_explanations": [],
         }
 
     total_requests = 0
@@ -110,6 +111,7 @@ def _load_audit_statistics(audit_log: str) -> Dict:
     nli_scores = []
     grounding_scores = []
     timestamps = []
+    failure_explanations = []  # Collect failure explanations
 
     with audit_path.open("r") as f:
         for line in f:
@@ -124,6 +126,17 @@ def _load_audit_statistics(audit_log: str) -> Dict:
                         total_hallucinations += 1
                     if entry.get("is_compliant"):
                         total_compliant += 1
+                    else:
+                        # Collect explanation for non-compliant requests
+                        explanation = entry.get("explanation")
+                        if explanation:
+                            failure_explanations.append(
+                                {
+                                    "timestamp": entry.get("timestamp"),
+                                    "function": entry.get("function"),
+                                    "explanation": explanation,
+                                }
+                            )
 
                     accuracy_scores.append(entry.get("accuracy_score", 0.0))
 
@@ -151,6 +164,7 @@ def _load_audit_statistics(audit_log: str) -> Dict:
             "period_start": None,
             "period_end": None,
             "audit_retention_days": 0,
+            "failure_explanations": [],
         }
 
     # Calculate statistics
@@ -188,6 +202,7 @@ def _load_audit_statistics(audit_log: str) -> Dict:
         "period_start": period_start,
         "period_end": period_end,
         "audit_retention_days": retention_days,
+        "failure_explanations": failure_explanations,
     }
 
 
@@ -388,7 +403,62 @@ SECTION 6: OVERALL COMPLIANCE DETERMINATION
 {("All monitored metrics meet or exceed EU AI Act requirements." if overall_compliant else "System requires attention: One or more metrics below compliance thresholds.")}
 
 {"=" * 80}
-SECTION 7: RECOMMENDATIONS & CONTINUOUS IMPROVEMENT
+SECTION 7: FAILURE ANALYSIS
+{"=" * 80}
+
+"""
+
+    # Add failure analysis if we have explanations
+    failure_explanations = stats.get("failure_explanations", [])
+    if failure_explanations:
+        report += f"""
+This section provides detailed analysis of non-compliant requests with
+actionable recommendations for improvement.
+
+Total Non-Compliant Requests: {len(failure_explanations)}
+
+"""
+        # Show up to 5 most recent failures
+        recent_failures = failure_explanations[-5:]
+        for i, failure in enumerate(recent_failures, 1):
+            explanation = failure["explanation"]
+            report += f"""
+─────────────────────────────────────────────────────────────────────────────
+Failure #{i}
+─────────────────────────────────────────────────────────────────────────────
+
+Timestamp: {failure["timestamp"]}
+Function: {failure["function"]}
+
+Failure Reason: {explanation["reason"]}
+Severity: {explanation["severity"].upper()}
+
+Evidence:
+"""
+            for evidence_item in explanation["evidence"]:
+                report += f"  • {evidence_item}\n"
+
+            report += f"""
+Recommendation:
+  {explanation["recommendation"]}
+
+"""
+
+        if len(failure_explanations) > 5:
+            report += f"\n(Showing 5 most recent failures. Total: {len(failure_explanations)})\n"
+
+    else:
+        report += """
+No failure explanations available. This indicates either:
+  • All requests are compliant (100% compliance rate)
+  • Monitoring has just been enabled
+  • Audit log does not yet contain detailed failure data
+
+"""
+
+    report += f"""
+{"=" * 80}
+SECTION 8: RECOMMENDATIONS & CONTINUOUS IMPROVEMENT
 {"=" * 80}
 
 """
@@ -435,7 +505,7 @@ SECTION 7: RECOMMENDATIONS & CONTINUOUS IMPROVEMENT
 
     report += f"""
 {"=" * 80}
-SECTION 8: DISCLAIMERS & CERTIFICATIONS
+SECTION 9: DISCLAIMERS & CERTIFICATIONS
 {"=" * 80}
 
 Important Disclaimers:

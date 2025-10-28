@@ -64,6 +64,7 @@ class AuditLogger:
         metrics: Dict[str, Any],
         timestamp: str,
         duration_ms: float,
+        explanation: Dict[str, Any] = None,
     ):
         """Log monitored request to audit trail.
 
@@ -77,6 +78,7 @@ class AuditLogger:
             metrics: Detailed metrics (semantic, NLI, grounding)
             timestamp: ISO timestamp of request
             duration_ms: Request duration in milliseconds
+            explanation: Optional failure explanation (when not compliant)
         """
         entry = {
             "type": "request",
@@ -96,6 +98,10 @@ class AuditLogger:
             "context_length": len(context),
             "answer_length": len(answer),
         }
+
+        # Add explanation if provided (for non-compliant requests)
+        if explanation:
+            entry["explanation"] = explanation
 
         self._append_log(entry)
 
