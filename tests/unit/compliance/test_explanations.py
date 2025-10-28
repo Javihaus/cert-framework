@@ -158,7 +158,10 @@ def test_severity_assessment_high():
 def test_severity_assessment_medium():
     """Test medium severity assessment."""
     # Single failure type with moderate confidence
-    result = MockMeasurementResult(semantic_score=0.4, confidence=0.6)
+    # Set grounding_score high to avoid multiple evidence items
+    result = MockMeasurementResult(
+        semantic_score=0.4, confidence=0.6, grounding_score=0.8, nli_score=0.8
+    )
 
     explanation = explain_measurement_failure(result, "answer", "context")
 
@@ -168,7 +171,10 @@ def test_severity_assessment_medium():
 def test_severity_assessment_low():
     """Test low severity assessment."""
     # Close to threshold
-    result = MockMeasurementResult(semantic_score=0.65, confidence=0.68)
+    # Set other scores high to avoid multiple evidence items
+    result = MockMeasurementResult(
+        semantic_score=0.65, confidence=0.68, grounding_score=0.8, nli_score=0.8
+    )
 
     explanation = explain_measurement_failure(result, "answer", "context")
 
