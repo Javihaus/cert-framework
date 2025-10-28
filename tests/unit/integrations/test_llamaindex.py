@@ -102,7 +102,7 @@ class TestLlamaIndexIntegration:
     def test_wrap_query_engine_response_string(self):
         """Test handling when response doesn't have .response attribute."""
         mock_response = Mock(spec=[])
-        mock_response.__str__ = Mock(return_value="String response")
+        mock_response.__str__ = lambda: "String response"
 
         mock_engine = Mock()
         mock_engine.query = Mock(return_value=mock_response)
