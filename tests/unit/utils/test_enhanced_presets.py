@@ -66,9 +66,7 @@ def test_healthcare_preset():
     assert len(preset.compliance_requirements) >= 1
 
     # Check has accuracy requirement
-    has_accuracy = any(
-        req.article == "Article 15.1" for req in preset.compliance_requirements
-    )
+    has_accuracy = any(req.article == "Article 15.1" for req in preset.compliance_requirements)
     assert has_accuracy
 
 
@@ -217,9 +215,7 @@ def test_all_presets_have_measure_config():
 def test_all_presets_have_compliance_requirements():
     """Test that all presets have compliance requirements."""
     for name, preset in INDUSTRY_PRESETS.items():
-        assert len(preset.compliance_requirements) > 0, (
-            f"{name} has no compliance requirements"
-        )
+        assert len(preset.compliance_requirements) > 0, f"{name} has no compliance requirements"
 
         # Check each requirement is well-formed
         for req in preset.compliance_requirements:

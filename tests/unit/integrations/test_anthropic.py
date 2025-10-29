@@ -121,9 +121,7 @@ class TestAnthropicIntegration:
             {"role": "user", "content": "Second question"},
         ]
 
-        result = wrapped.messages.create(
-            model="claude-3-opus-20240229", messages=messages
-        )
+        result = wrapped.messages.create(model="claude-3-opus-20240229", messages=messages)
 
         # Query should be last user message
         assert result["query"] == "Second question"
@@ -159,9 +157,7 @@ class TestAnthropicIntegration:
             }
         ]
 
-        result = wrapped.messages.create(
-            model="claude-3-opus-20240229", messages=messages
-        )
+        result = wrapped.messages.create(model="claude-3-opus-20240229", messages=messages)
 
         # Should extract text from multimodal content
         assert result["query"] == "What is in this image?"

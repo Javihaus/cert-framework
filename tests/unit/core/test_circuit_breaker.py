@@ -62,11 +62,7 @@ class TestCircuitBreaker:
 
     def test_half_open_to_closed(self):
         """Test transition from HALF_OPEN to CLOSED on successes."""
-        cb = CircuitBreaker(
-            failure_threshold=2,
-            recovery_timeout=0.1,
-            success_threshold=2
-        )
+        cb = CircuitBreaker(failure_threshold=2, recovery_timeout=0.1, success_threshold=2)
 
         # Open circuit breaker
         cb.record_failure()

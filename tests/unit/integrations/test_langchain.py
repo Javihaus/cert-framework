@@ -27,9 +27,7 @@ class TestLangChainIntegration:
         mock_chain.invoke = Mock(
             return_value={
                 "result": "Paris is the capital",
-                "source_documents": [
-                    Mock(page_content="France's capital is Paris")
-                ],
+                "source_documents": [Mock(page_content="France's capital is Paris")],
             }
         )
 
@@ -155,9 +153,7 @@ class TestLangChainIntegration:
         """Test that intermediate steps are captured as context."""
         mock_agent = Mock()
         steps = [("Action 1", "Observation 1"), ("Action 2", "Observation 2")]
-        mock_agent.invoke = Mock(
-            return_value={"output": "Final", "intermediate_steps": steps}
-        )
+        mock_agent.invoke = Mock(return_value={"output": "Final", "intermediate_steps": steps})
 
         wrapped = wrap_langchain_agent(mock_agent)
         result = wrapped.invoke({"input": "test"})

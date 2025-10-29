@@ -19,7 +19,7 @@ class TestMeasureFunction:
         result = measure(
             text1="The revenue was $500M in Q4",
             text2="The revenue was $500M in Q4",
-            threshold=0.5  # Lower threshold for CI environments where NLI may fail
+            threshold=0.5,  # Lower threshold for CI environments where NLI may fail
         )
 
         assert result is not None
@@ -31,10 +31,7 @@ class TestMeasureFunction:
         """Test measuring semantically similar texts."""
         from cert import measure
 
-        result = measure(
-            text1="Revenue was $500M in Q4",
-            text2="Q4 revenue reached $500 million"
-        )
+        result = measure(text1="Revenue was $500M in Q4", text2="Q4 revenue reached $500 million")
 
         assert result is not None
         assert isinstance(result.confidence, float)
@@ -50,7 +47,7 @@ class TestMeasureFunction:
             semantic_weight=0.4,
             nli_weight=0.4,
             grounding_weight=0.2,
-            threshold=0.5  # Lower threshold for CI environments
+            threshold=0.5,  # Lower threshold for CI environments
         )
 
         assert result is not None
@@ -66,7 +63,7 @@ class TestMeasureFunction:
             text2="Test text",
             use_semantic=True,
             use_nli=False,
-            use_grounding=False
+            use_grounding=False,
         )
 
         assert result is not None
@@ -78,11 +75,7 @@ class TestMeasureFunction:
         """Test measure with custom threshold."""
         from cert import measure
 
-        result = measure(
-            text1="Test",
-            text2="Test",
-            threshold=0.95
-        )
+        result = measure(text1="Test", text2="Test", threshold=0.95)
 
         assert result is not None
         assert result.threshold_used == 0.95
@@ -158,10 +151,7 @@ class TestMonitorDecorator:
         except ImportError:
             pytest.skip("protobuf/tiktoken not available in CI environment")
 
-        @monitor(
-            accuracy_threshold=0.85,
-            hallucination_tolerance=0.10
-        )
+        @monitor(accuracy_threshold=0.85, hallucination_tolerance=0.10)
         def test_function(query):
             return {"context": "test context", "answer": "test answer"}
 
@@ -181,7 +171,7 @@ class TestPresets:
             "hallucination_tolerance",
             "audit_retention_days",
             "description",
-            "regulatory_basis"
+            "regulatory_basis",
         ]
 
         for preset_name, config in PRESETS.items():
@@ -228,7 +218,7 @@ class TestExportReport:
             result = export_report(
                 output_path=str(output_path),
                 audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
-                system_name="Test System"
+                system_name="Test System",
             )
 
             assert result is not None
@@ -245,7 +235,7 @@ class TestExportReport:
                 output_path=str(output_path),
                 audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
                 system_name="Test System",
-                format="json"
+                format="json",
             )
 
             assert result is not None
@@ -262,7 +252,7 @@ class TestExportReport:
                 output_path=str(output_path),
                 audit_log=str(Path(tmpdir) / "nonexistent.jsonl"),
                 system_name="Test System",
-                format="csv"
+                format="csv",
             )
 
             assert result is not None
@@ -303,10 +293,10 @@ class TestAuditLogger:
                     "nli_score": 0.95,
                     "grounding_score": 0.98,
                     "is_contradiction": False,
-                    "ungrounded_terms_count": 0
+                    "ungrounded_terms_count": 0,
                 },
                 timestamp="2025-01-01T00:00:00",
-                duration_ms=100.0
+                duration_ms=100.0,
             )
 
             # Verify log was written

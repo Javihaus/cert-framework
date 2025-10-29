@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from cert.compliance.datasets import EvaluationDataset
-from cert.measure.measure import measure
 
 
 @dataclass
@@ -115,6 +114,14 @@ def run_experiment(
         >>> print(f"Pass rate: {run.results['pass_rate']:.1%}")
         >>> run.save("experiments/gpt4_baseline.json")
     """
+    # Lazy load measure function (requires [evaluation] extras)
+    try:
+        from cert.measure.measure import measure
+    except ImportError as e:
+        raise ImportError(
+            f"run_experiment requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+        )
+
     results = {
         "total": len(dataset.examples),
         "passed": 0,

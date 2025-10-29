@@ -50,8 +50,7 @@ def __getattr__(name):
             return locals()[name]
         except ImportError as e:
             raise ImportError(
-                f"{name} requires: pip install cert-framework[evaluation]\n"
-                f"Original error: {e}"
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
             )
 
     if name in [
@@ -71,8 +70,7 @@ def __getattr__(name):
             return locals()[name]
         except ImportError as e:
             raise ImportError(
-                f"{name} requires: pip install cert-framework[evaluation]\n"
-                f"Original error: {e}"
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
             )
 
     if name in [
@@ -92,8 +90,7 @@ def __getattr__(name):
             return locals()[name]
         except ImportError as e:
             raise ImportError(
-                f"{name} requires: pip install cert-framework[evaluation]\n"
-                f"Original error: {e}"
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
             )
 
     raise AttributeError(f"module 'cert.compliance' has no attribute '{name}'")

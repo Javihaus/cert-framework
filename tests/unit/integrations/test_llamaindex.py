@@ -105,6 +105,7 @@ class TestLlamaIndexIntegration:
 
     def test_wrap_query_engine_response_string(self):
         """Test handling when response doesn't have .response attribute."""
+
         # Create a custom class that returns string when converted
         class StringResponse:
             def __str__(self):

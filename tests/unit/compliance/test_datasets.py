@@ -31,12 +31,8 @@ def test_evaluation_example_creation():
 def test_evaluation_dataset_creation():
     """Test creating an evaluation dataset."""
     examples = [
-        EvaluationExample(
-            query="Question 1", context="Context 1", expected_answer="Answer 1"
-        ),
-        EvaluationExample(
-            query="Question 2", context="Context 2", expected_answer="Answer 2"
-        ),
+        EvaluationExample(query="Question 1", context="Context 1", expected_answer="Answer 1"),
+        EvaluationExample(query="Question 2", context="Context 2", expected_answer="Answer 2"),
     ]
 
     dataset = EvaluationDataset(
@@ -56,9 +52,7 @@ def test_evaluation_dataset_creation():
 def test_dataset_save_and_load(tmp_path):
     """Test saving and loading datasets."""
     examples = [
-        EvaluationExample(
-            query="Question 1", context="Context 1", expected_answer="Answer 1"
-        )
+        EvaluationExample(query="Question 1", context="Context 1", expected_answer="Answer 1")
     ]
 
     original = EvaluationDataset(

@@ -13,17 +13,16 @@ from cert.compliance.experiments import (
     load_experiments_from_directory,
 )
 
-# Check if required dependencies are available for NLI-based experiments
+# Check if evaluation dependencies are available
 try:
-    import protobuf  # noqa: F401
-    import tiktoken  # noqa: F401
-    NLI_DEPS_AVAILABLE = True
-except ImportError:
-    NLI_DEPS_AVAILABLE = False
+    from sentence_transformers import SentenceTransformer  # noqa: F401
 
-requires_nli_deps = pytest.mark.skipif(
-    not NLI_DEPS_AVAILABLE,
-    reason="NLI dependencies (protobuf, tiktoken) not available"
+    EVALUATION_DEPS_AVAILABLE = True
+except ImportError:
+    EVALUATION_DEPS_AVAILABLE = False
+
+requires_evaluation = pytest.mark.skipif(
+    not EVALUATION_DEPS_AVAILABLE, reason="Evaluation dependencies not available"
 )
 
 
@@ -69,7 +68,7 @@ def test_experiment_run_save_and_load(tmp_path):
     assert loaded.results == original.results
 
 
-@requires_nli_deps
+@requires_evaluation
 def test_run_experiment_basic():
     """Test running a basic experiment."""
     # Create test dataset
@@ -78,12 +77,8 @@ def test_run_experiment_basic():
         version="1.0",
         created_at=datetime.now(),
         examples=[
-            EvaluationExample(
-                query="What is 2+2?", context="Basic math", expected_answer="4"
-            ),
-            EvaluationExample(
-                query="What is 3+3?", context="Basic math", expected_answer="6"
-            ),
+            EvaluationExample(query="What is 2+2?", context="Basic math", expected_answer="4"),
+            EvaluationExample(query="What is 3+3?", context="Basic math", expected_answer="6"),
         ],
     )
 
@@ -111,7 +106,7 @@ def test_run_experiment_basic():
     assert run.results["pass_rate"] == 1.0
 
 
-@requires_nli_deps
+@requires_evaluation
 def test_run_experiment_with_failures():
     """Test experiment with some failures."""
     dataset = EvaluationDataset(
@@ -119,12 +114,8 @@ def test_run_experiment_with_failures():
         version="1.0",
         created_at=datetime.now(),
         examples=[
-            EvaluationExample(
-                query="What is 2+2?", context="Math", expected_answer="4"
-            ),
-            EvaluationExample(
-                query="What is 3+3?", context="Math", expected_answer="6"
-            ),
+            EvaluationExample(query="What is 2+2?", context="Math", expected_answer="4"),
+            EvaluationExample(query="What is 3+3?", context="Math", expected_answer="6"),
         ],
     )
 
@@ -136,9 +127,7 @@ def test_run_experiment_with_failures():
             return "7"  # Wrong
         return "unknown"
 
-    run = run_experiment(
-        name="imperfect_test", dataset=dataset, eval_function=imperfect_eval
-    )
+    run = run_experiment(name="imperfect_test", dataset=dataset, eval_function=imperfect_eval)
 
     assert run.results["total"] == 2
     assert run.results["passed"] == 1
@@ -148,15 +137,14 @@ def test_run_experiment_with_failures():
     assert run.results["failures"][0]["type"] == "measurement_failure"
 
 
+@requires_evaluation
 def test_run_experiment_with_function_error():
     """Test experiment where eval function raises error."""
     dataset = EvaluationDataset(
         name="test",
         version="1.0",
         created_at=datetime.now(),
-        examples=[
-            EvaluationExample(query="Test", context="Context", expected_answer="Answer")
-        ],
+        examples=[EvaluationExample(query="Test", context="Context", expected_answer="Answer")],
     )
 
     # Eval function that raises error
@@ -173,6 +161,7 @@ def test_run_experiment_with_function_error():
     assert "Intentional error" in run.results["failures"][0]["error"]
 
 
+@requires_evaluation
 def test_run_experiment_calculates_avg_confidence():
     """Test that average confidence is calculated correctly."""
     dataset = EvaluationDataset(
@@ -180,12 +169,8 @@ def test_run_experiment_calculates_avg_confidence():
         version="1.0",
         created_at=datetime.now(),
         examples=[
-            EvaluationExample(
-                query="Q1", context="C1", expected_answer="Similar text here"
-            ),
-            EvaluationExample(
-                query="Q2", context="C2", expected_answer="Different text"
-            ),
+            EvaluationExample(query="Q1", context="C1", expected_answer="Similar text here"),
+            EvaluationExample(query="Q2", context="C2", expected_answer="Different text"),
         ],
     )
 
@@ -286,15 +271,14 @@ def test_load_experiments_from_nonexistent_directory():
     assert experiments == []
 
 
+@requires_evaluation
 def test_experiment_with_custom_measure_config():
     """Test running experiment with custom measure configuration."""
     dataset = EvaluationDataset(
         name="test",
         version="1.0",
         created_at=datetime.now(),
-        examples=[
-            EvaluationExample(query="Test", context="Context", expected_answer="Answer")
-        ],
+        examples=[EvaluationExample(query="Test", context="Context", expected_answer="Answer")],
     )
 
     def eval_fn(query, context):
@@ -312,11 +296,10 @@ def test_experiment_with_custom_measure_config():
     assert run.results["total"] == 1
 
 
+@requires_evaluation
 def test_empty_dataset_experiment():
     """Test running experiment on empty dataset."""
-    dataset = EvaluationDataset(
-        name="empty", version="1.0", created_at=datetime.now(), examples=[]
-    )
+    dataset = EvaluationDataset(name="empty", version="1.0", created_at=datetime.now(), examples=[])
 
     def eval_fn(query, context):
         return "result"

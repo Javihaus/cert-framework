@@ -6,16 +6,13 @@ import pytest
 def test_import_trajectory_module():
     """Test trajectory module can be imported."""
     import cert.advanced.trajectory
+
     assert cert.advanced.trajectory.__version__ is not None
 
 
 def test_import_trajectory_types():
     """Test trajectory types can be imported."""
-    from cert.advanced.trajectory import (
-        ReasoningMetrics,
-        TrajectoryAnalysis,
-        TrajectoryConfig
-    )
+    from cert.advanced.trajectory import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
 
     assert ReasoningMetrics is not None
     assert TrajectoryAnalysis is not None
@@ -65,11 +62,14 @@ def test_deprecated_import_from_cert_package():
 
         # Check that there's a DeprecationWarning about advanced.trajectory
         deprecation_warnings = [
-            warning for warning in w
+            warning
+            for warning in w
             if issubclass(warning.category, DeprecationWarning)
             and "advanced.trajectory" in str(warning.message)
         ]
-        assert len(deprecation_warnings) >= 1, "Expected deprecation warning about advanced.trajectory"
+        assert len(deprecation_warnings) >= 1, (
+            "Expected deprecation warning about advanced.trajectory"
+        )
         assert analyze_trajectory is not None
 
 
@@ -97,7 +97,7 @@ def test_trajectory_config_custom():
         entropy_threshold=2.0,
         surprise_threshold=8.0,
         max_new_tokens=200,
-        temperature=0.5
+        temperature=0.5,
     )
 
     assert config.perplexity_threshold == 40.0
@@ -117,7 +117,7 @@ def test_reasoning_metrics_creation():
         perplexity=10.5,
         top_k_entropy=1.8,
         logit_gap=0.3,
-        cumulative_surprise=2.5
+        cumulative_surprise=2.5,
     )
 
     assert metrics.step == 0
@@ -138,7 +138,7 @@ def test_reasoning_metrics_to_dict():
         perplexity=10.5,
         top_k_entropy=1.8,
         logit_gap=0.3,
-        cumulative_surprise=2.5
+        cumulative_surprise=2.5,
     )
 
     metrics_dict = metrics.to_dict()

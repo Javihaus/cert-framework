@@ -101,6 +101,7 @@ class TestRetryDecorator:
             raise ValueError("Error")
 
         import time
+
         start = time.time()
 
         with pytest.raises(ValueError):

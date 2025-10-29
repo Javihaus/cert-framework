@@ -7,4 +7,5 @@ import pytest
 def cert_version():
     """Get CERT framework version."""
     import cert
+
     return cert.__version__

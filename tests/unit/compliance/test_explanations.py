@@ -89,9 +89,7 @@ def test_explain_low_semantic_score():
 
 def test_explain_nli_contradiction():
     """Test explanation for NLI contradiction."""
-    result = MockMeasurementResult(
-        nli_label="contradiction", nli_score=0.8, confidence=0.4
-    )
+    result = MockMeasurementResult(nli_label="contradiction", nli_score=0.8, confidence=0.4)
 
     explanation = explain_measurement_failure(result, "answer", "context")
 
@@ -103,9 +101,7 @@ def test_explain_nli_contradiction():
 
 def test_explain_ungrounded_terms():
     """Test explanation for ungrounded terms."""
-    result = MockMeasurementResult(
-        ungrounded_terms=["term1", "term2", "term3"], confidence=0.6
-    )
+    result = MockMeasurementResult(ungrounded_terms=["term1", "term2", "term3"], confidence=0.6)
 
     explanation = explain_measurement_failure(result, "answer", "context")
 

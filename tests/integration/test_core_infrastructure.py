@@ -15,6 +15,7 @@ class TestResourceManagement:
 
     def test_context_manager(self):
         """Test resource cleanup with context manager."""
+
         class TestResource(ModelResource):
             def _load_model(self):
                 return {"test": "model"}
@@ -105,11 +106,13 @@ class TestObservability:
         )
 
         import logging
+
         logger = logging.getLogger("cert")
         logger.info("Test message", extra={"key": "value"})
 
         # Verify log file created
         import os
+
         assert os.path.exists(log_file)
 
         # Clean up
@@ -134,10 +137,7 @@ class TestErrorHandling:
 
     def test_error_serialization(self):
         """Test error to dict conversion."""
-        error = ResourceLoadError(
-            "Test error",
-            context={"key": "value"}
-        )
+        error = ResourceLoadError("Test error", context={"key": "value"})
 
         error_dict = error.to_dict()
 

@@ -8,6 +8,7 @@ is correct and imports don't fail.
 def test_import_cert():
     """Test main cert package imports."""
     import cert
+
     assert cert.__version__ is not None
 
 
