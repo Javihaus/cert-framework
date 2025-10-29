@@ -46,67 +46,108 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        # Core ML dependencies
-        "sentence-transformers>=2.2.0,<3.0.0",  # Semantic comparison
-        "torch>=1.11.0",  # PyTorch for embeddings and NLI
-        "transformers>=4.30.0",  # NLI models for hallucination detection
-        "tiktoken>=0.5.0",  # Tokenization support for transformers
-        "protobuf>=3.20.0",  # Protobuf support for transformers
-        "numpy>=1.21.0",  # Numerical operations
-        "scipy>=1.7.0",  # Scientific computing for metrics
-        "matplotlib>=3.5.0",  # Visualization for trajectory monitoring
-        "typing-extensions>=4.0.0",  # Type hints for older Python
-        # Observability and Monitoring
-        "prometheus-client>=0.19.0",  # Prometheus metrics export
-        # LLM Provider SDKs (for agents)
-        "anthropic>=0.18.0",  # Anthropic Claude API
-        "openai>=1.0.0",  # OpenAI GPT API (also used by xAI)
-        "google-generativeai>=0.3.0",  # Google Gemini API
-        # Agentic Frameworks
-        "langchain>=0.1.0",  # LangChain framework
-        "langchain-core>=0.1.0",  # LangChain core
-        "pyautogen>=0.2.0",  # AutoGen framework
-        "crewai>=0.1.0",  # CrewAI framework
+        # Core has ZERO external dependencies - just standard library
+        # For evaluation features: pip install cert-framework[evaluation]
     ],
     extras_require={
+        # Evaluation features - ML models for accuracy measurement
+        "evaluation": [
+            "sentence-transformers>=2.2.0,<3.0.0",  # Semantic similarity
+            "torch>=1.11.0",  # PyTorch backend
+            "transformers>=4.30.0",  # NLI models
+            "tiktoken>=0.5.0",  # Tokenization
+            "protobuf>=3.20.0",  # Protobuf support
+            "numpy>=1.21.0",  # Numerical operations
+            "scipy>=1.7.0",  # Scientific computing
+        ],
+        # LLM Provider integrations
+        "anthropic": ["anthropic>=0.18.0"],
+        "openai": ["openai>=1.0.0"],
+        "google": ["google-generativeai>=0.3.0"],
+        # Framework integrations
+        "langchain": [
+            "langchain>=0.1.0",
+            "langchain-core>=0.1.0",
+        ],
+        "autogen": ["pyautogen>=0.2.0"],
+        "crewai": ["crewai>=0.1.0"],
+        # Compliance reporting (templates, PDF generation)
+        "compliance": [
+            "jinja2>=3.0.0",  # Template engine
+            "markdown>=3.3.0",  # Markdown to HTML
+        ],
+        # Observability exports
+        "observability": [
+            "prometheus-client>=0.19.0",  # Prometheus metrics
+        ],
+        # Trajectory monitoring (advanced/experimental)
+        "trajectory": [
+            "matplotlib>=3.5.0",  # Visualization
+        ],
+        # CLI tool
+        "cli": [
+            "click>=8.0.0",  # CLI framework
+        ],
+        # Development tools
         "dev": [
             "pytest>=7.0.0",
             "pytest-asyncio>=0.21.0",
+            "pytest-cov>=4.0.0",  # Coverage reporting
+            "hypothesis>=6.0.0",  # Property-based testing
             "ruff>=0.1.0",  # Linting and formatting
-            "mypy>=1.0.0",
+            "mypy>=1.0.0",  # Type checking
             "datasets>=2.0.0",  # For STS-Benchmark validation
-            "pandas>=1.3.0",  # For data analysis in validation
-            "rapidfuzz>=3.0.0",  # For fuzzy text matching in legacy comparators
+            "pandas>=1.3.0",  # For data analysis
+            "rapidfuzz>=3.0.0",  # Fuzzy matching
         ],
+        # Inspector UI (web-based log viewer)
         "inspector": [
-            "flask>=2.0.0",  # Lightweight server for inspector UI
-            "jinja2>=3.0.0",  # Template engine
+            "flask>=2.0.0",
+            "jinja2>=3.0.0",
         ],
+        # Jupyter notebook support
         "notebook": [
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
         ],
+        # All features
         "all": [
-            # Dev tools
-            "pytest>=7.0.0",
-            "pytest-asyncio>=0.21.0",
-            "ruff>=0.1.0",
-            "mypy>=1.0.0",
-            "datasets>=2.0.0",
-            "pandas>=1.3.0",
-            "rapidfuzz>=3.0.0",
-            # Inspector UI
-            "flask>=2.0.0",
+            # Evaluation
+            "sentence-transformers>=2.2.0,<3.0.0",
+            "torch>=1.11.0",
+            "transformers>=4.30.0",
+            "tiktoken>=0.5.0",
+            "protobuf>=3.20.0",
+            "numpy>=1.21.0",
+            "scipy>=1.7.0",
+            # LLM Providers
+            "anthropic>=0.18.0",
+            "openai>=1.0.0",
+            "google-generativeai>=0.3.0",
+            # Frameworks
+            "langchain>=0.1.0",
+            "langchain-core>=0.1.0",
+            "pyautogen>=0.2.0",
+            "crewai>=0.1.0",
+            # Compliance
             "jinja2>=3.0.0",
-            # Notebook support
+            "markdown>=3.3.0",
+            # Observability
+            "prometheus-client>=0.19.0",
+            # Trajectory
+            "matplotlib>=3.5.0",
+            # CLI
+            "click>=8.0.0",
+            # Inspector
+            "flask>=2.0.0",
+            # Notebook
             "ipython>=7.0.0",
             "ipywidgets>=8.0.0",
         ],
     },
     entry_points={
         "console_scripts": [
-            "cert=cert.cli:main",
-            "cert-compare=cert.cli:compare_texts",
+            "cert=cert.cli.main:main",
         ],
     },
     package_data={

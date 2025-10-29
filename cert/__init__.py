@@ -7,27 +7,29 @@ EU AI Act Article 15 Compliance Framework for LLM Systems
 Production-ready accuracy monitoring with automated compliance documentation.
 
 Public API:
-    - measure(): Measure consistency between two texts
-    - monitor(): Decorator for monitoring LLM outputs
-    - export_report(): Generate EU AI Act compliance reports
+    - trace(): Lightweight decorator for logging (zero dependencies)
+    - measure(): Measure consistency between two texts (requires [evaluation])
+    - monitor(): Decorator for monitoring LLM outputs (DEPRECATED, use trace())
+    - export_report(): Generate EU AI Act compliance reports (requires [compliance])
     - PRESETS: Industry preset configurations
 
 Example Usage:
-    >>> from cert import measure, monitor, export_report
+    >>> from cert import trace
     >>>
-    >>> # Measure consistency
-    >>> result = measure(
-    ...     text1="Revenue was $5M in Q4",
-    ...     text2="Q4 revenue reached $5M"
-    ... )
-    >>> print(f"Confidence: {result.confidence}")
-    >>>
-    >>> # Monitor with preset
-    >>> @monitor(preset="healthcare")
+    >>> # Basic tracing (zero dependencies)
+    >>> @trace()
     ... def my_rag_pipeline(query):
     ...     context = retrieve(query)
     ...     answer = llm(context, query)
     ...     return {"context": context, "answer": answer}
+    >>>
+    >>> # For evaluation features:
+    >>> # pip install cert-framework[evaluation]
+    >>> from cert import measure
+    >>> result = measure(
+    ...     text1="Revenue was $5M in Q4",
+    ...     text2="Q4 revenue reached $5M"
+    ... )
 
 Advanced Features (Experimental):
     For trajectory analysis and coordination monitoring, use:
@@ -41,28 +43,95 @@ __version__ = "4.0.0"
 __author__ = "Javier Marin"
 __license__ = "Apache 2.0"
 
-# Public API - Production-ready monitoring
-from cert.measure import measure
-from cert.monitor import monitor
-from cert.compliance import export_report
-from cert.utils import (
-    Preset,
-    PRESETS,
-    IndustryPreset,
-    ComplianceRequirement,
-    INDUSTRY_PRESETS,
-    get_industry_preset,
-)
+# Core API - Always available (zero dependencies)
+from cert.core.tracer import trace
+
+# Lazy imports for optional features
+def measure(*args, **kwargs):
+    """Measure consistency between two texts.
+
+    Requires: pip install cert-framework[evaluation]
+    """
+    try:
+        from cert.measure import measure as _measure
+        return _measure(*args, **kwargs)
+    except ImportError as e:
+        raise ImportError(
+            "Evaluation features require: pip install cert-framework[evaluation]\n"
+            f"Original error: {e}"
+        )
+
+def monitor(*args, **kwargs):
+    """Monitor LLM function for accuracy (DEPRECATED).
+
+    DEPRECATED: Use trace() for lightweight monitoring.
+    For evaluation, use trace() + Evaluator.evaluate_log_file()
+
+    Requires: pip install cert-framework[evaluation]
+    """
+    import warnings
+    warnings.warn(
+        "monitor() is deprecated. Use trace() for monitoring. "
+        "For evaluation, use: Evaluator.evaluate_log_file()",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    try:
+        from cert.monitor import monitor as _monitor
+        return _monitor(*args, **kwargs)
+    except ImportError as e:
+        raise ImportError(
+            "Monitor requires: pip install cert-framework[evaluation]\n"
+            f"Original error: {e}"
+        )
+
+def export_report(*args, **kwargs):
+    """Generate EU AI Act compliance report.
+
+    Requires: pip install cert-framework[compliance]
+    """
+    try:
+        from cert.compliance import export_report as _export_report
+        return _export_report(*args, **kwargs)
+    except ImportError as e:
+        raise ImportError(
+            "Compliance reporting requires: pip install cert-framework[compliance]\n"
+            f"Original error: {e}"
+        )
+
+# Lazy preset imports
+def _get_presets():
+    """Lazy load presets."""
+    try:
+        from cert.utils import (
+            Preset,
+            PRESETS,
+            IndustryPreset,
+            ComplianceRequirement,
+            INDUSTRY_PRESETS,
+            get_industry_preset,
+        )
+        return {
+            "Preset": Preset,
+            "PRESETS": PRESETS,
+            "IndustryPreset": IndustryPreset,
+            "ComplianceRequirement": ComplianceRequirement,
+            "INDUSTRY_PRESETS": INDUSTRY_PRESETS,
+            "get_industry_preset": get_industry_preset,
+        }
+    except ImportError:
+        return None
 
 __all__ = [
-    # Core API
+    # Core API (always available)
+    "trace",
+    # Optional features (lazy loaded)
     "measure",
     "monitor",
     "export_report",
-    # Presets (legacy)
+    # Presets
     "Preset",
     "PRESETS",
-    # Enhanced presets with EU AI Act compliance mapping
     "IndustryPreset",
     "ComplianceRequirement",
     "INDUSTRY_PRESETS",
@@ -72,8 +141,25 @@ __all__ = [
 
 # Deprecation warnings for v1.x imports
 def __getattr__(name):
-    """Handle deprecated imports with warnings."""
+    """Handle deprecated imports and lazy preset loading."""
     import warnings
+
+    # Lazy load presets
+    if name in [
+        "Preset",
+        "PRESETS",
+        "IndustryPreset",
+        "ComplianceRequirement",
+        "INDUSTRY_PRESETS",
+        "get_industry_preset",
+    ]:
+        presets = _get_presets()
+        if presets and name in presets:
+            return presets[name]
+        else:
+            raise ImportError(
+                f"Preset utilities require: pip install cert-framework[evaluation]"
+            )
 
     # Trajectory imports moved to advanced
     if name in [
