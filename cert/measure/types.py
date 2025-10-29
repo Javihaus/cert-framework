@@ -61,7 +61,10 @@ class MeasurementResult:
             "metadata": self.metadata,
             "timestamp": self.timestamp,
         }
-
+        
+    def get(self, key, default=None):
+        """Dict-like access for backwards compatibility."""
+        return getattr(self, key, default)
 
 # ============================================================================
 # METRIC DATACLASSES (for agent_monitor() function)
