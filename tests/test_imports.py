@@ -4,6 +4,8 @@ These are the most basic tests - they just verify the package structure
 is correct and imports don't fail.
 """
 
+from conftest import requires_evaluation
+
 
 def test_import_cert():
     """Test main cert package imports."""
@@ -12,6 +14,7 @@ def test_import_cert():
     assert cert.__version__ is not None
 
 
+@requires_evaluation
 def test_import_public_api():
     """Test public API imports from cert package."""
     from cert import measure, monitor, Preset, PRESETS, export_report
@@ -23,6 +26,7 @@ def test_import_public_api():
     assert export_report is not None
 
 
+@requires_evaluation
 def test_import_measure_module():
     """Test measure module imports."""
     from cert.measure import measure
@@ -32,6 +36,7 @@ def test_import_measure_module():
     assert MeasurementResult is not None
 
 
+@requires_evaluation
 def test_import_monitor_module():
     """Test monitor module imports."""
     from cert.monitor import monitor

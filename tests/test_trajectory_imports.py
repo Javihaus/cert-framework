@@ -1,8 +1,10 @@
 """Test trajectory module imports."""
 
 import pytest
+from conftest import requires_trajectory
 
 
+@requires_trajectory
 def test_import_trajectory_module():
     """Test trajectory module can be imported."""
     import cert.advanced.trajectory
@@ -10,6 +12,7 @@ def test_import_trajectory_module():
     assert cert.advanced.trajectory.__version__ is not None
 
 
+@requires_trajectory
 def test_import_trajectory_types():
     """Test trajectory types can be imported."""
     from cert.advanced.trajectory import ReasoningMetrics, TrajectoryAnalysis, TrajectoryConfig
@@ -19,6 +22,7 @@ def test_import_trajectory_types():
     assert TrajectoryConfig is not None
 
 
+@requires_trajectory
 def test_import_trajectory_monitor():
     """Test trajectory monitor can be imported."""
     from cert.advanced.trajectory import ReasoningTrajectoryMonitor
@@ -26,6 +30,7 @@ def test_import_trajectory_monitor():
     assert ReasoningTrajectoryMonitor is not None
 
 
+@requires_trajectory
 def test_import_trajectory_visualizer():
     """Test trajectory visualizer can be imported (requires matplotlib)."""
     pytest.importorskip("matplotlib")
@@ -34,6 +39,7 @@ def test_import_trajectory_visualizer():
     assert HamiltonianVisualizer is not None
 
 
+@requires_trajectory
 def test_import_trajectory_analyzer():
     """Test trajectory analyzer can be imported."""
     from cert.advanced.trajectory import CERTTrajectoryAnalyzer
@@ -41,6 +47,7 @@ def test_import_trajectory_analyzer():
     assert CERTTrajectoryAnalyzer is not None
 
 
+@requires_trajectory
 def test_import_trajectory_utils():
     """Test trajectory utils can be imported."""
     from cert.advanced.trajectory import load_model_for_monitoring, unload_model
@@ -73,6 +80,7 @@ def test_deprecated_import_from_cert_package():
         assert analyze_trajectory is not None
 
 
+@requires_trajectory
 def test_trajectory_config_defaults():
     """Test TrajectoryConfig has correct defaults."""
     from cert.advanced.trajectory import TrajectoryConfig
@@ -88,6 +96,7 @@ def test_trajectory_config_defaults():
     assert config.surprise_probability_threshold == 0.1
 
 
+@requires_trajectory
 def test_trajectory_config_custom():
     """Test TrajectoryConfig accepts custom values."""
     from cert.advanced.trajectory import TrajectoryConfig
@@ -107,6 +116,7 @@ def test_trajectory_config_custom():
     assert config.temperature == 0.5
 
 
+@requires_trajectory
 def test_reasoning_metrics_creation():
     """Test ReasoningMetrics can be created."""
     from cert.advanced.trajectory import ReasoningMetrics
@@ -128,6 +138,7 @@ def test_reasoning_metrics_creation():
     assert metrics.cumulative_surprise == 2.5
 
 
+@requires_trajectory
 def test_reasoning_metrics_to_dict():
     """Test ReasoningMetrics can be converted to dict."""
     from cert.advanced.trajectory import ReasoningMetrics

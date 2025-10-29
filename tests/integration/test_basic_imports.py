@@ -1,6 +1,7 @@
 """Test basic imports and API availability."""
 
 import pytest
+from conftest import requires_trajectory
 
 
 class TestImports:
@@ -38,6 +39,7 @@ class TestImports:
         assert get_metrics_text is not None
         assert create_grafana_dashboard_json is not None
 
+    @requires_trajectory
     def test_trajectory_imports(self):
         """Test trajectory (Hamiltonian) imports."""
         from cert.advanced.trajectory import (
@@ -70,6 +72,7 @@ class TestImports:
         assert QualityEvaluator is not None
         assert BaselineMeasurer is not None
 
+    @requires_trajectory
     def test_backward_compatibility(self):
         """Test v3.x API still available."""
         from cert.advanced.trajectory import (
@@ -84,6 +87,7 @@ class TestImports:
 class TestAPIAvailability:
     """Test API endpoints are accessible."""
 
+    @requires_trajectory
     def test_trajectory_api(self):
         """Test trajectory API instantiation."""
         from cert.advanced.trajectory import HamiltonianMonitor, TrajectoryConfig
@@ -125,6 +129,7 @@ class TestAPIAvailability:
 class TestConfiguration:
     """Test configuration management."""
 
+    @requires_trajectory
     def test_trajectory_config(self):
         """Test trajectory configuration."""
         from cert.advanced.trajectory import TrajectoryConfig

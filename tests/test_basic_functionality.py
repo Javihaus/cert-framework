@@ -8,7 +8,10 @@ import pytest
 from pathlib import Path
 import tempfile
 
+from conftest import requires_evaluation, requires_trajectory
 
+
+@requires_evaluation
 class TestMeasureFunction:
     """Test measure() function."""
 

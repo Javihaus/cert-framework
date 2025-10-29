@@ -34,52 +34,7 @@ License: MIT
 
 __version__ = "2.0.0"
 
-# Public API exports
-from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
-from cert.advanced.trajectory.types import (
-    ReasoningMetrics,
-    TrajectoryAnalysis,
-    TrajectoryConfig,
-)
-
-# Lazy import for optional dependencies
-try:
-    from cert.advanced.trajectory.visualizer import HamiltonianVisualizer
-except ImportError:
-    HamiltonianVisualizer = None
-
-from cert.advanced.trajectory.analyzer import CERTTrajectoryAnalyzer
-
-# Production API (v2.0+)
-from cert.advanced.trajectory.api import HamiltonianMonitor
-from cert.advanced.trajectory.engine import HamiltonianEngine
-from cert.advanced.trajectory.resources import HamiltonianModelResource
-from cert.advanced.trajectory.utils import load_model_for_monitoring, unload_model
-
-
-# Convenience function for simple trajectory analysis
-def analyze_trajectory(model, tokenizer, prompt: str, config: TrajectoryConfig = None):
-    """
-    Analyze a single generation with trajectory monitoring.
-
-    Args:
-        model: HuggingFace model
-        tokenizer: Corresponding tokenizer
-        prompt: Input prompt
-        config: Optional TrajectoryConfig (uses defaults if None)
-
-    Returns:
-        TrajectoryAnalysis with quality metrics
-
-    Example:
-        >>> model, tokenizer = load_model_for_monitoring("gpt2")
-        >>> analysis = analyze_trajectory(model, tokenizer, "Explain AI safety")
-        >>> print(f"Passed: {analysis.passed_quality_check}")
-    """
-    monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
-    return monitor.monitor_generation(prompt)
-
-
+# All trajectory features require torch (part of [evaluation] extras)
 __all__ = [
     # Data structures
     "ReasoningMetrics",
@@ -102,6 +57,92 @@ __all__ = [
     "unload_model",
 ]
 
-# Add to __all__ only if successfully imported
-if HamiltonianVisualizer is None:
-    __all__.remove("HamiltonianVisualizer")
+
+def __getattr__(name):
+    """Lazy load trajectory features (requires torch)."""
+    if name in [
+        "ReasoningTrajectoryMonitor",
+        "analyze_trajectory",
+    ]:
+        try:
+            from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
+
+            if name == "ReasoningTrajectoryMonitor":
+                return ReasoningTrajectoryMonitor
+            elif name == "analyze_trajectory":
+                # Define analyze_trajectory locally
+                def analyze_trajectory(model, tokenizer, prompt: str, config=None):
+                    """Analyze a single generation with trajectory monitoring."""
+                    from cert.advanced.trajectory.types import TrajectoryConfig
+
+                    monitor = ReasoningTrajectoryMonitor(model, tokenizer, config=config)
+                    return monitor.monitor_generation(prompt)
+
+                return analyze_trajectory
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+            )
+
+    if name in ["ReasoningMetrics", "TrajectoryAnalysis", "TrajectoryConfig"]:
+        try:
+            from cert.advanced.trajectory.types import (
+                ReasoningMetrics,
+                TrajectoryAnalysis,
+                TrajectoryConfig,
+            )
+
+            return locals()[name]
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+            )
+
+    if name == "HamiltonianVisualizer":
+        try:
+            from cert.advanced.trajectory.visualizer import HamiltonianVisualizer
+
+            return HamiltonianVisualizer
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation,trajectory]\n"
+                f"Matplotlib is required for visualization.\n"
+                f"Original error: {e}"
+            )
+
+    if name == "CERTTrajectoryAnalyzer":
+        try:
+            from cert.advanced.trajectory.analyzer import CERTTrajectoryAnalyzer
+
+            return CERTTrajectoryAnalyzer
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+            )
+
+    if name in ["HamiltonianMonitor", "HamiltonianEngine", "HamiltonianModelResource"]:
+        try:
+            from cert.advanced.trajectory.api import HamiltonianMonitor
+            from cert.advanced.trajectory.engine import HamiltonianEngine
+            from cert.advanced.trajectory.resources import HamiltonianModelResource
+
+            return locals()[name]
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+            )
+
+    if name in ["load_model_for_monitoring", "unload_model"]:
+        try:
+            from cert.advanced.trajectory.utils import (
+                load_model_for_monitoring,
+                unload_model,
+            )
+
+            return locals()[name]
+        except ImportError as e:
+            raise ImportError(
+                f"{name} requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+            )
+
+    raise AttributeError(f"module 'cert.advanced.trajectory' has no attribute '{name}'")
