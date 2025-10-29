@@ -87,9 +87,7 @@ class EmbeddingEngine:
         emb2 = self.get_embedding(text2)
 
         # Cosine similarity
-        similarity = float(
-            np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
-        )
+        similarity = float(np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2)))
 
         return similarity
 
@@ -114,10 +112,7 @@ def get_embedding_engine(model_name: str = "all-MiniLM-L6-v2") -> EmbeddingEngin
     """
     global _GLOBAL_EMBEDDING_ENGINE
 
-    if (
-        _GLOBAL_EMBEDDING_ENGINE is None
-        or _GLOBAL_EMBEDDING_ENGINE.model_name != model_name
-    ):
+    if _GLOBAL_EMBEDDING_ENGINE is None or _GLOBAL_EMBEDDING_ENGINE.model_name != model_name:
         _GLOBAL_EMBEDDING_ENGINE = EmbeddingEngine(model_name=model_name)
 
     return _GLOBAL_EMBEDDING_ENGINE

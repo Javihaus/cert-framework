@@ -10,9 +10,7 @@ from typing import List, Set
 logger = logging.getLogger(__name__)
 
 
-def compute_grounding_score(
-    context: str, answer: str, min_term_length: int = 4
-) -> float:
+def compute_grounding_score(context: str, answer: str, min_term_length: int = 4) -> float:
     """Compute grounding score between context and answer.
 
     Checks if key terms from answer appear in context. This catches cases
@@ -67,9 +65,7 @@ def extract_terms(text: str, min_length: int = 4) -> List[str]:
     return terms
 
 
-def get_ungrounded_terms(
-    context: str, answer: str, min_term_length: int = 4
-) -> Set[str]:
+def get_ungrounded_terms(context: str, answer: str, min_term_length: int = 4) -> Set[str]:
     """Get terms from answer that don't appear in context.
 
     Useful for debugging and explaining why grounding score is low.
@@ -107,8 +103,8 @@ def compute_term_overlap(text1: str, text2: str, min_term_length: int = 4) -> fl
     Returns:
         Jaccard similarity (0.0-1.0)
     """
-    terms1 = set(t.lower() for t in extract_terms(text1, min_length=min_term_length))
-    terms2 = set(t.lower() for t in extract_terms(text2, min_length=min_term_length))
+    terms1 = {t.lower() for t in extract_terms(text1, min_length=min_term_length)}
+    terms2 = {t.lower() for t in extract_terms(text2, min_length=min_term_length)}
 
     if not terms1 or not terms2:
         return 0.0

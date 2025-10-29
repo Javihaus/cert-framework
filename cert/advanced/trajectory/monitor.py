@@ -12,9 +12,10 @@ MARKETING LANGUAGE:
 - "Physics-inspired monitoring for advanced AI systems"
 """
 
-import torch
+from typing import List, Optional
+
 import numpy as np
-from typing import Optional, List
+import torch
 
 from cert.advanced.trajectory.types import (
     ReasoningMetrics,
@@ -34,9 +35,7 @@ class ReasoningTrajectoryMonitor:
     - Quality thresholds for production gates
     """
 
-    def __init__(
-        self, model, tokenizer, config: TrajectoryConfig = None, device: str = "cuda"
-    ):
+    def __init__(self, model, tokenizer, config: TrajectoryConfig = None, device: str = "cuda"):
         """
         Initialize monitor.
 
@@ -99,9 +98,7 @@ class ReasoningTrajectoryMonitor:
         # Calculate per-step metrics
         cumulative_surprise = 0.0
 
-        for step_idx, (token_id, scores) in enumerate(
-            zip(generated_ids, outputs.scores)
-        ):
+        for step_idx, (token_id, scores) in enumerate(zip(generated_ids, outputs.scores)):
             # Probability distribution
             probs = torch.softmax(scores[0], dim=-1)
 
@@ -111,9 +108,7 @@ class ReasoningTrajectoryMonitor:
 
             # Top-k entropy (standard measure of distribution spread)
             top_k_probs, top_k_indices = torch.topk(probs, k=self.config.top_k)
-            top_k_entropy = -torch.sum(
-                top_k_probs * torch.log(top_k_probs + 1e-10)
-            ).item()
+            top_k_entropy = -torch.sum(top_k_probs * torch.log(top_k_probs + 1e-10)).item()
 
             # Confidence gap (how decisive is the model?)
             if len(top_k_probs) >= 2:
@@ -143,9 +138,7 @@ class ReasoningTrajectoryMonitor:
             m.perplexity for m in self.metrics_history if m.perplexity != float("inf")
         ]
 
-        avg_perplexity = (
-            np.mean(valid_perplexities) if valid_perplexities else float("inf")
-        )
+        avg_perplexity = np.mean(valid_perplexities) if valid_perplexities else float("inf")
         max_perplexity = max(valid_perplexities) if valid_perplexities else float("inf")
         avg_entropy = np.mean([m.top_k_entropy for m in self.metrics_history])
         max_entropy = max([m.top_k_entropy for m in self.metrics_history])

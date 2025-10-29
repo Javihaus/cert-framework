@@ -36,22 +36,27 @@ def cli():
 
 
 @cli.command()
-@click.argument('log_path', type=click.Path(exists=True))
-@click.option('--output', '-o', default='compliance_report.md',
-              help='Output path for report')
-@click.option('--format', '-f',
-              type=click.Choice(['markdown', 'html', 'pdf', 'txt']),
-              default='markdown',
-              help='Report format')
-@click.option('--system-name', required=True,
-              help='Name of the AI system')
-@click.option('--risk-level',
-              type=click.Choice(['high', 'medium', 'low']),
-              default='high',
-              help='Risk classification of the system')
-@click.option('--eval-results',
-              type=click.Path(exists=True),
-              help='Path to evaluation results JSON (optional)')
+@click.argument("log_path", type=click.Path(exists=True))
+@click.option("--output", "-o", default="compliance_report.md", help="Output path for report")
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["markdown", "html", "pdf", "txt"]),
+    default="markdown",
+    help="Report format",
+)
+@click.option("--system-name", required=True, help="Name of the AI system")
+@click.option(
+    "--risk-level",
+    type=click.Choice(["high", "medium", "low"]),
+    default="high",
+    help="Risk classification of the system",
+)
+@click.option(
+    "--eval-results",
+    type=click.Path(exists=True),
+    help="Path to evaluation results JSON (optional)",
+)
 def report(log_path, output, format, system_name, risk_level, eval_results):
     """Generate EU AI Act compliance report from trace logs.
 
@@ -71,8 +76,9 @@ def report(log_path, output, format, system_name, risk_level, eval_results):
     try:
         from cert.compliance.reporter import ComplianceReporter
     except ImportError:
-        click.echo("Error: Compliance reporting requires: pip install cert-framework[compliance]",
-                   err=True)
+        click.echo(
+            "Error: Compliance reporting requires: pip install cert-framework[compliance]", err=True
+        )
         sys.exit(1)
 
     click.echo(f"Generating {format} compliance report...")
@@ -87,17 +93,14 @@ def report(log_path, output, format, system_name, risk_level, eval_results):
         click.echo(f"  Evaluation results: {eval_results}")
 
     # Generate report
-    reporter = ComplianceReporter(
-        system_name=system_name,
-        risk_level=risk_level
-    )
+    reporter = ComplianceReporter(system_name=system_name, risk_level=risk_level)
 
     try:
         output_path = reporter.generate_report(
             log_path=log_path,
             output_path=output,
             format=format,
-            evaluation_results=evaluation_results
+            evaluation_results=evaluation_results,
         )
         click.echo(f"\n✓ Report generated: {output_path}")
     except Exception as e:
@@ -106,13 +109,12 @@ def report(log_path, output, format, system_name, risk_level, eval_results):
 
 
 @cli.command()
-@click.argument('log_path', type=click.Path(exists=True))
-@click.option('--preset', default='general',
-              help='Evaluation preset (general, financial, healthcare, legal)')
-@click.option('--threshold', type=float, default=0.7,
-              help='Confidence threshold for pass/fail')
-@click.option('--output', '-o',
-              help='Output path for results JSON')
+@click.argument("log_path", type=click.Path(exists=True))
+@click.option(
+    "--preset", default="general", help="Evaluation preset (general, financial, healthcare, legal)"
+)
+@click.option("--threshold", type=float, default=0.7, help="Confidence threshold for pass/fail")
+@click.option("--output", "-o", help="Output path for results JSON")
 def evaluate(log_path, preset, threshold, output):
     """Evaluate traces offline with accuracy measurements.
 
@@ -131,8 +133,7 @@ def evaluate(log_path, preset, threshold, output):
     try:
         from cert.evaluation import Evaluator
     except ImportError:
-        click.echo("Error: Evaluation requires: pip install cert-framework[evaluation]",
-                   err=True)
+        click.echo("Error: Evaluation requires: pip install cert-framework[evaluation]", err=True)
         sys.exit(1)
 
     click.echo(f"Evaluating traces with preset={preset}, threshold={threshold}...")
@@ -144,39 +145,39 @@ def evaluate(log_path, preset, threshold, output):
         results = evaluator.evaluate_log_file(log_path)
 
         # Display results
-        click.echo(f"\n📊 Evaluation Results:")
+        click.echo("\n📊 Evaluation Results:")
         click.echo(f"  Total traces: {results['total_traces']}")
-        click.echo(f"  Passed: {results['passed']} ({results['passed']/results['total_traces']*100:.1f}%)")
-        click.echo(f"  Failed: {results['failed']} ({results['failed']/results['total_traces']*100:.1f}%)")
+        click.echo(
+            f"  Passed: {results['passed']} ({results['passed'] / results['total_traces'] * 100:.1f}%)"
+        )
+        click.echo(
+            f"  Failed: {results['failed']} ({results['failed'] / results['total_traces'] * 100:.1f}%)"
+        )
         click.echo(f"  Pass rate: {results['pass_rate']:.1%}")
 
-        if results['traces_skipped'] > 0:
+        if results["traces_skipped"] > 0:
             click.echo(f"  Skipped: {results['traces_skipped']} (missing context/answer)")
 
         # Save results if output specified
         if output:
-            with open(output, 'w') as f:
+            with open(output, "w") as f:
                 json.dump(results, f, indent=2)
             click.echo(f"\n✓ Results saved: {output}")
 
     except Exception as e:
         click.echo(f"\n✗ Error evaluating traces: {e}", err=True)
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
 @cli.command()
-@click.argument('log_path', type=click.Path(exists=True))
-@click.option('--tail', '-n', type=int, default=10,
-              help='Number of recent traces to show')
-@click.option('--filter-function',
-              help='Filter by function name')
-@click.option('--filter-status',
-              type=click.Choice(['success', 'error']),
-              help='Filter by status')
-@click.option('--json-output', is_flag=True,
-              help='Output as JSON')
+@click.argument("log_path", type=click.Path(exists=True))
+@click.option("--tail", "-n", type=int, default=10, help="Number of recent traces to show")
+@click.option("--filter-function", help="Filter by function name")
+@click.option("--filter-status", type=click.Choice(["success", "error"]), help="Filter by status")
+@click.option("--json-output", is_flag=True, help="Output as JSON")
 def logs(log_path, tail, filter_function, filter_status, json_output):
     """View recent traces from log file.
 
@@ -210,9 +211,9 @@ def logs(log_path, tail, filter_function, filter_status, json_output):
                 trace = json.loads(line)
 
                 # Apply filters
-                if filter_function and trace.get('function') != filter_function:
+                if filter_function and trace.get("function") != filter_function:
                     continue
-                if filter_status and trace.get('status') != filter_status:
+                if filter_status and trace.get("status") != filter_status:
                     continue
 
                 traces.append(trace)
@@ -246,7 +247,7 @@ def logs(log_path, tail, filter_function, filter_status, json_output):
 
 
 @cli.command()
-@click.argument('log_path', type=click.Path(exists=True))
+@click.argument("log_path", type=click.Path(exists=True))
 def stats(log_path):
     """Show statistics about trace logs.
 
@@ -282,11 +283,11 @@ def stats(log_path):
     durations = [t.get("duration_ms", 0) for t in traces]
     timestamps = [t.get("timestamp") for t in traces if t.get("timestamp")]
 
-    click.echo(f"\n📊 Trace Log Statistics:\n")
+    click.echo("\n📊 Trace Log Statistics:\n")
     click.echo(f"  Total requests: {total:,}")
-    click.echo(f"  Successful: {successes:,} ({successes/total*100:.1f}%)")
-    click.echo(f"  Errors: {errors:,} ({errors/total*100:.1f}%)")
-    click.echo(f"  Avg duration: {sum(durations)/len(durations):.2f}ms")
+    click.echo(f"  Successful: {successes:,} ({successes / total * 100:.1f}%)")
+    click.echo(f"  Errors: {errors:,} ({errors / total * 100:.1f}%)")
+    click.echo(f"  Avg duration: {sum(durations) / len(durations):.2f}ms")
     click.echo(f"  Min duration: {min(durations):.2f}ms")
     click.echo(f"  Max duration: {max(durations):.2f}ms")
 
@@ -299,7 +300,7 @@ def stats(log_path):
         func = trace.get("function", "unknown")
         functions[func] = functions.get(func, 0) + 1
 
-    click.echo(f"\n  Functions:")
+    click.echo("\n  Functions:")
     for func, count in sorted(functions.items(), key=lambda x: x[1], reverse=True):
         click.echo(f"    {func}: {count:,} calls")
 
@@ -309,5 +310,5 @@ def main():
     cli()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

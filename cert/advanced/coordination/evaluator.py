@@ -9,8 +9,9 @@ Provides:
 
 import json
 import logging
-import numpy as np
 from typing import Dict, List, Optional
+
+import numpy as np
 
 from cert.advanced.coordination.client import AnthropicClientWithResilience
 
@@ -149,9 +150,7 @@ class QualityEvaluator:
             Quality score (0-1)
         """
         # Build evaluation prompt
-        criteria_str = "\n".join(
-            f"- {name}: {desc}" for name, desc in self._criteria.items()
-        )
+        criteria_str = "\n".join(f"- {name}: {desc}" for name, desc in self._criteria.items())
 
         prompt = f"""Evaluate the following response to a task:
 

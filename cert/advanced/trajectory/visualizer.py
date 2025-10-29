@@ -9,9 +9,10 @@ MAPPING (for marketing consistency):
 These are metaphors that create memorable visual artifacts for sales/compliance.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 from typing import Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 from cert.advanced.trajectory.types import TrajectoryAnalysis
 
@@ -51,8 +52,7 @@ class HamiltonianVisualizer:
 
         steps = [m.step for m in analysis.metrics]
         perplexities = [
-            m.perplexity if m.perplexity != float("inf") else 100
-            for m in analysis.metrics
+            m.perplexity if m.perplexity != float("inf") else 100 for m in analysis.metrics
         ]
         entropies = [m.top_k_entropy for m in analysis.metrics]
         surprises = [m.cumulative_surprise for m in analysis.metrics]
@@ -69,12 +69,8 @@ class HamiltonianVisualizer:
         )
         axes[0, 0].fill_between(steps, perplexities, alpha=0.2, color="blue")
         axes[0, 0].set_xlabel("Generation Step", fontsize=12, fontweight="bold")
-        axes[0, 0].set_ylabel(
-            "Perplexity (Potential Energy)", fontsize=12, fontweight="bold"
-        )
-        axes[0, 0].set_title(
-            "Model Uncertainty Trajectory", fontsize=13, fontweight="bold"
-        )
+        axes[0, 0].set_ylabel("Perplexity (Potential Energy)", fontsize=12, fontweight="bold")
+        axes[0, 0].set_title("Model Uncertainty Trajectory", fontsize=13, fontweight="bold")
         axes[0, 0].legend(fontsize=10)
         axes[0, 0].grid(True, alpha=0.3)
 
@@ -90,12 +86,8 @@ class HamiltonianVisualizer:
         )
         axes[0, 1].fill_between(steps, entropies, alpha=0.2, color="green")
         axes[0, 1].set_xlabel("Generation Step", fontsize=12, fontweight="bold")
-        axes[0, 1].set_ylabel(
-            "Entropy (Kinetic Energy)", fontsize=12, fontweight="bold"
-        )
-        axes[0, 1].set_title(
-            "Distribution Spread Trajectory", fontsize=13, fontweight="bold"
-        )
+        axes[0, 1].set_ylabel("Entropy (Kinetic Energy)", fontsize=12, fontweight="bold")
+        axes[0, 1].set_title("Distribution Spread Trajectory", fontsize=13, fontweight="bold")
         axes[0, 1].legend(fontsize=10)
         axes[0, 1].grid(True, alpha=0.3)
 
@@ -105,9 +97,7 @@ class HamiltonianVisualizer:
         norm_entr = np.array(entropies) / analysis.entropy_threshold
         total_energy = norm_perp + norm_entr
 
-        axes[1, 0].plot(
-            steps, total_energy, "purple", linewidth=2.5, label="Total Energy"
-        )
+        axes[1, 0].plot(steps, total_energy, "purple", linewidth=2.5, label="Total Energy")
         axes[1, 0].fill_between(steps, total_energy, alpha=0.3, color="purple")
         axes[1, 0].axhline(
             y=2.0,
@@ -128,9 +118,7 @@ class HamiltonianVisualizer:
         axes[1, 0].grid(True, alpha=0.3)
 
         # Plot 4: Cumulative Surprise (Hallucination Risk)
-        axes[1, 1].plot(
-            steps, surprises, "orange", linewidth=2.5, label="Cumulative Surprise"
-        )
+        axes[1, 1].plot(steps, surprises, "orange", linewidth=2.5, label="Cumulative Surprise")
         axes[1, 1].fill_between(steps, surprises, alpha=0.3, color="orange")
         axes[1, 1].axhline(
             y=analysis.surprise_threshold,
@@ -142,9 +130,7 @@ class HamiltonianVisualizer:
         )
         axes[1, 1].set_xlabel("Generation Step", fontsize=12, fontweight="bold")
         axes[1, 1].set_ylabel("Cumulative Surprise", fontsize=12, fontweight="bold")
-        axes[1, 1].set_title(
-            "Hallucination Risk Indicator", fontsize=13, fontweight="bold"
-        )
+        axes[1, 1].set_title("Hallucination Risk Indicator", fontsize=13, fontweight="bold")
         axes[1, 1].legend(fontsize=10)
         axes[1, 1].grid(True, alpha=0.3)
 

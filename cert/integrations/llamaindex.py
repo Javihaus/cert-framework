@@ -13,7 +13,7 @@ Usage:
     response = monitored_engine.query("What is the diagnosis?")
 """
 
-from typing import Any, Optional, Dict
+from typing import Any, Dict, Optional
 
 from cert import monitor
 
@@ -52,8 +52,7 @@ def wrap_llamaindex_engine(
         import llama_index  # noqa: F401
     except ImportError:
         raise ImportError(
-            "LlamaIndex is required for this integration. "
-            "Install with: pip install llama-index"
+            "LlamaIndex is required for this integration. Install with: pip install llama-index"
         )
 
     # Store original query method
@@ -139,8 +138,7 @@ def wrap_llamaindex_agent(
         import llama_index  # noqa: F401
     except ImportError:
         raise ImportError(
-            "LlamaIndex is required for this integration. "
-            "Install with: pip install llama-index"
+            "LlamaIndex is required for this integration. Install with: pip install llama-index"
         )
 
     # Store original chat method
@@ -212,8 +210,7 @@ def wrap_llamaindex_chat_engine(
         import llama_index  # noqa: F401
     except ImportError:
         raise ImportError(
-            "LlamaIndex is required for this integration. "
-            "Install with: pip install llama-index"
+            "LlamaIndex is required for this integration. Install with: pip install llama-index"
         )
 
     original_chat = chat_engine.chat

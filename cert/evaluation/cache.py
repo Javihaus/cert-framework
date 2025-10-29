@@ -8,7 +8,7 @@ pairs appear frequently.
 
 import hashlib
 from functools import lru_cache
-from typing import Any, Tuple
+from typing import Any
 
 
 def cache_key(*args: Any) -> str:
@@ -31,7 +31,7 @@ def cached_measure(
     threshold: float = 0.7,
     use_semantic: bool = True,
     use_nli: bool = True,
-    use_grounding: bool = True
+    use_grounding: bool = True,
 ) -> Any:
     """Cached measurement for repeated evaluations.
 
@@ -60,7 +60,7 @@ def cached_measure(
         threshold=threshold,
         use_semantic=use_semantic,
         use_nli=use_nli,
-        use_grounding=use_grounding
+        use_grounding=use_grounding,
     )
 
 
@@ -85,7 +85,7 @@ def get_cache_info() -> dict:
         "misses": info.misses,
         "maxsize": info.maxsize,
         "currsize": info.currsize,
-        "hit_rate": info.hits / (info.hits + info.misses) if (info.hits + info.misses) > 0 else 0.0
+        "hit_rate": info.hits / (info.hits + info.misses) if (info.hits + info.misses) > 0 else 0.0,
     }
 
 
@@ -134,7 +134,7 @@ class MeasurementCache:
         import json
 
         cache_file = self.cache_dir / f"{key}.json"
-        with open(cache_file, 'w') as f:
+        with open(cache_file, "w") as f:
             json.dump(value, f)
 
     def clear(self) -> None:

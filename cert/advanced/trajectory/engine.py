@@ -10,21 +10,21 @@ Extracted from notebooks with:
 - CPU fallback for GPU OOM
 """
 
+import hashlib
+import json
 import logging
 import time
 from typing import Optional, Union
-import hashlib
-import json
 
-import torch
 import numpy as np
+import torch
 
+from cert.advanced.trajectory.resources import HamiltonianModelResource
 from cert.advanced.trajectory.types import (
+    ReasoningMetrics,
     TrajectoryAnalysis,
     TrajectoryConfig,
-    ReasoningMetrics,
 )
-from cert.advanced.trajectory.resources import HamiltonianModelResource
 from cert.core.errors import (
     AnalysisError,
     GPUOutOfMemoryError,
@@ -54,9 +54,7 @@ class EmbeddingCache:
         key_data = f"{prompt}:{config_str}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    def get(
-        self, prompt: str, config: TrajectoryConfig
-    ) -> Optional[TrajectoryAnalysis]:
+    def get(self, prompt: str, config: TrajectoryConfig) -> Optional[TrajectoryAnalysis]:
         """Get cached result."""
         key = self._compute_key(prompt, config)
         if key in self._cache:
@@ -203,9 +201,7 @@ class HamiltonianEngine:
                     extra={
                         "prompt_length": len(prompt),
                         "generated_tokens": result.generation_steps,
-                        "quality": "passed"
-                        if result.passed_quality_check
-                        else "failed",
+                        "quality": "passed" if result.passed_quality_check else "failed",
                         "avg_perplexity": result.avg_perplexity,
                         "avg_entropy": result.avg_entropy,
                         "duration_s": duration,
@@ -330,9 +326,7 @@ class HamiltonianEngine:
             metrics_history = []
             cumulative_surprise = 0.0
 
-            for step_idx, (token_id, scores) in enumerate(
-                zip(generated_ids, outputs.scores)
-            ):
+            for step_idx, (token_id, scores) in enumerate(zip(generated_ids, outputs.scores)):
                 # Probability distribution
                 probs = torch.softmax(scores[0], dim=-1)
 
@@ -342,9 +336,7 @@ class HamiltonianEngine:
 
                 # Top-k entropy
                 top_k_probs, _ = torch.topk(probs, k=self._config.top_k)
-                top_k_entropy = -torch.sum(
-                    top_k_probs * torch.log(top_k_probs + 1e-10)
-                ).item()
+                top_k_entropy = -torch.sum(top_k_probs * torch.log(top_k_probs + 1e-10)).item()
 
                 # Logit gap
                 if len(top_k_probs) >= 2:
@@ -374,12 +366,8 @@ class HamiltonianEngine:
                 m.perplexity for m in metrics_history if m.perplexity != float("inf")
             ]
 
-            avg_perplexity = (
-                np.mean(valid_perplexities) if valid_perplexities else float("inf")
-            )
-            max_perplexity = (
-                max(valid_perplexities) if valid_perplexities else float("inf")
-            )
+            avg_perplexity = np.mean(valid_perplexities) if valid_perplexities else float("inf")
+            max_perplexity = max(valid_perplexities) if valid_perplexities else float("inf")
             avg_entropy = np.mean([m.top_k_entropy for m in metrics_history])
             max_entropy = max([m.top_k_entropy for m in metrics_history])
 

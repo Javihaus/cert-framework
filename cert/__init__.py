@@ -46,6 +46,7 @@ __license__ = "Apache 2.0"
 # Core API - Always available (zero dependencies)
 from cert.core.tracer import trace
 
+
 # Lazy imports for optional features
 def measure(*args, **kwargs):
     """Measure consistency between two texts.
@@ -54,12 +55,14 @@ def measure(*args, **kwargs):
     """
     try:
         from cert.measure import measure as _measure
+
         return _measure(*args, **kwargs)
     except ImportError as e:
         raise ImportError(
             "Evaluation features require: pip install cert-framework[evaluation]\n"
             f"Original error: {e}"
         )
+
 
 def monitor(*args, **kwargs):
     """Monitor LLM function for accuracy (DEPRECATED).
@@ -70,20 +73,22 @@ def monitor(*args, **kwargs):
     Requires: pip install cert-framework[evaluation]
     """
     import warnings
+
     warnings.warn(
         "monitor() is deprecated. Use trace() for monitoring. "
         "For evaluation, use: Evaluator.evaluate_log_file()",
         DeprecationWarning,
-        stacklevel=2
+        stacklevel=2,
     )
     try:
         from cert.monitor import monitor as _monitor
+
         return _monitor(*args, **kwargs)
     except ImportError as e:
         raise ImportError(
-            "Monitor requires: pip install cert-framework[evaluation]\n"
-            f"Original error: {e}"
+            f"Monitor requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
         )
+
 
 def export_report(*args, **kwargs):
     """Generate EU AI Act compliance report.
@@ -92,6 +97,7 @@ def export_report(*args, **kwargs):
     """
     try:
         from cert.compliance import export_report as _export_report
+
         return _export_report(*args, **kwargs)
     except ImportError as e:
         raise ImportError(
@@ -99,18 +105,20 @@ def export_report(*args, **kwargs):
             f"Original error: {e}"
         )
 
+
 # Lazy preset imports
 def _get_presets():
     """Lazy load presets."""
     try:
         from cert.utils import (
-            Preset,
-            PRESETS,
-            IndustryPreset,
-            ComplianceRequirement,
             INDUSTRY_PRESETS,
+            PRESETS,
+            ComplianceRequirement,
+            IndustryPreset,
+            Preset,
             get_industry_preset,
         )
+
         return {
             "Preset": Preset,
             "PRESETS": PRESETS,
@@ -121,6 +129,7 @@ def _get_presets():
         }
     except ImportError:
         return None
+
 
 __all__ = [
     # Core API (always available)
@@ -157,9 +166,7 @@ def __getattr__(name):
         if presets and name in presets:
             return presets[name]
         else:
-            raise ImportError(
-                f"Preset utilities require: pip install cert-framework[evaluation]"
-            )
+            raise ImportError("Preset utilities require: pip install cert-framework[evaluation]")
 
     # Trajectory imports moved to advanced
     if name in [

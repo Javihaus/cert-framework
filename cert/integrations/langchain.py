@@ -55,8 +55,7 @@ def wrap_langchain_chain(
         import langchain  # noqa: F401
     except ImportError:
         raise ImportError(
-            "LangChain is required for this integration. "
-            "Install with: pip install langchain"
+            "LangChain is required for this integration. Install with: pip install langchain"
         )
 
     # Store original invoke method
@@ -83,9 +82,7 @@ def wrap_langchain_chain(
 
         # Extract answer
         if isinstance(result, dict):
-            answer = (
-                result.get("result") or result.get("answer") or result.get("output", "")
-            )
+            answer = result.get("result") or result.get("answer") or result.get("output", "")
         else:
             answer = str(result)
 
@@ -101,7 +98,7 @@ def wrap_langchain_chain(
     chain.invoke = monitored_invoke
 
     # Also wrap __call__ if it exists (older LangChain versions)
-    if hasattr(chain, "__call__"):
+    if callable(chain):
         original_call = chain.__call__
 
         @monitor(preset=preset, **config)
@@ -171,8 +168,7 @@ def wrap_langchain_agent(
         import langchain  # noqa: F401
     except ImportError:
         raise ImportError(
-            "LangChain is required for this integration. "
-            "Install with: pip install langchain"
+            "LangChain is required for this integration. Install with: pip install langchain"
         )
 
     original_invoke = agent.invoke
@@ -232,8 +228,7 @@ def create_monitored_callback(preset: str = "general") -> Any:
         from langchain.callbacks.base import BaseCallbackHandler
     except ImportError:
         raise ImportError(
-            "LangChain is required for this integration. "
-            "Install with: pip install langchain"
+            "LangChain is required for this integration. Install with: pip install langchain"
         )
 
     class CERTMonitoringCallback(BaseCallbackHandler):

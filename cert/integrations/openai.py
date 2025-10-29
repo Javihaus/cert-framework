@@ -15,8 +15,8 @@ Usage:
     )
 """
 
-from typing import Any, Optional, Dict
 import functools
+from typing import Any, Dict, Optional
 
 from cert import monitor
 
@@ -56,8 +56,7 @@ def wrap_openai_client(
         import openai  # noqa: F401
     except ImportError:
         raise ImportError(
-            "OpenAI SDK is required for this integration. "
-            "Install with: pip install openai"
+            "OpenAI SDK is required for this integration. Install with: pip install openai"
         )
 
     # Store original chat.completions.create method
@@ -96,7 +95,7 @@ def wrap_openai_client(
         context_parts = []
 
         # Add all non-user messages and previous user messages as context
-        for i, msg in enumerate(messages[:-1]):  # Exclude last user message
+        for _i, msg in enumerate(messages[:-1]):  # Exclude last user message
             role = msg.get("role", "")
             content = msg.get("content", "")
 
@@ -239,8 +238,7 @@ def create_monitored_openai_stream(
         import openai  # noqa: F401
     except ImportError:
         raise ImportError(
-            "OpenAI SDK is required for this integration. "
-            "Install with: pip install openai"
+            "OpenAI SDK is required for this integration. Install with: pip install openai"
         )
 
     # Store original create method
@@ -272,9 +270,7 @@ def create_monitored_openai_stream(
                     if isinstance(content, str):
                         context_parts.append(f"{role}: {content}")
 
-                context = (
-                    "\n\n".join(context_parts) if context_parts else "(no context)"
-                )
+                context = "\n\n".join(context_parts) if context_parts else "(no context)"
 
                 answer = ""
                 if hasattr(response, "choices") and response.choices:
@@ -335,9 +331,7 @@ def create_monitored_openai_stream(
                                 context_parts.append(f"{role}: {content}")
 
                         context = (
-                            "\n\n".join(context_parts)
-                            if context_parts
-                            else "(streaming context)"
+                            "\n\n".join(context_parts) if context_parts else "(streaming context)"
                         )
                         answer = "".join(self.accumulated_content)
 
@@ -407,8 +401,7 @@ def wrap_openai_assistants(
         import openai  # noqa: F401
     except ImportError:
         raise ImportError(
-            "OpenAI SDK is required for this integration. "
-            "Install with: pip install openai"
+            "OpenAI SDK is required for this integration. Install with: pip install openai"
         )
 
     # Store original messages create method

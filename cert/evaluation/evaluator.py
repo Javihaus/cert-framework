@@ -6,7 +6,7 @@ Separates evaluation from runtime monitoring for better performance.
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 from cert.core.tracer import CertTracer
 
@@ -15,10 +15,7 @@ class Evaluator:
     """Offline evaluation layer - requires [evaluation] extras."""
 
     def __init__(
-        self,
-        preset: str = "general",
-        threshold: float = 0.7,
-        tracer: Optional[CertTracer] = None
+        self, preset: str = "general", threshold: float = 0.7, tracer: Optional[CertTracer] = None
     ):
         """Initialize evaluator with preset configuration.
 
@@ -32,12 +29,11 @@ class Evaluator:
         """
         # Import measurement dependencies (only when evaluator is created)
         try:
-            from cert.utils.presets import get_preset
             from cert.measure import measure
+            from cert.utils.presets import get_preset
         except ImportError as e:
             raise ImportError(
-                "Evaluator requires: pip install cert-framework[evaluation]\n"
-                f"Original error: {e}"
+                f"Evaluator requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
             )
 
         # Load preset configuration
@@ -48,10 +44,7 @@ class Evaluator:
         self._measure = measure
 
     def evaluate_trace(
-        self,
-        context: str,
-        answer: str,
-        input_query: Optional[str] = None
+        self, context: str, answer: str, input_query: Optional[str] = None
     ) -> Dict[str, Any]:
         """Evaluate a single trace.
 
@@ -70,11 +63,7 @@ class Evaluator:
                 - preset: Preset used for evaluation
         """
         # Use measure function for evaluation
-        result = self._measure(
-            text1=answer,
-            text2=context,
-            threshold=self.threshold
-        )
+        result = self._measure(text1=answer, text2=context, threshold=self.threshold)
 
         return {
             "matched": result.matched,
@@ -122,15 +111,17 @@ class Evaluator:
                     eval_result = self.evaluate_trace(
                         context=trace["context"],
                         answer=trace["answer"],
-                        input_query=trace.get("input")
+                        input_query=trace.get("input"),
                     )
 
                     # Add trace metadata
-                    eval_result.update({
-                        "timestamp": trace.get("timestamp"),
-                        "function": trace.get("function"),
-                        "duration_ms": trace.get("duration_ms"),
-                    })
+                    eval_result.update(
+                        {
+                            "timestamp": trace.get("timestamp"),
+                            "function": trace.get("function"),
+                            "duration_ms": trace.get("duration_ms"),
+                        }
+                    )
 
                     results.append(eval_result)
                     traces_evaluated += 1
@@ -168,17 +159,17 @@ class Evaluator:
         for trace in traces:
             if trace.get("context") and trace.get("answer"):
                 eval_result = self.evaluate_trace(
-                    context=trace["context"],
-                    answer=trace["answer"],
-                    input_query=trace.get("input")
+                    context=trace["context"], answer=trace["answer"], input_query=trace.get("input")
                 )
 
                 # Add trace metadata
-                eval_result.update({
-                    "timestamp": trace.get("timestamp"),
-                    "function": trace.get("function"),
-                    "duration_ms": trace.get("duration_ms"),
-                })
+                eval_result.update(
+                    {
+                        "timestamp": trace.get("timestamp"),
+                        "function": trace.get("function"),
+                        "duration_ms": trace.get("duration_ms"),
+                    }
+                )
 
                 results.append(eval_result)
             else:

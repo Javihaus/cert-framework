@@ -104,9 +104,7 @@ def measure(
 
     # Validate at least one component enabled
     if not (use_semantic or use_nli or use_grounding):
-        raise ValueError(
-            "At least one component (semantic, nli, grounding) must be enabled"
-        )
+        raise ValueError("At least one component (semantic, nli, grounding) must be enabled")
 
     # Normalize weights
     enabled_weights = []
@@ -296,7 +294,6 @@ def compare(text1: str, text2: str, **kwargs) -> MeasurementResult:
     This function is deprecated and will be removed in a future version.
     """
     logger.warning(
-        "compare() is deprecated. Use measure() instead. "
-        "compare() will be removed in v3.0.0"
+        "compare() is deprecated. Use measure() instead. compare() will be removed in v3.0.0"
     )
     return measure(text1, text2, **kwargs)

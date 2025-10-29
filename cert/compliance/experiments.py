@@ -167,9 +167,7 @@ def run_experiment(
     # Calculate aggregated metrics
     if confidences:
         results["avg_confidence"] = sum(confidences) / len(confidences)
-    results["pass_rate"] = (
-        results["passed"] / results["total"] if results["total"] > 0 else 0.0
-    )
+    results["pass_rate"] = results["passed"] / results["total"] if results["total"] > 0 else 0.0
 
     return ExperimentRun(
         name=name,

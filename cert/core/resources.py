@@ -142,9 +142,7 @@ class ModelResource(ResourceManager):
                     },
                 )
             except Exception as e:
-                logger.error(
-                    f"Failed to load model '{self._model_name}': {e}", exc_info=True
-                )
+                logger.error(f"Failed to load model '{self._model_name}': {e}", exc_info=True)
                 raise ResourceLoadError(
                     f"Model load failed: {e}",
                     context={"model": self._model_name, "device": self._device},
@@ -235,9 +233,7 @@ class ModelResource(ResourceManager):
             RuntimeError: If model not loaded
         """
         if not self._loaded or self._model is None:
-            raise RuntimeError(
-                f"Model '{self._model_name}' not loaded. Call load() first."
-            )
+            raise RuntimeError(f"Model '{self._model_name}' not loaded. Call load() first.")
         return self._model
 
     @property

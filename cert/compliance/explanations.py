@@ -46,9 +46,7 @@ class FailureExplanation:
         }
 
 
-def explain_measurement_failure(
-    measurement_result, text1: str, text2: str
-) -> FailureExplanation:
+def explain_measurement_failure(measurement_result, text1: str, text2: str) -> FailureExplanation:
     """
     Generate explanation for why measurement failed.
 
@@ -92,10 +90,7 @@ def explain_measurement_failure(
             )
 
     # Check NLI contradictions
-    if (
-        hasattr(measurement_result, "nli_label")
-        and measurement_result.nli_label == "contradiction"
-    ):
+    if hasattr(measurement_result, "nli_label") and measurement_result.nli_label == "contradiction":
         nli_score = getattr(measurement_result, "nli_score", 0.0)
         evidence.append(
             f"Natural Language Inference detected contradiction (confidence: "
@@ -144,9 +139,7 @@ def explain_measurement_failure(
         reason = "Response contradicts source material"
     elif any("hallucination" in e.lower() for e in evidence):
         reason = "Response contains hallucinated information"
-    elif any(
-        "off-topic" in e.lower() or "different topics" in e.lower() for e in evidence
-    ):
+    elif any("off-topic" in e.lower() or "different topics" in e.lower() for e in evidence):
         reason = "Response is off-topic"
 
     return FailureExplanation(
@@ -209,12 +202,12 @@ def _generate_recommendation(evidence: List[str], measurement_result) -> str:
 
     # Check for hallucination
     if any("hallucination" in e.lower() or "ungrounded" in e.lower() for e in evidence):
-        return "Verify ungrounded terms against source. May indicate hallucination or missing context."
+        return (
+            "Verify ungrounded terms against source. May indicate hallucination or missing context."
+        )
 
     # Check for semantic issues
-    if any(
-        "semantic" in e.lower() or "different topics" in e.lower() for e in evidence
-    ):
+    if any("semantic" in e.lower() or "different topics" in e.lower() for e in evidence):
         return "Improve semantic alignment. Response should focus on topics present in source material."
 
     # Check for grounding issues

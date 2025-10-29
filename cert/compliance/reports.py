@@ -216,10 +216,7 @@ def _generate_text_report(system_name: str, stats: Dict) -> str:
     audit_compliant = stats["total_requests"] > 0
 
     overall_compliant = (
-        accuracy_compliant
-        and robustness_compliant
-        and hallucination_compliant
-        and audit_compliant
+        accuracy_compliant and robustness_compliant and hallucination_compliant and audit_compliant
     )
 
     status_symbol = "✓" if overall_compliant else "✗"

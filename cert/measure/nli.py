@@ -64,8 +64,7 @@ class NLIEngine:
             from transformers import pipeline
         except ImportError:
             raise ImportError(
-                "transformers required for NLI. "
-                "Install with: pip install transformers torch"
+                "transformers required for NLI. Install with: pip install transformers torch"
             )
 
         self.nli = pipeline(
@@ -123,9 +122,7 @@ class NLIEngine:
             entailment_score=entailment_score,
         )
 
-    def _normalize_label(
-        self, raw_label: str
-    ) -> Literal["entailment", "neutral", "contradiction"]:
+    def _normalize_label(self, raw_label: str) -> Literal["entailment", "neutral", "contradiction"]:
         """Normalize model label to standard format."""
         label_lower = raw_label.lower()
         if "entail" in label_lower:

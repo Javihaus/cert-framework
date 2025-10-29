@@ -14,8 +14,8 @@ import time
 from typing import Optional
 
 from cert.core.circuit_breaker import CircuitBreaker
-from cert.core.retry import async_retry
 from cert.core.errors import CircuitBreakerOpen
+from cert.core.retry import async_retry
 from cert.observability.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)
@@ -26,9 +26,7 @@ try:
 
     ANTHROPIC_AVAILABLE = True
 except ImportError:
-    logger.warning(
-        "anthropic package not available. Install with: pip install anthropic"
-    )
+    logger.warning("anthropic package not available. Install with: pip install anthropic")
     ANTHROPIC_AVAILABLE = False
 
 
@@ -242,9 +240,7 @@ class AnthropicClientWithResilience:
                 output_tokens=response.usage.output_tokens,
             )
             self._hourly_cost += cost
-            self._metrics.coordination_cost.labels(agent=agent_id or "unknown").inc(
-                cost
-            )
+            self._metrics.coordination_cost.labels(agent=agent_id or "unknown").inc(cost)
 
             # Log
             logger.info(

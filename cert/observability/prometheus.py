@@ -19,18 +19,18 @@ Usage:
 
 import json
 import time
-from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 try:
     from prometheus_client import (
-        Gauge,
-        Counter,
-        Histogram,
-        start_http_server,
-        generate_latest,
         REGISTRY,
+        Counter,
+        Gauge,
+        Histogram,
+        generate_latest,
+        start_http_server,
     )
 
     PROMETHEUS_AVAILABLE = True
@@ -164,7 +164,7 @@ def export_metrics_from_audit_log(
         "by_preset": {},
     }
 
-    with open(path, "r") as f:
+    with open(path) as f:
         for line in f:
             try:
                 entry = json.loads(line)
@@ -208,18 +208,12 @@ def export_metrics_from_audit_log(
 
                 # Update Prometheus metrics
                 status = "passed" if passed else "failed"
-                evaluation_total.labels(
-                    preset=preset, status=status, system=system_name
-                ).inc()
+                evaluation_total.labels(preset=preset, status=status, system=system_name).inc()
 
                 # Update gauges (latest value)
-                accuracy_gauge.labels(preset=preset, system=system_name).set(
-                    accuracy_score
-                )
+                accuracy_gauge.labels(preset=preset, system=system_name).set(accuracy_score)
 
-                confidence_gauge.labels(preset=preset, system=system_name).set(
-                    accuracy_score
-                )
+                confidence_gauge.labels(preset=preset, system=system_name).set(accuracy_score)
 
                 # Detailed metrics
                 metrics = accuracy_result.get("metrics", {})
@@ -242,9 +236,7 @@ def export_metrics_from_audit_log(
                 # Track failures
                 if not passed:
                     reason = accuracy_result.get("reason", "unknown")
-                    failure_total.labels(
-                        preset=preset, reason=reason, system=system_name
-                    ).inc()
+                    failure_total.labels(preset=preset, reason=reason, system=system_name).inc()
 
                 # Compliance metrics (if available)
                 if "compliance_check" in entry:
@@ -254,9 +246,9 @@ def export_metrics_from_audit_log(
 
                     if total_requirements > 0:
                         pass_rate = compliant_count / total_requirements
-                        compliance_pass_rate.labels(
-                            preset=preset, system=system_name
-                        ).set(pass_rate)
+                        compliance_pass_rate.labels(preset=preset, system=system_name).set(
+                            pass_rate
+                        )
 
                     # Per-article compliance
                     for article, compliant in compliance.items():
@@ -265,9 +257,7 @@ def export_metrics_from_audit_log(
                         ).set(1.0 if compliant else 0.0)
 
                 # Update timestamp
-                last_evaluation_timestamp.labels(preset=preset, system=system_name).set(
-                    time.time()
-                )
+                last_evaluation_timestamp.labels(preset=preset, system=system_name).set(time.time())
 
             except (json.JSONDecodeError, KeyError):
                 # Skip malformed entries

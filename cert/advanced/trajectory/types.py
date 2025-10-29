@@ -5,9 +5,9 @@ MARKETING: "Hamiltonian trajectory state variables"
 TECHNICAL: Per-token confidence metrics with quality thresholds
 """
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
 
 
 @dataclass

@@ -4,9 +4,10 @@ Utility functions for trajectory monitoring.
 Memory-efficient model loading and cleanup utilities.
 """
 
-import torch
 import gc
 from typing import Tuple
+
+import torch
 
 
 def load_model_for_monitoring(

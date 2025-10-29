@@ -10,7 +10,6 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-
 # ============================================================================
 # MEASUREMENT RESULTS (for measure() function)
 # ============================================================================
@@ -277,9 +276,7 @@ class AgentMonitorResult:
             "consistency": self.consistency.to_dict() if self.consistency else None,
             "performance": self.performance.to_dict() if self.performance else None,
             "latency": self.latency.to_dict() if self.latency else None,
-            "output_quality": (
-                self.output_quality.to_dict() if self.output_quality else None
-            ),
+            "output_quality": (self.output_quality.to_dict() if self.output_quality else None),
             "robustness": self.robustness.to_dict() if self.robustness else None,
             "config": self.config,
             "duration_seconds": self.duration_seconds,
@@ -434,9 +431,7 @@ class CostTrackerAccumulator:
             CostResult with aggregated totals
         """
         if not self.results:
-            return CostResult(
-                tokens_input=0, tokens_output=0, tokens_total=0, cost_total=0.0
-            )
+            return CostResult(tokens_input=0, tokens_output=0, tokens_total=0, cost_total=0.0)
 
         total_tokens_input = sum(r.tokens_input for r in self.results)
         total_tokens_output = sum(r.tokens_output for r in self.results)
@@ -444,9 +439,7 @@ class CostTrackerAccumulator:
 
         # Calculate costs if available
         costs_input = [r.cost_input for r in self.results if r.cost_input is not None]
-        costs_output = [
-            r.cost_output for r in self.results if r.cost_output is not None
-        ]
+        costs_output = [r.cost_output for r in self.results if r.cost_output is not None]
         costs_total = [r.cost_total for r in self.results if r.cost_total is not None]
 
         return CostResult(

@@ -10,10 +10,10 @@ import time
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Union
 
-from cert.utils.audit import AuditLogger
 from cert.measure.embeddings import get_embedding_engine
 from cert.measure.grounding import compute_grounding_score, get_ungrounded_terms
 from cert.measure.nli import get_nli_engine
+from cert.utils.audit import AuditLogger
 from cert.utils.presets import Preset, get_preset
 
 logger = logging.getLogger(__name__)
@@ -153,9 +153,7 @@ def monitor(
 
             if context is None or answer is None:
                 # Can't monitor without context and answer
-                logger.warning(
-                    f"Cannot monitor {func.__name__}: unable to extract context/answer"
-                )
+                logger.warning(f"Cannot monitor {func.__name__}: unable to extract context/answer")
                 return result
 
             # Measure accuracy
@@ -276,9 +274,7 @@ def _extract_context_answer(
         return None, None
 
 
-def _measure_accuracy(
-    context: str, answer: str, config: MonitorConfig
-) -> Dict[str, Any]:
+def _measure_accuracy(context: str, answer: str, config: MonitorConfig) -> Dict[str, Any]:
     """Measure accuracy using semantic, NLI, and grounding analysis."""
 
     # Semantic similarity
@@ -298,10 +294,7 @@ def _measure_accuracy(
 
     # Hallucination detection
     is_hallucination = (
-        is_contradiction
-        or nli_score < 0.3
-        or grounding_score < 0.5
-        or len(ungrounded_terms) > 5
+        is_contradiction or nli_score < 0.3 or grounding_score < 0.5 or len(ungrounded_terms) > 5
     )
 
     # Compliance check
@@ -342,9 +335,7 @@ def _generate_explanation(accuracy_result: Dict[str, Any], answer: str, context:
             self.semantic_score = result_dict["metrics"]["semantic_score"]
             self.nli_score = result_dict["metrics"]["nli_score"]
             self.nli_label = (
-                "contradiction"
-                if result_dict["metrics"]["is_contradiction"]
-                else "entailment"
+                "contradiction" if result_dict["metrics"]["is_contradiction"] else "entailment"
             )
             self.grounding_score = result_dict["metrics"]["grounding_score"]
             self.ungrounded_terms = result_dict["metrics"].get("ungrounded_terms", [])
@@ -404,18 +395,12 @@ def _alert_hallucination(
 def _show_status_update(function_name: str, config: MonitorConfig):
     """Show periodic status update."""
     hallucination_rate = (
-        config.total_hallucinations / config.total_calls
-        if config.total_calls > 0
-        else 0.0
+        config.total_hallucinations / config.total_calls if config.total_calls > 0 else 0.0
     )
-    compliance_rate = (
-        config.total_compliant / config.total_calls if config.total_calls > 0 else 0.0
-    )
+    compliance_rate = config.total_compliant / config.total_calls if config.total_calls > 0 else 0.0
 
     status = (
-        "✓ COMPLIANT"
-        if hallucination_rate <= config.hallucination_tolerance
-        else "✗ NON-COMPLIANT"
+        "✓ COMPLIANT" if hallucination_rate <= config.hallucination_tolerance else "✗ NON-COMPLIANT"
     )
 
     print("\n" + "-" * 60)

@@ -43,9 +43,7 @@ class ResourceError(CERTError):
     """Resource loading/management errors."""
 
     def __init__(self, message: str, **kwargs):
-        super().__init__(
-            message, error_type="ResourceError", recoverable=True, **kwargs
-        )
+        super().__init__(message, error_type="ResourceError", recoverable=True, **kwargs)
 
 
 class ResourceLoadError(ResourceError):
@@ -114,9 +112,7 @@ class InvalidInputError(CERTError):
     """Invalid input provided."""
 
     def __init__(self, message: str, **kwargs):
-        super().__init__(
-            message, error_type="InvalidInputError", recoverable=False, **kwargs
-        )
+        super().__init__(message, error_type="InvalidInputError", recoverable=False, **kwargs)
 
 
 class MaxRetriesExceeded(CERTError):
@@ -135,9 +131,7 @@ class AnalysisError(CERTError):
     """Error during analysis (Hamiltonian, Coordination, etc.)."""
 
     def __init__(self, error_type: str, message: str, recoverable: bool, **kwargs):
-        super().__init__(
-            message, error_type=error_type, recoverable=recoverable, **kwargs
-        )
+        super().__init__(message, error_type=error_type, recoverable=recoverable, **kwargs)
 
     def is_valid(self) -> bool:
         """Check if this represents a valid analysis result (always False for errors)."""

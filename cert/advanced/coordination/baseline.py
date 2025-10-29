@@ -11,9 +11,9 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from cert.advanced.coordination.types import AgentResponse, BaselineMeasurement
 from cert.advanced.coordination.client import AnthropicClientWithResilience
 from cert.advanced.coordination.evaluator import QualityEvaluator
+from cert.advanced.coordination.types import AgentResponse, BaselineMeasurement
 
 logger = logging.getLogger(__name__)
 

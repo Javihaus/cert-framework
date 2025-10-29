@@ -113,9 +113,7 @@ class CircuitBreaker:
                 ):
                     self._state = CircuitBreakerState.HALF_OPEN
                     self._success_count = 0
-                    logger.info(
-                        f"Circuit breaker '{self._name}' entering HALF_OPEN state"
-                    )
+                    logger.info(f"Circuit breaker '{self._name}' entering HALF_OPEN state")
                     return False
                 return True
             return False
@@ -145,9 +143,7 @@ class CircuitBreaker:
                 # Any failure in HALF_OPEN → back to OPEN
                 self._state = CircuitBreakerState.OPEN
                 self._last_failure_time = time.time()
-                logger.warning(
-                    f"Circuit breaker '{self._name}' reopened (HALF_OPEN failure)"
-                )
+                logger.warning(f"Circuit breaker '{self._name}' reopened (HALF_OPEN failure)")
             elif self._state == CircuitBreakerState.CLOSED:
                 self._failure_count += 1
                 logger.debug(
@@ -158,9 +154,7 @@ class CircuitBreaker:
                 if self._failure_count >= self._failure_threshold:
                     self._state = CircuitBreakerState.OPEN
                     self._last_failure_time = time.time()
-                    logger.error(
-                        f"Circuit breaker '{self._name}' OPEN (threshold exceeded)"
-                    )
+                    logger.error(f"Circuit breaker '{self._name}' OPEN (threshold exceeded)")
 
     def call(self, func: Callable, *args, **kwargs) -> Any:
         """

@@ -188,9 +188,7 @@ def create_dataset_from_audit_log(
     )
 
 
-def merge_datasets(
-    datasets: List[EvaluationDataset], name: str, version: str
-) -> EvaluationDataset:
+def merge_datasets(datasets: List[EvaluationDataset], name: str, version: str) -> EvaluationDataset:
     """Merge multiple datasets into one.
 
     Args:

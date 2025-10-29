@@ -55,9 +55,7 @@ def retry(
                         raise
 
                     # Calculate backoff with jitter
-                    backoff = min(
-                        backoff_base**attempt + random.uniform(0, 1), max_backoff
-                    )
+                    backoff = min(backoff_base**attempt + random.uniform(0, 1), max_backoff)
 
                     # Call retry callback if provided
                     if on_retry:
@@ -126,9 +124,7 @@ def async_retry(
                         raise
 
                     # Calculate backoff with jitter
-                    backoff = min(
-                        backoff_base**attempt + random.uniform(0, 1), max_backoff
-                    )
+                    backoff = min(backoff_base**attempt + random.uniform(0, 1), max_backoff)
 
                     # Call retry callback if provided
                     if on_retry:

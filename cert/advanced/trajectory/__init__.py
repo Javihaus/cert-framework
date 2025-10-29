@@ -35,13 +35,12 @@ License: MIT
 __version__ = "2.0.0"
 
 # Public API exports
+from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
 from cert.advanced.trajectory.types import (
     ReasoningMetrics,
     TrajectoryAnalysis,
     TrajectoryConfig,
 )
-
-from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
 
 # Lazy import for optional dependencies
 try:
@@ -51,12 +50,11 @@ except ImportError:
 
 from cert.advanced.trajectory.analyzer import CERTTrajectoryAnalyzer
 
-from cert.advanced.trajectory.utils import load_model_for_monitoring, unload_model
-
 # Production API (v2.0+)
 from cert.advanced.trajectory.api import HamiltonianMonitor
 from cert.advanced.trajectory.engine import HamiltonianEngine
 from cert.advanced.trajectory.resources import HamiltonianModelResource
+from cert.advanced.trajectory.utils import load_model_for_monitoring, unload_model
 
 
 # Convenience function for simple trajectory analysis

@@ -5,11 +5,12 @@ This provides the clean API for using trajectory monitoring
 as part of the CERT platform's Trustworthiness dimension.
 """
 
-import numpy as np
 import json
 import os
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
+
+import numpy as np
 
 from cert.advanced.trajectory.monitor import ReasoningTrajectoryMonitor
 from cert.advanced.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
@@ -61,9 +62,7 @@ class CERTTrajectoryAnalyzer:
 
         return results
 
-    def get_summary_statistics(
-        self, results: Dict[str, TrajectoryAnalysis]
-    ) -> Dict[str, float]:
+    def get_summary_statistics(self, results: Dict[str, TrajectoryAnalysis]) -> Dict[str, float]:
         """
         Calculate aggregate statistics across multiple analyses.
 

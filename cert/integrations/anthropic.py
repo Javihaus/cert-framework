@@ -15,8 +15,8 @@ Usage:
     )
 """
 
-from typing import Any, Optional, Dict
 import functools
+from typing import Any, Dict, Optional
 
 from cert import monitor
 
@@ -56,8 +56,7 @@ def wrap_anthropic_client(
         import anthropic  # noqa: F401
     except ImportError:
         raise ImportError(
-            "Anthropic SDK is required for this integration. "
-            "Install with: pip install anthropic"
+            "Anthropic SDK is required for this integration. Install with: pip install anthropic"
         )
 
     # Store original messages.create method
@@ -85,9 +84,7 @@ def wrap_anthropic_client(
                 elif isinstance(content, list):
                     # Handle multi-modal content
                     text_parts = [
-                        block.get("text", "")
-                        for block in content
-                        if block.get("type") == "text"
+                        block.get("text", "") for block in content if block.get("type") == "text"
                     ]
                     query = " ".join(text_parts)
                 break
@@ -114,9 +111,7 @@ def wrap_anthropic_client(
                 context_parts.append(f"{role}: {content}")
             elif isinstance(content, list):
                 text_parts = [
-                    block.get("text", "")
-                    for block in content
-                    if block.get("type") == "text"
+                    block.get("text", "") for block in content if block.get("type") == "text"
                 ]
                 if text_parts:
                     context_parts.append(f"{role}: {' '.join(text_parts)}")
@@ -127,9 +122,7 @@ def wrap_anthropic_client(
         answer = ""
         if hasattr(response, "content") and response.content:
             # Response.content is a list of content blocks
-            text_blocks = [
-                block.text for block in response.content if hasattr(block, "text")
-            ]
+            text_blocks = [block.text for block in response.content if hasattr(block, "text")]
             answer = " ".join(text_blocks)
 
         # Return in CERT format for monitoring
@@ -238,8 +231,7 @@ def create_monitored_anthropic_stream(
         import anthropic  # noqa: F401
     except ImportError:
         raise ImportError(
-            "Anthropic SDK is required for this integration. "
-            "Install with: pip install anthropic"
+            "Anthropic SDK is required for this integration. Install with: pip install anthropic"
         )
 
     # Store original stream method

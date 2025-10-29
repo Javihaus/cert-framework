@@ -22,11 +22,11 @@ Note: Prometheus integration requires prometheus_client:
 """
 
 from cert.observability.prometheus import (
-    export_metrics_from_audit_log,
-    start_metrics_server,
-    get_metrics_text,
-    export_metrics_continuously,
     create_grafana_dashboard_json,
+    export_metrics_continuously,
+    export_metrics_from_audit_log,
+    get_metrics_text,
+    start_metrics_server,
 )
 
 __all__ = [

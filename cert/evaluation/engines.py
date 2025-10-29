@@ -7,7 +7,6 @@ memory usage when evaluation is not needed.
 """
 
 import threading
-from typing import Optional
 
 
 class LazyModelLoader:
@@ -48,7 +47,7 @@ class LazyModelLoader:
                         print(f"Loading embedding model: {model_name}...")
                         cls._embedding_engine = EmbeddingEngine(model_name)
                         cls._embedding_model_name = model_name
-                        print(f"✓ Embedding model loaded")
+                        print("✓ Embedding model loaded")
                     except ImportError as e:
                         raise ImportError(
                             "Embedding engine requires: pip install cert-framework[evaluation]\n"
@@ -81,7 +80,7 @@ class LazyModelLoader:
                         print(f"Loading NLI model: {model_name}...")
                         cls._nli_engine = NLIEngine(model_name)
                         cls._nli_model_name = model_name
-                        print(f"✓ NLI model loaded")
+                        print("✓ NLI model loaded")
                     except ImportError as e:
                         raise ImportError(
                             "NLI engine requires: pip install cert-framework[evaluation]\n"
@@ -124,7 +123,6 @@ class LazyModelLoader:
         Returns:
             Dictionary with memory estimates in MB
         """
-        import sys
 
         memory = {
             "embedding_engine": 0,

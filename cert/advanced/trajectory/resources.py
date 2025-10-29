@@ -13,8 +13,8 @@ from typing import Any, Tuple
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from cert.core.errors import GPUOutOfMemoryError, ResourceLoadError
 from cert.core.resources import ModelResource
-from cert.core.errors import ResourceLoadError, GPUOutOfMemoryError
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +90,7 @@ class HamiltonianModelResource(ModelResource):
                 model = AutoModelForCausalLM.from_pretrained(
                     self._model_name,
                     device_map="auto" if self._device == "cuda" else None,
-                    torch_dtype=torch.float16
-                    if self._device == "cuda"
-                    else torch.float32,
+                    torch_dtype=torch.float16 if self._device == "cuda" else torch.float32,
                     trust_remote_code=self._trust_remote_code,
                 )
                 logger.info("Model loaded in standard precision")
@@ -160,9 +158,7 @@ class HamiltonianModelResource(ModelResource):
             RuntimeError: If model/tokenizer not loaded
         """
         if not self._loaded or self._tokenizer is None:
-            raise RuntimeError(
-                f"Tokenizer for '{self._model_name}' not loaded. Call load() first."
-            )
+            raise RuntimeError(f"Tokenizer for '{self._model_name}' not loaded. Call load() first.")
         return self._tokenizer
 
     def get_model_and_tokenizer(self) -> Tuple[Any, Any]:
@@ -185,9 +181,7 @@ class HamiltonianModelResource(ModelResource):
             True if both model and tokenizer are loaded
         """
         with self._lock:
-            return (
-                self._loaded and self._model is not None and self._tokenizer is not None
-            )
+            return self._loaded and self._model is not None and self._tokenizer is not None
 
     def test_inference(self, test_prompt: str = "Test") -> bool:
         """
@@ -204,9 +198,7 @@ class HamiltonianModelResource(ModelResource):
 
         try:
             with torch.no_grad():
-                inputs = self._tokenizer(test_prompt, return_tensors="pt").to(
-                    self._device
-                )
+                inputs = self._tokenizer(test_prompt, return_tensors="pt").to(self._device)
                 self._model.generate(
                     inputs.input_ids,
                     max_new_tokens=5,

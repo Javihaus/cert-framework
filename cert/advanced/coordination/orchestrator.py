@@ -13,10 +13,10 @@ import time
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from cert.advanced.coordination.types import AgentResponse, CoordinationMetrics
-from cert.advanced.coordination.client import AnthropicClientWithResilience
 from cert.advanced.coordination.baseline import BaselineMeasurer
+from cert.advanced.coordination.client import AnthropicClientWithResilience
 from cert.advanced.coordination.evaluator import QualityEvaluator
+from cert.advanced.coordination.types import AgentResponse, CoordinationMetrics
 from cert.observability.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)
@@ -312,9 +312,7 @@ Synthesize these responses into a single, comprehensive answer that combines the
         Returns:
             Tuple of (final_response, agent_responses)
         """
-        logger.debug(
-            f"Running debate coordination with {num_agents} agents for {rounds} rounds"
-        )
+        logger.debug(f"Running debate coordination with {num_agents} agents for {rounds} rounds")
 
         all_responses = []
 
@@ -348,9 +346,7 @@ Synthesize these responses into a single, comprehensive answer that combines the
             for i in range(num_agents):
                 # Show this agent all other agents' positions
                 other_positions = [
-                    f"Agent {j}: {current_positions[j]}"
-                    for j in range(num_agents)
-                    if j != i
+                    f"Agent {j}: {current_positions[j]}" for j in range(num_agents) if j != i
                 ]
 
                 debate_prompt = f"""Task: {task}

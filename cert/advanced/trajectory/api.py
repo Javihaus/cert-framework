@@ -19,8 +19,8 @@ from cert.advanced.trajectory.resources import HamiltonianModelResource
 from cert.advanced.trajectory.types import TrajectoryAnalysis, TrajectoryConfig
 from cert.core.errors import AnalysisError
 from cert.core.health import HealthChecker, HealthCheckResult
-from cert.observability.metrics import MetricsCollector
 from cert.observability.logging import correlation_id_context
+from cert.observability.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)
 
@@ -149,9 +149,7 @@ class HamiltonianMonitor:
                     "Trajectory analysis completed",
                     extra={
                         "correlation_id": correlation_id,
-                        "quality": "passed"
-                        if result.passed_quality_check
-                        else "failed",
+                        "quality": "passed" if result.passed_quality_check else "failed",
                         "tokens_generated": result.generation_steps,
                     },
                 )
@@ -240,9 +238,7 @@ class HamiltonianMonitor:
             "Batch analysis complete",
             extra={
                 "num_prompts": len(prompts),
-                "num_success": sum(
-                    1 for r in results if isinstance(r, TrajectoryAnalysis)
-                ),
+                "num_success": sum(1 for r in results if isinstance(r, TrajectoryAnalysis)),
                 "num_errors": sum(1 for r in results if isinstance(r, AnalysisError)),
             },
         )

@@ -34,15 +34,15 @@ class CertTracer:
         Args:
             trace: Dictionary containing trace data
         """
-        with open(self.log_path, 'a') as f:
-            f.write(json.dumps(trace, default=str) + '\n')
+        with open(self.log_path, "a") as f:
+            f.write(json.dumps(trace, default=str) + "\n")
 
 
 def trace(
     _func: Optional[Callable] = None,
     *,
     log_path: str = "cert_traces.jsonl",
-    metadata: Optional[Dict] = None
+    metadata: Optional[Dict] = None,
 ) -> Callable:
     """Lightweight decorator for tracing LLM function calls.
 
@@ -86,7 +86,7 @@ def trace(
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
-            timestamp = datetime.utcnow().isoformat() + 'Z'
+            timestamp = datetime.utcnow().isoformat() + "Z"
 
             # Call function
             result = None

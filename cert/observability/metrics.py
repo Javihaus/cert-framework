@@ -15,18 +15,16 @@ logger = logging.getLogger(__name__)
 # Try to import prometheus_client
 try:
     from prometheus_client import (
-        Counter,
-        Histogram,
-        Gauge,
-        generate_latest,
         REGISTRY,
+        Counter,
+        Gauge,
+        Histogram,
+        generate_latest,
     )
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:
-    logger.warning(
-        "prometheus_client not available. Install with: pip install prometheus-client"
-    )
+    logger.warning("prometheus_client not available. Install with: pip install prometheus-client")
     PROMETHEUS_AVAILABLE = False
 
 
@@ -169,9 +167,7 @@ class MetricsCollector:
         self.requests_total.labels(service=service, status=status).inc()
 
         if duration is not None and operation is not None:
-            self.request_duration.labels(service=service, operation=operation).observe(
-                duration
-            )
+            self.request_duration.labels(service=service, operation=operation).observe(duration)
 
     def record_error(self, service: str, error_type: str):
         """
@@ -204,9 +200,7 @@ class MetricsCollector:
         self.model_load_duration.labels(model_name=model_name).observe(duration)
 
         if memory_bytes is not None:
-            self.model_memory_usage.labels(model_name=model_name, device=device).set(
-                memory_bytes
-            )
+            self.model_memory_usage.labels(model_name=model_name, device=device).set(memory_bytes)
 
     def record_cache_hit(self, cache_type: str):
         """Record cache hit."""
