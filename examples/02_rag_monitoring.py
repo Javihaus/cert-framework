@@ -9,7 +9,7 @@ Time: < 10 seconds
 Dependencies: cert-framework
 """
 
-from cert import monitor, Preset
+from cert import monitor
 
 
 # Healthcare RAG with strict accuracy requirements

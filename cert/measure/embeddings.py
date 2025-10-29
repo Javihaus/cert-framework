@@ -5,7 +5,7 @@ Uses sentence-transformers for state-of-the-art semantic similarity.
 """
 
 import logging
-from typing import Dict, Optional
+from typing import Dict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -97,22 +97,24 @@ class EmbeddingEngine:
         logger.debug("Embedding cache cleared")
 
 
-# Global singleton for efficient reuse
-_GLOBAL_EMBEDDING_ENGINE: Optional[EmbeddingEngine] = None
+# Global model cache for efficient reuse across multiple calls
+_EMBEDDING_MODEL_CACHE: Dict[str, EmbeddingEngine] = {}
 
 
 def get_embedding_engine(model_name: str = "all-MiniLM-L6-v2") -> EmbeddingEngine:
-    """Get global embedding engine (singleton pattern).
+    """Get global embedding engine with model caching.
+
+    Models are cached by name to avoid reloading. This significantly improves
+    performance when measure() is called multiple times.
 
     Args:
         model_name: Sentence transformer model name
 
     Returns:
-        EmbeddingEngine instance (reuses existing if same model)
+        EmbeddingEngine instance (reuses cached model if available)
     """
-    global _GLOBAL_EMBEDDING_ENGINE
+    if model_name not in _EMBEDDING_MODEL_CACHE:
+        logger.info(f"Loading embedding model: {model_name}")
+        _EMBEDDING_MODEL_CACHE[model_name] = EmbeddingEngine(model_name=model_name)
 
-    if _GLOBAL_EMBEDDING_ENGINE is None or _GLOBAL_EMBEDDING_ENGINE.model_name != model_name:
-        _GLOBAL_EMBEDDING_ENGINE = EmbeddingEngine(model_name=model_name)
-
-    return _GLOBAL_EMBEDDING_ENGINE
+    return _EMBEDDING_MODEL_CACHE[model_name]

@@ -18,9 +18,9 @@ For real usage, install: pip install llama-index
 """
 
 from cert.integrations.llamaindex import (
-    wrap_llamaindex_engine,
-    wrap_llamaindex_chat_engine,
     wrap_llamaindex_agent,
+    wrap_llamaindex_chat_engine,
+    wrap_llamaindex_engine,
 )
 
 
@@ -101,7 +101,7 @@ def example_chat_engine():
 
     # Simulate conversation
     response = monitored_chat.chat("Hello, how are you?")
-    print(f"\n  User: Hello, how are you?")
+    print("\n  User: Hello, how are you?")
     print(f"  Assistant: {response['answer'][:50]}...")
 
 
@@ -128,7 +128,7 @@ def example_agent_wrapping():
     print("  ✓ Tool calls and outputs monitored")
 
     response = monitored_agent.chat("What is the weather in San Francisco?")
-    print(f"\n  Query: What is the weather in San Francisco?")
+    print("\n  Query: What is the weather in San Francisco?")
     print(f"  Answer: {response['answer'][:50]}...")
     print(f"  Context: {response['context']}")
 
@@ -155,7 +155,7 @@ def example_different_presets():
 
     for preset, description in use_cases:
         engine = MockQueryEngine()
-        monitored = wrap_llamaindex_engine(engine, preset=preset)
+        wrap_llamaindex_engine(engine, preset=preset)
         print(f"  ✓ {description}: preset='{preset}'")
 
     print("\n  Presets determine:")
@@ -222,9 +222,7 @@ def example_custom_config():
     }
 
     engine = MockQueryEngine()
-    monitored = wrap_llamaindex_engine(
-        engine, preset="financial", monitor_config=custom_config
-    )
+    wrap_llamaindex_engine(engine, preset="financial", monitor_config=custom_config)
 
     print("  ✓ Custom audit log: data/llamaindex_audit.jsonl")
     print("  ✓ Financial preset with 0.80 threshold")

@@ -37,9 +37,7 @@ def example_basic_chain_wrapping():
                     type(
                         "MockDoc",
                         (),
-                        {
-                            "page_content": "Mock context document 1 about medical procedures."
-                        },
+                        {"page_content": "Mock context document 1 about medical procedures."},
                     )(),
                     type(
                         "MockDoc",
@@ -60,9 +58,7 @@ def example_basic_chain_wrapping():
     print("  ✓ Context and answers automatically extracted")
 
     # Use the chain normally
-    result = monitored_chain.invoke(
-        {"query": "What are the treatment options for hypertension?"}
-    )
+    result = monitored_chain.invoke({"query": "What are the treatment options for hypertension?"})
 
     print(f"\n  Query: {result['query'][:50]}...")
     print(f"  Answer: {result['answer'][:50]}...")
@@ -90,7 +86,7 @@ def example_different_presets():
 
     for preset in presets:
         chain = MockChain()
-        monitored_chain = wrap_langchain_chain(chain, preset=preset)
+        wrap_langchain_chain(chain, preset=preset)
         print(f"  ✓ Chain wrapped with '{preset}' preset")
 
     print("\n  Each preset has different compliance requirements:")
@@ -121,9 +117,7 @@ def example_custom_config():
     }
 
     chain = MockChain()
-    monitored_chain = wrap_langchain_chain(
-        chain, preset="general", monitor_config=custom_config
-    )
+    monitored_chain = wrap_langchain_chain(chain, preset="general", monitor_config=custom_config)
 
     print("  ✓ Custom audit log path: data/langchain_audit.jsonl")
     print("  ✓ Custom threshold: 0.75")
@@ -141,7 +135,7 @@ def example_callback_handler():
     from cert.integrations.langchain import create_monitored_callback
 
     # Create callback handler
-    callback = create_monitored_callback(preset="healthcare")
+    create_monitored_callback(preset="healthcare")
 
     print("  ✓ Created CERTMonitoringCallback")
     print("  ✓ Add to any LangChain component:")

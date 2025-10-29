@@ -15,10 +15,7 @@ def example_measure():
     print("\n1. Basic Measurement")
     print("-" * 40)
 
-    result = measure(
-        text1="Revenue was $500M in Q4",
-        text2="Q4 revenue reached $500M"
-    )
+    result = measure(text1="Revenue was $500M in Q4", text2="Q4 revenue reached $500M")
 
     print(f"Confidence: {result.confidence:.3f}")
     print(f"Matched: {result.matched}")

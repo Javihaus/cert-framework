@@ -98,142 +98,153 @@ def measure(
             threshold=0.8
         )
     """
-    # Validate inputs
-    if not text1 or not text2:
-        raise ValueError("Both text1 and text2 must be non-empty strings")
+    try:
+        # Validate inputs
+        if not text1 or not text2:
+            raise ValueError("Both text1 and text2 must be non-empty strings")
 
-    # Validate at least one component enabled
-    if not (use_semantic or use_nli or use_grounding):
-        raise ValueError("At least one component (semantic, nli, grounding) must be enabled")
+        # Validate at least one component enabled
+        if not (use_semantic or use_nli or use_grounding):
+            raise ValueError("At least one component (semantic, nli, grounding) must be enabled")
 
-    # Normalize weights
-    enabled_weights = []
-    if use_semantic:
-        enabled_weights.append(semantic_weight)
-    if use_nli:
-        enabled_weights.append(nli_weight)
-    if use_grounding:
-        enabled_weights.append(grounding_weight)
+        # Normalize weights
+        enabled_weights = []
+        if use_semantic:
+            enabled_weights.append(semantic_weight)
+        if use_nli:
+            enabled_weights.append(nli_weight)
+        if use_grounding:
+            enabled_weights.append(grounding_weight)
 
-    total_weight = sum(enabled_weights)
-    if total_weight == 0:
-        raise ValueError("Sum of enabled component weights must be > 0")
+        total_weight = sum(enabled_weights)
+        if total_weight == 0:
+            raise ValueError("Sum of enabled component weights must be > 0")
 
-    # Normalize weights to sum to 1.0
-    if use_semantic:
-        semantic_weight = semantic_weight / total_weight
-    if use_nli:
-        nli_weight = nli_weight / total_weight
-    if use_grounding:
-        grounding_weight = grounding_weight / total_weight
+        # Normalize weights to sum to 1.0
+        if use_semantic:
+            semantic_weight = semantic_weight / total_weight
+        if use_nli:
+            nli_weight = nli_weight / total_weight
+        if use_grounding:
+            grounding_weight = grounding_weight / total_weight
 
-    logger.debug(
-        f"Measuring: semantic={use_semantic}({semantic_weight:.2f}), "
-        f"nli={use_nli}({nli_weight:.2f}), "
-        f"grounding={use_grounding}({grounding_weight:.2f})"
-    )
+        logger.debug(
+            f"Measuring: semantic={use_semantic}({semantic_weight:.2f}), "
+            f"nli={use_nli}({nli_weight:.2f}), "
+            f"grounding={use_grounding}({grounding_weight:.2f})"
+        )
 
-    # Compute component scores
-    semantic_score: Optional[float] = None
-    nli_score: Optional[float] = None
-    grounding_score: Optional[float] = None
-    components_used = []
+        # Compute component scores
+        semantic_score: Optional[float] = None
+        nli_score: Optional[float] = None
+        grounding_score: Optional[float] = None
+        components_used = []
 
-    # 1. Semantic similarity
-    if use_semantic:
-        try:
-            embedding_engine = get_embedding_engine(model_name=embedding_model)
-            semantic_score = embedding_engine.compute_similarity(text1, text2)
-            components_used.append("semantic")
-            logger.debug(f"Semantic score: {semantic_score:.3f}")
-        except Exception as e:
-            logger.error(f"Semantic similarity failed: {e}")
-            # Continue with other components
-            semantic_score = 0.5  # Neutral on error
-            use_semantic = False
+        # 1. Semantic similarity
+        if use_semantic:
+            try:
+                embedding_engine = get_embedding_engine(model_name=embedding_model)
+                semantic_score = embedding_engine.compute_similarity(text1, text2)
+                components_used.append("semantic")
+                logger.debug(f"Semantic score: {semantic_score:.3f}")
+            except Exception as e:
+                logger.error(f"Semantic similarity failed: {e}")
+                # Continue with other components
+                semantic_score = 0.5  # Neutral on error
+                use_semantic = False
 
-    # 2. NLI (treat text2 as premise, text1 as hypothesis)
-    if use_nli:
-        try:
-            nli_engine = get_nli_engine(model_name=nli_model)
-            nli_result = nli_engine.check_entailment(context=text2, answer=text1)
-            nli_score = nli_result.entailment_score
-            components_used.append("nli")
-            logger.debug(f"NLI: {nli_result.label} (score: {nli_score:.3f})")
-        except Exception as e:
-            logger.error(f"NLI failed: {e}")
-            nli_score = 0.5  # Neutral on error
-            use_nli = False
+        # 2. NLI (treat text2 as premise, text1 as hypothesis)
+        if use_nli:
+            try:
+                nli_engine = get_nli_engine(model_name=nli_model)
+                nli_result = nli_engine.check_entailment(context=text2, answer=text1)
+                nli_score = nli_result.entailment_score
+                components_used.append("nli")
+                logger.debug(f"NLI: {nli_result.label} (score: {nli_score:.3f})")
+            except Exception as e:
+                logger.error(f"NLI failed: {e}")
+                nli_score = 0.5  # Neutral on error
+                use_nli = False
 
-    # 3. Grounding (check if text1 terms appear in text2)
-    if use_grounding:
-        try:
-            grounding_score = compute_grounding_score(context=text2, answer=text1)
-            components_used.append("grounding")
-            logger.debug(f"Grounding score: {grounding_score:.3f}")
+        # 3. Grounding (check if text1 terms appear in text2)
+        if use_grounding:
+            try:
+                grounding_score = compute_grounding_score(context=text2, answer=text1)
+                components_used.append("grounding")
+                logger.debug(f"Grounding score: {grounding_score:.3f}")
 
-            # Log ungrounded terms for debugging
-            ungrounded = get_ungrounded_terms(context=text2, answer=text1)
-            if ungrounded:
-                logger.debug(f"Ungrounded terms: {ungrounded}")
-        except Exception as e:
-            logger.error(f"Grounding analysis failed: {e}")
-            grounding_score = 0.5  # Neutral on error
-            use_grounding = False
+                # Log ungrounded terms for debugging
+                ungrounded = get_ungrounded_terms(context=text2, answer=text1)
+                if ungrounded:
+                    logger.debug(f"Ungrounded terms: {ungrounded}")
+            except Exception as e:
+                logger.error(f"Grounding analysis failed: {e}")
+                grounding_score = 0.5  # Neutral on error
+                use_grounding = False
 
-    # Compute weighted confidence
-    confidence = 0.0
+        # Compute weighted confidence
+        confidence = 0.0
 
-    if use_semantic and semantic_score is not None:
-        confidence += semantic_weight * semantic_score
+        if use_semantic and semantic_score is not None:
+            confidence += semantic_weight * semantic_score
 
-    if use_nli and nli_score is not None:
-        confidence += nli_weight * nli_score
+        if use_nli and nli_score is not None:
+            confidence += nli_weight * nli_score
 
-    if use_grounding and grounding_score is not None:
-        confidence += grounding_weight * grounding_score
+        if use_grounding and grounding_score is not None:
+            confidence += grounding_weight * grounding_score
 
-    # Determine match
-    matched = confidence >= threshold
+        # Determine match
+        matched = confidence >= threshold
 
-    # Generate rule description
-    rule = _generate_rule_description(
-        matched=matched,
-        confidence=confidence,
-        threshold=threshold,
-        components_used=components_used,
-        semantic_score=semantic_score,
-        nli_score=nli_score,
-        grounding_score=grounding_score,
-    )
+        # Generate rule description
+        rule = _generate_rule_description(
+            matched=matched,
+            confidence=confidence,
+            threshold=threshold,
+            components_used=components_used,
+            semantic_score=semantic_score,
+            nli_score=nli_score,
+            grounding_score=grounding_score,
+        )
 
-    # Build result
-    result = MeasurementResult(
-        matched=matched,
-        confidence=confidence,
-        semantic_score=semantic_score,
-        nli_score=nli_score,
-        grounding_score=grounding_score,
-        threshold_used=threshold,
-        rule=rule,
-        components_used=components_used,
-        metadata={
-            "embedding_model": embedding_model if use_semantic else None,
-            "nli_model": nli_model if use_nli else None,
-            "weights": {
-                "semantic": semantic_weight if use_semantic else 0.0,
-                "nli": nli_weight if use_nli else 0.0,
-                "grounding": grounding_weight if use_grounding else 0.0,
+        # Build result
+        result = MeasurementResult(
+            matched=matched,
+            confidence=confidence,
+            semantic_score=semantic_score,
+            nli_score=nli_score,
+            grounding_score=grounding_score,
+            threshold_used=threshold,
+            rule=rule,
+            components_used=components_used,
+            metadata={
+                "embedding_model": embedding_model if use_semantic else None,
+                "nli_model": nli_model if use_nli else None,
+                "weights": {
+                    "semantic": semantic_weight if use_semantic else 0.0,
+                    "nli": nli_weight if use_nli else 0.0,
+                    "grounding": grounding_weight if use_grounding else 0.0,
+                },
             },
-        },
-    )
+        )
 
-    logger.info(
-        f"Measurement complete: matched={matched}, confidence={confidence:.3f}, "
-        f"components={components_used}"
-    )
+        logger.info(
+            f"Measurement complete: matched={matched}, confidence={confidence:.3f}, "
+            f"components={components_used}"
+        )
 
-    return result
+        return result
+
+    except Exception as e:
+        logger.error(f"Measurement failed: {e}", exc_info=True)
+        return MeasurementResult(
+            matched=False,
+            confidence=0.0,
+            rule=f"Error: {str(e)[:100]}",
+            components_used=[],
+            metadata={"error": str(e)},
+        )
 
 
 def _generate_rule_description(

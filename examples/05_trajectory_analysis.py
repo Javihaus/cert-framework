@@ -11,11 +11,12 @@ Dependencies: cert-framework[trajectory]
 
 try:
     from cert.advanced.trajectory import (
-        analyze_trajectory,
         TrajectoryConfig,
+        analyze_trajectory,
         load_model_for_monitoring,
-        unload_model
+        unload_model,
     )
+
     TRAJECTORY_AVAILABLE = True
 except ImportError:
     TRAJECTORY_AVAILABLE = False
@@ -36,11 +37,7 @@ def example_basic_analysis():
     prompt = "The capital of France is"
 
     # Configure analysis thresholds
-    config = TrajectoryConfig(
-        perplexity_threshold=50.0,
-        entropy_threshold=2.5,
-        max_new_tokens=20
-    )
+    config = TrajectoryConfig(perplexity_threshold=50.0, entropy_threshold=2.5, max_new_tokens=20)
 
     # Analyze generation
     analysis = analyze_trajectory(model, tokenizer, prompt, config)
@@ -63,7 +60,9 @@ def example_quality_detection():
 
     # High-quality prompt (clear, specific)
     good_prompt = "Explain photosynthesis:"
-    good_analysis = analyze_trajectory(model, tokenizer, good_prompt, TrajectoryConfig(max_new_tokens=15))
+    good_analysis = analyze_trajectory(
+        model, tokenizer, good_prompt, TrajectoryConfig(max_new_tokens=15)
+    )
 
     print(f"\nGood prompt: {good_prompt}")
     print(f"Perplexity: {good_analysis.mean_perplexity:.2f}")
@@ -71,7 +70,9 @@ def example_quality_detection():
 
     # Low-quality prompt (nonsensical)
     bad_prompt = "The color number elephant music"
-    bad_analysis = analyze_trajectory(model, tokenizer, bad_prompt, TrajectoryConfig(max_new_tokens=15))
+    bad_analysis = analyze_trajectory(
+        model, tokenizer, bad_prompt, TrajectoryConfig(max_new_tokens=15)
+    )
 
     print(f"\nBad prompt: {bad_prompt}")
     print(f"Perplexity: {bad_analysis.mean_perplexity:.2f}")
@@ -107,4 +108,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ Error: {e}")
         import traceback
+
         traceback.print_exc()

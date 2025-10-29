@@ -11,10 +11,11 @@ Dependencies: cert-framework
 
 try:
     from cert.advanced.coordination import (
+        BaselineMeasurer,
         CoordinationOrchestrator,
         QualityEvaluator,
-        BaselineMeasurer
     )
+
     COORDINATION_AVAILABLE = True
 except ImportError:
     COORDINATION_AVAILABLE = False
@@ -25,7 +26,7 @@ def simulate_baseline_agents(task: str, num_agents: int = 3):
     responses = [
         "The project deadline is March 15th with 3 deliverables.",
         "Project due date: March 15. Three key deliverables required.",
-        "Deadline: 3/15. Total deliverables: 3."
+        "Deadline: 3/15. Total deliverables: 3.",
     ]
     return responses[:num_agents]
 
@@ -53,7 +54,7 @@ def calculate_mock_metrics(baseline_responses, coordinated_response):
         "omega": omega,
         "baseline_mean": mean_baseline,
         "coordinated": coordinated_score,
-        "consensus_rate": 0.88
+        "consensus_rate": 0.88,
     }
 
 
@@ -85,7 +86,7 @@ def example_coordination_measurement():
     print(f"Baseline quality: {metrics['baseline_mean']:.3f}")
     print(f"Coordinated:      {metrics['coordinated']:.3f}")
 
-    if metrics['gamma'] > 1.0:
+    if metrics["gamma"] > 1.0:
         print("\n✓ Coordination is EFFECTIVE (γ > 1.0)")
     else:
         print("\n✗ Coordination is INEFFECTIVE (γ < 1.0)")
@@ -99,12 +100,14 @@ def example_coordination_strategies():
     strategies = {
         "sequential": {"gamma": 1.18, "consensus": 0.85},
         "parallel": {"gamma": 1.12, "consensus": 0.78},
-        "debate": {"gamma": 1.25, "consensus": 0.92}
+        "debate": {"gamma": 1.25, "consensus": 0.92},
     }
 
     for strategy, metrics in strategies.items():
         effective = "✓" if metrics["gamma"] > 1.0 else "✗"
-        print(f"{strategy:12s} | γ={metrics['gamma']:.2f} | consensus={metrics['consensus']:.0%} | {effective}")
+        print(
+            f"{strategy:12s} | γ={metrics['gamma']:.2f} | consensus={metrics['consensus']:.0%} | {effective}"
+        )
 
     print("\nBest strategy: debate (highest γ and consensus)")
 
@@ -129,4 +132,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ Error: {e}")
         import traceback
+
         traceback.print_exc()

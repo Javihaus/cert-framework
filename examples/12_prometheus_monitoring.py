@@ -17,7 +17,6 @@ Dependencies: cert-framework, prometheus-client
 Install: pip install prometheus-client
 """
 
-import time
 import json
 from pathlib import Path
 
@@ -63,11 +62,11 @@ def example_basic_metrics_export():
     # Export metrics
     stats = export_metrics_from_audit_log(mock_log_path, system_name="example-system")
 
-    print(f"\n  Metrics exported:")
+    print("\n  Metrics exported:")
     print(f"    Total evaluations: {stats['total_evaluations']}")
     print(f"    Passed: {stats['passed']}")
     print(f"    Failed: {stats['failed']}")
-    print(f"\n  Metrics available in Prometheus format")
+    print("\n  Metrics available in Prometheus format")
 
 
 def example_metrics_server():
@@ -145,13 +144,13 @@ def example_grafana_dashboard():
 
         print(f"  ✓ Dashboard created: {output_path}")
         print(f"  ✓ Panels: {len(dashboard['dashboard']['panels'])}")
-        print(f"\n  Dashboard includes:")
+        print("\n  Dashboard includes:")
         for panel in dashboard["dashboard"]["panels"]:
             print(f"    - {panel['title']}")
 
-        print(f"\n  Import into Grafana:")
-        print(f"    1. Open Grafana UI")
-        print(f"    2. Go to Dashboards > Import")
+        print("\n  Import into Grafana:")
+        print("    1. Open Grafana UI")
+        print("    2. Go to Dashboards > Import")
         print(f"    3. Upload {output_path}")
 
     except ImportError:
@@ -183,11 +182,11 @@ def example_available_metrics():
     for name, desc, mtype in metrics:
         print(f"  {name:<40} {mtype:<12} {desc}")
 
-    print(f"\n  Labels:")
-    print(f"    preset: general, healthcare, financial, legal")
-    print(f"    system: custom system identifier")
-    print(f"    status: passed, failed")
-    print(f"    article: EU AI Act article number")
+    print("\n  Labels:")
+    print("    preset: general, healthcare, financial, legal")
+    print("    system: custom system identifier")
+    print("    status: passed, failed")
+    print("    article: EU AI Act article number")
 
 
 def example_prometheus_config():
@@ -208,7 +207,7 @@ def example_prometheus_config():
             service: 'llm-api'
 
   # Or with service discovery:
-  
+
   scrape_configs:
     - job_name: 'cert-framework'
       kubernetes_sd_configs:

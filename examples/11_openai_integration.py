@@ -21,8 +21,6 @@ For real usage, install: pip install openai
 from cert.integrations.openai import (
     wrap_openai_client,
     wrap_openai_completion,
-    create_monitored_openai_stream,
-    wrap_openai_assistants,
 )
 
 
@@ -75,10 +73,10 @@ def example_basic_client_wrapping():
         ],
     )
 
-    print(f"\n  Query: extracted from last user message")
-    print(f"  Context: from system message and history")
+    print("\n  Query: extracted from last user message")
+    print("  Context: from system message and history")
     print(f"  Answer: {response['answer'][:50]}...")
-    print(f"  Original response: preserved")
+    print("  Original response: preserved")
 
 
 def example_multi_turn_conversation():
@@ -124,11 +122,11 @@ def example_multi_turn_conversation():
         {"role": "user", "content": "What about 3+3?"},
     ]
 
-    response = monitored_client.chat.completions.create(model="gpt-4", messages=messages)
+    monitored_client.chat.completions.create(model="gpt-4", messages=messages)
 
     print(f"\n  Conversation with {len(messages)} messages")
-    print(f"  ✓ System message and history extracted as context")
-    print(f"  ✓ Last user message extracted as query")
+    print("  ✓ System message and history extracted as context")
+    print("  ✓ Last user message extracted as query")
 
 
 def example_function_calling():
@@ -280,7 +278,7 @@ def example_custom_function_wrapping():
 
     result = monitored_pipeline("What is the revenue?")
     print(f"\n  Result: {result['answer'][:50]}...")
-    print(f"  ✓ Automatically monitored")
+    print("  ✓ Automatically monitored")
 
 
 def example_different_presets():
@@ -312,7 +310,7 @@ def example_different_presets():
 
     for preset, description in use_cases:
         client = MockClient()
-        monitored = wrap_openai_client(client, preset=preset)
+        wrap_openai_client(client, preset=preset)
         print(f"  ✓ {description}: preset='{preset}'")
 
 

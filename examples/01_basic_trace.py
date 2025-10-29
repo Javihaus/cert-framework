@@ -18,19 +18,15 @@ def simple_rag_pipeline(query: str) -> dict:
     context = "The company's revenue in Q4 2024 was $500 million, up 25% from Q3."
 
     # Simulate LLM generation (replace with actual LLM call)
-    answer = f"Based on the financial data, Q4 2024 revenue reached $500M."
+    answer = "Based on the financial data, Q4 2024 revenue reached $500M."
 
-    return {
-        "query": query,
-        "context": context,
-        "answer": answer
-    }
+    return {"query": query, "context": context, "answer": answer}
 
 
 # Example 2: With metadata
 @trace(
     log_path="example_traces.jsonl",
-    metadata={"service": "rag", "version": "1.0", "environment": "development"}
+    metadata={"service": "rag", "version": "1.0", "environment": "development"},
 )
 def rag_with_metadata(query: str) -> dict:
     """RAG pipeline with custom metadata in traces."""
@@ -53,9 +49,9 @@ def rag_with_errors(query: str) -> dict:
 
 
 if __name__ == "__main__":
-    print("="*60)
+    print("=" * 60)
     print("CERT Framework - Basic Trace Example")
-    print("="*60)
+    print("=" * 60)
 
     # Example 1: Normal usage
     print("\n1. Basic tracing:")
@@ -75,9 +71,9 @@ if __name__ == "__main__":
         print(f"   Error caught and logged: {e}")
 
     # Show log file
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✓ Traces logged to: example_traces.jsonl")
-    print("="*60)
+    print("=" * 60)
 
     print("\nView traces with:")
     print("  cert logs example_traces.jsonl")

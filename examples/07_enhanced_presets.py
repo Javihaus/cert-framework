@@ -15,9 +15,9 @@ Dependencies: cert-framework
 """
 
 from cert import (
-    measure,
-    get_industry_preset,
     INDUSTRY_PRESETS,
+    get_industry_preset,
+    measure,
 )
 
 
@@ -50,7 +50,7 @@ def example_basic_compliance_check():
     compliance = preset.check_compliance(result)
 
     print(f"\n  Measurement Confidence: {result.confidence:.3f}")
-    print(f"\n  Compliance Status:")
+    print("\n  Compliance Status:")
     for article, status in compliance.items():
         status_symbol = "✓" if status else "✗"
         print(f"    {status_symbol} {article}: {'PASS' if status else 'FAIL'}")
@@ -126,11 +126,11 @@ def example_preset_serialization():
     print(f"Description: {preset_dict['description']}")
     print(f"Risk Level: {preset_dict['risk_level']}")
 
-    print(f"\nMeasurement Config:")
+    print("\nMeasurement Config:")
     for key, value in preset_dict["measure_config"].items():
         print(f"  {key}: {value}")
 
-    print(f"\nCompliance Requirements:")
+    print("\nCompliance Requirements:")
     for req in preset_dict["compliance_requirements"]:
         print(f"\n  {req['article']}")
         print(f"    {req['description']}")

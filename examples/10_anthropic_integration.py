@@ -21,7 +21,6 @@ For real usage, install: pip install anthropic
 from cert.integrations.anthropic import (
     wrap_anthropic_client,
     wrap_anthropic_completion,
-    create_monitored_anthropic_stream,
 )
 
 
@@ -60,16 +59,14 @@ def example_basic_client_wrapping():
     # Use normally
     response = monitored_client.messages.create(
         model="claude-3-opus-20240229",
-        messages=[
-            {"role": "user", "content": "What is the treatment for hypertension?"}
-        ],
+        messages=[{"role": "user", "content": "What is the treatment for hypertension?"}],
         system="You are a medical expert assistant.",
     )
 
-    print(f"\n  Query extracted from last user message")
-    print(f"  Context from system message")
+    print("\n  Query extracted from last user message")
+    print("  Context from system message")
     print(f"  Answer: {response['answer'][:50]}...")
-    print(f"  Original response preserved")
+    print("  Original response preserved")
 
 
 def example_multi_turn_conversation():
@@ -106,15 +103,13 @@ def example_multi_turn_conversation():
         {"role": "user", "content": "What's its population?"},
     ]
 
-    response = monitored_client.messages.create(
-        model="claude-3-opus-20240229", messages=messages
-    )
+    monitored_client.messages.create(model="claude-3-opus-20240229", messages=messages)
 
-    print(f"\n  Conversation history:")
+    print("\n  Conversation history:")
     for msg in messages:
         print(f"    {msg['role']}: {msg['content'][:40]}...")
-    print(f"\n  ✓ All previous messages included as context")
-    print(f"  ✓ Last user message extracted as query")
+    print("\n  ✓ All previous messages included as context")
+    print("  ✓ Last user message extracted as query")
 
 
 def example_custom_function_wrapping():
@@ -144,7 +139,7 @@ def example_custom_function_wrapping():
 
     result = monitored_pipeline("What is the stock price?")
     print(f"\n  Result: {result['answer'][:50]}...")
-    print(f"  ✓ Automatically monitored and logged")
+    print("  ✓ Automatically monitored and logged")
 
 
 def example_streaming_support():
@@ -205,7 +200,7 @@ def example_different_presets():
 
     for preset, description in use_cases:
         client = MockClient()
-        monitored = wrap_anthropic_client(client, preset=preset)
+        wrap_anthropic_client(client, preset=preset)
         print(f"  ✓ {description}: preset='{preset}'")
 
 

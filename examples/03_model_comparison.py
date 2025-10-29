@@ -17,7 +17,7 @@ def simulate_model_outputs(prompt: str):
     outputs = {
         "gpt-4": "The company reported Q4 revenue of $500M with 20% year-over-year growth.",
         "claude-3": "Q4 revenue reached $500 million, representing a 20% increase from the previous year.",
-        "llama-3": "In Q4, the company's revenue was $500M, up 20% compared to last year."
+        "llama-3": "In Q4, the company's revenue was $500M, up 20% compared to last year.",
     }
     return outputs
 
@@ -32,10 +32,7 @@ def compare_models(prompt: str, reference: str):
 
     scores = {}
     for model, output in outputs.items():
-        result = measure(
-            text1=output,
-            text2=reference
-        )
+        result = measure(text1=output, text2=reference)
         scores[model] = result.confidence
         print(f"{model:12s} | {result.confidence:.3f} | {output[:60]}...")
 

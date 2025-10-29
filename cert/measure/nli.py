@@ -6,7 +6,7 @@ Uses transformer-based models to detect when outputs contradict source context.
 
 import logging
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Dict, Literal
 
 logger = logging.getLogger(__name__)
 
@@ -148,22 +148,24 @@ class NLIEngine:
             return 1.0 - score
 
 
-# Global singleton for efficient reuse
-_GLOBAL_NLI_ENGINE: Optional[NLIEngine] = None
+# Global model cache for efficient reuse across multiple calls
+_NLI_MODEL_CACHE: Dict[str, NLIEngine] = {}
 
 
 def get_nli_engine(model_name: str = "microsoft/deberta-v3-base") -> NLIEngine:
-    """Get global NLI engine (singleton pattern).
+    """Get global NLI engine with model caching.
+
+    Models are cached by name to avoid reloading. This significantly improves
+    performance when measure() is called multiple times.
 
     Args:
         model_name: HuggingFace model name
 
     Returns:
-        NLIEngine instance (reuses existing if same model)
+        NLIEngine instance (reuses cached model if available)
     """
-    global _GLOBAL_NLI_ENGINE
+    if model_name not in _NLI_MODEL_CACHE:
+        logger.info(f"Loading NLI model: {model_name}")
+        _NLI_MODEL_CACHE[model_name] = NLIEngine(model_name=model_name)
 
-    if _GLOBAL_NLI_ENGINE is None or _GLOBAL_NLI_ENGINE.model_name != model_name:
-        _GLOBAL_NLI_ENGINE = NLIEngine(model_name=model_name)
-
-    return _GLOBAL_NLI_ENGINE
+    return _NLI_MODEL_CACHE[model_name]

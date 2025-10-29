@@ -15,8 +15,9 @@ Time: < 10 seconds
 Dependencies: cert-framework
 """
 
-from cert import monitor, export_report
 import os
+
+from cert import export_report, monitor
 
 
 @monitor(preset="healthcare")
@@ -126,7 +127,7 @@ def show_report_sample():
     print("-" * 40)
 
     if os.path.exists("cert_compliance_report.txt"):
-        with open("cert_compliance_report.txt", "r") as f:
+        with open("cert_compliance_report.txt") as f:
             lines = f.readlines()[:15]  # First 15 lines
             print("".join(lines))
             print("... (truncated)")
@@ -153,9 +154,7 @@ if __name__ == "__main__":
         print("   - cert_compliance_report.txt (includes Section 7: Failure Analysis)")
         print("   - cert_compliance_report.json")
         print("   - cert_compliance_report.csv")
-        print(
-            "\n💡 Check Section 7 in the .txt report to see detailed failure explanations"
-        )
+        print("\n💡 Check Section 7 in the .txt report to see detailed failure explanations")
         print("   with severity levels and actionable recommendations!")
 
     except Exception as e:
