@@ -37,9 +37,9 @@ Advanced Features (Experimental):
 For detailed documentation, see: https://github.com/Javihaus/cert-framework
 """
 
-__version__ = "2.0.0"
+__version__ = "4.0.0"
 __author__ = "Javier Marin"
-__license__ = "MIT"
+__license__ = "Apache 2.0"
 
 # Public API - Production-ready monitoring
 from cert.measure import measure
