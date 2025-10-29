@@ -1,5 +1,5 @@
 """
-CERT Framework v2.0.0
+CERT Framework v4.0.0
 ======================
 
 EU AI Act Article 15 Compliance Framework for LLM Systems
