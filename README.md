@@ -1,6 +1,6 @@
 # CERT Framework
 
-Production-ready accuracy monitoring for LLM systems. Automated compliance documentation for EU AI Act Article 15.
+**Production-ready LLM monitoring with automated EU AI Act Article 15 compliance**
 
 <div align="center">
   <img src="docs/CERT.png" alt="CERT Framework" width="1000">
@@ -8,684 +8,356 @@ Production-ready accuracy monitoring for LLM systems. Automated compliance docum
 
 \
 [**Why CERT**](#why-cert)
-| [**Installation & Quickstart**](#iInstallation-&-quickstart)
-| [**Run the Examples**](#run-the-examples)
-| [**How It Works**](#how-it-works)
+| [**Installation**](#installation)
+| [**Quick Start**](#quick-start)
+| [**Architecture**](#architecture)
+| [**Evaluation**](#evaluation)
+| [**Compliance Reports**](#compliance-reports)
+| [**Comparison**](#comparison)
 | [**API Reference**](#api-reference)
-| [**Compliance Mapping**](#compliance-mapping)
-| [**Framework Integrations**](#framework-integrations)
-| [**Advanced Features**](#advanced-features)
 | [**Production Deployment**](#production-deployment)
-| [**Troubleshooting**](#troubleshooting)
-| [**Performance Characteristics**](#performance-characteristics)
-| [**Development**](#development)
+| [**Performance**](#performance)
+| [**Migration from v2.x**](#migration-from-v2x)
 | [**FAQ**](#faq)
 | [**License**](#license)
-| [**Citation**](#citation)
 
 \
 [![PyPI version](https://badge.fury.io/py/cert-framework.svg)](https://pypi.org/project/cert-framework/)
 ![pytest](https://img.shields.io/badge/pytest-passing-green)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 ---
 
 ## Why CERT
 
-The EU AI Act requires high-risk AI systems to demonstrate "appropriate levels of accuracy" (Article 15) with documented evidence for auditors. Compliance deadlines begin August 2026.
+The EU AI Act mandates accuracy documentation for high-risk AI systems. Article 15 requires "appropriate levels of accuracy" with documented evidence. Article 19 requires audit trails. Enforcement begins August 2, 2025.
 
-Most evaluation tools help you test prompts before deployment. CERT monitors accuracy **in production** and generates the compliance documentation auditors will request.
+CERT combines production monitoring with compliance automation. Think Langfuse for observability, plus automated Article 15 report generation. The monitoring features establish developer trust. The compliance features drive purchasing decisions.
 
-**The problem:** Your RAG system is answering customer questions right now. You need continuous proof it's meeting accuracy requirements. Manual spot-checking doesn't scale. Generic logging doesn't prove compliance.
+**Core Value:**
+- Developers get lightweight LLM monitoring (traces, performance metrics, error tracking)
+- Compliance teams get automated Article 15 documentation (accuracy reports, audit trails, transparency requirements)
+- One platform, two buyer personas, clear upgrade path from free to enterprise
 
-**This solution:** Three lines of code give you per-request accuracy measurement, automatic audit trails (Article 19), and ready-to-submit compliance reports (Article 15).
+**Design Philosophy:**
+
+Monitoring should be invisible until you need it. The core tracer is 5MB with zero ML dependencies. Evaluation happens offline when you choose. Compliance reports generate from trace logs via CLI tools. Each concern is separate, testable, and optional.
+
+This matters because most LLM monitoring tools force you to run evaluation models on every request. That adds latency, increases costs, and couples concerns that should be independent. We split them deliberately.
 
 ---
 
-## Installation & Quickstart
+## Installation
 
-### Installation
+Choose your installation based on what you need:
 ```bash
-# Basic installation
+# Core monitoring only (5MB, zero ML dependencies)
 pip install cert-framework
 
-# With advanced features (trajectory analysis)
-pip install cert-framework[trajectory]
+# Core + evaluation engines (150MB with transformers, torch, embeddings)
+pip install cert-framework[evaluation]
 
-# From source
-git clone https://github.com/Javihaus/cert-framework
-cd cert-framework
-pip install -e .
+# Core + specific integrations
+pip install cert-framework[langchain]
+pip install cert-framework[anthropic]
+pip install cert-framework[openai]
+
+# Everything (for development/testing)
+pip install cert-framework[all]
 ```
 
-### Three-Line Integration
+The core package gives you structured trace logging with <1ms overhead per request. Install evaluation features when you need accuracy measurement. Install integrations only for frameworks you use.
 
-Add accuracy monitoring to any LLM pipeline:
+This dependency model means your production containers stay small and your monitoring layer stays fast.
+
+---
+
+## Quick Start
+
+### Monitoring: Three Lines
 ```python
-from cert import monitor
+from cert import trace
 
-@monitor(preset="healthcare")  # or "financial", "legal", "general"
+@trace(log_path="traces.jsonl")
 def your_rag_pipeline(query):
     context = retrieve_documents(query)
     answer = llm.generate(context, query)
     return {"context": context, "answer": answer}
 
+# Call your function normally
 result = your_rag_pipeline("What was Q4 revenue?")
-# Automatically generates audit log in cert_audit.jsonl
 ```
 
-The decorator measures semantic similarity between `answer` and `context`, checking for hallucinations and factual grounding. Results are logged automatically for compliance reporting.
+That's it. Every call logs to `traces.jsonl` with timestamp, inputs, outputs, duration, and status. Works with any LLM provider. No magic, no auto-detection, no hidden ML models.
 
-### Generate Compliance Reports
-
-Create EU AI Act documentation from your audit logs:
-```python
-from cert import export_report
-
-export_report(
-    audit_log_path="cert_audit.jsonl",
-    system_name="Production RAG System",
-    format="pdf"  # or "txt", "json", "markdown", "html"
-)
-```
-
-**That's it.** You now have production monitoring and compliance documentation.
-
----
-
-## Run the Examples
-
-All examples work out-of-the-box with zero configuration:
-```bash
-# Basic examples (no setup required)
-python examples/01_quickstart.py              # Basic monitoring
-python examples/02_rag_monitoring.py          # RAG-specific patterns
-python examples/03_model_comparison.py        # A/B test models
-python examples/04_compliance_reports.py      # Generate EU AI Act reports
-
-# Advanced examples (require cert-framework[trajectory])
-python examples/05_trajectory_analysis.py     # Reasoning trajectory analysis
-python examples/06_coordination_monitor.py    # Multi-agent coordination
-```
-
-Each example runs in < 10 seconds with zero setup.
-
----
-
-## How It Works
-
-### Measurement Approach
-
-CERT uses three complementary methods to assess answer accuracy:
-
-1. **Semantic Similarity** (30% weight): Embedding-based similarity between answer and source context
-2. **Natural Language Inference** (50% weight): Detects logical contradictions using NLI models
-3. **Term Grounding** (20% weight): Identifies claims in the answer not present in source material
-
-These combine into a confidence score. Answers below the threshold (default: 0.7) are flagged for review.
-
-### Industry Presets
-
-Pre-configured for regulatory requirements:
-```python
-# Healthcare (EU AI Act Annex III, high-risk)
-@monitor(preset="healthcare")  # Threshold: 0.85, strict grounding
-def diagnose_patient(symptoms):
-    pass
-
-# Financial services (EU AI Act Annex III, high-risk)
-@monitor(preset="financial")   # Threshold: 0.80, balanced
-def assess_creditworthiness(application):
-    pass
-
-# Legal systems (EU AI Act Annex III, high-risk)
-@monitor(preset="legal")        # Threshold: 0.80, emphasis on grounding
-def analyze_contract(document):
-    pass
-
-# General purpose (low-risk)
-@monitor(preset="general")      # Threshold: 0.70, standard monitoring
-def answer_question(query):
-    pass
-```
-
-Each preset maps to specific EU AI Act requirements and adjusts measurement sensitivity accordingly.
-
-### Audit Trail
-
-Every monitored request generates a structured log entry:
+**What gets logged:**
 ```json
 {
-  "timestamp": "2025-10-28T14:32:11Z",
-  "preset": "healthcare",
-  "risk_level": "high",
-  "query": "What medications is the patient taking?",
-  "context": "Patient medications: Metformin 1000mg bid, Lisinopril 10mg qd",
-  "answer": "The patient takes Metformin and Lisinopril",
-  "measurement": {
-    "matched": true,
-    "confidence": 0.87,
-    "semantic_score": 0.82,
-    "nli_label": "entailment",
-    "nli_score": 0.91,
-    "grounding_score": 0.89,
-    "ungrounded_terms": []
-  },
-  "compliance": {
-    "Article 15.1": true,
-    "Article 15.4": true
-  }
+  "timestamp": "2025-01-15T14:23:11.847Z",
+  "function": "your_rag_pipeline",
+  "duration_ms": 234.5,
+  "status": "success",
+  "context": "Q4 revenue was $500M according to earnings report",
+  "answer": "Q4 revenue reached $500 million",
+  "metadata": {}
 }
 ```
 
-This log format satisfies Article 19 (record-keeping requirements) and provides evidence for Article 15 (accuracy requirements).
+### Evaluation: Run Offline
+
+Once you have traces, evaluate them on your schedule:
+```bash
+# Requires: pip install cert-framework[evaluation]
+
+cert evaluate traces.jsonl \
+  --preset financial \
+  --threshold 0.8 \
+  --output evaluation.json
+```
+
+This runs semantic similarity, NLI contradiction detection, and term grounding analysis on your logged traces. Takes ~200ms per trace. Run it hourly, daily, or on-demand. Not per-request.
+
+### Compliance: Generate Reports
+```bash
+cert report traces.jsonl \
+  --output article15_report.pdf \
+  --system-name "Production RAG System" \
+  --risk-level high \
+  --format pdf
+```
+
+Generates EU AI Act Article 15 compliance documentation from your trace logs. Includes accuracy statistics, audit trail summary, and Article 19 record-keeping evidence.
+
+---
+
+## Architecture
+
+CERT separates three concerns that are usually coupled:
+
+### 1. Runtime Monitoring (Core)
+
+The `@trace` decorator logs inputs, outputs, timing, and errors. Zero ML dependencies. <1ms overhead. Works everywhere.
+
+**Why separate:** Monitoring must be lightweight and reliable. Loading 500MB of ML models to log a timestamp is wrong.
+
+### 2. Offline Evaluation (Optional)
+
+The `cert evaluate` command processes traces in batch. Runs semantic similarity (embeddings), contradiction detection (NLI), and term grounding analysis. Configurable thresholds per industry preset.
+
+**Why offline:** Evaluation adds 50-200ms latency and requires ML models. Run it when you need it, not on every request.
+
+### 3. Compliance Reporting (CLI)
+
+The `cert report` command generates Article 15 documentation from trace logs. Markdown, HTML, or PDF output. Includes accuracy statistics, error rates, and audit trail summaries.
+
+**Why CLI:** Compliance reports are generated periodically for auditors. They operate on aggregate data, not individual requests. Separate tool, separate schedule.
+
+**Architecture Diagram:**
+```
+Your LLM App
+    ↓
+[@trace decorator] → traces.jsonl (5MB overhead, <1ms latency)
+                         ↓
+                    [cert evaluate] → evaluation.json (offline, 200ms/trace)
+                         ↓
+                    [cert report] → article15_report.pdf (periodic, for auditors)
+```
+
+This design means:
+- Production stays fast (monitoring adds <1ms)
+- Evaluation scales independently (run when you have capacity)
+- Compliance integrates with existing workflows (reports on demand)
+
+---
+
+## Evaluation
+
+Evaluation measures accuracy using three methods:
+
+### 1. Semantic Similarity (30% weight)
+
+Embedding-based cosine similarity between answer and context. Uses sentence-transformers (all-MiniLM-L6-v2 by default). Measures: does the answer semantically match the source material?
+
+### 2. NLI Contradiction Detection (50% weight)
+
+Natural Language Inference model checks if answer contradicts context. Uses microsoft/deberta-v3-base. Detects logical inconsistencies and hallucinations.
+
+### 3. Term Grounding (20% weight)
+
+Checks if terms in the answer appear in the context. Identifies claims not present in source material. Flags ungrounded statements.
+
+### Industry Presets
+```python
+# Healthcare (EU AI Act Annex III high-risk)
+cert evaluate traces.jsonl --preset healthcare
+# Threshold: 0.85, strict grounding
+
+# Financial services (high-risk)
+cert evaluate traces.jsonl --preset financial
+# Threshold: 0.80, balanced
+
+# Legal systems (high-risk)
+cert evaluate traces.jsonl --preset legal
+# Threshold: 0.80, emphasis on grounding
+
+# General purpose (low-risk)
+cert evaluate traces.jsonl --preset general
+# Threshold: 0.70, standard monitoring
+```
+
+Presets adjust thresholds and weights based on regulatory risk levels. Healthcare systems need higher accuracy than general chatbots.
+
+### Custom Configuration
+```python
+from cert.evaluation import Evaluator
+
+evaluator = Evaluator(
+    preset="custom",
+    threshold=0.85,
+    semantic_weight=0.4,
+    nli_weight=0.4,
+    grounding_weight=0.2
+)
+
+results = evaluator.evaluate_log_file("traces.jsonl")
+```
+
+---
+
+## Compliance Reports
+
+Generate EU AI Act documentation:
+```bash
+# Article 15 compliance report
+cert report traces.jsonl \
+  --output compliance/article15_2025_q1.pdf \
+  --system-name "Clinical Decision Support System" \
+  --risk-level high \
+  --format pdf
+
+# Include evaluation metrics
+cert report traces.jsonl \
+  --output compliance/full_report.html \
+  --system-name "Production RAG System" \
+  --risk-level high \
+  --format html \
+  --include-evaluation evaluation.json
+```
+
+### Report Contents
+
+**Article 15.1 - Accuracy Levels:**
+- Total requests processed
+- Success rate and error rate
+- Accuracy distribution (if evaluation included)
+- Threshold compliance percentage
+
+**Article 15.4 - Resilience to Errors:**
+- Error categorization and frequency
+- Performance degradation tracking
+- Recovery time statistics
+
+**Article 19 - Record Keeping:**
+- Audit trail summary
+- Data retention confirmation
+- Traceability evidence
+
+Reports include timestamps, system identification, and operator declarations required for audit submissions.
+
+---
+
+## Comparison
+
+| Feature | CERT | Langfuse | LangSmith | Helicone |
+|---------|------|----------|-----------|----------|
+| License | Apache 2.0 | Proprietary | Proprietary | MIT |
+| Self-Hosted | Unlimited | Limited tiers | Cloud only | Limited |
+| Core Size | 5MB | ~50MB | N/A | ~20MB |
+| EU AI Act Compliance | Native Article 15 | Manual | Manual | Manual |
+| Offline Evaluation | Yes | No | No | No |
+| Deployment | Library + CLI | Service | Service | Proxy |
+| Latency Overhead | <1ms | ~5ms | ~10ms | ~5ms |
+| Multi-Framework | Yes | Yes | LangChain focus | Yes |
+| Pricing | Freemium | Freemium | Pay-per-trace | Freemium |
+
+**Why CERT vs Langfuse:**
+
+Langfuse excels at observability and debugging. CERT adds compliance automation. If you need Article 15 documentation for EU AI Act audits, CERT handles it natively. If you just need traces and dashboards, Langfuse works fine.
+
+Use both if you want: Langfuse for real-time dashboards, CERT for compliance reporting. They read the same trace formats.
 
 ---
 
 ## API Reference
 
-### `monitor()`
+### trace()
 
-Decorator for monitoring function outputs.
-
-**Signature:**
+Decorator for monitoring function execution.
 ```python
-def monitor(
-    preset: str = "general",
-    threshold: float = None,
-    use_semantic: bool = True,
-    semantic_weight: float = None,
-    use_nli: bool = True,
-    nli_weight: float = None,
-    use_grounding: bool = True,
-    grounding_weight: float = None,
-    embedding_model: str = "all-MiniLM-L6-v2",
-    nli_model: str = "microsoft/deberta-v3-base"
+def trace(
+    _func: Optional[Callable] = None,
+    *,
+    log_path: str = "traces.jsonl",
+    metadata: Optional[Dict] = None
 ) -> Callable
 ```
 
 **Parameters:**
+- `log_path` - Path to JSONL trace log file
+- `metadata` - Additional metadata to include in traces
 
-- `preset` (str): Industry preset - "healthcare", "financial", "legal", or "general"
-- `threshold` (float): Override preset threshold (0.0-1.0)
-- `use_semantic` (bool): Enable semantic similarity measurement
-- `semantic_weight` (float): Override semantic component weight
-- `use_nli` (bool): Enable NLI contradiction detection
-- `nli_weight` (float): Override NLI component weight
-- `use_grounding` (bool): Enable term grounding analysis
-- `grounding_weight` (float): Override grounding component weight
-- `embedding_model` (str): Sentence transformer model name
-- `nli_model` (str): Natural language inference model name
+**Returns:** Decorated function that logs execution
 
-**Returns:**
-Decorator that wraps the function with monitoring
-
-**Expected Function Signature:**
-
-Your monitored function should return a dict with these keys:
+**Example:**
 ```python
-{
-    "context": str,  # Source material (documents, database results, etc.)
-    "answer": str,   # Model-generated response
-    "query": str     # Optional: original user query
-}
+from cert import trace
+
+@trace(log_path="production_traces.jsonl", metadata={"env": "prod"})
+def process_query(query: str) -> Dict[str, str]:
+    return {"context": "...", "answer": "..."}
 ```
 
-**Examples:**
+### Evaluator
+
+Batch evaluation of trace logs.
 ```python
-# Use preset defaults
-@monitor(preset="healthcare")
-def process_query(query):
-    return {"context": context, "answer": answer}
+from cert.evaluation import Evaluator
 
-# Override threshold
-@monitor(preset="financial", threshold=0.85)
-def risk_assessment(data):
-    return {"context": context, "answer": answer}
-
-# Custom weights
-@monitor(
-    preset="legal",
-    semantic_weight=0.2,
-    nli_weight=0.5,
-    grounding_weight=0.3
+evaluator = Evaluator(
+    preset: str = "general",
+    threshold: float = 0.7
 )
-def analyze_contract(text):
-    return {"context": context, "answer": answer}
+
+results = evaluator.evaluate_log_file(log_path: str)
 ```
 
----
+**Methods:**
+- `evaluate_trace(context, answer)` - Evaluate single trace
+- `evaluate_log_file(log_path)` - Batch evaluate all traces
 
-### `measure()`
+**Returns:** Dictionary with evaluation statistics
 
-Direct measurement function for comparing two texts.
+### ComplianceReporter
 
-**Signature:**
+Generate EU AI Act reports.
 ```python
-def measure(
-    text1: str,
-    text2: str,
-    *,
-    use_semantic: bool = True,
-    semantic_weight: float = 0.3,
-    use_nli: bool = True,
-    nli_weight: float = 0.5,
-    use_grounding: bool = True,
-    grounding_weight: float = 0.2,
-    threshold: float = 0.7,
-    embedding_model: str = "all-MiniLM-L6-v2",
-    nli_model: str = "microsoft/deberta-v3-base"
-) -> MeasurementResult
-```
+from cert.compliance import ComplianceReporter
 
-**Purpose:**
-Measures semantic similarity, detects contradictions, and checks grounding between two texts. Use this for one-off evaluations or custom workflows.
-
-**Parameters:**
-
-- `text1` (str): First text, typically model output or answer
-- `text2` (str): Second text, typically context or ground truth
-- `use_semantic` (bool): Enable embedding-based similarity
-- `semantic_weight` (float): Weight for semantic component (0.0-1.0)
-- `use_nli` (bool): Enable NLI contradiction detection
-- `nli_weight` (float): Weight for NLI component (0.0-1.0)
-- `use_grounding` (bool): Enable term grounding analysis
-- `grounding_weight` (float): Weight for grounding component (0.0-1.0)
-- `threshold` (float): Confidence threshold for match (0.0-1.0)
-- `embedding_model` (str): Sentence transformer model name
-- `nli_model` (str): NLI model name
-
-**Returns:**
-
-`MeasurementResult` object with:
-```python
-@dataclass
-class MeasurementResult:
-    matched: bool              # True if confidence >= threshold
-    confidence: float          # Overall confidence score (0.0-1.0)
-    semantic_score: float      # Embedding similarity (0.0-1.0)
-    nli_label: str            # "entailment", "neutral", or "contradiction"
-    nli_score: float          # NLI confidence (0.0-1.0)
-    grounding_score: float    # Term coverage (0.0-1.0)
-    ungrounded_terms: List[str]  # Terms in text1 not in text2
-```
-
-**Examples:**
-```python
-from cert import measure
-
-# Basic comparison
-result = measure(
-    "The patient has diabetes",
-    "Patient diagnosed with Type 2 diabetes mellitus"
-)
-print(result.matched)      # True
-print(result.confidence)   # 0.89
-
-# Check for hallucination
-result = measure(
-    "The patient is allergic to penicillin",
-    "Patient has no known drug allergies"
-)
-print(result.nli_label)    # "contradiction"
-print(result.matched)      # False
-
-# Identify ungrounded claims
-result = measure(
-    "Revenue increased 50% due to new product launch",
-    "Q4 revenue was $1.2M"
-)
-print(result.ungrounded_terms)  # ["50%", "new product launch"]
-```
-
----
-
-### `export_report()`
-
-Generate compliance reports from audit logs.
-
-**Signature:**
-```python
-def export_report(
-    audit_log_path: str = "cert_audit.jsonl",
-    system_name: str = "LLM System",
-    system_version: str = "1.0.0",
-    risk_level: str = "high",
-    format: str = "txt",
-    output_path: str = None
-) -> str
-```
-
-**Purpose:**
-Generates EU AI Act Article 15 compliance documentation showing accuracy metrics, robustness measures, and audit trail status.
-
-**Parameters:**
-
-- `audit_log_path` (str): Path to cert audit log (default: "cert_audit.jsonl")
-- `system_name` (str): Your AI system name
-- `system_version` (str): System version identifier
-- `risk_level` (str): "high", "limited", or "minimal" per EU AI Act classification
-- `format` (str): Report format - "txt", "json", "markdown", "html", or "pdf"
-- `output_path` (str): Custom output path (auto-generated if None)
-
-**Returns:**
-Path to generated report file
-
-**Examples:**
-```python
-from cert import export_report
-
-# Text report for internal review
-export_report(
-    audit_log_path="cert_audit.jsonl",
-    system_name="Customer Service RAG",
-    system_version="2.1.0",
-    risk_level="high",
-    format="txt"
+reporter = ComplianceReporter(
+    system_name: str,
+    risk_level: str = "high"
 )
 
-# PDF for external audit
-export_report(
-    system_name="Healthcare Diagnosis Assistant",
-    risk_level="high",
-    format="pdf",
-    output_path="compliance/audit_2025_q4.pdf"
-)
-
-# JSON for programmatic analysis
-export_report(
-    system_name="Credit Risk Assessment",
-    format="json",
-    output_path="metrics/compliance_metrics.json"
+report_path = reporter.generate_report(
+    log_path: str,
+    output_path: str,
+    format: str = "pdf"
 )
 ```
 
-**Report Contents:**
-
-Reports include:
-
-- **System Overview**: Name, version, risk classification, evaluation period
-- **Article 15.1 Compliance**: Accuracy metrics and pass rates
-- **Article 15.4 Compliance**: Robustness measures and error rates
-- **Article 19 Compliance**: Audit trail status and data retention
-- **Failure Analysis**: Top failure modes with explanations and recommendations
-- **Recommendations**: Specific actions to improve compliance
-
----
-
-## Compliance Mapping
-
-### EU AI Act Article 15
-
-**Article 15.1 - Accuracy:**
-> "High-risk AI systems shall be designed and developed in such a way that they achieve an appropriate level of accuracy, robustness and cybersecurity."
-
-**How CERT satisfies this:**
-- Per-request accuracy measurement with configurable thresholds
-- Industry-specific presets calibrated to regulatory expectations
-- Automated reporting showing sustained accuracy over time
-
-**Article 15.4 - Robustness:**
-> "High-risk AI systems shall be resilient as regards errors, faults or inconsistencies."
-
-**How CERT satisfies this:**
-- NLI-based contradiction detection catches factual errors
-- Grounding analysis identifies unsupported claims (hallucinations)
-- Failure explanations pinpoint specific robustness issues
-
-### EU AI Act Article 19
-
-**Article 19 - Record-keeping:**
-> "Providers of high-risk AI systems shall keep logs automatically generated by their systems."
-
-**How CERT satisfies this:**
-- Automatic JSONL audit logs for every evaluated request
-- Immutable append-only format prevents tampering
-- Structured format enables programmatic audit preparation
-
----
-
-## Framework Integrations
-
-### LangChain
-```python
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
-from langchain.vectorstores import Chroma
-from cert import monitor
-
-# Create your chain
-llm = OpenAI(temperature=0)
-vectorstore = Chroma.from_documents(documents, embeddings)
-chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=vectorstore.as_retriever()
-)
-
-# Wrap with monitoring
-@monitor(preset="general")
-def monitored_query(question):
-    result = chain({"query": question})
-    return {
-        "query": question,
-        "context": result.get("source_documents", ""),
-        "answer": result["result"]
-    }
-
-# Use normally
-answer = monitored_query("What is the capital of France?")
-```
-
-### LlamaIndex
-```python
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from cert import monitor
-
-# Create your index
-documents = SimpleDirectoryReader('data').load_data()
-index = VectorStoreIndex.from_documents(documents)
-
-# Wrap query engine with monitoring
-@monitor(preset="general")
-def monitored_query(question):
-    query_engine = index.as_query_engine()
-    response = query_engine.query(question)
-    
-    return {
-        "query": question,
-        "context": str(response.source_nodes),
-        "answer": str(response)
-    }
-
-# Use normally
-answer = monitored_query("Summarize the document")
-```
-
-### Anthropic SDK (Raw API)
-```python
-import anthropic
-from cert import monitor
-
-client = anthropic.Anthropic(api_key="your-key")
-
-@monitor(preset="financial")
-def analyze_with_claude(prompt, context):
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        messages=[{
-            "role": "user",
-            "content": f"Context: {context}\n\nQuestion: {prompt}"
-        }]
-    )
-    
-    return {
-        "query": prompt,
-        "context": context,
-        "answer": message.content[0].text
-    }
-
-# Use normally
-result = analyze_with_claude(
-    "What's the revenue trend?",
-    "Q1: $1.2M, Q2: $1.5M, Q3: $1.8M"
-)
-```
-
-### OpenAI SDK (Raw API)
-```python
-from openai import OpenAI
-from cert import monitor
-
-client = OpenAI(api_key="your-key")
-
-@monitor(preset="legal")
-def analyze_with_gpt(prompt, context):
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": f"Context: {context}"},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    
-    return {
-        "query": prompt,
-        "context": context,
-        "answer": response.choices[0].message.content
-    }
-
-# Use normally
-result = analyze_with_gpt(
-    "Is this contract enforceable?",
-    contract_text
-)
-```
-
----
-
-## Advanced Features
-
-### Experiment Tracking
-
-Compare model performance across iterations:
-```python
-from cert.compliance import create_dataset_from_audit_log, run_experiment
-
-# Create evaluation dataset from production logs
-dataset = create_dataset_from_audit_log(
-    audit_log_path="cert_audit.jsonl",
-    name="q4_production_sample",
-    version="1.0",
-    sample_size=100
-)
-
-# Save for reproducibility
-dataset.save("datasets/q4_eval_v1.json")
-
-# Run experiment with your model
-def eval_function(query, context):
-    # Your model inference here
-    return model.generate(query, context)
-
-run = run_experiment(
-    name="gpt4_baseline",
-    dataset=dataset,
-    eval_function=eval_function,
-    config={"model": "gpt-4", "temperature": 0}
-)
-
-# Results include pass rate, confidence, and failure analysis
-print(f"Pass rate: {run.results['passed'] / run.results['total'] * 100}%")
-print(f"Avg confidence: {run.results['avg_confidence']}")
-```
-
-Compare experiments over time:
-```python
-from cert.compliance import compare_experiments
-
-# Load previous runs
-run1 = ExperimentRun.load("experiments/baseline_2025_10_01.json")
-run2 = ExperimentRun.load("experiments/optimized_2025_10_15.json")
-run3 = ExperimentRun.load("experiments/final_2025_10_28.json")
-
-# Generate comparison report
-compare_experiments(
-    experiments=[run1, run2, run3],
-    output_path="reports/experiment_comparison.html"
-)
-# Opens interactive HTML dashboard showing metrics over time
-```
-
-### Prometheus Metrics
-
-Export metrics for alerting and dashboards:
-```python
-from cert.observability.prometheus import export_metrics_from_audit_log
-
-# Start metrics server
-export_metrics_from_audit_log(
-    audit_log_path="cert_audit.jsonl",
-    system_name="production_rag",
-    port=8000
-)
-# Metrics available at http://localhost:8000/metrics
-```
-
-**Available metrics:**
-
-| Metric | Type | Description | Labels |
-|--------|------|-------------|---------|
-| `cert_accuracy_score` | Gauge | Current accuracy score (0.0-1.0) | `system_name`, `preset` |
-| `cert_evaluations_total` | Counter | Total evaluations performed | `system_name`, `preset`, `result` (pass/fail) |
-| `cert_compliance_status` | Gauge | Compliance status per article (1=compliant, 0=non-compliant) | `system_name`, `article` |
-
-**Example output from `/metrics` endpoint:**
-```
-cert_accuracy_score{system_name="production_rag",preset="general"} 0.87
-cert_evaluations_total{system_name="production_rag",preset="general",result="pass"} 847
-cert_evaluations_total{system_name="production_rag",preset="general",result="fail"} 53
-cert_compliance_status{system_name="production_rag",article="Article 15.1"} 1
-```
-
-Set up Grafana alerts:
-```yaml
-# Example alert rule
-- alert: AccuracyBelowThreshold
-  expr: cert_accuracy_score < 0.7
-  for: 30m
-  labels:
-    severity: critical
-  annotations:
-    summary: "AI system accuracy dropped below threshold"
-    description: "System {{ $labels.system_name }} accuracy is {{ $value }}"
-```
-
-### Trajectory Analysis (Advanced)
-
-Analyze reasoning patterns in multi-step inference:
-```python
-from cert.advanced.trajectory import analyze_trajectory
-
-# Analyze reasoning trajectory
-analysis = analyze_trajectory(
-    prompt="What is the treatment for hypertension?",
-    response="First-line treatment is lifestyle modification...",
-    config=TrajectoryConfig(
-        capture_hidden_states=True,
-        analyze_attention_patterns=True
-    )
-)
-
-# Results include reasoning metrics
-print(analysis.coherence_score)      # How consistent is reasoning
-print(analysis.divergence_points)    # Where reasoning changes direction
-print(analysis.attention_entropy)    # Information distribution
-```
-
-**Note:** Trajectory analysis is experimental and requires `cert-framework[trajectory]` installation. It's useful for debugging complex reasoning failures but not required for compliance monitoring.
+**Formats:** markdown, html, pdf
 
 ---
 
@@ -693,285 +365,214 @@ print(analysis.attention_entropy)    # Information distribution
 
 ### Docker
 ```dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-WORKDIR /app
-
-# Install dependencies
-COPY requirements.txt .
+# Install core only for production
 RUN pip install cert-framework
 
-# Copy your application
-COPY . .
+# Your application code
+COPY . /app
+WORKDIR /app
 
-# Your application runs normally
-# CERT logs are written to cert_audit.jsonl
+# Traces persist to mounted volume
 CMD ["python", "app.py"]
 ```
+
+Mount `/app/traces.jsonl` to persistent storage for log retention.
 
 ### Kubernetes
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rag-system
+  name: llm-service
 spec:
   replicas: 3
   template:
     spec:
       containers:
       - name: app
-        image: your-rag-system:latest
+        image: your-service:latest
         volumeMounts:
-        - name: audit-logs
-          mountPath: /app/logs
+        - name: trace-logs
+          mountPath: /app/traces
       volumes:
-      - name: audit-logs
+      - name: trace-logs
         persistentVolumeClaim:
-          claimName: cert-audit-logs
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: prometheus-metrics
-spec:
-  selector:
-    app: rag-system
-  ports:
-  - port: 8000
-    targetPort: 8000
-    name: metrics
+          claimName: cert-traces-pvc
 ```
 
-### Monitoring Stack
+Run `cert evaluate` and `cert report` as CronJobs for periodic compliance checks.
 
-Complete observability setup:
-```yaml
-# docker-compose.yml
-version: '3'
+### Log Rotation
 
-services:
-  app:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./logs:/app/logs
-  
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-  
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./grafana-dashboards:/etc/grafana/provisioning/dashboards
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**"No module named 'sentence_transformers'"**
-
-Install the embedding library:
+For high-volume systems, rotate trace logs:
 ```bash
-pip install sentence-transformers
+# logrotate config
+/app/traces.jsonl {
+    daily
+    rotate 90
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
 ```
 
-**"CUDA out of memory" errors**
-
-CERT runs fine on CPU. Disable GPU:
-```python
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-```
-
-**Slow measurement times (> 1 second)**
-
-First measurement is slow (model loading). Subsequent requests are fast (~50-200ms). If still slow:
-
-1. Use smaller embedding model: `embedding_model="all-MiniLM-L6-v2"` (default, 80MB)
-2. Disable NLI if not needed: `use_nli=False`
-3. Reduce batch size for production deployments
-
-**Audit log file permissions**
-
-CERT writes to `cert_audit.jsonl` in current directory. Ensure write permissions:
-```python
-import os
-os.chmod("cert_audit.jsonl", 0o666)
-```
-
-**Compliance reports show "insufficient data"**
-
-Reports require at least 10 audit log entries. Run more monitored requests:
-```python
-for query in test_queries:
-    result = monitored_function(query)
-```
+Run evaluation before rotation to preserve metrics.
 
 ---
 
-## Performance Characteristics
+## Performance
 
-**Measurement latency:**
-- First call: 2-5 seconds (model loading)
-- Subsequent calls: 50-200ms per measurement (CPU)
-- GPU acceleration: 20-50ms per measurement
+### Latency
 
-**Memory footprint:**
-- Embedding model: ~100MB RAM
-- NLI model: ~500MB RAM
-- Total: ~600MB RAM per process
+- **Core tracer:** <1ms per request (just JSON logging)
+- **Evaluation:** 50-200ms per trace (semantic + NLI + grounding)
+- **Report generation:** 1-10 seconds (depends on log size, format)
 
-**Throughput:**
-- Single process: 5-20 requests/second
-- Multi-process: Scales linearly with CPU cores
+### Memory
 
-**Audit log size:**
-- ~1KB per logged request
-- 1M requests = ~1GB log file
-- Use log rotation for high-volume systems
+- **Core:** <10MB (no ML models loaded)
+- **Evaluation:** ~600MB (transformers + embeddings models)
+- **Peak:** ~1GB during batch evaluation
+
+### Throughput
+
+- **Tracing:** >10,000 requests/second (I/O bound)
+- **Evaluation:** 5-20 traces/second (ML bound)
+- **Scale:** Run evaluation distributed across workers for higher throughput
+
+### Model Loading
+
+First evaluation call loads ML models (2-5 seconds). Subsequent calls are fast. Use lazy loading to defer this cost until evaluation runs.
 
 ---
 
-## Development
+## Migration from v2.x
 
-### Running Tests
+Breaking changes in v3.0:
+
+### 1. Dependencies Now Optional
+
+**Before:**
 ```bash
-# Install dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run with coverage
-pytest --cov=cert --cov-report=html
-
-# Run specific test
-pytest tests/test_measure.py::test_semantic_similarity
+pip install cert-framework  # 1.5GB
 ```
 
-### Code Quality
+**After:**
 ```bash
-# Format code
-ruff format cert/
-
-# Lint
-ruff check cert/
-
-# Type check
-mypy cert/
+pip install cert-framework  # 5MB
+pip install cert-framework[evaluation]  # 150MB
 ```
 
-### Support
+### 2. Decorator Renamed
 
-- **Documentation**: [docs/](docs/)
-- **Examples**: [examples/](examples/)
-- **Issues**: [GitHub Issues](https://github.com/Javihaus/cert-framework/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Javihaus/cert-framework/discussions)
+**Before:**
+```python
+@monitor(preset="financial")
+```
 
+**After:**
+```python
+@trace()  # Just monitoring
+```
 
-### Contributing
+### 3. Evaluation Moved Offline
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes with tests
-4. Ensure all tests pass: `pytest`
-5. Submit a pull request
+**Before:** Evaluation happened automatically in decorator
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+**After:** Run `cert evaluate` on your schedule
+
+### 4. Compliance via CLI
+
+**Before:**
+```python
+from cert import export_report
+export_report("audit.jsonl", "report.pdf")
+```
+
+**After:**
+```bash
+cert report traces.jsonl -o report.pdf
+```
+
+**Migration Checklist:**
+- [ ] Update installation: `pip install cert-framework[evaluation]`
+- [ ] Replace `@monitor` with `@trace`
+- [ ] Add offline evaluation pipeline
+- [ ] Update compliance reporting to CLI
+- [ ] Test with production traces
+
+See [docs/migration-v2-to-v3.md](docs/migration-v2-to-v3.md) for complete guide.
 
 ---
 
 ## FAQ
 
-**Q: Does this work with any LLM provider?**
+**Does this work with any LLM provider?**
 
-Yes. CERT monitors your application code, not specific LLM APIs. Works with OpenAI, Anthropic, Cohere, self-hosted models, or any other provider.
+Yes. CERT monitors your application code, not specific APIs. Works with OpenAI, Anthropic, Cohere, self-hosted models, or any provider.
 
-**Q: What's the performance impact?**
+**What's the performance impact?**
 
-~50-200ms per request on CPU. This is negligible compared to typical LLM inference times (1-10 seconds). The decorator is non-blocking and logs asynchronously.
+<1ms per request for tracing. Evaluation runs offline on your schedule, so it doesn't affect production latency.
 
-**Q: Do I need to change my existing code?**
+**Do I need to change my existing code?**
 
-Minimal changes. Add the `@monitor()` decorator and ensure your function returns `{"context": str, "answer": str}`. That's it.
+Minimal changes. Add the `@trace` decorator and ensure your function returns a dict with "context" and "answer" keys.
 
-**Q: Is this GDPR compliant?**
+**Is this GDPR compliant?**
 
-CERT logs queries and answers locally. You control data retention and storage. The framework doesn't send data externally. Follow your organization's GDPR policies for log management.
+CERT logs queries and answers locally. You control data retention and storage. Follow your organization's GDPR policies for log management.
 
-**Q: Can I use custom evaluation metrics?**
+**Can I use custom evaluation metrics?**
 
-Yes. Use `measure()` directly with custom weights, or extend `MeasurementResult` for domain-specific metrics. See [examples/custom_metrics.py](examples/custom_metrics.py).
+Yes. Use `Evaluator` directly with custom weights, or extend `MeasurementResult` for domain-specific metrics.
 
-**Q: What about multilingual support?**
+**What about multilingual support?**
 
-Default models (all-MiniLM-L6-v2, deberta-v3) support 50+ languages. For specialized domains, specify custom models:
-```python
-@monitor(
-    embedding_model="distiluse-base-multilingual-cased-v2",
-    nli_model="joeddav/xlm-roberta-large-xnli"
-)
-```
+Default models (all-MiniLM-L6-v2, deberta-v3) support 50+ languages. For specialized domains, specify custom models in evaluation config.
 
-**Q: How do I handle high-traffic production systems?**
+**How do I handle high-traffic systems?**
 
-1. Use async logging (built-in)
-2. Sample requests: Monitor 10% of traffic for statistics
-3. Use external monitoring: Export to Prometheus, alert on aggregate metrics
-4. Rotate logs: Use logrotate or similar for multi-GB log files
+1. Tracing scales horizontally (just file writes)
+2. Sample traces if needed (monitor 10% of traffic)
+3. Run evaluation distributed across workers
+4. Use log rotation for retention management
 
-**Q: What's the difference between CERT and [other tool]?**
+**What's the difference between CERT and evaluation frameworks?**
 
-Most tools focus on pre-deployment evaluation (prompt testing, dataset benchmarking). CERT focuses on production monitoring with automatic compliance reporting. Use both: Test prompts with eval tools, monitor production with CERT.
+Most tools focus on pre-deployment testing (prompt optimization, dataset benchmarking). CERT focuses on production monitoring with compliance automation. Use both: test prompts with eval tools, monitor production with CERT.
 
-**Q: Is there a hosted/SaaS version?**
+**Is there a hosted/SaaS version?**
 
-No. CERT runs in your infrastructure. This gives you full data control and satisfies regulatory requirements for data residency.
+Yes. Self-hosted is free (Apache 2.0). Hosted tiers start at €49/month with managed infrastructure and advanced compliance features. See pricing at [cert-framework.com](https://cert-framework.com).
 
-**Q: Can I customize compliance reports?**
+**Can I customize compliance reports?**
 
-Yes. Reports are generated from audit logs. Create custom report templates using the log data:
-```python
-# Read audit log
-import json
-with open("cert_audit.jsonl") as f:
-    entries = [json.loads(line) for line in f]
-
-# Generate custom report
-# Your custom logic here
-```
+Yes. Reports generate from trace logs. Extend `ComplianceReporter` or create custom report templates using the JSONL data.
 
 ---
 
 ## License
-
 ```
 Copyright 2025 Javier Marín
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
-See [LICENSE](LICENSE) file for details.
+
+See [LICENSE](LICENSE) file for complete terms.
 
 ---
 
@@ -980,15 +581,19 @@ See [LICENSE](LICENSE) file for details.
 If you use CERT Framework in research, please cite:
 ```bibtex
 @software{cert_framework,
-  title = {CERT Framework: Production Accuracy Monitoring for LLM Systems},
-  author = {Javier Haus},
+  title = {CERT Framework: LLM Monitoring with EU AI Act Compliance},
+  author = {Javier Marín},
   year = {2025},
-  url = {https://github.com/Javihaus/cert-framework}
+  url = {https://github.com/yourusername/cert-framework},
+  license = {Apache-2.0}
 }
 ```
 
 ---
 
+**Built for developers. Sold to compliance teams. Open source forever.**
+
+[Documentation](https://docs.cert-framework.com) | [Examples](examples/) | [Discussions](https://github.com/yourusername/cert-framework/discussions) | [Enterprise](mailto:enterprise@cert-framework.com)
 
 
 
