@@ -122,8 +122,10 @@ def configure_logging(
     cert_logger = logging.getLogger("cert")
     cert_logger.setLevel(getattr(logging, level.upper()))
 
-    # Remove existing handlers
-    cert_logger.handlers.clear()
+    # Remove existing handlers (close them first to avoid resource warnings)
+    for handler in cert_logger.handlers[:]:
+        handler.close()
+        cert_logger.removeHandler(handler)
 
     # Add console handler
     if output in ("stdout", "both"):
