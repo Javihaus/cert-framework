@@ -1,0 +1,69 @@
+# CERT Framework v4.0 - Docker Compose Example
+#
+# This example shows how to run a simple monitoring setup with CERT
+
+version: '3.8'
+
+services:
+  # Core monitoring service (lightweight)
+  cert-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EXTRAS: ""  # Core only
+    container_name: cert-core
+    volumes:
+      - ./traces:/var/log/cert  # Mount for trace logs
+      - ./your_app:/app/your_app  # Mount your application code
+    environment:
+      - CERT_LOG_PATH=/var/log/cert/traces.jsonl
+    command: python /app/your_app/main.py
+    restart: unless-stopped
+
+  # Evaluation service (runs periodically)
+  cert-evaluator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EXTRAS: "evaluation,cli"
+    container_name: cert-evaluator
+    volumes:
+      - ./traces:/var/log/cert
+      - ./reports:/app/reports
+    environment:
+      - CERT_LOG_PATH=/var/log/cert/traces.jsonl
+    # Run evaluation every hour
+    command: >
+      sh -c "while true; do
+        cert evaluate /var/log/cert/traces.jsonl --preset general --output /app/reports/eval_results.json;
+        sleep 3600;
+      done"
+    restart: unless-stopped
+
+  # Optional: Compliance report generator (runs daily)
+  cert-reporter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EXTRAS: "cli,compliance"
+    container_name: cert-reporter
+    volumes:
+      - ./traces:/var/log/cert
+      - ./reports:/app/reports
+    # Run report generation daily at midnight
+    command: >
+      sh -c "while true; do
+        cert report /var/log/cert/traces.jsonl
+          -o /app/reports/compliance_report_$(date +%Y%m%d).md
+          --system-name 'Production RAG System'
+          --risk-level high;
+        sleep 86400;
+      done"
+    restart: unless-stopped
+
+volumes:
+  traces:
+  reports:
