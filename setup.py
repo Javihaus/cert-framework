@@ -54,6 +54,7 @@ setup(
         "protobuf>=3.20.0",  # Protobuf support for transformers
         "numpy>=1.21.0",  # Numerical operations
         "scipy>=1.7.0",  # Scientific computing for metrics
+        "matplotlib>=3.5.0",  # Visualization for trajectory monitoring
         "typing-extensions>=4.0.0",  # Type hints for older Python
         # Observability and Monitoring
         "prometheus-client>=0.19.0",  # Prometheus metrics export

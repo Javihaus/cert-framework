@@ -30,6 +30,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
+          # Force clean install to avoid stale cached packages
+          pip uninstall -y cert-framework 2>/dev/null || true
           pip install -e ".[dev]"
 
       - name: Run tests
