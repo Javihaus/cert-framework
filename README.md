@@ -17,7 +17,6 @@
 | [**API Reference**](#api-reference)
 | [**Production Deployment**](#production-deployment)
 | [**Performance**](#performance)
-| [**Migration from v2.x**](#migration-from-v2x)
 | [**FAQ**](#faq)
 | [**License**](#license)
 
@@ -449,62 +448,6 @@ First evaluation call loads ML models (2-5 seconds). Subsequent calls are fast. 
 
 ---
 
-## Migration from v2.x
-
-Breaking changes in v3.0:
-
-### 1. Dependencies Now Optional
-
-**Before:**
-```bash
-pip install cert-framework  # 1.5GB
-```
-
-**After:**
-```bash
-pip install cert-framework  # 5MB
-pip install cert-framework[evaluation]  # 150MB
-```
-
-### 2. Decorator Renamed
-
-**Before:**
-```python
-@monitor(preset="financial")
-```
-
-**After:**
-```python
-@trace()  # Just monitoring
-```
-
-### 3. Evaluation Moved Offline
-
-**Before:** Evaluation happened automatically in decorator
-
-**After:** Run `cert evaluate` on your schedule
-
-### 4. Compliance via CLI
-
-**Before:**
-```python
-from cert import export_report
-export_report("audit.jsonl", "report.pdf")
-```
-
-**After:**
-```bash
-cert report traces.jsonl -o report.pdf
-```
-
-**Migration Checklist:**
-- [ ] Update installation: `pip install cert-framework[evaluation]`
-- [ ] Replace `@monitor` with `@trace`
-- [ ] Add offline evaluation pipeline
-- [ ] Update compliance reporting to CLI
-- [ ] Test with production traces
-
-See [docs/migration-v2-to-v3.md](docs/migration-v2-to-v3.md) for complete guide.
 
 ---
 
