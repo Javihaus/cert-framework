@@ -116,5 +116,7 @@ def get_embedding_engine(model_name: str = "all-MiniLM-L6-v2") -> EmbeddingEngin
     if model_name not in _EMBEDDING_MODEL_CACHE:
         logger.info(f"Loading embedding model: {model_name}")
         _EMBEDDING_MODEL_CACHE[model_name] = EmbeddingEngine(model_name=model_name)
+    else:
+        logger.debug(f"Reusing cached embedding engine: {model_name}")
 
     return _EMBEDDING_MODEL_CACHE[model_name]

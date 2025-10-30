@@ -141,29 +141,44 @@ def measure(
 
     # 1. Semantic similarity
     if use_semantic:
-        embedding_engine = get_embedding_engine(model_name=embedding_model)
-        semantic_score = embedding_engine.compute_similarity(text1, text2)
-        components_used.append("semantic")
-        logger.debug(f"Semantic score: {semantic_score:.3f}")
+        try:
+            embedding_engine = get_embedding_engine(model_name=embedding_model)
+            semantic_score = embedding_engine.compute_similarity(text1, text2)
+            components_used.append("semantic")
+            logger.debug(f"Semantic score: {semantic_score:.3f}")
+        except Exception as e:
+            logger.error(f"SEMANTIC FAILED: {type(e).__name__}: {e}", exc_info=True)
+            # Don't return fake score - let caller handle it
+            raise RuntimeError(f"Semantic similarity component failed: {e}") from e
 
     # 2. NLI (treat text2 as premise, text1 as hypothesis)
     if use_nli:
-        nli_engine = get_nli_engine(model_name=nli_model)
-        nli_result = nli_engine.check_entailment(context=text2, answer=text1)
-        nli_score = nli_result.entailment_score
-        components_used.append("nli")
-        logger.debug(f"NLI: {nli_result.label} (score: {nli_score:.3f})")
+        try:
+            nli_engine = get_nli_engine(model_name=nli_model)
+            nli_result = nli_engine.check_entailment(context=text2, answer=text1)
+            nli_score = nli_result.entailment_score
+            components_used.append("nli")
+            logger.debug(f"NLI: {nli_result.label} (score: {nli_score:.3f})")
+        except Exception as e:
+            logger.error(f"NLI FAILED: {type(e).__name__}: {e}", exc_info=True)
+            # Don't return fake score - let caller handle it
+            raise RuntimeError(f"NLI component failed: {e}") from e
 
     # 3. Grounding (check if text1 terms appear in text2)
     if use_grounding:
-        grounding_score = compute_grounding_score(context=text2, answer=text1)
-        components_used.append("grounding")
-        logger.debug(f"Grounding score: {grounding_score:.3f}")
+        try:
+            grounding_score = compute_grounding_score(context=text2, answer=text1)
+            components_used.append("grounding")
+            logger.debug(f"Grounding score: {grounding_score:.3f}")
 
-        # Log ungrounded terms for debugging
-        ungrounded = get_ungrounded_terms(context=text2, answer=text1)
-        if ungrounded:
-            logger.debug(f"Ungrounded terms: {ungrounded}")
+            # Log ungrounded terms for debugging
+            ungrounded = get_ungrounded_terms(context=text2, answer=text1)
+            if ungrounded:
+                logger.debug(f"Ungrounded terms: {ungrounded}")
+        except Exception as e:
+            logger.error(f"GROUNDING FAILED: {type(e).__name__}: {e}", exc_info=True)
+            # Don't return fake score - let caller handle it
+            raise RuntimeError(f"Grounding component failed: {e}") from e
 
     # Compute weighted confidence
     confidence = 0.0

@@ -99,6 +99,13 @@ class NLIEngine:
               context: "Revenue was $391B"
               answer: "The company performed well"
         """
+        # Validate inputs
+        if not context or not answer:
+            raise ValueError(f"Empty input: context={bool(context)}, answer={bool(answer)}")
+
+        if len(context) > 10000 or len(answer) > 10000:
+            raise ValueError(f"Text too long: context={len(context)}, answer={len(answer)}")
+
         # Format for NLI: premise [SEP] hypothesis
         # Model checks if hypothesis follows from premise
         result = self.nli(
@@ -167,5 +174,7 @@ def get_nli_engine(model_name: str = "microsoft/deberta-v3-base") -> NLIEngine:
     if model_name not in _NLI_MODEL_CACHE:
         logger.info(f"Loading NLI model: {model_name}")
         _NLI_MODEL_CACHE[model_name] = NLIEngine(model_name=model_name)
+    else:
+        logger.debug(f"Reusing cached NLI engine: {model_name}")
 
     return _NLI_MODEL_CACHE[model_name]
