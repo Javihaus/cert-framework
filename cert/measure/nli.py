@@ -61,20 +61,28 @@ class NLIEngine:
         logger.info(f"Loading NLI model: {model_name}")
 
         try:
-            from transformers import pipeline
+            import torch
+            from transformers import AutoModelForSequenceClassification, AutoTokenizer
         except ImportError:
             raise ImportError(
                 "transformers required for NLI. Install with: pip install transformers torch"
             )
 
-        self.nli = pipeline(
-            "text-classification",
-            model=model_name,
-            device=-1,  # CPU (use device=0 for GPU)
-            top_k=None,  # Return all label scores
-        )
+        # Load model and tokenizer explicitly (not pipeline)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        logger.info(f"NLI model loaded: {model_name}")
+        # Force model to eval mode (no training)
+        self.model.eval()
+
+        # Set device (GPU if available, else CPU)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model.to(self.device)
+
+        # Store torch module for later use
+        self.torch = torch
+
+        logger.info(f"NLI model loaded: {model_name} (device: {self.device})")
 
     def check_entailment(self, context: str, answer: str) -> NLIResult:
         """Check if answer is entailed by context.
@@ -106,19 +114,52 @@ class NLIEngine:
         if len(context) > 10000 or len(answer) > 10000:
             raise ValueError(f"Text too long: context={len(context)}, answer={len(answer)}")
 
-        # Format for NLI: premise [SEP] hypothesis
-        # Model checks if hypothesis follows from premise
-        result = self.nli(
-            f"{context} [SEP] {answer}",
+        # Log inputs for debugging
+        logger.debug("\n=== NLI Call ===")
+        logger.debug(f"Context: {context[:100]}...")
+        logger.debug(f"Answer: {answer[:100]}...")
+
+        # Force model back to eval mode (defensive)
+        self.model.eval()
+
+        # Tokenize inputs (premise and hypothesis)
+        # Use text_pair for proper NLI formatting
+        inputs = self.tokenizer(
+            text=context,
+            text_pair=answer,
+            return_tensors="pt",
+            padding="max_length",
             truncation=True,
             max_length=512,
         )
 
-        # Result is list of dicts with 'label' and 'score'
-        # Find the label with highest score
-        best = max(result[0], key=lambda x: x["score"])
-        label = self._normalize_label(best["label"])
-        score = best["score"]
+        # Move inputs to same device as model
+        inputs = {key: val.to(self.device) for key, val in inputs.items()}
+
+        logger.debug(f"Input IDs shape: {inputs['input_ids'].shape}")
+        logger.debug(f"Input IDs sample: {inputs['input_ids'][0][:10]}")
+
+        # Run inference (no gradient computation)
+        with self.torch.no_grad():
+            outputs = self.model(**inputs)
+
+        # Get logits and convert to probabilities
+        logits = outputs.logits
+        probs = self.torch.softmax(logits, dim=-1)
+
+        logger.debug(f"Logits: {logits}")
+        logger.debug(f"Probs: {probs}")
+
+        # Get predicted class (highest probability)
+        predicted_class = self.torch.argmax(probs, dim=-1).item()
+
+        # Map class index to label
+        # DeBERTa NLI models typically use: 0=contradiction, 1=neutral, 2=entailment
+        label_map = {0: "contradiction", 1: "neutral", 2: "entailment"}
+        label = label_map.get(predicted_class, "neutral")
+        score = probs[0][predicted_class].item()
+
+        logger.debug(f"Predicted class: {predicted_class} -> {label} ({score:.3f})")
 
         # Convert to normalized entailment score
         entailment_score = self._normalize_score(label, score)
