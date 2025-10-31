@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "total_traces": 10,
+    "evaluated_traces": 10,
+    "passed_traces": 9,
+    "failed_traces": 1,
+    "accuracy": 0.9,
+    "mean_confidence": 0.85,
+    "threshold_used": 0.7,
+    "date_range": {
+      "start": "2025-10-01",
+      "end": "2025-10-31"
+    }
+  },
+  "results": [
+    {
+      "trace_id": "trace_001",
+      "timestamp": "2025-10-15T10:30:00Z",
+      "query": "What was the revenue?",
+      "measurement": {
+        "matched": true,
+        "confidence": 0.89,
+        "semantic_score": 0.92,
+        "grounding_score": 0.86,
+        "threshold_used": 0.7,
+        "rule": "Match (confidence 0.89 >= threshold 0.70)",
+        "components_used": ["semantic", "grounding"]
+      },
+      "passed": true
+    }
+  ]
+}
