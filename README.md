@@ -244,18 +244,35 @@ CERT computes an accuracy score (0.0 to 1.0) for each LLM output. The **threshol
 
 The default is intentionally strict until you calibrate for your domain. Better to start strict than lenient.
 
-#### Optimal Thresholds (Empirically Validated)
+#### Recommended Starting Points by Domain
 
-It turns out the optimal threshold varies by domain. We validated this on SQuAD v2.0:
+Based on the general validation, here are suggested thresholds to start with:
 
-| Domain | Threshold | Performance |
-|--------|-----------|-------------|
-| General Q&A | 0.40 | Lower stakes, more lenient |
-| Financial | 0.46 | **95.3% accuracy, 0.961 ROC AUC** |
-| Legal | 0.48 | Precision-critical |
-| Healthcare | 0.50 | Higher confidence needed |
+| Domain | Starting Threshold | Rationale |
+|--------|-------------------|-----------|
+| General Q&A | 0.40 | Validated range, lower stakes |
+| Financial | 0.46 | Validated optimal on SQuAD |
+| Legal | 0.48 | Higher precision needed |
+| Healthcare | 0.50 | Medical accuracy critical |
 
-The measurement system reliably discriminates accurate from inaccurate outputs (0.961 ROC AUC is near-perfect).
+**Important**: These are starting points based on general Q&A validation. You should calibrate for your specific domain.
+
+### Calibrating Your Threshold
+```bash
+# 1. Start with recommended threshold
+cert evaluate traces.jsonl --preset financial --threshold 0.46
+
+# 2. Collect domain-specific validation data (100-200 examples with labels)
+# 3. Find optimal threshold for your data
+cert evaluate validation.jsonl --optimize-threshold
+
+# 4. Use the calibrated threshold in production
+cert evaluate traces.jsonl --threshold 0.52  # Your calibrated value
+```
+
+**What the threshold controls**: Higher = stricter quality standards (fewer passes, catches more errors). Lower = more lenient (more passes, might miss some errors).
+
+The measurement system works - 0.961 ROC AUC proves that. But the specific threshold value is domain-dependent, so calibrate it for your use case.
 
 #### Calibrating Your Threshold
 ```bash
