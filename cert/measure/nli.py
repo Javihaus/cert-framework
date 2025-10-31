@@ -63,10 +63,14 @@ class NLIEngine:
         try:
             import torch
             from transformers import AutoModelForSequenceClassification, AutoTokenizer
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
-                "transformers required for NLI. Install with: pip install transformers torch"
-            )
+                "transformers and torch packages are required for NLI contradiction detection.\n"
+                "Install them with:\n"
+                "  pip install transformers torch\n"
+                "Or install cert-framework with evaluation extras:\n"
+                "  pip install cert-framework[evaluation]"
+            ) from e
 
         # Load model and tokenizer explicitly (not pipeline)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name)

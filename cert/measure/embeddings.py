@@ -9,7 +9,6 @@ from typing import Dict
 
 import numpy as np
 from numpy.typing import NDArray
-from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +44,17 @@ class EmbeddingEngine:
         self.model_name = model_name
         self.cache_size = cache_size
         self.cache: Dict[str, NDArray[np.floating]] = {}
+
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError as e:
+            raise ImportError(
+                "sentence-transformers package is required for semantic similarity.\n"
+                "Install it with:\n"
+                "  pip install sentence-transformers\n"
+                "Or install cert-framework with evaluation extras:\n"
+                "  pip install cert-framework[evaluation]"
+            ) from e
 
         logger.info(f"Loading embedding model: {model_name}")
         self.model = SentenceTransformer(model_name)
