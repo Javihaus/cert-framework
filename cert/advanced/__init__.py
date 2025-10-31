@@ -33,8 +33,8 @@ except ImportError as e:
 # Make coordination optional
 try:
     from cert.advanced.coordination import (
-        CoordinationOrchestrator,
         CoordinationMetrics,
+        CoordinationOrchestrator,
     )
     COORDINATION_AVAILABLE = True
 except ImportError as e:
