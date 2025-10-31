@@ -1,6 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Text,
+  VStack,
+  Icon,
+} from '@chakra-ui/react';
+import { MdUpload, MdCheckCircle } from 'react-icons/md';
+import Card from './Card';
 
 interface FileUploadProps {
   onFileLoad: (data: any) => void;
@@ -11,9 +20,9 @@ interface FileUploadProps {
 export default function FileUpload({ onFileLoad, accept, label }: FileUploadProps) {
   const [fileName, setFileName] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileChange = async (file: File) => {
     if (!file) return;
 
     setFileName(file.name);
@@ -22,14 +31,11 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
     try {
       const text = await file.text();
 
-      // Parse based on file extension
       if (file.name.endsWith('.jsonl')) {
-        // JSONL: each line is a separate JSON object
         const lines = text.split('\n').filter(line => line.trim());
         const data = lines.map(line => JSON.parse(line));
         onFileLoad(data);
       } else if (file.name.endsWith('.json')) {
-        // Regular JSON
         const data = JSON.parse(text);
         onFileLoad(data);
       } else {
@@ -42,36 +48,85 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
   };
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
+    <Card>
+      <VStack gap="20px" align="stretch">
+        <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
+          {label}
+        </Text>
 
-      <div className="flex items-center space-x-4">
-        <input
-          type="file"
-          accept={accept}
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
+        <Box
+          border="2px dashed"
+          borderColor={isDragging ? 'brand.500' : 'secondaryGray.400'}
+          borderRadius="16px"
+          p="40px"
+          textAlign="center"
+          bg={isDragging ? 'brand.50' : 'transparent'}
+          transition="all 0.2s"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileChange(file);
+          }}
+        >
+          <Icon
+            as={fileName ? MdCheckCircle : MdUpload}
+            w="40px"
+            h="40px"
+            color={fileName ? 'green.500' : 'brand.500'}
+            mb="12px"
+          />
 
-        {fileName && (
-          <span className="text-sm text-green-600">
-            ✓ {fileName}
-          </span>
+          {fileName ? (
+            <Text fontSize="md" fontWeight="500" color="green.500">
+              ✓ {fileName}
+            </Text>
+          ) : (
+            <>
+              <Text fontSize="md" fontWeight="500" color="secondaryGray.900" mb="8px">
+                Drop your file here or click to browse
+              </Text>
+              <Text fontSize="sm" color="secondaryGray.600">
+                Supported formats: .json, .jsonl
+              </Text>
+            </>
+          )}
+
+          <input
+            type="file"
+            accept={accept}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileChange(file);
+            }}
+            style={{ display: 'none' }}
+            id="file-upload"
+          />
+
+          <label htmlFor="file-upload" style={{ display: 'inline-block', marginTop: '16px' }}>
+            <Button
+              bg="brand.500"
+              color="white"
+              _hover={{ bg: 'brand.600' }}
+              cursor="pointer"
+              pointerEvents="none"
+            >
+              Choose File
+            </Button>
+          </label>
+        </Box>
+
+        {error && (
+          <Text fontSize="sm" color="red.500">
+            {error}
+          </Text>
         )}
-      </div>
-
-      {error && (
-        <p className="text-sm text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
+      </VStack>
+    </Card>
   );
 }

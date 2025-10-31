@@ -1,8 +1,38 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Text,
+  Badge,
+  VStack,
+  HStack,
+  Code,
+} from '@chakra-ui/react';
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+} from '@chakra-ui/table';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/modal';
+import { MdCheckCircle, MdCancel, MdAssessment, MdList } from 'react-icons/md';
+import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
-import EvaluationDashboard from '@/components/EvaluationDashboard';
+import MetricCard from '@/components/MetricCard';
+import Card from '@/components/Card';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 
 export default function Home() {
@@ -10,10 +40,9 @@ export default function Home() {
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
+  const [selectedResult, setSelectedResult] = useState<EvaluationResult | null>(null);
 
   const handleEvaluationFileLoad = (data: any) => {
-    // cert-framework evaluation results have this structure:
-    // { summary: {...}, results: [...] }
     console.log('Loaded data:', data);
 
     if (!data || typeof data !== 'object') {
@@ -34,37 +63,30 @@ export default function Home() {
     setEvaluationData(data);
   };
 
-  return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            cert-framework Dashboard
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            EU AI Act Article 15 Compliance Monitoring
-          </p>
-        </div>
-      </div>
+  if (!evaluationData) {
+    return (
+      <Box minH="100vh" bg="secondaryGray.300">
+        <Header />
+        <Box maxW="1200px" mx="auto" px="20px" py="30px">
+          <FileUpload
+            onFileLoad={handleEvaluationFileLoad}
+            accept=".json"
+            label="Upload Evaluation Results"
+          />
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!evaluationData ? (
-          <div className="bg-white rounded-lg shadow p-8">
-            <h2 className="text-xl font-semibold mb-6">Upload Evaluation Results</h2>
-
-            <FileUpload
-              onFileLoad={handleEvaluationFileLoad}
-              accept=".json"
-              label="Evaluation Results (JSON)"
-            />
-
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h3 className="text-sm font-semibold text-blue-900 mb-2">
-                How to generate evaluation results:
-              </h3>
-              <pre className="text-xs text-blue-800 bg-blue-100 p-3 rounded overflow-x-auto">
+          <Card mt="20px">
+            <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="12px">
+              How to generate evaluation results:
+            </Text>
+            <Code
+              display="block"
+              whiteSpace="pre"
+              p="16px"
+              borderRadius="12px"
+              fontSize="sm"
+              bg="secondaryGray.400"
+              color="navy.900"
+            >
 {`from cert.evaluation import Evaluator
 
 evaluator = Evaluator(threshold=0.7)
@@ -72,25 +94,284 @@ results = evaluator.evaluate_log_file(
     log_file="production_traces.jsonl",
     output="evaluation_results.json"
 )`}
-              </pre>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <button
-              onClick={() => setEvaluationData(null)}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              ← Load Different File
-            </button>
+            </Code>
+          </Card>
+        </Box>
+      </Box>
+    );
+  }
 
-            <EvaluationDashboard
-              summary={evaluationData.summary}
-              results={evaluationData.results}
-            />
-          </div>
-        )}
-      </div>
-    </main>
+  const { summary, results } = evaluationData;
+
+  return (
+    <Box minH="100vh" bg="secondaryGray.300">
+      <Header />
+
+      <Box maxW="1600px" mx="auto" px="20px" py="30px">
+        <Button
+          onClick={() => setEvaluationData(null)}
+          mb="20px"
+          bg="white"
+          color="secondaryGray.900"
+          _hover={{ bg: 'secondaryGray.100' }}
+        >
+          ← Load Different File
+        </Button>
+
+        {/* Metrics Grid */}
+        <Grid
+          templateColumns={{
+            base: '1fr',
+            md: 'repeat(2, 1fr)',
+            lg: 'repeat(4, 1fr)',
+          }}
+          gap="20px"
+          mb="20px"
+        >
+          <MetricCard
+            label="Accuracy"
+            value={`${(summary.accuracy * 100).toFixed(1)}%`}
+            icon={MdAssessment}
+            color={summary.accuracy >= 0.9 ? 'green' : summary.accuracy >= 0.8 ? 'orange' : 'red'}
+          />
+          <MetricCard
+            label="Total Traces"
+            value={summary.total_traces.toString()}
+            icon={MdList}
+            color="blue"
+          />
+          <MetricCard
+            label="Passed"
+            value={summary.passed_traces.toString()}
+            icon={MdCheckCircle}
+            color="green"
+          />
+          <MetricCard
+            label="Failed"
+            value={summary.failed_traces.toString()}
+            icon={MdCancel}
+            color="red"
+          />
+        </Grid>
+
+        {/* Mean Confidence Card */}
+        <Card mb="20px">
+          <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
+            Mean Confidence
+          </Text>
+          <Flex align="baseline" gap="8px" mb="8px">
+            <Text fontSize="48px" fontWeight="700" color="brand.500">
+              {summary.mean_confidence.toFixed(3)}
+            </Text>
+          </Flex>
+          <Text fontSize="sm" color="secondaryGray.600">
+            Threshold: {summary.threshold_used.toFixed(2)}
+          </Text>
+        </Card>
+
+        {/* Results Table */}
+        <Card>
+          <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
+            Evaluation Results
+          </Text>
+
+          <Box overflowX="auto">
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th
+                    borderColor="gray.200"
+                    color="secondaryGray.600"
+                    fontSize="xs"
+                    fontWeight="700"
+                    textTransform="uppercase"
+                  >
+                    Timestamp
+                  </Th>
+                  <Th
+                    borderColor="gray.200"
+                    color="secondaryGray.600"
+                    fontSize="xs"
+                    fontWeight="700"
+                    textTransform="uppercase"
+                  >
+                    Query
+                  </Th>
+                  <Th
+                    borderColor="gray.200"
+                    color="secondaryGray.600"
+                    fontSize="xs"
+                    fontWeight="700"
+                    textTransform="uppercase"
+                  >
+                    Confidence
+                  </Th>
+                  <Th
+                    borderColor="gray.200"
+                    color="secondaryGray.600"
+                    fontSize="xs"
+                    fontWeight="700"
+                    textTransform="uppercase"
+                  >
+                    Status
+                  </Th>
+                  <Th
+                    borderColor="gray.200"
+                    color="secondaryGray.600"
+                    fontSize="xs"
+                    fontWeight="700"
+                    textTransform="uppercase"
+                  >
+                    Actions
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {results.map((result, idx) => (
+                  <Tr key={idx}>
+                    <Td borderColor="gray.200" fontSize="sm" color="secondaryGray.900">
+                      {new Date(result.timestamp).toLocaleString()}
+                    </Td>
+                    <Td borderColor="gray.200" fontSize="sm" color="secondaryGray.900" maxW="300px">
+                      <Text
+                        overflow="hidden"
+                        textOverflow="ellipsis"
+                        whiteSpace="nowrap"
+                      >
+                        {result.query}
+                      </Text>
+                    </Td>
+                    <Td borderColor="gray.200">
+                      <Text
+                        fontSize="sm"
+                        fontWeight="700"
+                        color={
+                          result.measurement.confidence >= summary.threshold_used
+                            ? 'green.500'
+                            : 'red.500'
+                        }
+                      >
+                        {result.measurement.confidence.toFixed(3)}
+                      </Text>
+                    </Td>
+                    <Td borderColor="gray.200">
+                      <Badge
+                        colorScheme={result.passed ? 'green' : 'red'}
+                        fontSize="xs"
+                        fontWeight="700"
+                        px="8px"
+                        py="4px"
+                        borderRadius="7px"
+                      >
+                        {result.passed ? 'Passed' : 'Failed'}
+                      </Badge>
+                    </Td>
+                    <Td borderColor="gray.200">
+                      <Button
+                        onClick={() => setSelectedResult(result)}
+                        size="sm"
+                        bg="brand.500"
+                        color="white"
+                        _hover={{ bg: 'brand.600' }}
+                      >
+                        Details
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        </Card>
+      </Box>
+
+      {/* Details Modal */}
+      {selectedResult && (
+        <Modal isOpen={true} onClose={() => setSelectedResult(null)} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Evaluation Details</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb="24px">
+              <VStack gap="16px" align="stretch">
+                <Box>
+                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
+                    Query
+                  </Text>
+                  <Box
+                    p="12px"
+                    bg="secondaryGray.300"
+                    borderRadius="12px"
+                    fontSize="sm"
+                    color="secondaryGray.900"
+                  >
+                    {selectedResult.query}
+                  </Box>
+                </Box>
+
+                <Box>
+                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
+                    Confidence Score
+                  </Text>
+                  <Text fontSize="2xl" fontWeight="700" color="brand.500">
+                    {selectedResult.measurement.confidence.toFixed(3)}
+                  </Text>
+                </Box>
+
+                <Box>
+                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
+                    Components
+                  </Text>
+                  <HStack gap="8px">
+                    {selectedResult.measurement.components_used.map((component, idx) => (
+                      <Badge key={idx} colorScheme="blue">
+                        {component}
+                      </Badge>
+                    ))}
+                  </HStack>
+                </Box>
+
+                {selectedResult.measurement.semantic_score !== undefined && (
+                  <Box>
+                    <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="4px">
+                      Semantic Score
+                    </Text>
+                    <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
+                      {selectedResult.measurement.semantic_score.toFixed(3)}
+                    </Text>
+                  </Box>
+                )}
+
+                {selectedResult.measurement.grounding_score !== undefined && (
+                  <Box>
+                    <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="4px">
+                      Grounding Score
+                    </Text>
+                    <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
+                      {selectedResult.measurement.grounding_score.toFixed(3)}
+                    </Text>
+                  </Box>
+                )}
+
+                <Box>
+                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
+                    Rule
+                  </Text>
+                  <Box
+                    p="12px"
+                    bg="secondaryGray.300"
+                    borderRadius="12px"
+                    fontSize="sm"
+                    color="secondaryGray.700"
+                  >
+                    {selectedResult.measurement.rule}
+                  </Box>
+                </Box>
+              </VStack>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+    </Box>
   );
 }
