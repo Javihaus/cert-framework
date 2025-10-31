@@ -644,14 +644,14 @@ Research collaborations welcome. See CONTRIBUTING.md.
 
 ## Roadmap
 
-### Q4 2024 (Shipped)
+### Q4 2025 (Shipped)
 
 - [x] Core measurement engine (semantic + grounding)
 - [x] Production tracing decorator
 - [x] SQuAD v2 validation (ROC AUC 0.961)
 - [x] Basic compliance reports
 
-### Q1 2025 (In Progress)
+### Q1 2026 (In Progress)
 
 - [ ] Multi-language support (Spanish, German, French)
 - [ ] Langfuse integration
@@ -659,7 +659,7 @@ Research collaborations welcome. See CONTRIBUTING.md.
 - [ ] Grafana dashboard templates
 - [ ] Docker Compose deployment
 
-### Q2 2025  (Planned)
+### Q2 2026  (Planned)
 
 - [ ] Hosted compliance platform (freemium SaaS)
 - [ ] Domain-specific validation benchmarks (finance, healthcare, legal)
@@ -667,7 +667,7 @@ Research collaborations welcome. See CONTRIBUTING.md.
 - [ ] Automated threshold calibration
 - [ ] Multi-modal support (image grounding)
 
-### Q3 2025  (Vision)
+### Q3 2026  (Vision)
 
 - [ ] Real-time monitoring dashboard
 - [ ] Automated incident response (circuit breakers)
