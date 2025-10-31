@@ -110,27 +110,66 @@ print(f"Mean confidence: {results.mean_confidence:.2f}")
 
 ### Compliance Reports
 
-```python
-from cert.compliance import generate_report
+Generate complete EU AI Act Annex IV technical documentation:
 
-# Generate EU AI Act Article 15 report
-report = generate_report(
-    trace_file="production_traces.jsonl",
-    evaluation_file="evaluation_results.json",
+```python
+from cert.compliance import ComplianceReporter
+import json
+
+# Load system metadata (see cert/compliance/metadata_template.json)
+with open("system_metadata.json") as f:
+    system_metadata = json.load(f)
+
+# Load evaluation results
+with open("evaluation_results.json") as f:
+    evaluation_results = json.load(f)
+
+# Initialize reporter
+reporter = ComplianceReporter(
     system_name="Production RAG System",
-    risk_level="high",
-    output_format="pdf"
+    provider_name="Your Company Ltd",
+    system_version="v1.0.0",
+    risk_classification="HIGH-RISK",
+    intended_purpose="Automated customer support system for FAQ handling"
 )
 
-# Generates: article15_report_20251031.pdf
+# Generate comprehensive Annex IV report
+reporter.generate_comprehensive_report(
+    log_path="production_traces.jsonl",
+    output_path="compliance_report.pdf",
+    system_metadata=system_metadata,
+    evaluation_results=evaluation_results,
+    format="pdf"  # or "html", "markdown"
+)
+
+# Generates: compliance_report.pdf (professional, regulatory-ready)
 ```
 
-Report includes:
-- System description and risk classification
-- Accuracy metrics and statistical analysis
-- Representative examples with scores
-- Audit trail summary
-- Article 19 record-keeping evidence
+**Complete Annex IV coverage (all 9 sections):**
+1. General Description of the AI System
+2. Detailed Description of System Elements
+3. Detailed Description of System Development
+4. Monitoring, Functioning and Control
+5. Description of Risk Management System
+6. Description of Changes Made to the System
+7. Description of the System Operation
+8. Human Oversight
+9. Accuracy, Robustness and Cybersecurity
+
+**Plus:**
+- Article 15 compliance (accuracy, robustness, cybersecurity)
+- Article 19 compliance (automatic logging)
+- Professional PDF formatting for regulatory submission
+- Declaration of Conformity signature block
+
+**Quick start:**
+```bash
+# Copy metadata template
+cp cert/compliance/metadata_template.json system_metadata.json
+
+# Fill in your system details
+# Then generate report as shown above
+```
 
 ---
 

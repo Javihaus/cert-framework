@@ -2,6 +2,7 @@
 Compliance module for CERT Framework.
 
 Provides EU AI Act compliance reporting and analysis tools:
+- ComplianceReporter: Generate comprehensive Annex IV compliance reports (no extras required)
 - export_report: Generate compliance reports (no extras required)
 - explain_measurement_failure: Human-readable failure explanations (requires [evaluation])
 - FailureExplanation: Structured explanation data (requires [evaluation])
@@ -13,9 +14,12 @@ Provides EU AI Act compliance reporting and analysis tools:
 """
 
 # Core compliance (no extras required)
+from cert.compliance.reporter import ComplianceReporter
 from cert.compliance.reports import export_report
 
 __all__ = [
+    # Reporter (always available)
+    "ComplianceReporter",
     # Reports (always available)
     "export_report",
     # Explanations (requires [evaluation])

@@ -1,0 +1,45 @@
+{
+  "architecture_description": "Detailed description of how your AI system is built. Include information about the overall system design, how components interact, and the technical architecture.",
+
+  "integrations": [
+    {
+      "name": "Example API Integration",
+      "description": "Description of what this integration does and why it's needed",
+      "interface_type": "REST API / gRPC / WebSocket / Library / etc."
+    }
+  ],
+
+  "third_party_components": [
+    {
+      "name": "sentence-transformers",
+      "purpose": "Semantic similarity evaluation",
+      "integration": "Python library via pip"
+    },
+    {
+      "name": "anthropic",
+      "purpose": "LLM API access",
+      "integration": "Python SDK"
+    }
+  ],
+
+  "cybersecurity_overview": "Description of cybersecurity measures implemented. Include authentication, authorization, encryption, network security, and other protective measures.",
+
+  "risk_overview": "Summary of risk assessment and management process. Describe how risks were identified, evaluated, and mitigated.",
+
+  "development_overview": "Description of the development process. Include information about version control, testing procedures, code review processes, and quality assurance measures.",
+
+  "core_version": "v1.0.0",
+  "dependencies": "Listed in requirements.txt or package.json",
+  "model_version": "Model version if using ML models (e.g., gpt-4, claude-3, etc.)",
+
+  "min_hardware": "4 CPU cores, 8GB RAM, 10GB storage",
+  "recommended_hardware": "8 CPU cores, 16GB RAM, 50GB storage",
+  "gpu_requirements": "Optional / NVIDIA GPU with 8GB VRAM / Not required",
+  "network_requirements": "HTTPS connectivity, outbound connections to API endpoints",
+
+  "data_overview": "Description of data handling practices. Include information about data collection, processing, storage, retention, and deletion policies.",
+
+  "validation_data_source": "Description of datasets used for validation and testing. Include source, size, and characteristics of validation data.",
+
+  "oversight_philosophy": "Description of human oversight mechanisms. Explain how humans monitor, review, and can intervene in the system's operation."
+}
