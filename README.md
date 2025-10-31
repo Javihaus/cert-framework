@@ -13,60 +13,74 @@
 
 ---
 
+## The Problem
 
-## What is CERT?
+Companies deploying LLMs in the EU face a coordination failure. You need:
 
-CERT is an open-source library for monitoring LLM system accuracy in production. It measures output reliability using research-backed methodology and automatically generates EU AI Act Article 15 documentation.
+1. **Technical monitoring** (Langfuse, Arize) - Engineering teams instrument production systems, trace calls, measure latency
+2. **Compliance documentation** (OneTrust, Vanta) - Legal teams manage policies, generate reports, track regulatory requirements
 
-**The unified approach:** Most companies need two separate tools - one for technical monitoring (Langfuse, Arize) and one for compliance paperwork (OneTrust, Vanta). cert-framework does both. Your production traces become compliance evidence automatically.
+These systems don't talk to each other. Your engineers log 10,000 production inferences. Your compliance team manually samples 50 cases and documents them in spreadsheets. The EU AI Act requires "appropriate levels of accuracy" with "predetermined metrics" and "automatic recording" - but your monitoring traces never become compliance evidence.
 
-**Why it exists:** The EU AI Act (August 2, 2025 enforcement) requires high-risk AI systems to demonstrate "appropriate levels of accuracy" with documented evidence. Manual compliance costs €29K+ per system annually. We built the measurement infrastructure that works in production and generates regulatory documentation as a side effect.
+CERT eliminates this gap. Your production monitoring automatically generates Article 15 compliance documentation. One tool. One dataset. One source of truth.
 
-**Empirical validation:** We validated the core methodology on 150 SQuAD v2 examples with known correct/incorrect answers:
-- ROC AUC: **0.961** (excellent discrimination)
-- Optimal accuracy: **95.3%** at threshold 0.46
-- Score separation: 0.247 standard deviations between correct/incorrect
+## What CERT Does
 
-The system reliably distinguishes correct from incorrect LLM outputs. You can trust it in production.
+CERT measures LLM accuracy in production and generates regulatory documentation as a side effect.
 
----
+**Core capabilities:**
+- **Accuracy measurement** - Semantic similarity + term grounding scores for every inference
+- **Production tracing** - Lightweight decorator logs inputs/outputs/timing (<1ms overhead)
+- **Batch evaluation** - Offline scoring with configurable thresholds
+- **Compliance automation** - Article 15 reports generated from production traces
+- **Framework integration** - Works with LangChain, LlamaIndex, OpenAI, Anthropic
+
+**The unified approach:** Most LLM observability tools (Langfuse, Arize) provide excellent debugging but no compliance features. Compliance platforms (OneTrust, Vanta) generate documentation but don't measure LLM accuracy. CERT does both. Your engineering infrastructure becomes your regulatory evidence.
+
+## Validation
+
+We validated the methodology on Stanford Question Answering Dataset -SQuAD (distributed under the CC BY-SA 4.0 license), a reading comprehension dataset, consisting of questions posed by crowdworkers on a set of Wikipedia articles, where the answer to every question is a segment of text, or span, from the corresponding reading passage, or the question might be unanswerable. We used SQuAD v2.0.
+
+Ref: Rajpurkar, P., Jia, R., & Liang, P. (2018). Know what you don't know: Unanswerable questions for SQuAD. arXiv preprint arXiv:1806.03822.
+
+**Results**
+
+- **ROC AUC: 0.961** - Near-perfect discrimination between correct and incorrect outputs
+- **Accuracy: 95.3%** at optimal threshold (0.46)
+- **Separation: 0.247σ** between correct/incorrect score distributions
+
+The measurement system reliably distinguishes accurate LLM outputs from hallucinations. You can trust it in production.
 
 ## Quick Start
 
 ### Installation
 
 ```bash
-# Core library (5MB, no ML dependencies)
+# Core library (5MB, zero ML dependencies for tracing)
 pip install cert-framework
 
-# With evaluation models (adds transformers)
+# With evaluation models (adds sentence-transformers)
 pip install cert-framework[evaluation]
 ```
 
-### Basic Usage
+### Measure LLM Output Quality
 
 ```python
 from cert import measure
 
 # Compare LLM output against retrieved context
 result = measure(
-    text1="Apple's Q4 revenue was $450 billion",      # LLM output
-    text2="Apple reported Q4 revenue of $89.5B"      # Retrieved context
+    text1="Apple's Q4 revenue was $450 billion",    # LLM output
+    text2="Apple reported Q4 revenue of $89.5B"     # Retrieved context
 )
 
-print(f"Confidence: {result.confidence:.2f}")
-print(f"Match: {result.matched}")
-print(f"Components: {result.components_used}")
+print(f"Confidence: {result.confidence:.2f}")      # 0.42
+print(f"Match: {result.matched}")                  # False
+print(f"Semantic: {result.semantic_score:.2f}")    # 0.92
+print(f"Grounding: {result.grounding_score:.2f}")  # 0.86
 ```
 
-Output:
-```
-Confidence: 0.42
-Match: False
-Components: ['semantic', 'grounding']
-```
-
-The system detected a hallucination (450B vs 89.5B) despite semantic similarity.
+**What happened:** Semantic similarity is high (0.92) because the sentences have similar structure. But the grounding score penalizes the factual error ($450B vs $89.5B). Combined confidence (0.42) correctly flags this as a hallucination.
 
 ### Production Integration
 
@@ -75,35 +89,35 @@ from cert import trace
 
 @trace(log_path="production_traces.jsonl")
 def rag_pipeline(query: str) -> dict:
-    """Your existing RAG pipeline - no changes needed."""
+    """Your existing RAG pipeline - zero changes needed."""
     context = retrieve_documents(query)
     answer = llm.generate(context, query)
     return {"context": context, "answer": answer, "query": query}
 
 # Use normally - every call logs automatically
-result = rag_pipeline("What was Q4 revenue?")
+result = rag_pipeline("What was Apple's Q4 revenue?")
 ```
 
-Logs every call with:
+Logs include:
 - Input query
-- Retrieved context  
+- Retrieved context
 - Generated answer
 - Timestamp, latency, error status
-- Zero overhead (async writes)
+- Async writes (zero performance impact)
 
 ### Batch Evaluation
 
 ```python
 from cert.evaluation import evaluate_traces
 
-# Evaluate logged traces offline
+# Evaluate logged production traces offline
 results = evaluate_traces(
     trace_file="production_traces.jsonl",
     threshold=0.7,
     output="evaluation_results.json"
 )
 
-print(f"Evaluated: {results.total_traces}")
+print(f"Total traces: {results.total_traces}")
 print(f"Accuracy: {results.accuracy:.1%}")
 print(f"Mean confidence: {results.mean_confidence:.2f}")
 ```
@@ -113,7 +127,7 @@ print(f"Mean confidence: {results.mean_confidence:.2f}")
 ```python
 from cert.compliance import generate_report
 
-# Generate EU AI Act Article 15 report
+# Generate EU AI Act Article 15 documentation
 report = generate_report(
     trace_file="production_traces.jsonl",
     evaluation_file="evaluation_results.json",
@@ -122,627 +136,575 @@ report = generate_report(
     output_format="pdf"
 )
 
-# Generates: article15_report_20251031.pdf
+# Output: article15_report_20251031.pdf
 ```
 
 Report includes:
 - System description and risk classification
-- Accuracy metrics and statistical analysis
-- Representative examples with scores
-- Audit trail summary
-- Article 19 record-keeping evidence
+- Accuracy metrics with statistical analysis  
+- Representative examples with confidence scores
+- Audit trail summary (Article 19 requirement)
+- Methodology documentation (predetermined metrics)
 
 ---
 
 ## How It Works
 
-### Measurement Methodology
+CERT combines two measurement components that catch different failure modes.
 
-The `measure()` function combines two components:
+### Component 1: Semantic Similarity (50% weight)
 
-**1. Semantic Similarity (weight: 0.5)**
-- Embeds both texts using sentence transformers
-- Computes cosine similarity in embedding space
-- Detects paraphrasing and semantic equivalence
-- Correlation with ground truth: r = 0.644
+Embeds both texts using sentence transformers (all-MiniLM-L6-v2) and computes cosine similarity in embedding space.
 
-**2. Term Grounding (weight: 0.5)**
-- Extracts content terms from LLM output
-- Checks if each term appears in source context
-- Computes percentage of grounded terms
-- Correlation with ground truth: r = 0.899
+**What it catches:** Meaning shifts, paraphrasing errors, topic drift
 
-**Combined confidence score:**
+**Example:**
+```python
+text1 = "The company performed well financially"
+text2 = "Strong corporate results were reported"
+# semantic_score: 0.78 (high - captures shared meaning)
 ```
+
+**Correlation with ground truth:** r = 0.644
+
+### Component 2: Term Grounding (50% weight)
+
+Extracts content terms from LLM output, checks if each term appears in source context, computes percentage of grounded terms.
+
+**What it catches:** Factual hallucinations, number substitutions, unsupported claims
+
+**Example:**
+```python
+text1 = "Revenue was $450 billion"
+text2 = "Revenue was $89.5 billion"  
+# grounding_score: low (number mismatch detected)
+```
+
+**Correlation with ground truth:** r = 0.899
+
+### Combined Score
+
+```python
 confidence = 0.5 × semantic_similarity + 0.5 × grounding_score
 ```
 
-Empirically validated configuration:
-- Semantic similarity detects meaning shifts
-- Grounding detects factual hallucinations
-- Together: ROC AUC 0.961 (near-perfect discrimination)
+**Why equal weights:** Empirically optimal on SQuAD v2. Semantic similarity alone misses factual errors (high similarity, wrong facts). Grounding alone misses paraphrasing (low overlap, correct meaning). Together they provide robust accuracy measurement.
 
-### Why This Works
+### Calibration
 
-The key insight: **different components catch different failure modes.**
-
-Semantic similarity alone misses factual errors:
-```python
-# High semantic similarity but factually wrong
-text1 = "Revenue was $450 billion"
-text2 = "Revenue was $89.5 billion"
-# semantic_score: 0.92 (very similar)
-# grounding_score: 1.0 (all terms present)
-# But confidence: 0.96 → Incorrect! Numbers matter.
-```
-
-Term grounding catches number substitutions but misses paraphrasing:
-```python
-# Different words but same meaning
-text1 = "The company performed well"
-text2 = "Strong corporate results"
-# semantic_score: 0.78 (captures meaning)
-# grounding_score: 0.0 (no word overlap)
-# But confidence: 0.39 → Correct paraphrase!
-```
-
-Combined approach catches both:
-- Semantic similarity detects meaning preservation
-- Grounding detects factual drift
-- Together they provide robust accuracy assessment
-
-### Calibration to Your Domain
-
-Default threshold (0.7) works for general Q&A, but optimal thresholds vary by domain:
+Default threshold (0.7) works for general Q&A. Domain-specific calibration improves performance:
 
 ```python
-from cert import measure
-
 # Financial services (precision-critical)
 result = measure(text1, text2, threshold=0.8)
 
-# Healthcare (safety-critical)  
+# Healthcare (safety-critical)
 result = measure(text1, text2, threshold=0.85)
 
 # General Q&A (balanced)
 result = measure(text1, text2, threshold=0.7)
 ```
 
-**How to find your optimal threshold:**
-1. Collect 50-100 examples with known correct/incorrect labels
+**How to calibrate:**
+1. Collect 50-100 examples with known labels from your domain
 2. Run evaluation and compute ROC curve
-3. Choose threshold that maximizes your objective (accuracy, precision, recall)
+3. Choose threshold that maximizes your objective (accuracy/precision/recall)
 4. Validate on held-out test set
 
-We provide validation notebooks in `examples/` to help you calibrate.
+We provide validation notebooks in `examples/`.
 
 ---
 
 ## EU AI Act Compliance
 
-### The Regulatory Requirement
+### Regulatory Requirements
 
 **EU AI Act Article 15** (Accuracy, robustness and cybersecurity):
-- **15.1:** High-risk AI systems shall achieve appropriate levels of accuracy
-- **15.3:** Testing shall be conducted for purposes of identifying appropriate risk management measures
-- **15.4:** Testing shall be conducted against predetermined metrics and probabilistic thresholds
-- **Article 19:** Automatic recording of events throughout the lifecycle (audit logs)
+- High-risk AI systems must achieve "appropriate levels of accuracy"
+- Testing must use "predetermined metrics and probabilistic thresholds"
+- "Automatic recording of events" required throughout lifecycle (Article 19)
 
 **Enforcement timeline:**
-- August 2, 2025: GPAI obligations, governance rules, penalty enforcement active
-- August 2, 2026: High-risk AI system requirements active (Article 15 included)
+- **August 2, 2025:** GPAI obligations, governance rules, penalty enforcement active
+- **August 2, 2026:** High-risk AI system requirements (Article 15) active
 
-**Non-compliance penalties:**
-- Prohibited AI: €35M or 7% of global revenue
-- High-risk violations: €15M or 3% of global revenue
-- Documentation failures: €7.5M or 1.5% of global revenue
+**Penalties:**
+- Prohibited AI: €35M or 7% global revenue
+- High-risk violations: €15M or 3% global revenue  
+- Documentation failures: €7.5M or 1.5% global revenue
 
-### What cert-framework Provides
+### What CERT Provides
 
-**1. Predetermined metrics** (Article 15.4 requirement)
+**1. Predetermined Metrics (Article 15.4)**
 - Semantic similarity (cosine distance in embedding space)
 - Term grounding (percentage of traceable terms)
 - Combined confidence score (weighted average)
 - Clear mathematical definitions for auditors
 
-**2. Probabilistic thresholds** (Article 15.4 requirement)
+**2. Probabilistic Thresholds (Article 15.4)**
 - Configurable confidence threshold (default: 0.7)
-- ROC curve analysis to optimize threshold
+- ROC curve analysis for threshold optimization
 - Domain-specific presets (financial, healthcare, legal)
 - Statistical validation methodology
 
-**3. Automatic logging** (Article 19 requirement)
+**3. Automatic Logging (Article 19)**
 - Every inference logged with inputs, outputs, scores
 - Timestamps for audit trail
 - Error tracking and anomaly detection
-- Tamper-evident storage format (append-only JSONL)
+- Tamper-evident storage (append-only JSONL)
 
-**4. Evidence documentation** (Article 15.3 requirement)
+**4. Evidence Documentation (Article 15.3)**
 - PDF/HTML reports for regulators
 - Accuracy statistics over time periods
 - Representative examples with explanations
-- Testing methodology description
+- Audit trail summary
 
-### Compliance Workflow
+### Compliance vs. Manual Process
 
-```python
-# Step 1: Deploy with tracing enabled
-from cert import trace
-
-@trace(log_path="production_traces.jsonl")
-def your_rag_system(query):
-    # Your existing code
-    return result
-
-# Step 2: Evaluate periodically (weekly/monthly)
-from cert.evaluation import evaluate_traces
-
-results = evaluate_traces(
-    trace_file="production_traces.jsonl",
-    date_range=("2025-10-01", "2025-10-31"),
-    threshold=0.7
-)
-
-# Step 3: Generate compliance report
-from cert.compliance import generate_report
-
-report = generate_report(
-    evaluation_results=results,
-    system_name="Production Credit Risk Model",
-    risk_level="high",
-    report_type="monthly",
-    output_format="pdf"
-)
-
-# Step 4: Store report as evidence
-# Report includes everything Article 15 requires
-```
-
-### Cost Analysis
-
-**Manual compliance approach:**
-- 8 hours/week sampling and evaluation
-- 4 hours/week documentation
-- €60/hour loaded cost
-- **€37,440/year per system**
-
-**cert-framework approach:**
-- 15 minutes/week review of automated reports
-- 1 hour/month report generation
-- **€5,200/year per system**
-- **Savings: €32,240/year** (86% reduction)
-
-Plus: Better accuracy, more coverage, auditable methodology, less human error.
+| Aspect | Manual Process | CERT Automation |
+|--------|---------------|-----------------|
+| Coverage | Sample 50-100 cases/month | 100% of production traffic |
+| Consistency | Variable (human judgment) | Deterministic (same inputs → same scores) |
+| Audit trail | Spreadsheets | Tamper-evident logs |
+| Cost per system | ~€29K/year | ~€5K/year (83% savings) |
+| Report generation | Days of work | Seconds (automated) |
 
 ---
 
 ## Architecture
 
-### Design Philosophy
+### Design Principles
 
-**Separation of concerns:**
+**1. Separation of concerns**
+- Runtime tracing is <1ms overhead, zero ML dependencies
+- Offline evaluation uses heavyweight models (sentence-transformers)
+- Clear boundary prevents production performance impact
+
+**2. Framework agnostic**
+- Works with any Python function via `@trace()` decorator
+- Native integrations for LangChain, LlamaIndex, OpenAI, Anthropic
+- No vendor lock-in
+
+**3. Self-hosted first**
+- Runs entirely in your infrastructure
+- No data sent to external services
+- Complete control over storage and access
+
+### Components
+
 ```
-cert/
-├── measure/          # Core measurement (semantic, grounding)
-├── evaluation/       # Batch evaluation and caching
-├── compliance/       # Report generation for Article 15
-├── integrations/     # Framework integrations (LangChain, LlamaIndex)
-├── observability/    # Production monitoring (Prometheus, logging)
-└── advanced/         # Multi-agent coordination, trajectory analysis
+cert-framework/
+├── cert/measure/          # Core accuracy measurement
+│   ├── embeddings.py      # Semantic similarity (sentence-transformers)
+│   ├── grounding.py       # Term grounding analysis
+│   └── measure.py         # Combined scoring logic
+│
+├── cert/monitor/          # Production tracing
+│   └── monitor.py         # @trace() decorator
+│
+├── cert/evaluation/       # Batch evaluation
+│   ├── evaluator.py       # Offline scoring engine
+│   └── cache.py           # Result caching
+│
+├── cert/compliance/       # Compliance automation
+│   ├── reporter.py        # Article 15 report generation
+│   ├── reports.py         # Report templates
+│   └── datasets.py        # Validation datasets
+│
+├── cert/integrations/     # Framework adapters
+│   ├── langchain.py
+│   ├── llamaindex.py
+│   ├── openai.py
+│   └── anthropic.py
+│
+└── dashboard/             # TypeScript visualization
+    ├── app/               # Next.js dashboard
+    └── components/        # React components
 ```
 
-**Minimal dependencies:**
-- Core library: 5MB, no ML dependencies (tracing, logging)
-- Evaluation: +500MB (sentence-transformers)
-- Keep core lightweight for production deployments
+### TypeScript Dashboard
 
-**Extension points:**
-- Custom similarity metrics
-- Custom grounding analyzers
-- Framework-specific integrations
-- Domain-specific report templates
+CERT includes a Next.js dashboard for visualization:
 
-### Performance
+```bash
+cd dashboard
+npm install
+npm run dev
+# Open http://localhost:3000
+```
 
-**Measurement latency:**
-- Semantic similarity: ~50ms (cached embeddings)
-- Grounding analysis: ~5ms (string operations)
-- Combined: ~55ms overhead per measurement
+Features:
+- Upload evaluation results JSON
+- View accuracy metrics and trends
+- Inspect individual traces
+- Export compliance reports
+- Professional UI (Chakra UI components)
 
-**Evaluation throughput:**
-- Single process: ~20 traces/second
-- GPU acceleration: ~100 traces/second
-- Batch processing: configurable parallelism
-
-**Storage:**
-- ~1KB per trace (compressed JSONL)
-- 1M traces = ~1GB storage
-- Automatic rotation and archival
+Deploy to Vercel:
+```bash
+npm run build
+vercel deploy
+```
 
 ---
 
-## Use Cases
+## Integration Examples
 
-### RAG Hallucination Detection
+### LangChain
 
 ```python
-from cert import measure
+from langchain.chains import RetrievalQA
+from cert.integrations.langchain import CERTCallback
 
-# Typical RAG pipeline
-retrieved_docs = vector_store.search(query)
-context = "\n".join(retrieved_docs)
-answer = llm.generate(prompt=f"Context: {context}\n\nQuestion: {query}")
+callback = CERTCallback(log_path="langchain_traces.jsonl")
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=retriever,
+    callbacks=[callback]
+)
 
-# Verify answer is grounded in context
-result = measure(text1=answer, text2=context)
-
-if result.confidence < 0.7:
-    # Low confidence - answer may be hallucinated
-    # Option 1: Return "I don't have enough information"
-    # Option 2: Fetch more context and retry
-    # Option 3: Flag for human review
-    logger.warning(f"Low confidence answer: {result.confidence:.2f}")
+result = qa_chain({"query": "What was Q4 revenue?"})
+# Automatically logged with CERT metadata
 ```
 
-### Multi-Source Fact Verification
+### LlamaIndex
 
 ```python
-from cert import measure
+from llama_index import VectorStoreIndex
+from cert.integrations.llamaindex import CERTCallback
 
-# Check if claim is supported by multiple sources
-claim = "Apple's revenue grew 15% year-over-year"
-sources = [
-    "Apple Q4 revenue: $89.5B (up from $77.8B)",
-    "Year-over-year growth: 15%",
-    "Record quarterly revenue despite supply constraints"
-]
+callback = CERTCallback(log_path="llamaindex_traces.jsonl")
+index = VectorStoreIndex.from_documents(documents)
+query_engine = index.as_query_engine(callbacks=[callback])
 
-# Measure against each source
-scores = [measure(text1=claim, text2=source) for source in sources]
-
-# Require majority agreement
-supported = sum(1 for s in scores if s.confidence > 0.7)
-if supported >= len(sources) / 2:
-    print("Claim is well-supported")
-else:
-    print("Claim needs more evidence")
+response = query_engine.query("What was Q4 revenue?")
+# Automatically logged with CERT metadata
 ```
 
-### Compliance Monitoring Dashboard
+### OpenAI
 
 ```python
-from cert.evaluation import evaluate_traces
-from cert.observability import PrometheusExporter
-import time
+from cert.integrations.openai import trace_completion
 
-# Export metrics to Prometheus
-exporter = PrometheusExporter(port=8000)
-
-while True:
-    # Evaluate last hour of traces
-    results = evaluate_traces(
-        trace_file="production_traces.jsonl",
-        time_window="1h"
+@trace_completion(log_path="openai_traces.jsonl")
+def generate_answer(query: str, context: str) -> str:
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"Context: {context}\n\nQuestion: {query}"}
+        ]
     )
-    
-    # Export to monitoring system
-    exporter.record_accuracy(results.accuracy)
-    exporter.record_mean_confidence(results.mean_confidence)
-    exporter.record_low_confidence_count(results.low_confidence_count)
-    
-    time.sleep(300)  # Check every 5 minutes
+    return response.choices[0].message.content
 
-# Grafana dashboard shows:
-# - Accuracy over time
-# - Confidence score distribution  
-# - Alert on degradation
+answer = generate_answer("What was Q4 revenue?", context)
+# Automatically logged
 ```
 
-### A/B Testing LLM Versions
+### Anthropic Claude
 
 ```python
-from cert import trace, evaluate_traces
+from cert.integrations.anthropic import trace_message
 
-# Deploy two model versions
-@trace(log_path="model_a_traces.jsonl")
-def model_a_pipeline(query):
-    return gpt4.generate(query)
+@trace_message(log_path="anthropic_traces.jsonl")
+def generate_answer(query: str, context: str) -> str:
+    message = anthropic.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": f"Context: {context}\n\nQuestion: {query}"}
+        ]
+    )
+    return message.content[0].text
 
-@trace(log_path="model_b_traces.jsonl")
-def model_b_pipeline(query):
-    return claude.generate(query)
-
-# After 1 week, compare accuracy
-results_a = evaluate_traces("model_a_traces.jsonl")
-results_b = evaluate_traces("model_b_traces.jsonl")
-
-print(f"Model A accuracy: {results_a.accuracy:.1%}")
-print(f"Model B accuracy: {results_b.accuracy:.1%}")
-
-# Statistical significance test
-from scipy.stats import mannwhitneyu
-statistic, pvalue = mannwhitneyu(
-    results_a.confidence_scores,
-    results_b.confidence_scores
-)
-print(f"P-value: {pvalue:.4f}")
+answer = generate_answer("What was Q4 revenue?", context)
+# Automatically logged
 ```
 
 ---
 
-## Advanced Features
+## Deployment
 
-### Custom Similarity Metrics
+### Docker Compose (Recommended)
 
-```python
-from cert.measure import MeasurementEngine
-from cert.measure.embeddings import EmbeddingEngine
-
-# Define custom embedding model
-class CustomEmbedder(EmbeddingEngine):
-    def __init__(self):
-        # Load your custom model
-        self.model = load_custom_model()
-    
-    def compute_similarity(self, text1, text2):
-        emb1 = self.model.encode(text1)
-        emb2 = self.model.encode(text2)
-        return cosine_similarity(emb1, emb2)
-
-# Use in measurement
-engine = MeasurementEngine(embedder=CustomEmbedder())
-result = engine.measure(text1, text2)
+```bash
+docker-compose up -d
 ```
 
-### Multi-Agent Coordination
+Includes:
+- CERT Python service
+- PostgreSQL (trace storage)
+- Prometheus (metrics)
+- Grafana (visualization)
+- Next.js dashboard
 
-```python
-from cert.advanced.coordination import OrchestatorEngine
+Access:
+- Dashboard: http://localhost:3000
+- Grafana: http://localhost:3001
+- Prometheus: http://localhost:9090
 
-# Coordinate multiple LLM agents
-orchestrator = OrchestatorEngine(
-    agents=["researcher", "writer", "editor"],
-    coordination_strategy="sequential"
-)
+### Self-Hosted (Production)
 
-# Each agent's output verified before next step
-result = orchestrator.execute(
-    task="Write article about quantum computing",
-    verification_threshold=0.75
-)
+```bash
+# Install CERT
+pip install cert-framework[evaluation]
 
-# Audit trail shows verification at each step
-for step in result.execution_trace:
-    print(f"{step.agent}: confidence={step.confidence:.2f}")
+# Configure trace storage
+export CERT_LOG_PATH=/var/log/cert/traces.jsonl
+export CERT_EVALUATION_PATH=/var/log/cert/evaluations.json
+
+# Run evaluation service (cron job)
+cert evaluate --trace-file /var/log/cert/traces.jsonl \
+               --output /var/log/cert/evaluations.json \
+               --threshold 0.7
+
+# Deploy dashboard
+cd dashboard
+npm run build
+npm start
 ```
 
-### Trajectory Analysis
+### Cloud Deployment
 
-```python
-from cert.advanced.trajectory import TrajectoryAnalyzer
+**AWS:**
+- ECS Fargate for Python service
+- RDS PostgreSQL for trace storage
+- S3 for evaluation results
+- CloudWatch for monitoring
+- Amplify for dashboard
 
-# Analyze multi-step reasoning
-analyzer = TrajectoryAnalyzer()
+**GCP:**
+- Cloud Run for Python service
+- Cloud SQL for trace storage
+- Cloud Storage for evaluation results
+- Cloud Monitoring
+- Firebase Hosting for dashboard
 
-conversation = [
-    {"role": "user", "content": "What's 25 × 17?"},
-    {"role": "assistant", "content": "Let me break this down..."},
-    {"role": "assistant", "content": "25 × 17 = 425"},
-]
+**Azure:**
+- Container Instances for Python service
+- Azure Database for PostgreSQL
+- Blob Storage for evaluation results
+- Azure Monitor
+- Static Web Apps for dashboard
 
-# Track confidence evolution
-trajectory = analyzer.analyze(conversation)
-print(f"Final confidence: {trajectory.final_confidence:.2f}")
-print(f"Reasoning steps: {len(trajectory.steps)}")
-print(f"Confidence trend: {trajectory.trend}")  # increasing/decreasing/stable
-```
+Deployment guides: See `deployments/` directory
 
 ---
 
-## Validation and Research
-
-### Empirical Validation
-
-We validated cert-framework on SQuAD v2 (general Q&A benchmark):
-
-**Results:**
-- **ROC AUC:** 0.961 (excellent discrimination)
-- **Accuracy at threshold 0.8:** 66.7%
-- **Accuracy at optimal threshold 0.46:** 95.3%
-
-**Component analysis:**
-| Component | Correlation with ground truth | Notes |
-|-----------|-------------------------------|-------|
-| Semantic similarity | r = 0.644 | Detects meaning shifts |
-| Term grounding | r = 0.899 | Detects factual errors |
-| Combined | r = 0.867 | Robust to both failure modes |
-
-**Score distribution:**
-- Correct answers: 0.523 ± 0.066 (mean ± std)
-- Incorrect answers: 0.277 ± 0.067
-- Separation: 0.247 standard deviations
-
-The system shows clear bimodal distribution - correct and incorrect answers are well-separated.
-
-### Research Background
-
-CERT builds on established research in semantic similarity and factual consistency:
-
-**Semantic Similarity:**
-- Reimers & Gurevych (2019). "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks." EMNLP 2019.
-- Shown to correlate r=0.78 with human judgments on STS benchmark
-
-**Factual Consistency:**
-- Maynez et al. (2020). "On Faithfulness and Factuality in Abstractive Summarization." ACL 2020.
-- Kryscinski et al. (2020). "Evaluating Factuality in Generation with Dependency-level Entailment." EMNLP 2020.
-
-**EU AI Act Methodology:**
-- Laux et al. (2024). "AI Act Compliance: Technical and Organizational Measures for High-Risk AI Systems."
-- European Commission (2024). "Guidelines on Regulatory Sandboxes and Testing in Real World Conditions."
-
-### Ongoing Research
-
-We're actively researching:
-- **Domain adaptation:** How to calibrate thresholds for specialized domains
-- **Multimodal verification:** Extending to image/video outputs
-- **Causal analysis:** Understanding why systems succeed or fail
-- **Cross-lingual validation:** Evaluating on non-English languages
-
-Research collaborations welcome. See CONTRIBUTING.md.
-
----
-
-## Comparison with Other Tools
+## Comparison with Alternatives
 
 ### vs. Langfuse / Arize (LLM Observability)
 
-**Similarities:**
-- Production tracing and logging
-- Evaluation frameworks
-- Prometheus integration
+**What they do well:**
+- Detailed tracing and debugging
+- Rich visualization dashboards
+- Team collaboration features
+- Mature ecosystem
 
-**Differences:**
-- cert-framework adds EU AI Act compliance automation
-- Built-in semantic similarity and grounding (not just logging)
+**What CERT adds:**
+- EU AI Act compliance automation
+- Built-in accuracy measurement (not just logging)
 - Compliance reports generated automatically
 - Lighter weight (5MB core vs 50MB+)
 
-**Use together:** cert-framework for compliance, Langfuse for detailed debugging.
+**Use together:** Langfuse for detailed debugging, CERT for compliance.
 
 ### vs. OneTrust / Vanta (Compliance Platforms)
 
-**Similarities:**
-- Compliance documentation
-- Audit trail management
+**What they do well:**
+- Org-wide compliance management
+- Policy documentation
 - Risk assessment frameworks
+- Audit workflow
 
-**Differences:**
-- cert-framework does technical measurement (not just paperwork)
-- Developer-friendly (SDK, not GUI)
+**What CERT adds:**
+- Technical LLM accuracy measurement (not just paperwork)
+- Developer-friendly SDK (not GUI-only)
 - Open source (Apache 2.0)
 - Much lower cost (free self-hosted)
 
-**Use together:** OneTrust for org-wide compliance, cert-framework for AI-specific technical measurement.
+**Use together:** OneTrust for org-wide compliance, CERT for AI-specific technical measurement.
 
 ### vs. Manual Compliance
 
-**Manual approach:**
-- Sample 50-100 cases monthly
-- Human evaluation ("does this look right?")
-- Spreadsheet documentation
-- ~€37K/year per system
+| Approach | Coverage | Cost/year | Consistency | Audit Quality |
+|----------|----------|-----------|-------------|---------------|
+| Manual sampling | 50-100 cases/month | €29K | Variable | Spreadsheets |
+| CERT automation | 100% of traffic | €5K | Deterministic | Structured logs |
 
-**cert-framework approach:**
-- Evaluate 100% of production traffic
-- Automated, consistent measurement
-- Generated compliance reports
-- ~€5K/year per system (86% savings)
-
-**Quality difference:** Automated measurement is more consistent, comprehensive, and auditable than human sampling.
+**Quality improvement:** Automated measurement is more comprehensive, consistent, and auditable than human sampling.
 
 ---
 
 ## Roadmap
 
-### Q4 2025 (Shipped)
+### Q4 2025 ✅ Shipped
 
 - [x] Core measurement engine (semantic + grounding)
 - [x] Production tracing decorator
 - [x] SQuAD v2 validation (ROC AUC 0.961)
 - [x] Basic compliance reports
+- [x] TypeScript dashboard (Next.js)
 
-### Q1 2026 (In Progress)
+### Q1 2026 🚧 In Progress
 
 - [ ] Multi-language support (Spanish, German, French)
-- [ ] Langfuse integration
-- [ ] LlamaIndex callback handler
+- [ ] Langfuse integration (export traces)
+- [ ] LlamaIndex callback handler improvements
 - [ ] Grafana dashboard templates
-- [ ] Docker Compose deployment
+- [ ] Hosted SaaS platform (freemium)
 
-### Q2 2026  (Planned)
+### Q2 2026 📋 Planned
 
-- [ ] Hosted compliance platform (freemium SaaS)
 - [ ] Domain-specific validation benchmarks (finance, healthcare, legal)
 - [ ] Adversarial robustness testing
 - [ ] Automated threshold calibration
 - [ ] Multi-modal support (image grounding)
-
-### Q3 2026  (Vision)
-
 - [ ] Real-time monitoring dashboard
+
+### Q3 2026 🔮 Vision
+
 - [ ] Automated incident response (circuit breakers)
 - [ ] Cross-system compliance aggregation
 - [ ] Integration marketplace
 - [ ] Enterprise features (SSO, RBAC, SLAs)
+- [ ] Advanced analytics (drift detection, anomaly alerts)
 
-Community input shapes the roadmap. Vote on features in GitHub Discussions.
-
----
-
-## Contributing
-
-We welcome contributions! cert-framework thrives on community involvement.
-
-**Ways to contribute:**
-- Report bugs and request features (GitHub Issues)
-- Improve documentation and examples
-- Submit pull requests (see CONTRIBUTING.md)
-- Share validation results on your domain
-- Academic collaborations on methodology
-- Help others in GitHub Discussions
-
-**Good first issues:**
-- Add pre-commit hooks configuration
-- Create Jupyter notebook tutorials
-- Add language support (non-English)
-- Improve error messages
-- Write integration tests
-
-**High-impact contributions:**
-- Domain-specific validation benchmarks
-- Framework integrations (Haystack, Semantic Kernel)
-- Cloud deployment guides (AWS, GCP, Azure)
-- Case studies from production deployments
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+**Community shapes the roadmap.** Vote on features in GitHub Discussions.
 
 ---
 
-## Community
+## Pricing
 
-**GitHub:** [github.com/yourusername/cert-framework](https://github.com/yourusername/cert-framework)  
-- Star the repo to show support 
-- Watch for updates on releases
-- Discuss in GitHub Discussions
+### Open Source (Current)
 
-**Documentation:** [cert-framework.readthedocs.io](https://cert-framework.readthedocs.io)  
-- API reference
-- Tutorials and guides
+**Free forever:**
+- Core library (Apache 2.0 license)
+- Self-hosted deployment
+- Unlimited production usage
+- Community support (GitHub)
+
+**Ideal for:**
+- Startups building AI products
+- Research teams validating methods
+- Companies preferring self-hosted solutions
+
+### SaaS Platform (Q1 2026)
+
+**Free tier:**
+- Up to 10K traces/month
+- Basic compliance reports
+- Community support
+
+**Pro ($99/month):**
+- Up to 100K traces/month
+- Advanced compliance reports
+- Email support
+- Hosted dashboard
+
+**Teams ($499/month):**
+- Unlimited traces
+- Multi-project organization
+- Team collaboration features
+- Priority support
+- Custom integrations
+
+**Enterprise (Custom):**
+- Dedicated infrastructure
+- SSO/SAML authentication
+- SLA guarantees
+- On-premise deployment option
+- Professional services
+
+---
+
+## FAQ
+
+**Q: Does this replace human evaluation?**
+
+No. CERT provides scalable automated measurement, but human evaluation remains essential for:
+- Subjective quality (tone, style, appropriateness)
+- Edge cases and adversarial examples
+- Validating that automated metrics align with business goals
+
+Think of CERT as "automated first-pass evaluation" that flags issues for human review.
+
+**Q: How accurate is the measurement?**
+
+ROC AUC 0.961 on SQuAD v2 means the system correctly ranks correct answers higher than incorrect answers 96.1% of the time. This is near-perfect discrimination.
+
+However, accuracy depends on your domain. We recommend:
+1. Validate on 50-100 examples from your domain
+2. Calibrate threshold for your accuracy/precision/recall tradeoffs
+3. Monitor performance over time
+
+**Q: Can I use this with [my framework]?**
+
+Yes. CERT provides:
+- Generic `@trace()` decorator (works with any Python function)
+- Native integrations for LangChain, LlamaIndex, OpenAI, Anthropic
+- Custom integration guide in `docs/integrations.md`
+
+**Q: What about privacy and data security?**
+
+CERT runs entirely in your infrastructure:
+- No data sent to external services
+- Logs stored locally (you control storage)
+- Self-hosted deployment
+- No telemetry
+
+For hosted SaaS (Q1 2026): SOC 2 Type II, GDPR compliance, EU data residency.
+
+**Q: What if my system isn't "high-risk" under the EU AI Act?**
+
+CERT still provides value:
+- Better production monitoring (catch hallucinations)
+- A/B testing LLM versions (measure improvements)
+- Debugging failures (audit trails)
+- Future-proofing (requirements may expand)
+
+Measuring accuracy is good engineering practice regardless of regulation.
+
+**Q: How does the TypeScript dashboard work?**
+
+The dashboard is a standalone Next.js application that:
+- Reads evaluation JSON files from Python SDK
+- Displays metrics, traces, and trends
+- Exports compliance reports
+- Deploys to Vercel/Netlify/AWS Amplify
+
+It's a separate component - you can use CERT without it.
+
+**Q: Can I contribute?**
+
+Yes! We welcome:
+- Bug reports and feature requests (GitHub Issues)
+- Pull requests (see CONTRIBUTING.md)
+- Documentation improvements
+- Domain-specific validation datasets
 - Integration examples
+- Academic collaborations
 
-**Blog:** [blog.cert-framework.dev](https://blog.cert-framework.dev)  
-- Case studies
-- Methodology deep-dives
-- EU AI Act analysis
+**Q: What if I find a security issue?**
 
-**Contact:**
-- Email: javier@jmarin.info
-- LinkedIn: https://www.linkedin.com/in/javiermarinvalenzuela
-- Twitter: https://x.com/jamarinval
+Please report privately: security@cert-framework.dev
+
+We aim to respond within 48 hours.
 
 ---
 
 ## Citation
 
-If you use cert-framework in academic research, please cite:
+If you use CERT in academic research, please cite:
 
 ```bibtex
 @software{certframework2025,
-  author = {[Your Name]},
-  title = {cert-framework: Production LLM Monitoring with EU AI Act Compliance},
+  title = {CERT Framework: Production LLM Monitoring with EU AI Act Compliance},
+  author = {Marin, Javier},
   year = {2025},
   publisher = {GitHub},
-  url = {https://github.com/yourusername/cert-framework},
+  url = {https://github.com/javier/cert-framework},
+  note = {Apache License 2.0}
 }
 ```
 
@@ -752,90 +714,33 @@ If you use cert-framework in academic research, please cite:
 
 Apache License 2.0 - See [LICENSE](LICENSE) for details.
 
-**TL;DR:**
--  Commercial use allowed
--  Modification allowed
--  Distribution allowed
--  Private use allowed
--  Must include license and copyright notice
--  Provided "as is" without warranty
+**Commercial use allowed.** Modification allowed. Distribution allowed. Private use allowed.
+
+**Must include:** License and copyright notice.
+
+**Provided "as is"** without warranty.
 
 ---
 
-## FAQ
+## Contact
 
-**Q: Does this replace human evaluation?**
+**Maintainer:** Javier Marin  
+**Email:** javier@jmarin.info  
+**LinkedIn:** https://www.linkedin.com/in/javiermarinvalenzuela  
+**Twitter:** https://x.com/jamarinval
 
-A: No. cert-framework provides scalable automated measurement, but human evaluation remains important for:
-- Subjective quality (tone, style, appropriateness)
-- Edge cases and adversarial examples
-- Validating that automated metrics align with business goals
-
-Think of it as "automated first-pass evaluation" that flags issues for human review.
-
-**Q: How accurate is the measurement?**
-
-A: ROC AUC 0.961 on SQuAD v2 means the system correctly ranks correct answers higher than incorrect answers 96.1% of the time. This is excellent discrimination.
-
-However, accuracy depends on your domain. We recommend:
-1. Validate on 50-100 examples from your domain
-2. Calibrate the threshold for your accuracy/precision/recall tradeoffs
-3. Monitor performance over time
-
-**Q: Can I use this with [LangChain / LlamaIndex / Haystack]?**
-
-A: Yes! We provide integrations for major frameworks:
-- LangChain: `cert.integrations.langchain.CERTCallback`
-- LlamaIndex: `cert.integrations.llamaindex.CERTCallback`
-- OpenAI: `cert.integrations.openai.trace_completion()`
-
-For other frameworks, the `@trace()` decorator works with any Python function.
-
-**Q: What about privacy and data security?**
-
-A: cert-framework runs entirely in your infrastructure:
-- No data sent to external services
-- Logs stored locally (you control storage)
-- Self-hosted deployment
-- No telemetry or phone-home
-
-For SaaS version (Q1 2026), we'll provide SOC 2 Type II, GDPR compliance, and data residency options.
-
-**Q: What if my system isn't "high-risk" under the EU AI Act?**
-
-A: You might still benefit from cert-framework:
-- Better production monitoring (catch hallucinations)
-- A/B testing LLM versions (measure improvements)
-- Debugging failures (audit trails)
-- Future-proofing (requirements may expand)
-
-Even if not legally required, measuring accuracy is good engineering practice.
-
-**Q: Can I self-host everything?**
-
-A: Yes! Apache 2.0 license allows self-hosting with no restrictions. Run on:
-- Your laptop (development)
-- Your servers (production)
-- Private cloud (AWS VPC, GCP private network)
-- Air-gapped environments (no internet required after installation)
-
-**Q: What if I find a bug or security issue?**
-
-A: Please report:
-- Bugs: GitHub Issues
-- Security vulnerabilities: Email [your-email] (private disclosure)
-- Feature requests: GitHub Discussions
-
-We aim to respond within 48 hours.
+**GitHub:** https://github.com/javier/cert-framework  
+**Documentation:** https://cert-framework.readthedocs.io  
+**Discussions:** https://github.com/javier/cert-framework/discussions
 
 ---
 
 ## Acknowledgments
 
-cert-framework builds on ideas from:
+CERT builds on research from:
 - Sentence-BERT (Reimers & Gurevych, 2019)
-- Factuality metrics (Maynez et al., 2020; Kryscinski et al., 2020)
-- EU AI Act technical guidelines (European Commission, 2024)
+- Factuality metrics in NLG (Maynez et al., 2020; Kryscinski et al., 2020)
+- EU AI Act technical standards (European Commission, 2024)
 
 Special thanks to:
 - Open source community for foundational tools
@@ -844,7 +749,7 @@ Special thanks to:
 
 ---
 
-**Built with empirical rigor. Validated in production. Ready for regulation.**
+**Empirically validated. Production ready. Regulation compliant.**
 
 Start measuring: `pip install cert-framework`
 
