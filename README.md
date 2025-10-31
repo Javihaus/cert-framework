@@ -1,6 +1,6 @@
 # CERT Framework
 
-**Production LLM Monitoring with Built-in EU AI Act Compliance**
+## Production LLM Monitoring with Built-in EU AI Act Compliance
 
 ![CERT Framework](docs/CERT.png)
 
