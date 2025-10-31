@@ -82,7 +82,13 @@ setup(
         ],
         # Trajectory monitoring (advanced/experimental)
         "trajectory": [
+            "torch>=2.0.0",  # PyTorch for model loading
+            "transformers>=4.30.0",  # Transformers models
             "matplotlib>=3.5.0",  # Visualization
+        ],
+        # Coordination monitoring (requires requests for API calls)
+        "coordination": [
+            "anthropic>=0.18.0",  # Anthropic API
         ],
         # CLI tool
         "cli": [
@@ -114,7 +120,7 @@ setup(
         "all": [
             # Evaluation
             "sentence-transformers>=2.2.0,<3.0.0",
-            "torch>=1.11.0",
+            "torch>=2.0.0",
             "transformers>=4.30.0",
             "tiktoken>=0.5.0",
             "protobuf>=3.20.0",
@@ -134,7 +140,7 @@ setup(
             "markdown>=3.3.0",
             # Observability
             "prometheus-client>=0.19.0",
-            # Trajectory
+            # Trajectory (advanced)
             "matplotlib>=3.5.0",
             # CLI
             "click>=8.0.0",

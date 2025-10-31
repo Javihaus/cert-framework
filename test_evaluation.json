@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "total_traces": 100,
+    "evaluated_traces": 100,
+    "passed_traces": 95,
+    "failed_traces": 5,
+    "accuracy": 0.95,
+    "mean_confidence": 0.823,
+    "threshold_used": 0.7,
+    "date_range": {
+      "start": "2025-10-01",
+      "end": "2025-10-31"
+    }
+  },
+  "results": [
+    {
+      "trace_id": "trace_001",
+      "timestamp": "2025-10-15T10:30:00Z",
+      "query": "What was Apple's Q4 revenue?",
+      "measurement": {
+        "matched": true,
+        "confidence": 0.89,
+        "semantic_score": 0.92,
+        "grounding_score": 0.86,
+        "threshold_used": 0.7,
+        "rule": "Match (confidence 0.89 >= threshold 0.70); strongest: semantic(0.92), weakest: grounding(0.86)",
+        "components_used": ["semantic", "grounding"]
+      },
+      "passed": true
+    },
+    {
+      "trace_id": "trace_002",
+      "timestamp": "2025-10-15T10:31:00Z",
+      "query": "What is the capital of France?",
+      "measurement": {
+        "matched": false,
+        "confidence": 0.45,
+        "semantic_score": 0.51,
+        "grounding_score": 0.39,
+        "threshold_used": 0.7,
+        "rule": "No match (confidence 0.45 < threshold 0.70); strongest: semantic(0.51), weakest: grounding(0.39)",
+        "components_used": ["semantic", "grounding"]
+      },
+      "passed": false
+    },
+    {
+      "trace_id": "trace_003",
+      "timestamp": "2025-10-15T10:32:00Z",
+      "query": "How many employees does the company have?",
+      "measurement": {
+        "matched": true,
+        "confidence": 0.87,
+        "semantic_score": 0.88,
+        "grounding_score": 0.86,
+        "threshold_used": 0.7,
+        "rule": "Match (confidence 0.87 >= threshold 0.70); strongest: semantic(0.88), weakest: grounding(0.86)",
+        "components_used": ["semantic", "grounding"]
+      },
+      "passed": true
+    }
+  ]
+}
