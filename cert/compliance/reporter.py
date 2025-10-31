@@ -72,9 +72,7 @@ class ComplianceReporter:
             html_content = self._generate_html(stats, system_metadata)
             return self._convert_to_pdf(html_content, output_path)
         else:
-            raise ValueError(
-                f"Unsupported format: {format}. Use 'markdown', 'html', or 'pdf'"
-            )
+            raise ValueError(f"Unsupported format: {format}. Use 'markdown', 'html', or 'pdf'")
 
         # Write report
         output_file = Path(output_path)
@@ -626,9 +624,9 @@ class ComplianceReporter:
         html = "<table><tr><th>Integration</th><th>Description</th><th>Interface Type</th></tr>"
         for integration in integrations:
             html += f"""<tr>
-                <td>{integration.get('name', 'N/A')}</td>
-                <td>{integration.get('description', 'N/A')}</td>
-                <td>{integration.get('interface_type', 'N/A')}</td>
+                <td>{integration.get("name", "N/A")}</td>
+                <td>{integration.get("description", "N/A")}</td>
+                <td>{integration.get("interface_type", "N/A")}</td>
             </tr>"""
         html += "</table>"
         return html
@@ -641,9 +639,9 @@ class ComplianceReporter:
         html = "<table><tr><th>Component</th><th>Purpose</th><th>Integration Method</th></tr>"
         for comp in components:
             html += f"""<tr>
-                <td>{comp.get('name', 'N/A')}</td>
-                <td>{comp.get('purpose', 'N/A')}</td>
-                <td>{comp.get('integration', 'N/A')}</td>
+                <td>{comp.get("name", "N/A")}</td>
+                <td>{comp.get("purpose", "N/A")}</td>
+                <td>{comp.get("integration", "N/A")}</td>
             </tr>"""
         html += "</table>"
         return html
@@ -712,7 +710,7 @@ results = evaluator.evaluate_log_file(
             </tr>
             <tr>
                 <td>Pass Rate</td>
-                <td class="{'compliant' if stats['pass_rate'] >= 0.9 else 'non-compliant'}">{stats["pass_rate"]:.1%}</td>
+                <td class="{"compliant" if stats["pass_rate"] >= 0.9 else "non-compliant"}">{stats["pass_rate"]:.1%}</td>
             </tr>
             <tr>
                 <td>Evaluation Preset</td>
@@ -724,7 +722,7 @@ results = evaluator.evaluate_log_file(
             </tr>
         </table>
 
-        <p><strong>Assessment:</strong> The system demonstrates {'<span class="compliant">COMPLIANT</span>' if stats['pass_rate'] >= 0.9 else '<span class="non-compliant">NON-COMPLIANT</span>'} levels of accuracy according to Article 15.1 requirements.</p>"""
+        <p><strong>Assessment:</strong> The system demonstrates {'<span class="compliant">COMPLIANT</span>' if stats["pass_rate"] >= 0.9 else '<span class="non-compliant">NON-COMPLIANT</span>'} levels of accuracy according to Article 15.1 requirements.</p>"""
 
     def _format_robustness_assessment(self, stats: Dict) -> str:
         """Format robustness assessment section."""
@@ -737,7 +735,7 @@ results = evaluator.evaluate_log_file(
             <tr>
                 <td>Error Rate</td>
                 <td>{stats["error_rate"]:.1%}</td>
-                <td class="{'compliant' if stats['error_rate'] < 0.05 else 'non-compliant'}">{'ACCEPTABLE' if stats['error_rate'] < 0.05 else 'EXCEEDS THRESHOLD'}</td>
+                <td class="{"compliant" if stats["error_rate"] < 0.05 else "non-compliant"}">{"ACCEPTABLE" if stats["error_rate"] < 0.05 else "EXCEEDS THRESHOLD"}</td>
             </tr>
             <tr>
                 <td>System Availability</td>
@@ -746,7 +744,7 @@ results = evaluator.evaluate_log_file(
             </tr>
         </table>
 
-        <p>Error handling is implemented with automatic logging of all failures for investigation. The system maintains {'<span class="compliant">acceptable</span>' if stats['error_rate'] < 0.05 else '<span class="non-compliant">elevated</span>'} error rates according to Article 15.4 resilience requirements.</p>"""
+        <p>Error handling is implemented with automatic logging of all failures for investigation. The system maintains {'<span class="compliant">acceptable</span>' if stats["error_rate"] < 0.05 else '<span class="non-compliant">elevated</span>'} error rates according to Article 15.4 resilience requirements.</p>"""
 
     def _format_log_example(self) -> str:
         """Format example log entry."""
@@ -776,29 +774,29 @@ results = evaluator.evaluate_log_file(
             <tr>
                 <td rowspan="2">Article 15.1 (Accuracy)</td>
                 <td>Pass Rate</td>
-                <td>{stats.get('pass_rate', 0):.1%}</td>
-                <td class="{'compliant' if stats.get('pass_rate', 0) >= 0.9 else 'non-compliant'}">{'✓ COMPLIANT' if stats.get('pass_rate', 0) >= 0.9 else '✗ NON-COMPLIANT'}</td>
+                <td>{stats.get("pass_rate", 0):.1%}</td>
+                <td class="{"compliant" if stats.get("pass_rate", 0) >= 0.9 else "non-compliant"}">{"✓ COMPLIANT" if stats.get("pass_rate", 0) >= 0.9 else "✗ NON-COMPLIANT"}</td>
             </tr>
             <tr>
                 <td>Traces Evaluated</td>
-                <td>{stats.get('total_evaluated', stats['total_requests']):,}</td>
+                <td>{stats.get("total_evaluated", stats["total_requests"]):,}</td>
                 <td class="compliant">✓ DOCUMENTED</td>
             </tr>
             <tr>
                 <td rowspan="2">Article 15.4 (Robustness)</td>
                 <td>Error Rate</td>
-                <td>{stats['error_rate']:.1%}</td>
-                <td class="{'compliant' if stats['error_rate'] < 0.05 else 'non-compliant'}">{'✓ COMPLIANT' if stats['error_rate'] < 0.05 else '✗ NON-COMPLIANT'}</td>
+                <td>{stats["error_rate"]:.1%}</td>
+                <td class="{"compliant" if stats["error_rate"] < 0.05 else "non-compliant"}">{"✓ COMPLIANT" if stats["error_rate"] < 0.05 else "✗ NON-COMPLIANT"}</td>
             </tr>
             <tr>
                 <td>Availability</td>
-                <td>{stats['success_rate']:.1%}</td>
+                <td>{stats["success_rate"]:.1%}</td>
                 <td class="compliant">✓ MONITORED</td>
             </tr>
             <tr>
                 <td>Article 19 (Logging)</td>
                 <td>Automatic Logging</td>
-                <td>{stats['total_requests']:,} requests logged</td>
+                <td>{stats["total_requests"]:,} requests logged</td>
                 <td class="compliant">✓ COMPLIANT</td>
             </tr>
         </table>"""
@@ -854,16 +852,16 @@ results = evaluator.evaluate_log_file(
 ### Section 9: Accuracy, Robustness and Cybersecurity
 
 #### Accuracy (Article 15.1)
-- Pass Rate: {stats.get('pass_rate', 0):.1%}
-- Total Evaluated: {stats.get('total_evaluated', 0):,}
+- Pass Rate: {stats.get("pass_rate", 0):.1%}
+- Total Evaluated: {stats.get("total_evaluated", 0):,}
 
 #### Robustness (Article 15.4)
-- Error Rate: {stats['error_rate']:.1%}
-- Success Rate: {stats['success_rate']:.1%}
+- Error Rate: {stats["error_rate"]:.1%}
+- Success Rate: {stats["success_rate"]:.1%}
 
 #### Article 19: Automatic Logging
-- Total Logged: {stats['total_requests']:,}
-- Period: {stats.get('period_start', 'N/A')} to {stats.get('period_end', 'N/A')}
+- Total Logged: {stats["total_requests"]:,}
+- Period: {stats.get("period_start", "N/A")} to {stats.get("period_end", "N/A")}
 
 ## Compliance Status
 
