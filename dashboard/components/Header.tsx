@@ -16,7 +16,7 @@ export default function Header() {
           <Image
             src="/cert-logo.png"
             alt="CERT Logo"
-            h="40px"
+            h="150px"
             w="auto"
           />
           <Box>

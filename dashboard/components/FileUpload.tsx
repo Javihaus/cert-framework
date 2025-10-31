@@ -62,6 +62,10 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
           textAlign="center"
           bg={isDragging ? 'brand.50' : 'transparent'}
           transition="all 0.2s"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -80,6 +84,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
             h="40px"
             color={fileName ? 'green.500' : 'brand.500'}
             mb="12px"
+            mx="auto"
           />
 
           {fileName ? (
@@ -108,13 +113,12 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
             id="file-upload"
           />
 
-          <label htmlFor="file-upload" style={{ display: 'inline-block', marginTop: '16px' }}>
+          <label htmlFor="file-upload" style={{ display: 'inline-block', marginTop: '16px', cursor: 'pointer' }}>
             <Button
+              as="span"
               bg="brand.500"
               color="white"
               _hover={{ bg: 'brand.600' }}
-              cursor="pointer"
-              pointerEvents="none"
             >
               Choose File
             </Button>
