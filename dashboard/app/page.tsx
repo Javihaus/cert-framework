@@ -7,32 +7,21 @@ import {
   Flex,
   Grid,
   Text,
-  Badge,
-  VStack,
-  HStack,
   Code,
 } from '@chakra-ui/react';
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-} from '@chakra-ui/table';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-} from '@chakra-ui/modal';
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+} from '@chakra-ui/tabs';
 import { MdCheckCircle, MdCancel, MdAssessment, MdList } from 'react-icons/md';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
+import FailedTracesView from '@/components/FailedTracesView';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 
 export default function Home() {
@@ -40,7 +29,6 @@ export default function Home() {
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
-  const [selectedResult, setSelectedResult] = useState<EvaluationResult | null>(null);
 
   const handleEvaluationFileLoad = (data: any) => {
     console.log('Loaded data:', data);
@@ -154,6 +142,7 @@ results = evaluator.evaluate_log_file(
   }
 
   const { summary, results } = evaluationData;
+  const isCompliant = summary.accuracy >= 0.9;
 
   return (
     <Box minH="100vh" bg="secondaryGray.300">
@@ -169,6 +158,27 @@ results = evaluator.evaluate_log_file(
         >
           ← Load Different File
         </Button>
+
+        {/* Status Banner */}
+        <Box
+          bg={isCompliant ? 'green.500' : 'orange.400'}
+          color="white"
+          p="20px"
+          borderRadius="12px"
+          mb="24px"
+        >
+          <Flex justify="space-between" align="center">
+            <Box>
+              <Text fontSize="18px" fontWeight="600" mb="4px">
+                {isCompliant ? '✅ Compliant' : '⚠️ Below Compliance Threshold'}
+              </Text>
+              <Text fontSize="14px">
+                Accuracy at {(summary.accuracy * 100).toFixed(1)}% (target: 90%)
+                {!isCompliant && ` - Review ${summary.failed_traces} failed traces.`}
+              </Text>
+            </Box>
+          </Flex>
+        </Box>
 
         {/* Metrics Grid */}
         <Grid
@@ -206,238 +216,184 @@ results = evaluator.evaluate_log_file(
           />
         </Grid>
 
-        {/* Mean Confidence Card */}
-        <Card mb="20px">
-          <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
-            Mean Confidence
-          </Text>
-          <Flex align="baseline" gap="8px" mb="8px">
-            <Text fontSize="48px" fontWeight="700" color="brand.500">
-              {summary.mean_confidence.toFixed(3)}
-            </Text>
-          </Flex>
-          <Text fontSize="sm" color="secondaryGray.600">
-            Threshold: {summary.threshold_used.toFixed(2)}
-          </Text>
-        </Card>
+        {/* Tabs */}
+        <Tabs colorScheme="brand" variant="enclosed">
+          <TabList bg="white" borderRadius="12px 12px 0 0">
+            <Tab>Overview</Tab>
+            <Tab>Failed Traces ({summary.failed_traces})</Tab>
+            <Tab>Distribution</Tab>
+            <Tab>Documentation</Tab>
+          </TabList>
 
-        {/* Results Table */}
-        {results.length > 0 ? (
-          <Card>
-            <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
-              Evaluation Results ({results.length} examples)
-            </Text>
+          <TabPanels bg="white" borderRadius="0 0 12px 12px" p="20px">
+            {/* Overview Tab */}
+            <TabPanel>
+              <Grid
+                templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+                gap="20px"
+              >
+                <Card>
+                  <Text fontSize="md" fontWeight="700" color="secondaryGray.600" mb="4px">
+                    Mean Confidence
+                  </Text>
+                  <Text fontSize="48px" fontWeight="700" color="brand.500">
+                    {summary.mean_confidence.toFixed(3)}
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.600" mt="8px">
+                    Threshold: {summary.threshold_used.toFixed(2)}
+                  </Text>
+                </Card>
 
-            <Box overflowX="auto">
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th
-                      borderColor="gray.200"
-                      color="secondaryGray.600"
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      Timestamp
-                    </Th>
-                    <Th
-                      borderColor="gray.200"
-                      color="secondaryGray.600"
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      Query
-                    </Th>
-                    <Th
-                      borderColor="gray.200"
-                      color="secondaryGray.600"
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      Confidence
-                    </Th>
-                    <Th
-                      borderColor="gray.200"
-                      color="secondaryGray.600"
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      Status
-                    </Th>
-                    <Th
-                      borderColor="gray.200"
-                      color="secondaryGray.600"
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      Actions
-                    </Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {results.map((result, idx) => (
-                  <Tr key={idx}>
-                    <Td borderColor="gray.200" fontSize="sm" color="secondaryGray.900">
-                      {new Date(result.timestamp).toLocaleString()}
-                    </Td>
-                    <Td borderColor="gray.200" fontSize="sm" color="secondaryGray.900" maxW="300px">
-                      <Text
-                        overflow="hidden"
-                        textOverflow="ellipsis"
-                        whiteSpace="nowrap"
-                      >
-                        {result.query}
-                      </Text>
-                    </Td>
-                    <Td borderColor="gray.200">
-                      <Text
-                        fontSize="sm"
-                        fontWeight="700"
-                        color={
-                          result.measurement.confidence >= summary.threshold_used
-                            ? 'green.500'
-                            : 'red.500'
-                        }
-                      >
-                        {result.measurement.confidence.toFixed(3)}
-                      </Text>
-                    </Td>
-                    <Td borderColor="gray.200">
-                      <Badge
-                        colorScheme={result.passed ? 'green' : 'red'}
-                        fontSize="xs"
-                        fontWeight="700"
-                        px="8px"
-                        py="4px"
-                        borderRadius="7px"
-                      >
-                        {result.passed ? 'Passed' : 'Failed'}
-                      </Badge>
-                    </Td>
-                    <Td borderColor="gray.200">
-                      <Button
-                        onClick={() => setSelectedResult(result)}
-                        size="sm"
-                        bg="brand.500"
-                        color="white"
-                        _hover={{ bg: 'brand.600' }}
-                      >
-                        Details
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Box>
-        </Card>
-        ) : (
-          <Card>
-            <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="12px">
-              Evaluation Results
-            </Text>
-            <Text fontSize="md" color="secondaryGray.600">
-              No detailed results available. This file contains summary metrics only.
-            </Text>
-            <Text fontSize="sm" color="secondaryGray.500" mt="8px">
-              The dashboard is showing {summary.passed_traces} passed and {summary.failed_traces} failed traces based on summary data.
-            </Text>
-          </Card>
-        )}
-      </Box>
+                <Card>
+                  <Text fontSize="md" fontWeight="700" color="secondaryGray.600" mb="12px">
+                    Evaluation Period
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.700" mb="4px">
+                    <strong>Start:</strong> {summary.date_range.start}
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.700">
+                    <strong>End:</strong> {summary.date_range.end}
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.600" mt="12px">
+                    Total traces evaluated: {summary.evaluated_traces.toLocaleString()}
+                  </Text>
+                </Card>
 
-      {/* Details Modal */}
-      {selectedResult && (
-        <Modal isOpen={true} onClose={() => setSelectedResult(null)} size="xl">
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Evaluation Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb="24px">
-              <VStack gap="16px" align="stretch">
-                <Box>
-                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
-                    Query
+                <Card gridColumn={{ base: '1', lg: 'span 2' }}>
+                  <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="12px">
+                    Compliance Status
                   </Text>
                   <Box
-                    p="12px"
-                    bg="secondaryGray.300"
-                    borderRadius="12px"
-                    fontSize="sm"
-                    color="secondaryGray.900"
+                    bg={isCompliant ? 'green.50' : 'orange.50'}
+                    border="2px solid"
+                    borderColor={isCompliant ? 'green.200' : 'orange.200'}
+                    p="16px"
+                    borderRadius="8px"
                   >
-                    {selectedResult.query}
+                    <Text fontSize="lg" fontWeight="600" color={isCompliant ? 'green.700' : 'orange.700'}>
+                      {isCompliant
+                        ? '✅ System meets EU AI Act Article 15 requirements'
+                        : '⚠️ Action Required: System below 90% accuracy threshold'
+                      }
+                    </Text>
+                    {!isCompliant && (
+                      <Text fontSize="sm" color="orange.600" mt="8px">
+                        Review failed traces and consider adjusting threshold or improving system accuracy.
+                      </Text>
+                    )}
                   </Box>
+                </Card>
+              </Grid>
+            </TabPanel>
+
+            {/* Failed Traces Tab */}
+            <TabPanel>
+              {results.length > 0 ? (
+                <FailedTracesView results={results} threshold={summary.threshold_used} />
+              ) : (
+                <Card>
+                  <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="8px">
+                    No Detailed Trace Data
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.600">
+                    This file contains summary metrics only. {summary.failed_traces} traces failed based on summary data.
+                  </Text>
+                </Card>
+              )}
+            </TabPanel>
+
+            {/* Distribution Tab */}
+            <TabPanel>
+              <Card>
+                <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="12px">
+                  Score Distribution
+                </Text>
+                <Text fontSize="sm" color="secondaryGray.600">
+                  Distribution visualization coming soon...
+                </Text>
+                <Box mt="20px" p="20px" bg="gray.50" borderRadius="8px">
+                  <Text fontSize="xs" color="gray.500">
+                    This tab will show:
+                  </Text>
+                  <Text fontSize="xs" color="gray.500" mt="4px">
+                    • Histogram of confidence scores
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    • Threshold line visualization
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    • Pass/fail distribution
+                  </Text>
+                </Box>
+              </Card>
+            </TabPanel>
+
+            {/* Documentation Tab */}
+            <TabPanel>
+              <Card>
+                <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="16px">
+                  Understanding CERT Metrics
+                </Text>
+
+                <Box mb="20px">
+                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
+                    Accuracy
+                  </Text>
+                  <Text fontSize="sm" color="secondaryGray.700">
+                    The percentage of traces that passed the confidence threshold. EU AI Act Article 15
+                    requires "appropriate levels of accuracy" - typically 90% or higher for high-risk systems.
+                  </Text>
                 </Box>
 
-                <Box>
-                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
+                <Box mb="20px">
+                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
                     Confidence Score
                   </Text>
-                  <Text fontSize="2xl" fontWeight="700" color="brand.500">
-                    {selectedResult.measurement.confidence.toFixed(3)}
+                  <Text fontSize="sm" color="secondaryGray.700">
+                    A value between 0.0 and 1.0 measuring the reliability of an AI output. Scores are
+                    computed using semantic similarity and term grounding components.
                   </Text>
                 </Box>
 
-                <Box>
-                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
-                    Components
+                <Box mb="20px">
+                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
+                    Threshold
                   </Text>
-                  <HStack gap="8px">
-                    {selectedResult.measurement.components_used.map((component, idx) => (
-                      <Badge key={idx} colorScheme="blue">
-                        {component}
-                      </Badge>
-                    ))}
-                  </HStack>
+                  <Text fontSize="sm" color="secondaryGray.700">
+                    The minimum confidence score required for a trace to pass. Default is 0.70, but can
+                    be calibrated based on your domain (financial: 0.46, healthcare: 0.50, legal: 0.48).
+                  </Text>
                 </Box>
 
-                {selectedResult.measurement.semantic_score !== undefined && (
-                  <Box>
-                    <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="4px">
-                      Semantic Score
-                    </Text>
-                    <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
-                      {selectedResult.measurement.semantic_score.toFixed(3)}
-                    </Text>
-                  </Box>
-                )}
-
-                {selectedResult.measurement.grounding_score !== undefined && (
-                  <Box>
-                    <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="4px">
-                      Grounding Score
-                    </Text>
-                    <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
-                      {selectedResult.measurement.grounding_score.toFixed(3)}
-                    </Text>
-                  </Box>
-                )}
-
-                <Box>
-                  <Text fontSize="sm" fontWeight="700" color="secondaryGray.600" mb="8px">
-                    Rule
+                <Box mb="20px">
+                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
+                    Failure Patterns
                   </Text>
-                  <Box
-                    p="12px"
-                    bg="secondaryGray.300"
-                    borderRadius="12px"
-                    fontSize="sm"
-                    color="secondaryGray.700"
-                  >
-                    {selectedResult.measurement.rule}
+                  <Text fontSize="sm" color="secondaryGray.700" mb="4px">
+                    Failed traces are automatically classified into patterns:
+                  </Text>
+                  <Box pl="12px" mt="8px">
+                    <Text fontSize="sm" color="red.600">• <strong>Irrelevant:</strong> Completely off-topic responses</Text>
+                    <Text fontSize="sm" color="orange.600">• <strong>Incomplete:</strong> Vague or missing details</Text>
+                    <Text fontSize="sm" color="yellow.600">• <strong>Missing Info:</strong> No specific data provided</Text>
+                    <Text fontSize="sm" color="blue.600">• <strong>Definition Only:</strong> Defines without explaining</Text>
                   </Box>
                 </Box>
-              </VStack>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-      )}
+
+                <Box bg="blue.50" p="16px" borderRadius="8px">
+                  <Text fontSize="sm" fontWeight="600" color="blue.700" mb="4px">
+                    💡 Article 19 Compliance
+                  </Text>
+                  <Text fontSize="xs" color="blue.600">
+                    All traces shown in this dashboard are automatically logged per EU AI Act Article 19
+                    requirements, providing complete audit trail for regulatory review.
+                  </Text>
+                </Box>
+              </Card>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
     </Box>
   );
 }

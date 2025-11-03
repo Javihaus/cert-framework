@@ -24,11 +24,22 @@ export interface MeasurementResult {
 }
 
 export interface EvaluationResult {
-  trace_id: string;
+  trace_id?: string;
   timestamp: string;
   query: string;
+  response?: string;
   measurement: MeasurementResult;
   passed: boolean;
+  duration_ms?: number;
+}
+
+// Pattern classification for failed traces
+export interface FailurePattern {
+  type: 'irrelevant' | 'incomplete' | 'missing_info' | 'definition_only';
+  label: string;
+  description: string;
+  color: string;
+  icon: string;
 }
 
 export interface EvaluationSummary {
