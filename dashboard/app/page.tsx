@@ -55,12 +55,64 @@ export default function Home() {
       return;
     }
 
-    if (!data.results || !Array.isArray(data.results)) {
-      alert('Invalid file: Missing or invalid "results" field. Expected an array of evaluation results.');
-      return;
+    // Handle different file formats
+    let results = data.results;
+
+    // If no results array, try to build from failed_examples and high_scoring_examples
+    if (!results || !Array.isArray(results)) {
+      const failedExamples = data.failed_examples || [];
+      const highScoringExamples = data.high_scoring_examples || [];
+
+      // Convert examples to results format
+      results = [
+        ...failedExamples.map((ex: any) => ({
+          timestamp: ex.timestamp,
+          query: ex.input,
+          response: ex.output,
+          measurement: {
+            confidence: ex.score,
+            rule: 'evaluation',
+            components_used: ['semantic', 'grounding']
+          },
+          passed: false,
+          duration_ms: 0
+        })),
+        ...highScoringExamples.map((ex: any) => ({
+          timestamp: ex.timestamp,
+          query: ex.input,
+          response: ex.output,
+          measurement: {
+            confidence: ex.score,
+            rule: 'evaluation',
+            components_used: ['semantic', 'grounding']
+          },
+          passed: true,
+          duration_ms: 0
+        }))
+      ];
+
+      // If still no results, use empty array (summary-only mode)
+      if (results.length === 0) {
+        results = [];
+      }
     }
 
-    setEvaluationData(data);
+    // Normalize summary field names for different formats
+    const normalizedSummary = {
+      total_traces: data.summary.total_traces,
+      evaluated_traces: data.summary.evaluated_traces || data.summary.total_traces,
+      passed_traces: data.summary.passed_traces || data.summary.passed,
+      failed_traces: data.summary.failed_traces || data.summary.failed,
+      accuracy: data.summary.accuracy || data.summary.pass_rate,
+      mean_confidence: data.summary.mean_confidence || data.summary.mean_score,
+      threshold_used: data.summary.threshold_used || data.threshold_analysis?.current_threshold || 0.7,
+      date_range: data.summary.date_range || {
+        start: data.temporal_analysis?.period_start || 'N/A',
+        end: data.temporal_analysis?.period_end || 'N/A'
+      }
+    };
+
+    setEvaluationData({ summary: normalizedSummary, results });
   };
 
   if (!evaluationData) {
@@ -170,64 +222,65 @@ results = evaluator.evaluate_log_file(
         </Card>
 
         {/* Results Table */}
-        <Card>
-          <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
-            Evaluation Results
-          </Text>
+        {results.length > 0 ? (
+          <Card>
+            <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="20px">
+              Evaluation Results ({results.length} examples)
+            </Text>
 
-          <Box overflowX="auto">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th
-                    borderColor="gray.200"
-                    color="secondaryGray.600"
-                    fontSize="xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                  >
-                    Timestamp
-                  </Th>
-                  <Th
-                    borderColor="gray.200"
-                    color="secondaryGray.600"
-                    fontSize="xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                  >
-                    Query
-                  </Th>
-                  <Th
-                    borderColor="gray.200"
-                    color="secondaryGray.600"
-                    fontSize="xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                  >
-                    Confidence
-                  </Th>
-                  <Th
-                    borderColor="gray.200"
-                    color="secondaryGray.600"
-                    fontSize="xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                  >
-                    Status
-                  </Th>
-                  <Th
-                    borderColor="gray.200"
-                    color="secondaryGray.600"
-                    fontSize="xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                  >
-                    Actions
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {results.map((result, idx) => (
+            <Box overflowX="auto">
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th
+                      borderColor="gray.200"
+                      color="secondaryGray.600"
+                      fontSize="xs"
+                      fontWeight="700"
+                      textTransform="uppercase"
+                    >
+                      Timestamp
+                    </Th>
+                    <Th
+                      borderColor="gray.200"
+                      color="secondaryGray.600"
+                      fontSize="xs"
+                      fontWeight="700"
+                      textTransform="uppercase"
+                    >
+                      Query
+                    </Th>
+                    <Th
+                      borderColor="gray.200"
+                      color="secondaryGray.600"
+                      fontSize="xs"
+                      fontWeight="700"
+                      textTransform="uppercase"
+                    >
+                      Confidence
+                    </Th>
+                    <Th
+                      borderColor="gray.200"
+                      color="secondaryGray.600"
+                      fontSize="xs"
+                      fontWeight="700"
+                      textTransform="uppercase"
+                    >
+                      Status
+                    </Th>
+                    <Th
+                      borderColor="gray.200"
+                      color="secondaryGray.600"
+                      fontSize="xs"
+                      fontWeight="700"
+                      textTransform="uppercase"
+                    >
+                      Actions
+                    </Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {results.map((result, idx) => (
                   <Tr key={idx}>
                     <Td borderColor="gray.200" fontSize="sm" color="secondaryGray.900">
                       {new Date(result.timestamp).toLocaleString()}
@@ -283,6 +336,19 @@ results = evaluator.evaluate_log_file(
             </Table>
           </Box>
         </Card>
+        ) : (
+          <Card>
+            <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="12px">
+              Evaluation Results
+            </Text>
+            <Text fontSize="md" color="secondaryGray.600">
+              No detailed results available. This file contains summary metrics only.
+            </Text>
+            <Text fontSize="sm" color="secondaryGray.500" mt="8px">
+              The dashboard is showing {summary.passed_traces} passed and {summary.failed_traces} failed traces based on summary data.
+            </Text>
+          </Card>
+        )}
       </Box>
 
       {/* Details Modal */}
