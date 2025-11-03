@@ -33,17 +33,24 @@ export default function DistributionChart({ results, threshold }: DistributionCh
       { min: 0.9, max: 1.0, label: '0.9-1.0' },
     ];
 
-    const maxCount = Math.max(...ranges.map(range => {
+    const maxCount = Math.max(...ranges.map((range, idx) => {
+      const isLastBucket = idx === ranges.length - 1;
       return results.filter(r =>
         r.measurement.confidence >= range.min &&
-        r.measurement.confidence < range.max
+        (isLastBucket
+          ? r.measurement.confidence <= range.max
+          : r.measurement.confidence < range.max)
       ).length;
     }), 1);
 
-    ranges.forEach(range => {
+    ranges.forEach((range, idx) => {
+      // For the last bucket, include values equal to max (e.g., 1.0)
+      const isLastBucket = idx === ranges.length - 1;
       const count = results.filter(r =>
         r.measurement.confidence >= range.min &&
-        r.measurement.confidence < range.max
+        (isLastBucket
+          ? r.measurement.confidence <= range.max
+          : r.measurement.confidence < range.max)
       ).length;
 
       let status: 'fail' | 'warn' | 'pass' = 'pass';
@@ -73,7 +80,8 @@ export default function DistributionChart({ results, threshold }: DistributionCh
         Shows how scores cluster across the threshold. Red = failed, orange = near threshold, green = passed.
       </Text>
 
-      <Box position="relative" h="280px">
+      {/* Center container at 60% width */}
+      <Box maxW="60%" mx="auto" position="relative" h="280px">
         {/* Bar Chart */}
         <Flex
           align="flex-end"
@@ -164,6 +172,7 @@ export default function DistributionChart({ results, threshold }: DistributionCh
           </Text>
         </Box>
       </Box>
+      {/* End center container */}
     </Box>
   );
 }

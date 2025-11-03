@@ -26,7 +26,7 @@ export default function Home() {
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('load');
 
   const handleEvaluationFileLoad = (data: any) => {
     console.log('Loaded data:', data);
@@ -99,6 +99,8 @@ export default function Home() {
     };
 
     setEvaluationData({ summary: normalizedSummary, results });
+    // Switch to overview tab after loading data
+    setActiveTab('overview');
   };
 
   const handleExportCSV = () => {
@@ -124,44 +126,50 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
-  if (!evaluationData) {
-    return (
-      <Box minH="100vh" bg={colors.background}>
-        <Box maxW="1200px" mx="auto" px="20px" py="30px">
-          <Box mb="32px">
-            <Text
-              fontSize="28px"
-              fontWeight="700"
-              color={colors.navy}
-              mb="8px"
-              letterSpacing="-0.5px"
-            >
-              CERT Dashboard
-            </Text>
-            <Text fontSize="15px" color={colors.text.muted}>
-              EU AI Act Compliance Monitoring
-            </Text>
-          </Box>
+  const summary = evaluationData?.summary;
+  const results = evaluationData?.results || [];
+  const isCompliant = summary ? summary.accuracy >= 0.9 : false;
 
-          <FileUpload
-            onFileLoad={handleEvaluationFileLoad}
-            accept=".json"
-            label="Upload Evaluation Results"
-          />
+  // Render active tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'load':
+        return (
+          <Box maxW="1200px" mx="auto">
+            <Box mb="32px">
+              <Text
+                fontSize="24px"
+                fontWeight="700"
+                color={colors.navy}
+                mb="8px"
+                letterSpacing="-0.5px"
+              >
+                Upload Evaluation Results
+              </Text>
+              <Text fontSize="15px" color={colors.text.muted}>
+                Load your CERT evaluation data to view compliance metrics and analysis
+              </Text>
+            </Box>
 
-          <Card mt="20px" style={{ borderColor: colors.patience }}>
-            <Text fontSize="md" fontWeight="700" color={colors.navy} mb="12px">
-              How to generate evaluation results:
-            </Text>
-            <Code
-              display="block"
-              whiteSpace="pre"
-              p="16px"
-              borderRadius="12px"
-              fontSize="sm"
-              bg={colors.patience}
-              color={colors.navy}
-            >
+            <FileUpload
+              onFileLoad={handleEvaluationFileLoad}
+              accept=".json"
+              label="Upload Evaluation Results"
+            />
+
+            <Card mt="20px" style={{ borderColor: colors.patience }}>
+              <Text fontSize="md" fontWeight="700" color={colors.navy} mb="12px">
+                How to generate evaluation results:
+              </Text>
+              <Code
+                display="block"
+                whiteSpace="pre"
+                p="16px"
+                borderRadius="12px"
+                fontSize="sm"
+                bg={colors.patience}
+                color={colors.navy}
+              >
 {`from cert.evaluation import Evaluator
 
 evaluator = Evaluator(threshold=0.7)
@@ -169,26 +177,19 @@ results = evaluator.evaluate_log_file(
     log_file="production_traces.jsonl",
     output="evaluation_results.json"
 )`}
-            </Code>
-          </Card>
-        </Box>
-      </Box>
-    );
-  }
+              </Code>
+            </Card>
+          </Box>
+        );
 
-  const { summary, results } = evaluationData;
-  const isCompliant = summary.accuracy >= 0.9;
-
-  // Render active tab content
-  const renderTabContent = () => {
-    switch (activeTab) {
       case 'overview':
+        if (!evaluationData) return null;
         return (
           <>
             <StatusBanner
               isCompliant={isCompliant}
-              accuracy={summary.accuracy}
-              failedCount={summary.failed_traces}
+              accuracy={summary!.accuracy}
+              failedCount={summary!.failed_traces}
             />
 
             {/* Metrics Grid */}
@@ -203,25 +204,25 @@ results = evaluator.evaluate_log_file(
             >
               <MetricCard
                 label="Accuracy"
-                value={`${(summary.accuracy * 100).toFixed(1)}%`}
+                value={`${(summary!.accuracy * 100).toFixed(1)}%`}
                 icon={MdAssessment}
-                color={summary.accuracy >= 0.9 ? 'green' : summary.accuracy >= 0.8 ? 'orange' : 'red'}
+                color={summary!.accuracy >= 0.9 ? 'green' : summary!.accuracy >= 0.8 ? 'orange' : 'red'}
               />
               <MetricCard
                 label="Total Traces"
-                value={summary.total_traces.toString()}
+                value={summary!.total_traces.toString()}
                 icon={MdList}
                 color="blue"
               />
               <MetricCard
                 label="Passed"
-                value={summary.passed_traces.toString()}
+                value={summary!.passed_traces.toString()}
                 icon={MdCheckCircle}
                 color="green"
               />
               <MetricCard
                 label="Failed"
-                value={summary.failed_traces.toString()}
+                value={summary!.failed_traces.toString()}
                 icon={MdCancel}
                 color="red"
               />
@@ -233,14 +234,14 @@ results = evaluator.evaluate_log_file(
                   Mean Confidence
                 </Text>
                 <Text fontSize="48px" fontWeight="700" color={colors.cobalt}>
-                  {summary.mean_confidence.toFixed(3)}
+                  {summary!.mean_confidence.toFixed(3)}
                 </Text>
                 <Text fontSize="sm" color={colors.text.muted} mt="8px">
-                  Threshold: {summary.threshold_used.toFixed(2)}
+                  Threshold: {summary!.threshold_used.toFixed(2)}
                 </Text>
                 <Text fontSize="14px" color={colors.text.muted} mt="16px" lineHeight="1.6">
-                  Mean confidence of {summary.mean_confidence.toFixed(3)} suggests {' '}
-                  {summary.mean_confidence > 0.8
+                  Mean confidence of {summary!.mean_confidence.toFixed(3)} suggests {' '}
+                  {summary!.mean_confidence > 0.8
                     ? 'strong performance with most predictions highly confident.'
                     : 'moderate performance near the boundary - small improvements will increase compliance.'}
                 </Text>
@@ -251,13 +252,13 @@ results = evaluator.evaluate_log_file(
                   Evaluation Period
                 </Text>
                 <Text fontSize="sm" color={colors.text.primary} mb="4px">
-                  <strong>Start:</strong> {summary.date_range.start}
+                  <strong>Start:</strong> {summary!.date_range.start}
                 </Text>
                 <Text fontSize="sm" color={colors.text.primary}>
-                  <strong>End:</strong> {summary.date_range.end}
+                  <strong>End:</strong> {summary!.date_range.end}
                 </Text>
                 <Text fontSize="sm" color={colors.text.muted} mt="12px">
-                  Total traces evaluated: {summary.evaluated_traces.toLocaleString()}
+                  Total traces evaluated: {summary!.evaluated_traces.toLocaleString()}
                 </Text>
               </Card>
             </Grid>
@@ -271,20 +272,22 @@ results = evaluator.evaluate_log_file(
         );
 
       case 'failed':
+        if (!evaluationData) return null;
         return results.length > 0 ? (
-          <FailedTracesView results={results} threshold={summary.threshold_used} />
+          <FailedTracesView results={results} threshold={summary!.threshold_used} />
         ) : (
           <Card style={{ borderColor: colors.patience }}>
             <Text fontSize="md" fontWeight="700" color={colors.navy} mb="8px">
               No Detailed Trace Data
             </Text>
             <Text fontSize="sm" color={colors.text.muted}>
-              This file contains summary metrics only. {summary.failed_traces} traces failed based on summary data.
+              This file contains summary metrics only. {summary!.failed_traces} traces failed based on summary data.
             </Text>
           </Card>
         );
 
       case 'distribution':
+        if (!evaluationData) return null;
         return (
           <>
             <Card style={{ borderColor: colors.patience, marginBottom: '24px' }}>
@@ -292,7 +295,7 @@ results = evaluator.evaluate_log_file(
                 Score Distribution
               </Text>
               {results.length > 0 ? (
-                <DistributionChart results={results} threshold={summary.threshold_used} />
+                <DistributionChart results={results} threshold={summary!.threshold_used} />
               ) : (
                 <Text fontSize="14px" color={colors.text.muted}>
                   No detailed trace data available for distribution analysis.
@@ -308,13 +311,13 @@ results = evaluator.evaluate_log_file(
                 <Text fontSize="14px" color={colors.text.primary} lineHeight="1.7">
                   {(() => {
                     const borderlineCount = results.filter(r =>
-                      r.measurement.confidence >= 0.5 && r.measurement.confidence < summary.threshold_used
+                      r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
                     ).length;
                     const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
 
                     return (
                       <>
-                        <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary.threshold_used.toFixed(1)} - just below or near the threshold.
+                        <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary!.threshold_used.toFixed(1)} - just below or near the threshold.
                         These represent borderline cases where small improvements could push you to 90%+ compliance.
                         Focus engineering effort here for maximum impact.
                       </>
@@ -340,23 +343,13 @@ results = evaluator.evaluate_log_file(
 
   return (
     <Box minH="100vh" bg={colors.background}>
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        hasData={!!evaluationData}
+      />
 
       <Box maxW="1600px" mx="auto" px="32px" py="32px">
-        <Button
-          onClick={() => setEvaluationData(null)}
-          mb="20px"
-          bg="white"
-          color={colors.navy}
-          border="1px solid"
-          borderColor={colors.patience}
-          fontSize="14px"
-          fontWeight="500"
-          _hover={{ bg: colors.patience }}
-        >
-          ← Load Different File
-        </Button>
-
         {renderTabContent()}
       </Box>
     </Box>

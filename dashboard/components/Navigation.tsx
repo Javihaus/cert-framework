@@ -6,14 +6,16 @@ import { colors } from '@/theme/colors';
 interface NavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  hasData: boolean;
 }
 
-export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
+export default function Navigation({ activeTab, onTabChange, hasData }: NavigationProps) {
   const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'failed', label: 'Failed Traces' },
-    { id: 'distribution', label: 'Distribution' },
-    { id: 'documentation', label: 'Documentation' },
+    { id: 'load', label: 'Load Data', enabled: true },
+    { id: 'overview', label: 'Overview', enabled: hasData },
+    { id: 'failed', label: 'Failed Traces', enabled: hasData },
+    { id: 'distribution', label: 'Distribution', enabled: hasData },
+    { id: 'documentation', label: 'Documentation', enabled: hasData },
   ];
 
   return (
@@ -51,15 +53,26 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
               py="8px"
               fontSize="14px"
               fontWeight="500"
-              color={activeTab === tab.id ? 'white' : colors.text.muted}
-              bg={activeTab === tab.id ? colors.cobalt : 'transparent'}
+              color={
+                !tab.enabled
+                  ? colors.text.muted
+                  : activeTab === tab.id
+                  ? 'white'
+                  : colors.text.secondary
+              }
+              bg={activeTab === tab.id && tab.enabled ? colors.cobalt : 'transparent'}
               borderRadius="6px"
-              cursor="pointer"
+              cursor={tab.enabled ? 'pointer' : 'not-allowed'}
+              opacity={tab.enabled ? 1 : 0.5}
               transition="all 0.2s"
               _hover={{
-                bg: activeTab === tab.id ? colors.cobalt : colors.patience,
+                bg: tab.enabled
+                  ? activeTab === tab.id
+                    ? colors.cobalt
+                    : colors.patience
+                  : 'transparent',
               }}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => tab.enabled && onTabChange(tab.id)}
             >
               {tab.label}
             </Box>
