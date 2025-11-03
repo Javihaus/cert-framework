@@ -4,31 +4,29 @@ import { useState } from 'react';
 import {
   Box,
   Button,
-  Flex,
   Grid,
   Text,
   Code,
 } from '@chakra-ui/react';
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-} from '@chakra-ui/tabs';
 import { MdCheckCircle, MdCancel, MdAssessment, MdList } from 'react-icons/md';
-import Header from '@/components/Header';
+import Navigation from '@/components/Navigation';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
+import StatusBanner from '@/components/StatusBanner';
+import QuickActions from '@/components/QuickActions';
 import FailedTracesView from '@/components/FailedTracesView';
+import DistributionChart from '@/components/DistributionChart';
+import DocumentationContent from '@/components/DocumentationContent';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
+import { colors } from '@/theme/colors';
 
 export default function Home() {
   const [evaluationData, setEvaluationData] = useState<{
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
   const handleEvaluationFileLoad = (data: any) => {
     console.log('Loaded data:', data);
@@ -103,19 +101,56 @@ export default function Home() {
     setEvaluationData({ summary: normalizedSummary, results });
   };
 
+  const handleExportCSV = () => {
+    if (!evaluationData) return;
+
+    const { results } = evaluationData;
+    const headers = ['Timestamp', 'Query', 'Response', 'Confidence', 'Passed'];
+    const rows = results.map(r => [
+      r.timestamp,
+      `"${r.query.replace(/"/g, '""')}"`,
+      `"${(r.response || '').replace(/"/g, '""')}"`,
+      r.measurement.confidence.toFixed(3),
+      r.passed ? 'Yes' : 'No',
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `evaluation_results_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (!evaluationData) {
     return (
-      <Box minH="100vh" bg="secondaryGray.300">
-        <Header />
+      <Box minH="100vh" bg={colors.background}>
         <Box maxW="1200px" mx="auto" px="20px" py="30px">
+          <Box mb="32px">
+            <Text
+              fontSize="28px"
+              fontWeight="700"
+              color={colors.navy}
+              mb="8px"
+              letterSpacing="-0.5px"
+            >
+              CERT Dashboard
+            </Text>
+            <Text fontSize="15px" color={colors.text.muted}>
+              EU AI Act Compliance Monitoring
+            </Text>
+          </Box>
+
           <FileUpload
             onFileLoad={handleEvaluationFileLoad}
             accept=".json"
             label="Upload Evaluation Results"
           />
 
-          <Card mt="20px">
-            <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="12px">
+          <Card mt="20px" style={{ borderColor: colors.patience }}>
+            <Text fontSize="md" fontWeight="700" color={colors.navy} mb="12px">
               How to generate evaluation results:
             </Text>
             <Code
@@ -124,8 +159,8 @@ export default function Home() {
               p="16px"
               borderRadius="12px"
               fontSize="sm"
-              bg="secondaryGray.400"
-              color="navy.900"
+              bg={colors.patience}
+              color={colors.navy}
             >
 {`from cert.evaluation import Evaluator
 
@@ -144,255 +179,185 @@ results = evaluator.evaluate_log_file(
   const { summary, results } = evaluationData;
   const isCompliant = summary.accuracy >= 0.9;
 
-  return (
-    <Box minH="100vh" bg="secondaryGray.300">
-      <Header />
+  // Render active tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <>
+            <StatusBanner
+              isCompliant={isCompliant}
+              accuracy={summary.accuracy}
+              failedCount={summary.failed_traces}
+            />
 
-      <Box maxW="1600px" mx="auto" px="20px" py="30px">
+            {/* Metrics Grid */}
+            <Grid
+              templateColumns={{
+                base: '1fr',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(4, 1fr)',
+              }}
+              gap="20px"
+              mb="20px"
+            >
+              <MetricCard
+                label="Accuracy"
+                value={`${(summary.accuracy * 100).toFixed(1)}%`}
+                icon={MdAssessment}
+                color={summary.accuracy >= 0.9 ? 'green' : summary.accuracy >= 0.8 ? 'orange' : 'red'}
+              />
+              <MetricCard
+                label="Total Traces"
+                value={summary.total_traces.toString()}
+                icon={MdList}
+                color="blue"
+              />
+              <MetricCard
+                label="Passed"
+                value={summary.passed_traces.toString()}
+                icon={MdCheckCircle}
+                color="green"
+              />
+              <MetricCard
+                label="Failed"
+                value={summary.failed_traces.toString()}
+                icon={MdCancel}
+                color="red"
+              />
+            </Grid>
+
+            <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="20px" mb="20px">
+              <Card style={{ borderColor: colors.patience }}>
+                <Text fontSize="md" fontWeight="700" color={colors.text.muted} mb="4px">
+                  Mean Confidence
+                </Text>
+                <Text fontSize="48px" fontWeight="700" color={colors.cobalt}>
+                  {summary.mean_confidence.toFixed(3)}
+                </Text>
+                <Text fontSize="sm" color={colors.text.muted} mt="8px">
+                  Threshold: {summary.threshold_used.toFixed(2)}
+                </Text>
+                <Text fontSize="14px" color={colors.text.muted} mt="16px" lineHeight="1.6">
+                  Mean confidence of {summary.mean_confidence.toFixed(3)} suggests {' '}
+                  {summary.mean_confidence > 0.8
+                    ? 'strong performance with most predictions highly confident.'
+                    : 'moderate performance near the boundary - small improvements will increase compliance.'}
+                </Text>
+              </Card>
+
+              <Card style={{ borderColor: colors.patience }}>
+                <Text fontSize="md" fontWeight="700" color={colors.text.muted} mb="12px">
+                  Evaluation Period
+                </Text>
+                <Text fontSize="sm" color={colors.text.primary} mb="4px">
+                  <strong>Start:</strong> {summary.date_range.start}
+                </Text>
+                <Text fontSize="sm" color={colors.text.primary}>
+                  <strong>End:</strong> {summary.date_range.end}
+                </Text>
+                <Text fontSize="sm" color={colors.text.muted} mt="12px">
+                  Total traces evaluated: {summary.evaluated_traces.toLocaleString()}
+                </Text>
+              </Card>
+            </Grid>
+
+            <QuickActions
+              onViewFailed={() => setActiveTab('failed')}
+              onViewDistribution={() => setActiveTab('distribution')}
+              onExport={handleExportCSV}
+            />
+          </>
+        );
+
+      case 'failed':
+        return results.length > 0 ? (
+          <FailedTracesView results={results} threshold={summary.threshold_used} />
+        ) : (
+          <Card style={{ borderColor: colors.patience }}>
+            <Text fontSize="md" fontWeight="700" color={colors.navy} mb="8px">
+              No Detailed Trace Data
+            </Text>
+            <Text fontSize="sm" color={colors.text.muted}>
+              This file contains summary metrics only. {summary.failed_traces} traces failed based on summary data.
+            </Text>
+          </Card>
+        );
+
+      case 'distribution':
+        return (
+          <>
+            <Card style={{ borderColor: colors.patience, marginBottom: '24px' }}>
+              <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
+                Score Distribution
+              </Text>
+              {results.length > 0 ? (
+                <DistributionChart results={results} threshold={summary.threshold_used} />
+              ) : (
+                <Text fontSize="14px" color={colors.text.muted}>
+                  No detailed trace data available for distribution analysis.
+                </Text>
+              )}
+            </Card>
+
+            {results.length > 0 && (
+              <Card style={{ borderColor: colors.warning, background: '#FEF3C7' }}>
+                <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="8px">
+                  Critical Finding
+                </Text>
+                <Text fontSize="14px" color={colors.text.primary} lineHeight="1.7">
+                  {(() => {
+                    const borderlineCount = results.filter(r =>
+                      r.measurement.confidence >= 0.5 && r.measurement.confidence < summary.threshold_used
+                    ).length;
+                    const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
+
+                    return (
+                      <>
+                        <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary.threshold_used.toFixed(1)} - just below or near the threshold.
+                        These represent borderline cases where small improvements could push you to 90%+ compliance.
+                        Focus engineering effort here for maximum impact.
+                      </>
+                    );
+                  })()}
+                </Text>
+              </Card>
+            )}
+          </>
+        );
+
+      case 'documentation':
+        return (
+          <Card style={{ borderColor: colors.patience }}>
+            <DocumentationContent />
+          </Card>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Box minH="100vh" bg={colors.background}>
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      <Box maxW="1600px" mx="auto" px="32px" py="32px">
         <Button
           onClick={() => setEvaluationData(null)}
           mb="20px"
           bg="white"
-          color="secondaryGray.900"
-          _hover={{ bg: 'secondaryGray.100' }}
+          color={colors.navy}
+          border="1px solid"
+          borderColor={colors.patience}
+          fontSize="14px"
+          fontWeight="500"
+          _hover={{ bg: colors.patience }}
         >
           ← Load Different File
         </Button>
 
-        {/* Status Banner */}
-        <Box
-          bg={isCompliant ? 'green.500' : 'orange.400'}
-          color="white"
-          p="20px"
-          borderRadius="12px"
-          mb="24px"
-        >
-          <Flex justify="space-between" align="center">
-            <Box>
-              <Text fontSize="18px" fontWeight="600" mb="4px">
-                {isCompliant ? '✅ Compliant' : '⚠️ Below Compliance Threshold'}
-              </Text>
-              <Text fontSize="14px">
-                Accuracy at {(summary.accuracy * 100).toFixed(1)}% (target: 90%)
-                {!isCompliant && ` - Review ${summary.failed_traces} failed traces.`}
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
-
-        {/* Metrics Grid */}
-        <Grid
-          templateColumns={{
-            base: '1fr',
-            md: 'repeat(2, 1fr)',
-            lg: 'repeat(4, 1fr)',
-          }}
-          gap="20px"
-          mb="20px"
-        >
-          <MetricCard
-            label="Accuracy"
-            value={`${(summary.accuracy * 100).toFixed(1)}%`}
-            icon={MdAssessment}
-            color={summary.accuracy >= 0.9 ? 'green' : summary.accuracy >= 0.8 ? 'orange' : 'red'}
-          />
-          <MetricCard
-            label="Total Traces"
-            value={summary.total_traces.toString()}
-            icon={MdList}
-            color="blue"
-          />
-          <MetricCard
-            label="Passed"
-            value={summary.passed_traces.toString()}
-            icon={MdCheckCircle}
-            color="green"
-          />
-          <MetricCard
-            label="Failed"
-            value={summary.failed_traces.toString()}
-            icon={MdCancel}
-            color="red"
-          />
-        </Grid>
-
-        {/* Tabs */}
-        <Tabs colorScheme="brand" variant="enclosed">
-          <TabList bg="white" borderRadius="12px 12px 0 0">
-            <Tab>Overview</Tab>
-            <Tab>Failed Traces ({summary.failed_traces})</Tab>
-            <Tab>Distribution</Tab>
-            <Tab>Documentation</Tab>
-          </TabList>
-
-          <TabPanels bg="white" borderRadius="0 0 12px 12px" p="20px">
-            {/* Overview Tab */}
-            <TabPanel>
-              <Grid
-                templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
-                gap="20px"
-              >
-                <Card>
-                  <Text fontSize="md" fontWeight="700" color="secondaryGray.600" mb="4px">
-                    Mean Confidence
-                  </Text>
-                  <Text fontSize="48px" fontWeight="700" color="brand.500">
-                    {summary.mean_confidence.toFixed(3)}
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.600" mt="8px">
-                    Threshold: {summary.threshold_used.toFixed(2)}
-                  </Text>
-                </Card>
-
-                <Card>
-                  <Text fontSize="md" fontWeight="700" color="secondaryGray.600" mb="12px">
-                    Evaluation Period
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700" mb="4px">
-                    <strong>Start:</strong> {summary.date_range.start}
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700">
-                    <strong>End:</strong> {summary.date_range.end}
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.600" mt="12px">
-                    Total traces evaluated: {summary.evaluated_traces.toLocaleString()}
-                  </Text>
-                </Card>
-
-                <Card gridColumn={{ base: '1', lg: 'span 2' }}>
-                  <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="12px">
-                    Compliance Status
-                  </Text>
-                  <Box
-                    bg={isCompliant ? 'green.50' : 'orange.50'}
-                    border="2px solid"
-                    borderColor={isCompliant ? 'green.200' : 'orange.200'}
-                    p="16px"
-                    borderRadius="8px"
-                  >
-                    <Text fontSize="lg" fontWeight="600" color={isCompliant ? 'green.700' : 'orange.700'}>
-                      {isCompliant
-                        ? '✅ System meets EU AI Act Article 15 requirements'
-                        : '⚠️ Action Required: System below 90% accuracy threshold'
-                      }
-                    </Text>
-                    {!isCompliant && (
-                      <Text fontSize="sm" color="orange.600" mt="8px">
-                        Review failed traces and consider adjusting threshold or improving system accuracy.
-                      </Text>
-                    )}
-                  </Box>
-                </Card>
-              </Grid>
-            </TabPanel>
-
-            {/* Failed Traces Tab */}
-            <TabPanel>
-              {results.length > 0 ? (
-                <FailedTracesView results={results} threshold={summary.threshold_used} />
-              ) : (
-                <Card>
-                  <Text fontSize="md" fontWeight="700" color="secondaryGray.900" mb="8px">
-                    No Detailed Trace Data
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.600">
-                    This file contains summary metrics only. {summary.failed_traces} traces failed based on summary data.
-                  </Text>
-                </Card>
-              )}
-            </TabPanel>
-
-            {/* Distribution Tab */}
-            <TabPanel>
-              <Card>
-                <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="12px">
-                  Score Distribution
-                </Text>
-                <Text fontSize="sm" color="secondaryGray.600">
-                  Distribution visualization coming soon...
-                </Text>
-                <Box mt="20px" p="20px" bg="gray.50" borderRadius="8px">
-                  <Text fontSize="xs" color="gray.500">
-                    This tab will show:
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" mt="4px">
-                    • Histogram of confidence scores
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    • Threshold line visualization
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    • Pass/fail distribution
-                  </Text>
-                </Box>
-              </Card>
-            </TabPanel>
-
-            {/* Documentation Tab */}
-            <TabPanel>
-              <Card>
-                <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="16px">
-                  Understanding CERT Metrics
-                </Text>
-
-                <Box mb="20px">
-                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
-                    Accuracy
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700">
-                    The percentage of traces that passed the confidence threshold. EU AI Act Article 15
-                    requires "appropriate levels of accuracy" - typically 90% or higher for high-risk systems.
-                  </Text>
-                </Box>
-
-                <Box mb="20px">
-                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
-                    Confidence Score
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700">
-                    A value between 0.0 and 1.0 measuring the reliability of an AI output. Scores are
-                    computed using semantic similarity and term grounding components.
-                  </Text>
-                </Box>
-
-                <Box mb="20px">
-                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
-                    Threshold
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700">
-                    The minimum confidence score required for a trace to pass. Default is 0.70, but can
-                    be calibrated based on your domain (financial: 0.46, healthcare: 0.50, legal: 0.48).
-                  </Text>
-                </Box>
-
-                <Box mb="20px">
-                  <Text fontSize="md" fontWeight="600" color="secondaryGray.900" mb="8px">
-                    Failure Patterns
-                  </Text>
-                  <Text fontSize="sm" color="secondaryGray.700" mb="4px">
-                    Failed traces are automatically classified into patterns:
-                  </Text>
-                  <Box pl="12px" mt="8px">
-                    <Text fontSize="sm" color="red.600">• <strong>Irrelevant:</strong> Completely off-topic responses</Text>
-                    <Text fontSize="sm" color="orange.600">• <strong>Incomplete:</strong> Vague or missing details</Text>
-                    <Text fontSize="sm" color="yellow.600">• <strong>Missing Info:</strong> No specific data provided</Text>
-                    <Text fontSize="sm" color="blue.600">• <strong>Definition Only:</strong> Defines without explaining</Text>
-                  </Box>
-                </Box>
-
-                <Box bg="blue.50" p="16px" borderRadius="8px">
-                  <Text fontSize="sm" fontWeight="600" color="blue.700" mb="4px">
-                    💡 Article 19 Compliance
-                  </Text>
-                  <Text fontSize="xs" color="blue.600">
-                    All traces shown in this dashboard are automatically logged per EU AI Act Article 19
-                    requirements, providing complete audit trail for regulatory review.
-                  </Text>
-                </Box>
-              </Card>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        {renderTabContent()}
       </Box>
     </Box>
   );

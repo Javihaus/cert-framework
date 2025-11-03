@@ -28,6 +28,7 @@ import {
 import Card from './Card';
 import { EvaluationResult } from '@/types/cert';
 import { classifyFailure, PATTERNS } from '@/utils/patternClassifier';
+import { colors } from '@/theme/colors';
 
 interface FailedTracesViewProps {
   results: EvaluationResult[];
@@ -129,9 +130,12 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
   return (
     <VStack gap="20px" align="stretch">
       {/* Pattern Cards */}
-      <Card>
-        <Text fontSize="lg" fontWeight="700" color="secondaryGray.900" mb="16px">
+      <Card style={{ borderColor: colors.patience }}>
+        <Text fontSize="lg" fontWeight="700" color={colors.navy} mb="16px">
           Failure Pattern Classification
+        </Text>
+        <Text fontSize="14px" color={colors.text.muted} mb="16px">
+          {failedResults.length} failed traces grouped by failure type. Click a pattern to filter results.
         </Text>
         <Flex gap="12px" flexWrap="wrap">
           {Object.entries(PATTERNS).map(([key, pattern]) => {
@@ -187,9 +191,9 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
       </Card>
 
       {/* Export Buttons & Table */}
-      <Card>
+      <Card style={{ borderColor: colors.patience }}>
         <Flex justify="space-between" align="center" mb="20px">
-          <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
+          <Text fontSize="lg" fontWeight="700" color={colors.navy}>
             {filterPattern
               ? `${PATTERNS[filterPattern].label} Traces (${filteredResults.length})`
               : `Failed Traces (${failedResults.length})`
@@ -201,8 +205,10 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
               onClick={handleExportCSV}
               bg="white"
               border="1px solid"
-              borderColor="gray.200"
-              _hover={{ bg: 'gray.50' }}
+              borderColor={colors.patience}
+              color={colors.navy}
+              fontSize="14px"
+              _hover={{ bg: colors.background }}
             >
               <MdFileDownload style={{ marginRight: '8px' }} />
               Export CSV
@@ -212,8 +218,10 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
               onClick={handleExportJSON}
               bg="white"
               border="1px solid"
-              borderColor="gray.200"
-              _hover={{ bg: 'gray.50' }}
+              borderColor={colors.patience}
+              color={colors.navy}
+              fontSize="14px"
+              _hover={{ bg: colors.background }}
             >
               <MdFileDownload style={{ marginRight: '8px' }} />
               Export JSON
@@ -222,7 +230,7 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
         </Flex>
 
         {filteredResults.length === 0 ? (
-          <Text color="secondaryGray.600" textAlign="center" py="40px">
+          <Text color={colors.text.muted} textAlign="center" py="40px">
             No traces match the selected filter
           </Text>
         ) : (
