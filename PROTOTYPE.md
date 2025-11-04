@@ -1,4 +1,5 @@
 <div align="center">
+<img src="docs/CERT_LOGO_NEW_1.png" alt="Logo" width="20%" />
 
 # CERT Framework
 
@@ -200,8 +201,7 @@ Together they provide robust accuracy measurement validated on SQuAD v2.
 
 <div align="center">
 
-<img src="docs/dashboard-metrics.png" alt="Metrics View" width="45%" />
-<img src="docs/dashboard-traces.png" alt="Failed Traces" width="45%" />
+<img src="docs/dashboard-metrics.png" alt="Metrics View" width="95%" />
 
 **Interactive visualization • Real-time compliance status • Failed trace analysis**
 
