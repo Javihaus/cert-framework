@@ -154,9 +154,7 @@ def check_logging_compliance(traces: List[Dict]) -> Tuple[bool, List[str]]:
     missing_fields = [field for field in required_log_fields if field not in sample_trace]
 
     if missing_fields:
-        issues.append(
-            f"Logs missing required Article 19 fields: {', '.join(missing_fields)}"
-        )
+        issues.append(f"Logs missing required Article 19 fields: {', '.join(missing_fields)}")
 
     # Check if logging is recent (within last 30 days)
     if "timestamp" in sample_trace:
@@ -168,9 +166,7 @@ def check_logging_compliance(traces: List[Dict]) -> Tuple[bool, List[str]]:
             days_old = (datetime.now(latest_date.tzinfo) - latest_date).days
 
             if days_old > 30:
-                issues.append(
-                    f"Logging appears stale: latest trace is {days_old} days old"
-                )
+                issues.append(f"Logging appears stale: latest trace is {days_old} days old")
         except Exception:
             issues.append("Could not parse timestamps - verify logging is active")
 
@@ -261,13 +257,9 @@ def audit_status(trace_file, metadata, output, fail_on_issues):
     annex_iv_complete, annex_iv_missing, annex_iv_data = check_annex_iv_compliance(metadata)
 
     if annex_iv_complete:
-        click.echo(
-            f"✓ Annex IV: COMPLETE ({annex_iv_data['completion_percentage']:.0f}%)"
-        )
+        click.echo(f"✓ Annex IV: COMPLETE ({annex_iv_data['completion_percentage']:.0f}%)")
     else:
-        click.echo(
-            f"✗ Annex IV: INCOMPLETE ({annex_iv_data['completion_percentage']:.0f}%)"
-        )
+        click.echo(f"✗ Annex IV: INCOMPLETE ({annex_iv_data['completion_percentage']:.0f}%)")
 
     if annex_iv_missing:
         click.echo("  Missing sections:")
@@ -292,7 +284,9 @@ def audit_status(trace_file, metadata, output, fail_on_issues):
 
     # Create audit result
     audit_result = {
-        "timestamp": click.DateTime.utcnow().isoformat() if hasattr(click.DateTime, 'utcnow') else "",
+        "timestamp": click.DateTime.utcnow().isoformat()
+        if hasattr(click.DateTime, "utcnow")
+        else "",
         "overall_compliant": all_compliant,
         "total_issues": total_issues,
         "article_15": {

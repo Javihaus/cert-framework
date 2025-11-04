@@ -73,9 +73,7 @@ def generate_annex_iv_data(system_metadata: Dict) -> Dict:
             "data": {
                 "model_type": system_metadata.get("architecture", {}).get("model_type", ""),
                 "model_version": system_metadata.get("architecture", {}).get("model_version", ""),
-                "infrastructure": system_metadata.get("architecture", {}).get(
-                    "infrastructure", ""
-                ),
+                "infrastructure": system_metadata.get("architecture", {}).get("infrastructure", ""),
                 "integration": system_metadata.get("architecture", {}).get("integration", ""),
             },
         },
@@ -89,9 +87,7 @@ def generate_annex_iv_data(system_metadata: Dict) -> Dict:
                 "validation_data": system_metadata.get("data_governance", {}).get(
                     "validation_data", ""
                 ),
-                "data_quality": system_metadata.get("data_governance", {}).get(
-                    "data_quality", ""
-                ),
+                "data_quality": system_metadata.get("data_governance", {}).get("data_quality", ""),
                 "bias_mitigation": system_metadata.get("data_governance", {}).get(
                     "bias_mitigation", ""
                 ),
@@ -183,7 +179,9 @@ def generate_docs(
     total_sections = len(annex_iv_data)
     completion_pct = (completed_sections / total_sections) * 100
 
-    click.echo(f"✓ Annex IV: {completed_sections}/{total_sections} sections completed ({completion_pct:.0f}%)")
+    click.echo(
+        f"✓ Annex IV: {completed_sections}/{total_sections} sections completed ({completion_pct:.0f}%)"
+    )
 
     # Create output data structure
     output_data = {

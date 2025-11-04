@@ -168,7 +168,9 @@ def classify_system(output, non_interactive):
         return 0  # Still return 0 for successful execution
     elif risk_level["level"] == "limited":
         click.echo()
-        click.echo("⚠️  Your system has limited risk characteristics. Consider voluntary compliance.")
+        click.echo(
+            "⚠️  Your system has limited risk characteristics. Consider voluntary compliance."
+        )
         return 0
     else:
         click.echo()
