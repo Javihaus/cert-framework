@@ -2,37 +2,11 @@
 CERT Framework Observability
 =============================
 
-Observability and metrics export modules for monitoring CERT Framework.
+Observability modules for monitoring CERT Framework.
 
-Available Modules:
-- prometheus: Prometheus metrics exporter for accuracy monitoring
-
-Usage:
-    >>> from cert.observability.prometheus import export_metrics_from_audit_log
-    >>> from cert.observability.prometheus import start_metrics_server
-    >>>
-    >>> # Export metrics from audit log
-    >>> export_metrics_from_audit_log("data/audit.jsonl")
-    >>>
-    >>> # Start metrics server
-    >>> start_metrics_server(port=8000)
-
-Note: Prometheus integration requires prometheus_client:
-    pip install prometheus-client
+Note: Prometheus integration was removed as premature complexity.
+For production monitoring, use the database layer with Supabase.
+See database/README.md for setup instructions.
 """
 
-from cert.observability.prometheus import (
-    create_grafana_dashboard_json,
-    export_metrics_continuously,
-    export_metrics_from_audit_log,
-    get_metrics_text,
-    start_metrics_server,
-)
-
-__all__ = [
-    "export_metrics_from_audit_log",
-    "start_metrics_server",
-    "get_metrics_text",
-    "export_metrics_continuously",
-    "create_grafana_dashboard_json",
-]
+__all__ = []
