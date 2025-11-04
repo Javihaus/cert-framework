@@ -136,6 +136,7 @@ def create_context_wrapper(trace_id: str):
         >>> with create_context_wrapper(trace_id) as wrapper:
         >>>     result = wrapper(lambda: client.chat.completions.create(...))
     """
+
     class LLMWrapper:
         def __init__(self, trace_id: str):
             self.trace_id = trace_id
