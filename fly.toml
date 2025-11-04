@@ -2,7 +2,7 @@
 # Documentation: https://fly.io/docs/reference/configuration/
 
 app = "cert-report-api"
-primary_region = "iad"  # Washington D.C. - change to your preferred region
+primary_region = "iad"  # Washington D.C.
 
 [build]
   dockerfile = "Dockerfile.api"
@@ -34,9 +34,3 @@ primary_region = "iad"  # Washington D.C. - change to your preferred region
   memory = '512mb'   # Enough for PDF generation
   cpu_kind = 'shared'
   cpus = 1
-
-# Uncomment to set up regions for global deployment
-# [[regions]]
-#   name = "iad"  # Washington D.C.
-# [[regions]]
-#   name = "fra"  # Frankfurt
