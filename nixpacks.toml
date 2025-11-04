@@ -1,5 +1,0 @@
-[phases.setup]
-nixPkgs = ["python310", "cairo", "pango", "gdk-pixbuf", "libffi"]
-
-[phases.install]
-cmds = ["pip install -r requirements.txt"]

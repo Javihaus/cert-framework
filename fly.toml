@@ -1,0 +1,42 @@
+# Fly.io configuration for CERT Report API
+# Documentation: https://fly.io/docs/reference/configuration/
+
+app = "cert-report-api"
+primary_region = "iad"  # Washington D.C. - change to your preferred region
+
+[build]
+  dockerfile = "Dockerfile.api"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"    # Stop when idle (free tier)
+  auto_start_machines = true     # Auto-start on request
+  min_machines_running = 0       # Scale to zero when idle
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = '512mb'   # Enough for PDF generation
+  cpu_kind = 'shared'
+  cpus = 1
+
+# Uncomment to set up regions for global deployment
+# [[regions]]
+#   name = "iad"  # Washington D.C.
+# [[regions]]
+#   name = "fra"  # Frankfurt
