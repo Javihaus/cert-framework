@@ -234,7 +234,7 @@ export default function ReportView({ summary, results }: ReportViewProps) {
           borderRadius="8px"
           _hover={{ bg: colors.navy }}
           onClick={handleDownloadReport}
-          isDisabled={loading}
+          disabled={loading}
         >
           {loading ? (
             'Generating Report...'
