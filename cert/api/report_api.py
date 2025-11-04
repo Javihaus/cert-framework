@@ -788,6 +788,7 @@ async def health_check():
 
 if __name__ == "__main__":
     import os
+
     import uvicorn
 
     port = int(os.environ.get("PORT", 8000))
