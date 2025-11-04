@@ -4,7 +4,6 @@ Helps determine if your AI system is high-risk.
 """
 
 import json
-import os
 from pathlib import Path
 
 import click
@@ -13,7 +12,7 @@ import click
 def load_risk_questions():
     """Load risk questions from JSON file."""
     questions_path = Path(__file__).parent / "risk_questions.json"
-    with open(questions_path, "r") as f:
+    with open(questions_path) as f:
         return json.load(f)
 
 

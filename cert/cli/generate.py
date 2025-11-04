@@ -11,8 +11,7 @@ working code in the dashboard.
 import json
 import sys
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import click
 
@@ -20,7 +19,7 @@ import click
 def load_traces(trace_file: str) -> List[Dict]:
     """Load traces from JSONL file."""
     traces = []
-    with open(trace_file, "r") as f:
+    with open(trace_file) as f:
         for line in f:
             if line.strip():
                 traces.append(json.loads(line))
@@ -165,7 +164,7 @@ def generate_docs(
 
     if metadata:
         try:
-            with open(metadata, "r") as f:
+            with open(metadata) as f:
                 additional_metadata = json.load(f)
                 system_metadata.update(additional_metadata)
             click.echo(f"✓ Loaded additional metadata from {metadata}")

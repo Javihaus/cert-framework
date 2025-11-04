@@ -14,7 +14,7 @@ import click
 def load_traces(trace_file: str) -> List[Dict]:
     """Load traces from JSONL file."""
     traces = []
-    with open(trace_file, "r") as f:
+    with open(trace_file) as f:
         for line in f:
             if line.strip():
                 traces.append(json.loads(line))
@@ -109,7 +109,7 @@ def check_annex_iv_compliance(metadata_file: str = None) -> Tuple[bool, List[str
 
     # Load metadata
     try:
-        with open(metadata_file, "r") as f:
+        with open(metadata_file) as f:
             metadata = json.load(f)
     except Exception as e:
         return False, [f"Error loading metadata: {e}"], {}
@@ -160,7 +160,7 @@ def check_logging_compliance(traces: List[Dict]) -> Tuple[bool, List[str]]:
 
     # Check if logging is recent (within last 30 days)
     if "timestamp" in sample_trace:
-        from datetime import datetime, timedelta
+        from datetime import datetime
 
         try:
             latest_timestamp = max(t.get("timestamp", "") for t in traces)
@@ -270,7 +270,7 @@ def audit_status(trace_file, metadata, output, fail_on_issues):
         )
 
     if annex_iv_missing:
-        click.echo(f"  Missing sections:")
+        click.echo("  Missing sections:")
         for section in annex_iv_missing:
             click.echo(f"  • {section}")
     click.echo()
