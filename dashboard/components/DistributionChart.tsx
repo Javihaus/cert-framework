@@ -76,20 +76,19 @@ export default function DistributionChart({ results, threshold }: DistributionCh
 
   return (
     <Box>
-      <Text fontSize="14px" color={colors.text.muted} mb="20px">
+      <Text fontSize="14px" color={colors.text.muted} mb="24px">
         Shows how scores cluster across the threshold. Red = failed, orange = near threshold, green = passed.
       </Text>
 
-      {/* Center container at 60% width */}
-      <Box maxW="60%" mx="auto" position="relative" h="280px">
+      <Box position="relative" h="340px" pb="60px">
         {/* Bar Chart */}
         <Flex
           align="flex-end"
-          h="240px"
-          gap="8px"
-          px="20px"
+          h="260px"
+          gap="6px"
           borderBottom="2px solid"
           borderColor={colors.navy}
+          position="relative"
         >
           {buckets.map((bucket, idx) => (
             <Flex
@@ -105,10 +104,11 @@ export default function DistributionChart({ results, threshold }: DistributionCh
               <Box
                 bg={getBarColor(bucket.status)}
                 w="100%"
-                h={`${bucket.percentage}%`}
+                h={bucket.count > 0 ? `${bucket.percentage}%` : '0%'}
+                minH={bucket.count > 0 ? '4px' : '0px'}
                 borderRadius="4px 4px 0 0"
                 transition="all 0.3s"
-                _hover={{ opacity: 0.8 }}
+                _hover={{ opacity: 0.85 }}
                 cursor="pointer"
                 position="relative"
               >
@@ -116,11 +116,11 @@ export default function DistributionChart({ results, threshold }: DistributionCh
                 {bucket.count > 0 && (
                   <Text
                     position="absolute"
-                    top="-24px"
+                    top="-22px"
                     left="50%"
                     transform="translateX(-50%)"
-                    fontSize="12px"
-                    fontWeight="600"
+                    fontSize="13px"
+                    fontWeight="700"
                     color={colors.navy}
                     whiteSpace="nowrap"
                   >
@@ -128,51 +128,68 @@ export default function DistributionChart({ results, threshold }: DistributionCh
                   </Text>
                 )}
               </Box>
+            </Flex>
+          ))}
 
-              {/* Label below */}
+          {/* Threshold line */}
+          <Box
+            position="absolute"
+            left={`${(7 / 10) * 100}%`}
+            bottom="0"
+            w="2px"
+            h="260px"
+            borderLeft="2px dashed"
+            borderColor={colors.navy}
+            opacity="0.6"
+            pointerEvents="none"
+          >
+            <Box
+              position="absolute"
+              top="50%"
+              left="8px"
+              transform="translateY(-50%)"
+              bg={colors.background}
+              px="8px"
+              py="4px"
+              borderRadius="4px"
+              border="1px solid"
+              borderColor={colors.navy}
+            >
               <Text
-                position="absolute"
-                bottom="-28px"
                 fontSize="11px"
-                color={colors.text.muted}
+                fontWeight="700"
+                color={colors.navy}
                 whiteSpace="nowrap"
+              >
+                Threshold: {threshold.toFixed(2)}
+              </Text>
+            </Box>
+          </Box>
+        </Flex>
+
+        {/* X-axis labels */}
+        <Flex mt="12px" gap="6px">
+          {buckets.map((bucket, idx) => (
+            <Box
+              key={idx}
+              flex="1"
+              textAlign="center"
+            >
+              <Text
+                fontSize="10px"
+                color={colors.text.muted}
+                fontWeight="500"
                 transform="rotate(-45deg)"
-                transformOrigin="top left"
-                ml="8px"
+                transformOrigin="center"
+                whiteSpace="nowrap"
+                mt="20px"
               >
                 {bucket.label}
               </Text>
-            </Flex>
+            </Box>
           ))}
         </Flex>
-
-        {/* Threshold line */}
-        <Box
-          position="absolute"
-          left={`${(7 / 10) * 100}%`}
-          bottom="40px"
-          w="2px"
-          h="240px"
-          borderLeft="2px dashed"
-          borderColor={colors.navy}
-          opacity="0.5"
-        >
-          <Text
-            position="absolute"
-            bottom="210px"
-            left="-60px"
-            fontSize="12px"
-            fontWeight="600"
-            color={colors.navy}
-            transform="rotate(-90deg)"
-            transformOrigin="center"
-            whiteSpace="nowrap"
-          >
-            Threshold: {threshold.toFixed(2)} →
-          </Text>
-        </Box>
       </Box>
-      {/* End center container */}
     </Box>
   );
 }

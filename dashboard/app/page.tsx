@@ -292,7 +292,7 @@ results = evaluator.evaluate_log_file(
       case 'distribution':
         if (!evaluationData) return null;
         return (
-          <>
+          <Box maxW="900px" mx="auto">
             <Card style={{ borderColor: colors.patience, marginBottom: '24px' }}>
               <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
                 Score Distribution
@@ -329,7 +329,7 @@ results = evaluator.evaluate_log_file(
                 </Text>
               </Card>
             )}
-          </>
+          </Box>
         );
 
       case 'documentation':
