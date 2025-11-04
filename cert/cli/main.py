@@ -120,5 +120,19 @@ def version():
     click.echo(f"CERT Framework v{__version__}")
 
 
+# Register new compliance commands
+try:
+    from cert.cli.classify import classify_system
+    from cert.cli.generate import generate_docs
+    from cert.cli.audit import audit_status
+
+    cli.add_command(classify_system)
+    cli.add_command(generate_docs)
+    cli.add_command(audit_status)
+except ImportError as e:
+    # Commands will not be available if dependencies missing
+    pass
+
+
 if __name__ == "__main__":
     cli()

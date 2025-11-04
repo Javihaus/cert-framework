@@ -119,7 +119,7 @@ Documentation = "https://github.com/Javihaus/cert-framework#readme"
 "Source Code" = "https://github.com/Javihaus/cert-framework"
 
 [project.scripts]
-cert = "cert.cli.main:main"
+cert = "cert.cli.main:cli"
 
 [tool.setuptools]
 packages = ["cert"]

@@ -1,0 +1,152 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Does your system identify or categorize natural persons based on biometric data?",
+      "category": "biometric",
+      "annex_reference": "Annex III(1)",
+      "examples": [
+        "Facial recognition for access control",
+        "Voice identification",
+        "Fingerprint authentication"
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Is your system used for critical infrastructure management (transport, water, gas, electricity, health)?",
+      "category": "critical_infrastructure",
+      "annex_reference": "Annex III(2)",
+      "examples": [
+        "Traffic management systems",
+        "Power grid optimization",
+        "Hospital patient monitoring"
+      ]
+    },
+    {
+      "id": 3,
+      "text": "Is your system used in educational or vocational training for determining access or evaluation?",
+      "category": "education",
+      "annex_reference": "Annex III(3)",
+      "examples": [
+        "Student admission systems",
+        "Automated exam grading",
+        "Learning outcome assessment"
+      ]
+    },
+    {
+      "id": 4,
+      "text": "Does your system evaluate or rank workers, affect terms of employment, or manage workforce allocation?",
+      "category": "employment",
+      "annex_reference": "Annex III(4)",
+      "examples": [
+        "Recruitment screening tools",
+        "Performance evaluation systems",
+        "Task assignment algorithms"
+      ]
+    },
+    {
+      "id": 5,
+      "text": "Is your system used to determine access to essential services or public assistance benefits?",
+      "category": "essential_services",
+      "annex_reference": "Annex III(5)",
+      "examples": [
+        "Credit scoring for loans",
+        "Social benefit eligibility",
+        "Emergency services dispatch"
+      ]
+    },
+    {
+      "id": 6,
+      "text": "Does your system evaluate creditworthiness or affect credit scores?",
+      "category": "creditworthiness",
+      "annex_reference": "Annex III(5b)",
+      "examples": [
+        "Credit card approval systems",
+        "Loan risk assessment",
+        "Insurance premium calculation"
+      ]
+    },
+    {
+      "id": 7,
+      "text": "Is your system used by law enforcement for risk assessment, polygraph analysis, or crime prediction?",
+      "category": "law_enforcement",
+      "annex_reference": "Annex III(6)",
+      "examples": [
+        "Recidivism prediction",
+        "Crime hotspot analysis",
+        "Lie detection systems"
+      ]
+    },
+    {
+      "id": 8,
+      "text": "Does your system assist in migration, asylum, or border control decisions?",
+      "category": "migration",
+      "annex_reference": "Annex III(7)",
+      "examples": [
+        "Visa application screening",
+        "Asylum claim assessment",
+        "Border crossing risk analysis"
+      ]
+    },
+    {
+      "id": 9,
+      "text": "Is your system used in the administration of justice or democratic processes?",
+      "category": "justice",
+      "annex_reference": "Annex III(8)",
+      "examples": [
+        "Legal case outcome prediction",
+        "Judicial sentencing assistance",
+        "Voter eligibility verification"
+      ]
+    },
+    {
+      "id": 10,
+      "text": "Does your system use emotion recognition or biometric categorization of natural persons?",
+      "category": "emotion_recognition",
+      "annex_reference": "Annex III(1a)",
+      "examples": [
+        "Emotion detection in interviews",
+        "Mood analysis from voice",
+        "Sentiment assessment from facial expressions"
+      ]
+    }
+  ],
+  "risk_levels": {
+    "no_answers": {
+      "level": "minimal",
+      "title": "Minimal Risk System",
+      "description": "Your system does not appear to fall under Annex III high-risk categories.",
+      "requirements": [
+        "General transparency obligations (Article 52)",
+        "Basic documentation of system capabilities"
+      ],
+      "color": "green"
+    },
+    "1_to_2_answers": {
+      "level": "limited",
+      "title": "Limited Risk System",
+      "description": "Your system has some high-risk characteristics but limited scope.",
+      "requirements": [
+        "Enhanced transparency obligations",
+        "User notification requirements",
+        "Consider voluntary compliance with Article 15"
+      ],
+      "color": "yellow"
+    },
+    "3_or_more_answers": {
+      "level": "high",
+      "title": "High-Risk AI System (Annex III)",
+      "description": "Your system is classified as high-risk under EU AI Act Annex III.",
+      "requirements": [
+        "Full Article 15 compliance (accuracy, robustness, cybersecurity)",
+        "Complete Annex IV technical documentation",
+        "Article 19 logging and traceability",
+        "Risk management system (Article 9)",
+        "Data governance (Article 10)",
+        "Human oversight (Article 14)",
+        "Conformity assessment before market placement"
+      ],
+      "color": "red"
+    }
+  }
+}
