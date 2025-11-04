@@ -21,6 +21,7 @@ Usage:
 """
 
 from typing import Any, Callable, Dict, Optional
+
 from cert.core.api import get_tracer
 
 

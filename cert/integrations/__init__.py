@@ -21,7 +21,7 @@ The generic adapter works with any LLM provider:
 - Any custom LLM implementation
 """
 
-from cert.integrations.generic_adapter import wrap_llm_call, create_context_wrapper
+from cert.integrations.generic_adapter import create_context_wrapper, wrap_llm_call
 
 __all__ = [
     "wrap_llm_call",
