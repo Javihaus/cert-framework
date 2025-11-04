@@ -2,71 +2,28 @@
 CERT Framework Integrations
 ============================
 
-Integration modules for popular LLM frameworks and SDKs.
-
-Available Integrations:
-- langchain: LangChain chains and agents
-- llamaindex: LlamaIndex query engines and agents
-- anthropic: Anthropic SDK clients
-- openai: OpenAI SDK clients
+Generic integration module for any LLM framework or SDK.
 
 Usage:
-    >>> from cert.integrations.langchain import wrap_langchain_chain
-    >>> from cert.integrations.llamaindex import wrap_llamaindex_engine
-    >>> from cert.integrations.anthropic import wrap_anthropic_client
-    >>> from cert.integrations.openai import wrap_openai_client
+    >>> from cert.integrations import wrap_llm_call, create_context_wrapper
+    >>> from cert import start_trace, end_trace
+    >>>
+    >>> # Wrap any LLM call
+    >>> trace_id = start_trace(query="What is the capital of France?")
+    >>> result = wrap_llm_call(trace_id, lambda: client.chat.completions.create(...))
+    >>> end_trace(trace_id)
 
-Note: These integrations require the respective framework to be installed:
-    pip install langchain
-    pip install llama-index
-    pip install anthropic
-    pip install openai
+The generic adapter works with any LLM provider:
+- OpenAI
+- Anthropic
+- LangChain
+- LlamaIndex
+- Any custom LLM implementation
 """
 
-# LangChain
-# Anthropic
-from cert.integrations.anthropic import (
-    create_monitored_anthropic_stream,
-    wrap_anthropic_client,
-    wrap_anthropic_completion,
-)
-from cert.integrations.langchain import (
-    create_monitored_callback,
-    wrap_langchain_agent,
-    wrap_langchain_chain,
-)
-
-# LlamaIndex
-from cert.integrations.llamaindex import (
-    wrap_llamaindex_agent,
-    wrap_llamaindex_chat_engine,
-    wrap_llamaindex_engine,
-)
-
-# OpenAI
-from cert.integrations.openai import (
-    create_monitored_openai_stream,
-    wrap_openai_assistants,
-    wrap_openai_client,
-    wrap_openai_completion,
-)
+from cert.integrations.generic_adapter import wrap_llm_call, create_context_wrapper
 
 __all__ = [
-    # LangChain
-    "wrap_langchain_chain",
-    "wrap_langchain_agent",
-    "create_monitored_callback",
-    # LlamaIndex
-    "wrap_llamaindex_engine",
-    "wrap_llamaindex_agent",
-    "wrap_llamaindex_chat_engine",
-    # Anthropic
-    "wrap_anthropic_client",
-    "wrap_anthropic_completion",
-    "create_monitored_anthropic_stream",
-    # OpenAI
-    "wrap_openai_client",
-    "wrap_openai_completion",
-    "create_monitored_openai_stream",
-    "wrap_openai_assistants",
+    "wrap_llm_call",
+    "create_context_wrapper",
 ]
