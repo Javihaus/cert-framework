@@ -36,8 +36,11 @@ export async function POST(request: NextRequest) {
       <CERTReportPDF summary={summary} results={results} metadata={metadata} />
     );
 
+    // Convert Buffer to Uint8Array for NextResponse
+    const uint8Array = new Uint8Array(pdfBuffer);
+
     // Return PDF with proper headers
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(uint8Array, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
