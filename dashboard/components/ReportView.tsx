@@ -62,7 +62,7 @@ export default function ReportView({ summary, results }: ReportViewProps) {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error generating report:', error);
-      alert('Failed to generate report. Please ensure the Python backend is running.');
+      alert('Failed to generate report. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -1,31 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { renderToBuffer } from '@react-pdf/renderer';
+import { CERTReportPDF } from '@/components/CERTReportPDF';
+import { EvaluationSummary, EvaluationResult } from '@/types/cert';
+
+interface ReportMetadata {
+  title: string;
+  organization?: string;
+  evaluator?: string;
+  notes?: string;
+  generated_date: string;
+}
+
+interface GenerateReportRequest {
+  summary: EvaluationSummary;
+  results: EvaluationResult[];
+  metadata: ReportMetadata;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body: GenerateReportRequest = await request.json();
+    const { summary, results, metadata } = body;
 
-    // Forward request to Python backend
-    const pythonBackendUrl = process.env.PYTHON_BACKEND_URL || 'http://localhost:8000';
-
-    const response = await fetch(`${pythonBackendUrl}/api/generate-report`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Python backend error:', errorText);
+    // Validate required fields
+    if (!summary || !results || !metadata) {
       return NextResponse.json(
-        { error: 'Failed to generate report from Python backend' },
-        { status: response.status }
+        { error: 'Missing required fields: summary, results, or metadata' },
+        { status: 400 }
       );
     }
 
-    // Get the PDF blob from Python backend
-    const pdfBuffer = await response.arrayBuffer();
+    // Generate PDF using @react-pdf/renderer
+    const pdfBuffer = await renderToBuffer(
+      <CERTReportPDF summary={summary} results={results} metadata={metadata} />
+    );
 
     // Return PDF with proper headers
     return new NextResponse(pdfBuffer, {
@@ -36,9 +44,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in generate-report API route:', error);
+    console.error('Error generating PDF report:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Failed to generate PDF report',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }
