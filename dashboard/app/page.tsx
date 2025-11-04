@@ -136,9 +136,9 @@ export default function Home() {
       case 'load':
         return (
           <Box maxW="1200px" mx="auto">
-            <Box mb="32px">
+            <Box mb="40px" textAlign="center">
               <Text
-                fontSize="24px"
+                fontSize="28px"
                 fontWeight="700"
                 color={colors.navy}
                 mb="8px"
@@ -157,19 +157,21 @@ export default function Home() {
               label="Upload Evaluation Results"
             />
 
-            <Card mt="20px" style={{ borderColor: colors.patience }}>
-              <Text fontSize="md" fontWeight="700" color={colors.navy} mb="12px">
-                How to generate evaluation results:
-              </Text>
-              <Code
-                display="block"
-                whiteSpace="pre"
-                p="16px"
-                borderRadius="12px"
-                fontSize="sm"
-                bg={colors.patience}
-                color={colors.navy}
-              >
+            <Box maxW="60%" mx="auto" mt="32px">
+              <Card style={{ borderColor: colors.patience, background: 'white' }}>
+                <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="16px">
+                  How to generate evaluation results:
+                </Text>
+                <Code
+                  display="block"
+                  whiteSpace="pre"
+                  p="20px"
+                  borderRadius="12px"
+                  fontSize="14px"
+                  bg={colors.patience}
+                  color={colors.navy}
+                  lineHeight="1.6"
+                >
 {`from cert.evaluation import Evaluator
 
 evaluator = Evaluator(threshold=0.7)
@@ -177,8 +179,9 @@ results = evaluator.evaluate_log_file(
     log_file="production_traces.jsonl",
     output="evaluation_results.json"
 )`}
-              </Code>
-            </Card>
+                </Code>
+              </Card>
+            </Box>
           </Box>
         );
 

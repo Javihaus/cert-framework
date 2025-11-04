@@ -35,14 +35,23 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
         h="64px"
         align="center"
       >
-        <Text
-          fontSize="20px"
-          fontWeight="700"
-          color={colors.cobalt}
-          letterSpacing="-0.5px"
-        >
-          CERT Dashboard
-        </Text>
+        <Flex align="center" gap="12px">
+          <Box h="40px" display="flex" alignItems="center">
+            <img
+              src="/cert-logo.png"
+              alt="CERT Logo"
+              style={{ height: '40px', width: 'auto' }}
+            />
+          </Box>
+          <Text
+            fontSize="20px"
+            fontWeight="700"
+            color={colors.cobalt}
+            letterSpacing="-0.5px"
+          >
+            CERT Dashboard
+          </Text>
+        </Flex>
 
         <Flex ml="48px" gap="4px">
           {tabs.map((tab) => (

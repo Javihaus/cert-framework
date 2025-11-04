@@ -9,7 +9,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { MdUpload, MdCheckCircle } from 'react-icons/md';
-import Card from './Card';
+import { colors } from '@/theme/colors';
 
 interface FileUploadProps {
   onFileLoad: (data: any) => void;
@@ -48,24 +48,29 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
   };
 
   return (
-    <Card>
-      <VStack gap="20px" align="stretch">
-        <Text fontSize="lg" fontWeight="700" color="secondaryGray.900">
-          {label}
-        </Text>
-
+    <Box
+      maxW="800px"
+      mx="auto"
+      bg="white"
+      p="32px"
+      borderRadius="12px"
+      border="1px solid"
+      borderColor={colors.patience}
+    >
+      <VStack gap="24px" align="stretch">
         <Box
           border="2px dashed"
-          borderColor={isDragging ? 'brand.500' : 'secondaryGray.400'}
-          borderRadius="16px"
-          p="40px"
+          borderColor={isDragging ? colors.cobalt : colors.patience}
+          borderRadius="12px"
+          p="60px"
           textAlign="center"
-          bg={isDragging ? 'brand.50' : 'transparent'}
+          bg={isDragging ? colors.background : 'white'}
           transition="all 0.2s"
           display="flex"
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
+          minH="280px"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -80,23 +85,22 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         >
           <Icon
             as={fileName ? MdCheckCircle : MdUpload}
-            w="40px"
-            h="40px"
-            color={fileName ? 'green.500' : 'brand.500'}
-            mb="12px"
-            mx="auto"
+            w="48px"
+            h="48px"
+            color={fileName ? colors.success : colors.navy}
+            mb="20px"
           />
 
           {fileName ? (
-            <Text fontSize="md" fontWeight="500" color="green.500">
+            <Text fontSize="md" fontWeight="600" color={colors.success}>
               ✓ {fileName}
             </Text>
           ) : (
             <>
-              <Text fontSize="md" fontWeight="500" color="secondaryGray.900" mb="8px">
+              <Text fontSize="16px" fontWeight="500" color={colors.navy} mb="8px">
                 Drop your file here or click to browse
               </Text>
-              <Text fontSize="sm" color="secondaryGray.600">
+              <Text fontSize="14px" color={colors.text.muted} mb="20px">
                 Supported formats: .json, .jsonl
               </Text>
             </>
@@ -113,12 +117,19 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
             id="file-upload"
           />
 
-          <label htmlFor="file-upload" style={{ display: 'inline-block', marginTop: '16px', cursor: 'pointer' }}>
+          <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
             <Button
               as="span"
-              bg="brand.500"
+              bg={colors.navy}
               color="white"
-              _hover={{ bg: 'brand.600' }}
+              px="32px"
+              py="12px"
+              h="auto"
+              fontSize="15px"
+              fontWeight="500"
+              borderRadius="8px"
+              _hover={{ bg: colors.cobalt }}
+              transition="all 0.2s"
             >
               Choose File
             </Button>
@@ -126,11 +137,11 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         </Box>
 
         {error && (
-          <Text fontSize="sm" color="red.500">
+          <Text fontSize="sm" color={colors.error} textAlign="center">
             {error}
           </Text>
         )}
       </VStack>
-    </Card>
+    </Box>
   );
 }
