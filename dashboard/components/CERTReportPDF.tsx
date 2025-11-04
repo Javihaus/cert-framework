@@ -294,7 +294,7 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
             • Medium Confidence (0.7-0.9): {results.filter((r) => r.measurement.confidence >= 0.7 && r.measurement.confidence < 0.9).length} traces
           </Text>
           <Text style={styles.bulletPoint}>
-            • Low Confidence (<0.7): {results.filter((r) => r.measurement.confidence < 0.7).length} traces
+            • Low Confidence (&lt; 0.7): {results.filter((r) => r.measurement.confidence < 0.7).length} traces
           </Text>
         </View>
 
