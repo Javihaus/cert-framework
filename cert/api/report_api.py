@@ -4,11 +4,7 @@ FastAPI backend for CERT Dashboard report generation.
 This service handles PDF report generation requests from the Next.js dashboard.
 """
 
-import io
-import json
-import tempfile
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -105,9 +101,7 @@ def generate_html_report(
     # Classification of failed traces
     failed_results = [r for r in results if not r.passed]
     borderline_results = [
-        r
-        for r in results
-        if 0.5 <= r.measurement.confidence < summary.threshold_used
+        r for r in results if 0.5 <= r.measurement.confidence < summary.threshold_used
     ]
 
     # Score distribution
@@ -218,7 +212,7 @@ def generate_html_report(
             margin: 30px 0;
             text-align: center;
             page-break-inside: avoid;
-            background: {'linear-gradient(135deg, #48bb78 0%, #38a169 100%)' if is_compliant else 'linear-gradient(135deg, #E48B59 0%, #dd6b20 100%)'};
+            background: {"linear-gradient(135deg, #48bb78 0%, #38a169 100%)" if is_compliant else "linear-gradient(135deg, #E48B59 0%, #dd6b20 100%)"};
             color: white;
         }}
 
@@ -381,15 +375,15 @@ def generate_html_report(
     <div class="metadata-box">
         <div class="metadata-row">
             <span class="metadata-label">Organization:</span>
-            <span class="metadata-value">{metadata.organization or 'N/A'}</span>
+            <span class="metadata-value">{metadata.organization or "N/A"}</span>
         </div>
         <div class="metadata-row">
             <span class="metadata-label">Evaluator:</span>
-            <span class="metadata-value">{metadata.evaluator or 'N/A'}</span>
+            <span class="metadata-value">{metadata.evaluator or "N/A"}</span>
         </div>
         <div class="metadata-row">
             <span class="metadata-label">Report Generated:</span>
-            <span class="metadata-value">{datetime.fromisoformat(metadata.generated_date.replace('Z', '+00:00')).strftime('%B %d, %Y at %I:%M %p UTC')}</span>
+            <span class="metadata-value">{datetime.fromisoformat(metadata.generated_date.replace("Z", "+00:00")).strftime("%B %d, %Y at %I:%M %p UTC")}</span>
         </div>
         <div class="metadata-row">
             <span class="metadata-label">Evaluation Period:</span>
@@ -401,16 +395,16 @@ def generate_html_report(
         </div>
     </div>
 
-    {f'<div class="metadata-box"><p><strong>Notes:</strong> {metadata.notes}</p></div>' if metadata.notes else ''}
+    {f'<div class="metadata-box"><p><strong>Notes:</strong> {metadata.notes}</p></div>' if metadata.notes else ""}
 
     <!-- Compliance Status Banner -->
     <div class="status-banner">
-        <div class="status-icon">{'✓' if is_compliant else '⚠'}</div>
+        <div class="status-icon">{"✓" if is_compliant else "⚠"}</div>
         <div class="status-title">
-            {'COMPLIANT' if is_compliant else 'NON-COMPLIANT'}
+            {"COMPLIANT" if is_compliant else "NON-COMPLIANT"}
         </div>
         <div class="status-message">
-            {f'System achieves {summary.accuracy * 100:.1f}% accuracy, meeting the 90% compliance threshold.' if is_compliant else f'System achieves {summary.accuracy * 100:.1f}% accuracy. Below the 90% threshold. Action required.'}
+            {f"System achieves {summary.accuracy * 100:.1f}% accuracy, meeting the 90% compliance threshold." if is_compliant else f"System achieves {summary.accuracy * 100:.1f}% accuracy. Below the 90% threshold. Action required."}
         </div>
     </div>
 
@@ -420,7 +414,7 @@ def generate_html_report(
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-label">Accuracy</div>
-            <div class="metric-value" style="color: {'#48bb78' if summary.accuracy >= 0.9 else '#E48B59' if summary.accuracy >= 0.8 else '#fc8181'};">
+            <div class="metric-value" style="color: {"#48bb78" if summary.accuracy >= 0.9 else "#E48B59" if summary.accuracy >= 0.8 else "#fc8181"};">
                 {summary.accuracy * 100:.1f}%
             </div>
             <div class="metric-threshold">Threshold: 90%</div>
@@ -448,7 +442,7 @@ def generate_html_report(
     <h2>Mean Confidence Score</h2>
     <p>The average confidence score across all evaluations is <strong style="color: #3C6098;">{summary.mean_confidence:.3f}</strong> (threshold: {summary.threshold_used:.2f}).</p>
 
-    <p>{'This indicates strong performance with most predictions highly confident.' if summary.mean_confidence > 0.8 else 'This suggests moderate performance near the boundary. Small improvements will significantly increase compliance.'}</p>
+    <p>{"This indicates strong performance with most predictions highly confident." if summary.mean_confidence > 0.8 else "This suggests moderate performance near the boundary. Small improvements will significantly increase compliance."}</p>
 
     <!-- Detailed Evaluation Metrics -->
     <div class="page-break"></div>
@@ -468,15 +462,15 @@ def generate_html_report(
         <tr>
             <td>Accuracy Rate</td>
             <td>{summary.accuracy * 100:.2f}%</td>
-            <td class="{'compliant' if summary.accuracy >= 0.9 else 'non-compliant'}">
-                {'✓ Meets Threshold' if summary.accuracy >= 0.9 else '✗ Below Threshold'}
+            <td class="{"compliant" if summary.accuracy >= 0.9 else "non-compliant"}">
+                {"✓ Meets Threshold" if summary.accuracy >= 0.9 else "✗ Below Threshold"}
             </td>
         </tr>
         <tr>
             <td>Mean Confidence</td>
             <td>{summary.mean_confidence:.3f}</td>
-            <td class="{'compliant' if summary.mean_confidence > summary.threshold_used else 'warning'}">
-                {'✓ Above Threshold' if summary.mean_confidence > summary.threshold_used else '⚠ Near Threshold'}
+            <td class="{"compliant" if summary.mean_confidence > summary.threshold_used else "warning"}">
+                {"✓ Above Threshold" if summary.mean_confidence > summary.threshold_used else "⚠ Near Threshold"}
             </td>
         </tr>
         <tr>
@@ -487,8 +481,8 @@ def generate_html_report(
         <tr>
             <td>Failed Traces</td>
             <td>{summary.failed_traces:,}</td>
-            <td class="{'compliant' if summary.failed_traces == 0 else 'warning'}">
-                {'✓ No Failures' if summary.failed_traces == 0 else 'Requires Review'}
+            <td class="{"compliant" if summary.failed_traces == 0 else "warning"}">
+                {"✓ No Failures" if summary.failed_traces == 0 else "Requires Review"}
             </td>
         </tr>
     </table>
@@ -508,7 +502,7 @@ def generate_html_report(
         {generate_distribution_rows(distribution)}
     </table>
 
-    {generate_borderline_analysis(borderline_results, results, summary.threshold_used) if borderline_results else ''}
+    {generate_borderline_analysis(borderline_results, results, summary.threshold_used) if borderline_results else ""}
 
     <!-- Failed Trace Analysis -->
     {generate_failed_trace_section(failed_results, summary) if failed_results else '<div class="info-box"><p><strong>✓ No Failed Traces:</strong> All evaluated traces passed the compliance threshold.</p></div>'}
@@ -552,9 +546,7 @@ def generate_html_report(
 </html>"""
 
 
-def compute_score_distribution(
-    results: List[EvaluationResult], threshold: float
-) -> Dict[str, Any]:
+def compute_score_distribution(results: List[EvaluationResult], threshold: float) -> Dict[str, Any]:
     """Compute score distribution across buckets."""
     ranges = [
         {"min": 0.0, "max": 0.1, "label": "0.0-0.1"},
@@ -611,19 +603,23 @@ def generate_distribution_rows(distribution: Dict[str, Any]) -> str:
         status_class = (
             "non-compliant"
             if bucket["status"] == "fail"
-            else "warning" if bucket["status"] == "warn" else "compliant"
+            else "warning"
+            if bucket["status"] == "warn"
+            else "compliant"
         )
         status_label = (
             "Failed"
             if bucket["status"] == "fail"
-            else "Borderline" if bucket["status"] == "warn" else "Passed"
+            else "Borderline"
+            if bucket["status"] == "warn"
+            else "Passed"
         )
 
         rows.append(
             f"""<tr>
-            <td>{bucket['label']}</td>
-            <td>{bucket['count']}</td>
-            <td>{bucket['percentage']:.1f}%</td>
+            <td>{bucket["label"]}</td>
+            <td>{bucket["count"]}</td>
+            <td>{bucket["percentage"]:.1f}%</td>
             <td class="{status_class}">{status_label}</td>
         </tr>"""
         )
@@ -678,9 +674,7 @@ def generate_failed_trace_rows(failed_results: List[EvaluationResult]) -> str:
     """Generate HTML table rows for failed traces."""
     rows = []
     for result in failed_results:
-        query_preview = (
-            result.query[:80] + "..." if len(result.query) > 80 else result.query
-        )
+        query_preview = result.query[:80] + "..." if len(result.query) > 80 else result.query
         rows.append(
             f"""<tr>
             <td>{query_preview}</td>
@@ -750,14 +744,16 @@ def generate_recommendations(
         priority_color = (
             "#fc8181"
             if rec["priority"] == "HIGH"
-            else "#E48B59" if rec["priority"] == "MEDIUM" else "#3C6098"
+            else "#E48B59"
+            if rec["priority"] == "MEDIUM"
+            else "#3C6098"
         )
         html += f"""
         <div class="recommendation-box" style="border-color: {priority_color};">
             <div class="recommendation-title" style="color: {priority_color};">
-                {rec['priority']} PRIORITY: {rec['title']}
+                {rec["priority"]} PRIORITY: {rec["title"]}
             </div>
-            <p>{rec['description']}</p>
+            <p>{rec["description"]}</p>
         </div>
         """
 
@@ -768,11 +764,6 @@ def generate_recommendations(
 async def generate_report(request: ReportRequest):
     """Generate PDF report from evaluation data."""
     try:
-        # Convert Pydantic models to regular dicts/objects for easier handling
-        summary_dict = request.summary.model_dump()
-        results_list = [r.model_dump() for r in request.results]
-        metadata_dict = request.metadata.model_dump()
-
         # Generate PDF
         pdf_bytes = generate_pdf_report(request.summary, request.results, request.metadata)
 
