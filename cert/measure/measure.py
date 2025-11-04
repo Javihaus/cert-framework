@@ -48,12 +48,12 @@ def measure(text1: str, text2: str) -> float:
     Note:
         For batch processing or advanced options, use measure_batch().
     """
-    # Input validation
-    if not text1 or not text2:
-        raise ValueError("Both text1 and text2 must be non-empty strings")
-
+    # Input validation - check types first
     if not isinstance(text1, str) or not isinstance(text2, str):
         raise TypeError(f"Expected strings, got {type(text1)} and {type(text2)}")
+
+    if not text1 or not text2:
+        raise ValueError("Both text1 and text2 must be non-empty strings")
 
     # Import here to avoid loading ML models unless actually used
     from cert.measure.embeddings import get_embedding_engine
@@ -90,6 +90,10 @@ def measure_detailed(text1: str, text2: str) -> MeasurementResult:
         >>> if not result.is_accurate(threshold=0.6):
         ...     print("Low confidence - check grounding score")
     """
+    # Input validation - check types first
+    if not isinstance(text1, str) or not isinstance(text2, str):
+        raise TypeError(f"Expected strings, got {type(text1)} and {type(text2)}")
+
     if not text1 or not text2:
         raise ValueError("Both texts must be non-empty")
 
