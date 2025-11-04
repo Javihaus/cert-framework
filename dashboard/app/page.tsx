@@ -18,6 +18,7 @@ import QuickActions from '@/components/QuickActions';
 import FailedTracesView from '@/components/FailedTracesView';
 import DistributionChart from '@/components/DistributionChart';
 import DocumentationContent from '@/components/DocumentationContent';
+import ReportView from '@/components/ReportView';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors } from '@/theme/colors';
 
@@ -331,6 +332,10 @@ results = evaluator.evaluate_log_file(
             )}
           </Box>
         );
+
+      case 'report':
+        if (!evaluationData) return null;
+        return <ReportView summary={summary!} results={results} />;
 
       case 'documentation':
         return (

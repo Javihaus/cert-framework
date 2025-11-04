@@ -15,6 +15,7 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
     { id: 'overview', label: 'Overview', enabled: hasData },
     { id: 'failed', label: 'Failed Traces', enabled: hasData },
     { id: 'distribution', label: 'Distribution', enabled: hasData },
+    { id: 'report', label: 'Report', enabled: hasData },
     { id: 'documentation', label: 'Documentation', enabled: hasData },
   ];
 
