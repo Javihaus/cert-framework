@@ -1,3 +1,4 @@
+import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { CERTReportPDF } from '@/components/CERTReportPDF';
@@ -31,8 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate PDF using @react-pdf/renderer
+    // Use React.createElement instead of JSX for TypeScript compatibility
     const pdfBuffer = await renderToBuffer(
-      <CERTReportPDF summary={summary} results={results} metadata={metadata} />
+      React.createElement(CERTReportPDF, { summary, results, metadata })
     );
 
     // Return PDF with proper headers
