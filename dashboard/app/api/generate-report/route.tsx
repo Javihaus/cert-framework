@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate PDF using @react-pdf/renderer
-    // Call component as function since we're in .ts file (not .tsx)
-    const pdfElement = CERTReportPDF({ summary, results, metadata });
-    const pdfBuffer = await renderToBuffer(pdfElement);
+    const pdfBuffer = await renderToBuffer(
+      <CERTReportPDF summary={summary} results={results} metadata={metadata} />
+    );
 
     // Return PDF with proper headers
     return new NextResponse(pdfBuffer, {
