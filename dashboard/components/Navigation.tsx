@@ -69,12 +69,12 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
             />
           </Box>
           <Text
-            fontSize="20px"
+            fontSize="24px"
             fontWeight="700"
             color={colors.cobalt}
             letterSpacing="-0.5px"
           >
-            CERT Dashboard
+            CERT
           </Text>
         </Flex>
 

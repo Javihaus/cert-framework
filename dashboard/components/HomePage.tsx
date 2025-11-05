@@ -1,48 +1,53 @@
 'use client';
 
 import { Box, Text, Grid, Flex } from '@chakra-ui/react';
+import { MdCheckCircle, MdInsertDriveFile, MdBarChart, MdSecurity, MdSpeed, MdVerifiedUser } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 import Card from '@/components/Card';
 
 export default function HomePage() {
   return (
-    <Box maxW="1200px" mx="auto" p="32px">
-      {/* Header */}
-      <Box mb="40px">
+    <Box maxW="1200px" mx="auto" p="48px">
+      {/* Hero Section */}
+      <Box mb="72px" textAlign="center">
         <Text
-          fontSize="36px"
+          fontSize="56px"
           fontWeight="700"
           color={colors.navy}
-          mb="12px"
-          letterSpacing="-1px"
+          mb="24px"
+          letterSpacing="-2px"
+          lineHeight="1.1"
         >
-          CERT Framework
+          AI systems you can deploy with confidence
         </Text>
-        <Text fontSize="18px" color={colors.text.secondary} lineHeight="1.6">
-          Compliance Evaluation and Reporting Toolkit for EU AI Act
+        <Text fontSize="24px" color={colors.text.secondary} lineHeight="1.6" maxW="800px" mx="auto">
+          Built for the August 2025 EU AI Act deadline. Trace analysis that proves 90%+ accuracy. Documentation ready for conformity assessment.
         </Text>
       </Box>
 
       {/* Overview Card */}
-      <Card style={{ borderColor: colors.patience, marginBottom: '32px' }}>
-        <Text fontSize="20px" fontWeight="700" color={colors.navy} mb="16px">
+      <Card style={{ borderColor: colors.patience, marginBottom: '48px' }}>
+        <Text fontSize="28px" fontWeight="700" color={colors.navy} mb="20px">
           What CERT Does
         </Text>
-        <Text fontSize="15px" lineHeight="1.7" color={colors.text.primary} mb="16px">
+        <Text fontSize="18px" lineHeight="1.7" color={colors.text.primary} mb="24px">
           CERT combines production LLM monitoring with EU AI Act compliance automation.
           Track accuracy, analyze failures, and generate audit-ready documentation automatically.
         </Text>
         <Box
           bg={colors.patience}
-          p="16px"
-          borderRadius="8px"
+          p="24px"
+          borderRadius="12px"
           borderLeft="4px solid"
           borderLeftColor={colors.cobalt}
         >
-          <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
-            🎯 Built for Compliance Consultants
-          </Text>
-          <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+          <Flex align="center" gap="12px" mb="12px">
+            <MdVerifiedUser size={28} color={colors.cobalt} />
+            <Text fontSize="18px" fontWeight="600" color={colors.navy}>
+              Built for Compliance Consultants
+            </Text>
+          </Flex>
+          <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
             Turn weeks of manual documentation into hours. CERT analyzes your traces,
             classifies risk, and generates professional Word documents ready for expert review.
           </Text>
@@ -50,68 +55,66 @@ export default function HomePage() {
       </Card>
 
       {/* Features Grid */}
-      <Grid templateColumns="repeat(2, 1fr)" gap="24px" mb="32px">
+      <Grid templateColumns="repeat(2, 1fr)" gap="32px" mb="48px">
         {/* Monitoring */}
-        <Card style={{ borderColor: colors.patience }}>
-          <Flex align="start" gap="12px" mb="12px">
+        <Card style={{ borderColor: colors.patience, padding: '32px' }}>
+          <Flex align="start" gap="16px" mb="16px">
             <Box
-              w="40px"
-              h="40px"
+              w="56px"
+              h="56px"
               bg={colors.cobalt}
-              borderRadius="8px"
+              borderRadius="12px"
               display="flex"
               alignItems="center"
               justifyContent="center"
               color="white"
-              fontSize="20px"
             >
-              📊
+              <MdBarChart size={32} />
             </Box>
             <Box flex="1">
-              <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="8px">
+              <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="12px">
                 Production Monitoring
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Upload LLM traces to analyze accuracy, identify failures, and track
                 performance metrics required by Article 15 (accuracy, robustness).
               </Text>
             </Box>
           </Flex>
-          <Box mt="16px" pt="16px" borderTop="1px solid" borderColor={colors.patience}>
-            <Text fontSize="13px" color={colors.text.secondary}>
+          <Box mt="20px" pt="20px" borderTop="1px solid" borderColor={colors.patience}>
+            <Text fontSize="15px" color={colors.text.secondary}>
               → Use <strong>Monitoring</strong> tab to load trace data
             </Text>
           </Box>
         </Card>
 
         {/* Document Generation */}
-        <Card style={{ borderColor: colors.patience }}>
-          <Flex align="start" gap="12px" mb="12px">
+        <Card style={{ borderColor: colors.patience, padding: '32px' }}>
+          <Flex align="start" gap="16px" mb="16px">
             <Box
-              w="40px"
-              h="40px"
+              w="56px"
+              h="56px"
               bg={colors.coral}
-              borderRadius="8px"
+              borderRadius="12px"
               display="flex"
               alignItems="center"
               justifyContent="center"
               color="white"
-              fontSize="20px"
             >
-              📄
+              <MdInsertDriveFile size={32} />
             </Box>
             <Box flex="1">
-              <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="8px">
+              <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="12px">
                 Compliance Documents
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Generate 5 professional Word documents for EU AI Act compliance:
                 Risk Classification, Annex IV Technical Documentation, and more.
               </Text>
             </Box>
           </Flex>
-          <Box mt="16px" pt="16px" borderTop="1px solid" borderColor={colors.patience}>
-            <Text fontSize="13px" color={colors.text.secondary}>
+          <Box mt="20px" pt="20px" borderTop="1px solid" borderColor={colors.patience}>
+            <Text fontSize="15px" color={colors.text.secondary}>
               → Use <strong>Document Generation</strong> tab to create package
             </Text>
           </Box>
@@ -119,33 +122,33 @@ export default function HomePage() {
       </Grid>
 
       {/* Workflow Card */}
-      <Card style={{ borderColor: colors.cobalt, backgroundColor: '#f8fafc' }}>
-        <Text fontSize="20px" fontWeight="700" color={colors.navy} mb="20px">
+      <Card style={{ borderColor: colors.cobalt, backgroundColor: '#f8fafc', padding: '40px' }}>
+        <Text fontSize="32px" fontWeight="700" color={colors.navy} mb="32px">
           Typical Workflow
         </Text>
 
-        <Flex direction="column" gap="16px">
+        <Flex direction="column" gap="24px">
           {/* Step 1 */}
-          <Flex align="start" gap="16px">
+          <Flex align="start" gap="20px">
             <Box
-              minW="32px"
-              h="32px"
+              minW="44px"
+              h="44px"
               bg={colors.cobalt}
               color="white"
               borderRadius="full"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              fontSize="16px"
+              fontSize="20px"
               fontWeight="700"
             >
               1
             </Box>
             <Box>
-              <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="4px">
+              <Text fontSize="20px" fontWeight="600" color={colors.navy} mb="8px">
                 Load Production Traces
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Upload JSON file with LLM traces from your production system (via OpenTelemetry,
                 LangSmith, or custom logging). CERT analyzes accuracy and failure patterns.
               </Text>
@@ -153,26 +156,26 @@ export default function HomePage() {
           </Flex>
 
           {/* Step 2 */}
-          <Flex align="start" gap="16px">
+          <Flex align="start" gap="20px">
             <Box
-              minW="32px"
-              h="32px"
+              minW="44px"
+              h="44px"
               bg={colors.cobalt}
               color="white"
               borderRadius="full"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              fontSize="16px"
+              fontSize="20px"
               fontWeight="700"
             >
               2
             </Box>
             <Box>
-              <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="4px">
+              <Text fontSize="20px" fontWeight="600" color={colors.navy} mb="8px">
                 Review Monitoring Dashboards
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Explore overview metrics, failed traces, and distribution charts. Identify
                 issues to address before generating compliance documentation.
               </Text>
@@ -180,26 +183,26 @@ export default function HomePage() {
           </Flex>
 
           {/* Step 3 */}
-          <Flex align="start" gap="16px">
+          <Flex align="start" gap="20px">
             <Box
-              minW="32px"
-              h="32px"
+              minW="44px"
+              h="44px"
               bg={colors.cobalt}
               color="white"
               borderRadius="full"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              fontSize="16px"
+              fontSize="20px"
               fontWeight="700"
             >
               3
             </Box>
             <Box>
-              <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="4px">
+              <Text fontSize="20px" fontWeight="600" color={colors.navy} mb="8px">
                 Generate Compliance Package
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Fill in system details (name, purpose, risk classification) and generate
                 5 Word documents: Risk Report, Annex IV, Audit Trail, Monitoring, and Checklist.
               </Text>
@@ -207,26 +210,26 @@ export default function HomePage() {
           </Flex>
 
           {/* Step 4 */}
-          <Flex align="start" gap="16px">
+          <Flex align="start" gap="20px">
             <Box
-              minW="32px"
-              h="32px"
+              minW="44px"
+              h="44px"
               bg={colors.cobalt}
               color="white"
               borderRadius="full"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              fontSize="16px"
+              fontSize="20px"
               fontWeight="700"
             >
               4
             </Box>
             <Box>
-              <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="4px">
+              <Text fontSize="20px" fontWeight="600" color={colors.navy} mb="8px">
                 Expert Review & Delivery
               </Text>
-              <Text fontSize="14px" lineHeight="1.6" color={colors.text.primary}>
+              <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
                 Documents include [EXPERT INPUT REQUIRED] markers for manual sections.
                 Add professional commentary (8-10 hours), convert to PDF, deliver to client.
               </Text>
@@ -236,35 +239,44 @@ export default function HomePage() {
       </Card>
 
       {/* Footer Info */}
-      <Box mt="40px" pt="24px" borderTop="1px solid" borderColor={colors.patience}>
-        <Flex gap="48px">
-          <Box>
-            <Text fontSize="13px" fontWeight="600" color={colors.text.secondary} mb="4px">
-              EU AI Act Focus
-            </Text>
-            <Text fontSize="12px" color={colors.text.muted} lineHeight="1.5">
+      <Box mt="64px" pt="32px" borderTop="1px solid" borderColor={colors.patience}>
+        <Flex gap="64px">
+          <Box flex="1">
+            <Flex align="center" gap="8px" mb="12px">
+              <MdSecurity size={20} color={colors.cobalt} />
+              <Text fontSize="16px" fontWeight="600" color={colors.text.secondary}>
+                EU AI Act Focus
+              </Text>
+            </Flex>
+            <Text fontSize="15px" color={colors.text.muted} lineHeight="1.7">
               Risk classification (Annex III)<br/>
               Technical documentation (Annex IV)<br/>
               Accuracy & robustness (Article 15)<br/>
               Logging requirements (Article 19)
             </Text>
           </Box>
-          <Box>
-            <Text fontSize="13px" fontWeight="600" color={colors.text.secondary} mb="4px">
-              Document Outputs
-            </Text>
-            <Text fontSize="12px" color={colors.text.muted} lineHeight="1.5">
+          <Box flex="1">
+            <Flex align="center" gap="8px" mb="12px">
+              <MdInsertDriveFile size={20} color={colors.cobalt} />
+              <Text fontSize="16px" fontWeight="600" color={colors.text.secondary}>
+                Document Outputs
+              </Text>
+            </Flex>
+            <Text fontSize="15px" color={colors.text.muted} lineHeight="1.7">
               5 Microsoft Word documents<br/>
               32 pages total<br/>
               Auto-populated with trace data<br/>
               Expert sections marked for review
             </Text>
           </Box>
-          <Box>
-            <Text fontSize="13px" fontWeight="600" color={colors.text.secondary} mb="4px">
-              Time Savings
-            </Text>
-            <Text fontSize="12px" color={colors.text.muted} lineHeight="1.5">
+          <Box flex="1">
+            <Flex align="center" gap="8px" mb="12px">
+              <MdSpeed size={20} color={colors.cobalt} />
+              <Text fontSize="16px" fontWeight="600" color={colors.text.secondary}>
+                Time Savings
+              </Text>
+            </Flex>
+            <Text fontSize="15px" color={colors.text.muted} lineHeight="1.7">
               Traditional: 40-60 hours manual work<br/>
               With CERT: 8-10 hours expert review<br/>
               Automation: 80% time reduction<br/>
