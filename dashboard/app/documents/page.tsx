@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Text, Progress, VStack, Alert, AlertIcon, HStack } from '@chakra-ui/react';
+import { Box, Button, Text, Progress, VStack, Flex } from '@chakra-ui/react';
+import { colors } from '@/theme/colors';
 
 /**
  * Documents generation page.
@@ -80,11 +81,22 @@ export default function DocumentsPage() {
 
         {status === 'idle' && (
           <Box>
-            <Alert status="info" mb={4}>
-              <AlertIcon />
-              This will generate 5 Word documents based on your trace analysis.
-              Documents will need expert review before delivery.
-            </Alert>
+            <Box
+              bg={colors.patience}
+              borderLeft="4px solid"
+              borderLeftColor={colors.cobalt}
+              p="16px"
+              borderRadius="8px"
+              mb={4}
+            >
+              <Flex align="start" gap="12px">
+                <Text fontSize="20px">ℹ️</Text>
+                <Text fontSize="14px" color={colors.text.primary}>
+                  This will generate 5 Word documents based on your trace analysis.
+                  Documents will need expert review before delivery.
+                </Text>
+              </Flex>
+            </Box>
 
             <Button
               onClick={handleGenerate}
@@ -122,10 +134,21 @@ export default function DocumentsPage() {
 
         {status === 'complete' && downloadUrl && (
           <Box>
-            <Alert status="success" mb={4}>
-              <AlertIcon />
-              Documents generated successfully!
-            </Alert>
+            <Box
+              bg="green.50"
+              borderLeft="4px solid"
+              borderLeftColor="green.500"
+              p="16px"
+              borderRadius="8px"
+              mb={4}
+            >
+              <Flex align="start" gap="12px">
+                <Text fontSize="20px">✅</Text>
+                <Text fontSize="14px" color="green.800" fontWeight="600">
+                  Documents generated successfully!
+                </Text>
+              </Flex>
+            </Box>
 
             <Button
               as="a"
@@ -155,13 +178,21 @@ export default function DocumentsPage() {
         )}
 
         {status === 'error' && (
-          <Alert status="error">
-            <AlertIcon />
-            <Box>
-              <Text fontWeight="bold">Error generating documents</Text>
-              <Text fontSize="14px">{errorMessage}</Text>
-            </Box>
-          </Alert>
+          <Box
+            bg="red.50"
+            borderLeft="4px solid"
+            borderLeftColor="red.500"
+            p="16px"
+            borderRadius="8px"
+          >
+            <Flex align="start" gap="12px">
+              <Text fontSize="20px">❌</Text>
+              <Box>
+                <Text fontWeight="bold" color="red.800">Error generating documents</Text>
+                <Text fontSize="14px" color="red.700">{errorMessage}</Text>
+              </Box>
+            </Flex>
+          </Box>
         )}
 
         <Box mt={8} p={4} bg="gray.50" borderRadius="md">
