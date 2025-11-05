@@ -85,22 +85,27 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         >
           <Icon
             as={fileName ? MdCheckCircle : MdUpload}
-            w="48px"
-            h="48px"
+            w="56px"
+            h="56px"
             color={fileName ? colors.success : colors.navy}
-            mb="20px"
+            mb="24px"
           />
 
           {fileName ? (
-            <Text fontSize="md" fontWeight="600" color={colors.success}>
-              ✓ {fileName}
-            </Text>
+            <Box textAlign="center">
+              <Text fontSize="18px" fontWeight="600" color={colors.success} mb="8px">
+                File uploaded successfully
+              </Text>
+              <Text fontSize="15px" color={colors.text.secondary}>
+                {fileName}
+              </Text>
+            </Box>
           ) : (
             <>
-              <Text fontSize="16px" fontWeight="500" color={colors.navy} mb="8px">
+              <Text fontSize="18px" fontWeight="500" color={colors.navy} mb="12px">
                 Drop your file here or click to browse
               </Text>
-              <Text fontSize="14px" color={colors.text.muted} mb="20px">
+              <Text fontSize="15px" color={colors.text.muted} mb="24px">
                 Supported formats: .json, .jsonl
               </Text>
             </>
@@ -117,29 +122,39 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
             id="file-upload"
           />
 
-          <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-            <Button
-              as="span"
-              bg={colors.navy}
-              color="white"
-              px="32px"
-              py="12px"
-              h="auto"
-              fontSize="15px"
-              fontWeight="500"
-              borderRadius="8px"
-              _hover={{ bg: colors.cobalt }}
-              transition="all 0.2s"
-            >
-              Choose File
-            </Button>
-          </label>
+          {!fileName && (
+            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+              <Button
+                as="span"
+                bg={colors.navy}
+                color="white"
+                px="40px"
+                py="14px"
+                h="auto"
+                fontSize="16px"
+                fontWeight="500"
+                borderRadius="8px"
+                _hover={{ bg: colors.cobalt }}
+                transition="all 0.2s"
+              >
+                Choose File
+              </Button>
+            </label>
+          )}
         </Box>
 
         {error && (
-          <Text fontSize="sm" color={colors.error} textAlign="center">
-            {error}
-          </Text>
+          <Box
+            bg="#fee"
+            borderLeft="4px solid"
+            borderLeftColor={colors.error}
+            p="16px"
+            borderRadius="8px"
+          >
+            <Text fontSize="15px" color={colors.error} fontWeight="500">
+              {error}
+            </Text>
+          </Box>
         )}
       </VStack>
     </Box>

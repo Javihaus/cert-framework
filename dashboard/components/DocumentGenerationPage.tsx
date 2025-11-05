@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Box, Button, Flex, Text, Grid, Input, Textarea } from '@chakra-ui/react';
-import { MdFileDownload, MdWarning, MdCheckCircle, MdError, MdRocketLaunch } from 'react-icons/md';
+import { MdFileDownload, MdFileUpload, MdWarning, MdCheckCircle, MdError, MdRocketLaunch } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 import Card from '@/components/Card';
 
@@ -147,7 +147,7 @@ export default function DocumentGenerationPage() {
           _hover={{ bg: colors.mist }}
         >
           <Flex align="center" gap="8px">
-            <MdFileDownload size={20} />
+            <MdFileUpload size={20} />
             <span>Load Data from Traces (if available)</span>
           </Flex>
         </Button>
