@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Text, Progress, VStack, Flex } from '@chakra-ui/react';
+import { Box, Button, Text, VStack, Flex } from '@chakra-ui/react';
 import { colors } from '@/theme/colors';
 
 /**
@@ -69,7 +69,7 @@ export default function DocumentsPage() {
 
   return (
     <Box p={8} maxW="800px" margin="0 auto">
-      <VStack spacing={6} align="stretch">
+      <VStack gap={6} align="stretch">
         <Box>
           <Text fontSize="32px" fontWeight="bold" mb={2}>
             Generate Compliance Documents
@@ -111,7 +111,7 @@ export default function DocumentsPage() {
               <Text fontSize="14px" fontWeight="bold" mb={2}>
                 What will be generated:
               </Text>
-              <VStack align="start" spacing={1} fontSize="14px">
+              <VStack align="start" gap={1} fontSize="14px">
                 <Text>• Risk Classification Report (2 pages)</Text>
                 <Text>• Annex IV Technical Documentation (20-25 pages)</Text>
                 <Text>• Audit Trail Setup Guide (3 pages)</Text>
@@ -124,11 +124,38 @@ export default function DocumentsPage() {
 
         {status === 'processing' && (
           <Box>
-            <Text mb={4} fontSize="18px">Generating documents...</Text>
-            <Progress size="sm" isIndeterminate colorScheme="blue" />
-            <Text mt={4} fontSize="14px" color="gray.600">
+            <Flex align="center" gap="12px" mb={4}>
+              <Text fontSize="18px">Generating documents</Text>
+              <Flex gap="4px">
+                {[0, 1, 2].map((i) => (
+                  <Box
+                    key={i}
+                    w="8px"
+                    h="8px"
+                    bg="blue.500"
+                    borderRadius="full"
+                    style={{
+                      animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </Flex>
+            </Flex>
+            <Text fontSize="14px" color="gray.600">
               This takes 10-30 seconds depending on document size.
             </Text>
+            <style jsx>{`
+              @keyframes pulse {
+                0%, 80%, 100% {
+                  opacity: 0.3;
+                  transform: scale(0.8);
+                }
+                40% {
+                  opacity: 1;
+                  transform: scale(1);
+                }
+              }
+            `}</style>
           </Box>
         )}
 
@@ -150,22 +177,35 @@ export default function DocumentsPage() {
               </Flex>
             </Box>
 
-            <Button
-              as="a"
+            <a
               href={downloadUrl}
               download
-              colorScheme="green"
-              size="lg"
-              width="full"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#38a169',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontSize: '18px',
+                fontWeight: '500',
+                textDecoration: 'none',
+                width: '100%',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2f855a')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#38a169')}
             >
               Download Package (.zip)
-            </Button>
+            </a>
 
             <Box mt={6} p={4} bg="yellow.50" borderRadius="md" borderLeft="4px solid" borderLeftColor="yellow.400">
               <Text fontSize="14px" fontWeight="bold" mb={2}>
                 ⚠️ Next Steps - Expert Review Required
               </Text>
-              <VStack align="start" spacing={2} fontSize="14px">
+              <VStack align="start" gap={2} fontSize="14px">
                 <Text>1. Extract the ZIP file</Text>
                 <Text>2. Open each Word document</Text>
                 <Text>3. Search for "[EXPERT INPUT REQUIRED]" markers</Text>
