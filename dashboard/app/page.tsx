@@ -19,6 +19,8 @@ import FailedTracesView from '@/components/FailedTracesView';
 import DistributionChart from '@/components/DistributionChart';
 import DocumentationContent from '@/components/DocumentationContent';
 import ReportView from '@/components/ReportView';
+import HomePage from '@/components/HomePage';
+import DocumentGenerationPage from '@/components/DocumentGenerationPage';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors } from '@/theme/colors';
 
@@ -27,7 +29,7 @@ export default function Home() {
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('load');
+  const [activeTab, setActiveTab] = useState('home');
 
   const handleEvaluationFileLoad = (data: any) => {
     console.log('Loaded data:', data);
@@ -134,6 +136,12 @@ export default function Home() {
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'home':
+        return <HomePage />;
+
+      case 'documents':
+        return <DocumentGenerationPage />;
+
       case 'load':
         return (
           <Box maxW="1200px" mx="auto">
