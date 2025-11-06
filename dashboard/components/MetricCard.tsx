@@ -34,7 +34,7 @@ export default function MetricCard({ label, value, icon, color, bgColor }: Metri
   const scheme = colorSchemes[color];
 
   return (
-    <Card style={{ borderColor: colors.patience, backgroundColor: bgColor }}>
+    <Card style={{ borderColor: colors.patience, backgroundColor: bgColor || 'white' }}>
       <Flex align="center" justify="space-between" w="100%">
         <Flex direction="column">
           <Text
@@ -54,16 +54,7 @@ export default function MetricCard({ label, value, icon, color, bgColor }: Metri
             {value}
           </Text>
         </Flex>
-        <Flex
-          align="center"
-          justify="center"
-          bg={scheme.light}
-          borderRadius="12px"
-          w="64px"
-          h="64px"
-        >
-          <Icon as={icon} w="32px" h="32px" color={scheme.bg} />
-        </Flex>
+        <Icon as={icon} w="48px" h="48px" color={scheme.bg} />
       </Flex>
     </Card>
   );

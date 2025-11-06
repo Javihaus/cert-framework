@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Flex, Text, Icon } from '@chakra-ui/react';
-import { MdCheckCircle, MdWarning } from 'react-icons/md';
+import { MdCheckCircle, MdInfo } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 
 interface StatusBannerProps {
@@ -12,7 +12,7 @@ interface StatusBannerProps {
 
 export default function StatusBanner({ isCompliant, accuracy, failedCount }: StatusBannerProps) {
   const gradient = isCompliant ? colors.gradients.compliant : colors.gradients.warning;
-  const IconComponent = isCompliant ? MdCheckCircle : MdWarning;
+  const IconComponent = isCompliant ? MdCheckCircle : MdInfo;
   const title = isCompliant ? 'Compliant' : 'Below Compliance Threshold';
   const message = isCompliant
     ? `Accuracy at ${(accuracy * 100).toFixed(1)}% exceeds the 90% regulatory threshold.`

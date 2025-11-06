@@ -167,7 +167,7 @@ export default function Home() {
               label="Upload Evaluation Results"
             />
 
-            <Box maxW="60%" mx="auto" mt="32px">
+            <Box maxW="800px" mx="auto" mt="32px">
               <Card style={{ borderColor: colors.patience, background: 'white' }}>
                 <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
                   How to generate evaluation results:
@@ -181,6 +181,7 @@ export default function Home() {
                   bg={colors.patience}
                   color={colors.navy}
                   lineHeight="1.6"
+                  minW="450px"
                 >
 {`from cert.evaluation import Evaluator
 
