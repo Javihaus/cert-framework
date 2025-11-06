@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text, Icon } from '@chakra-ui/react';
+import { MdCheckCircle, MdWarning } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 
 interface StatusBannerProps {
@@ -11,7 +12,7 @@ interface StatusBannerProps {
 
 export default function StatusBanner({ isCompliant, accuracy, failedCount }: StatusBannerProps) {
   const gradient = isCompliant ? colors.gradients.compliant : colors.gradients.warning;
-  const icon = isCompliant ? '✓' : '⚠';
+  const IconComponent = isCompliant ? MdCheckCircle : MdWarning;
   const title = isCompliant ? 'Compliant' : 'Below Compliance Threshold';
   const message = isCompliant
     ? `Accuracy at ${(accuracy * 100).toFixed(1)}% exceeds the 90% regulatory threshold.`
@@ -21,28 +22,26 @@ export default function StatusBanner({ isCompliant, accuracy, failedCount }: Sta
     <Box
       background={gradient}
       color="white"
-      p="20px 24px"
+      p="24px 28px"
       borderRadius="12px"
       mb="24px"
     >
-      <Flex align="center" gap="16px">
+      <Flex align="center" gap="20px">
         <Flex
-          w="48px"
-          h="48px"
+          w="56px"
+          h="56px"
           align="center"
           justify="center"
           bg="rgba(255, 255, 255, 0.2)"
-          borderRadius="50%"
-          fontSize="24px"
-          fontWeight="700"
+          borderRadius="12px"
         >
-          {icon}
+          <Icon as={IconComponent} w="32px" h="32px" />
         </Flex>
         <Box flex="1">
-          <Text fontSize="18px" fontWeight="600" mb="4px">
+          <Text fontSize="20px" fontWeight="700" mb="6px">
             {title}
           </Text>
-          <Text fontSize="14px" opacity="0.95">
+          <Text fontSize="16px" opacity="0.95" lineHeight="1.5">
             {message}
           </Text>
         </Box>

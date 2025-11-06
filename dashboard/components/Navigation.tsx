@@ -53,42 +53,38 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
       borderColor={colors.patience}
       boxShadow="sm"
     >
-      <Flex
-        maxW="1600px"
-        mx="auto"
-        px="32px"
-        h="64px"
-        align="center"
-      >
-        <Flex align="center" gap="12px">
-          <Box h="40px" display="flex" alignItems="center">
-            <img
-              src="/cert-logo.png"
-              alt="CERT Logo"
-              style={{ height: '40px', width: 'auto' }}
-            />
-          </Box>
-          <Text
-            fontSize="24px"
-            fontWeight="700"
-            color={colors.cobalt}
-            letterSpacing="-0.5px"
-          >
-            CERT
-          </Text>
-        </Flex>
+      <Box maxW="1600px" mx="auto" px="32px">
+        {/* Main Navigation Bar */}
+        <Flex h="64px" align="center">
+          <Flex align="center" gap="12px">
+            <Box h="40px" display="flex" alignItems="center">
+              <img
+                src="/cert-logo.png"
+                alt="CERT Logo"
+                style={{ height: '40px', width: 'auto' }}
+              />
+            </Box>
+            <Text
+              fontSize="24px"
+              fontWeight="700"
+              color={colors.cobalt}
+              letterSpacing="-0.5px"
+            >
+              CERT
+            </Text>
+          </Flex>
 
-        <Flex ml="48px" gap="4px">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id || isParentActive(tab);
+          <Flex ml="48px" gap="4px">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id || isParentActive(tab);
 
-            return (
-              <Box key={tab.id} position="relative">
+              return (
                 <Box
+                  key={tab.id}
                   as="button"
                   px="16px"
                   py="8px"
-                  fontSize="14px"
+                  fontSize="15px"
                   fontWeight="500"
                   color={
                     !tab.enabled
@@ -97,7 +93,7 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
                       ? 'white'
                       : colors.text.secondary
                   }
-                  bg={isActive && tab.enabled ? colors.cobalt : 'transparent'}
+                  bg={isActive && tab.enabled ? colors.navy : 'transparent'}
                   borderRadius="6px"
                   cursor={tab.enabled ? 'pointer' : 'not-allowed'}
                   opacity={tab.enabled ? 1 : 0.5}
@@ -105,8 +101,8 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
                   _hover={{
                     bg: tab.enabled
                       ? isActive
-                        ? colors.cobalt
-                        : colors.patience
+                        ? colors.navy
+                        : colors.mist
                       : 'transparent',
                   }}
                   onClick={() => {
@@ -125,60 +121,56 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
                 >
                   {tab.label}
                 </Box>
-
-                {/* Subtabs dropdown */}
-                {tab.subtabs && isParentActive(tab) && (
-                  <Box
-                    position="absolute"
-                    top="100%"
-                    left="0"
-                    mt="4px"
-                    bg="white"
-                    borderRadius="6px"
-                    boxShadow="md"
-                    border="1px solid"
-                    borderColor={colors.patience}
-                    minW="180px"
-                    py="4px"
-                    zIndex="101"
-                  >
-                    {tab.subtabs.map((subtab) => (
-                      <Box
-                        key={subtab.id}
-                        as="button"
-                        display="block"
-                        width="100%"
-                        px="16px"
-                        py="8px"
-                        fontSize="13px"
-                        fontWeight="400"
-                        textAlign="left"
-                        color={
-                          !subtab.enabled
-                            ? colors.text.muted
-                            : activeTab === subtab.id
-                            ? colors.cobalt
-                            : colors.text.primary
-                        }
-                        bg={activeTab === subtab.id ? colors.patience : 'transparent'}
-                        cursor={subtab.enabled ? 'pointer' : 'not-allowed'}
-                        opacity={subtab.enabled ? 1 : 0.5}
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: subtab.enabled ? colors.patience : 'transparent',
-                        }}
-                        onClick={() => subtab.enabled && onTabChange(subtab.id)}
-                      >
-                        {subtab.label}
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            );
-          })}
+              );
+            })}
+          </Flex>
         </Flex>
-      </Flex>
+
+        {/* Horizontal Subtabs for Monitoring */}
+        {tabs.find(t => t.id === 'monitoring')?.subtabs && isParentActive(tabs.find(t => t.id === 'monitoring')!) && (
+          <Flex
+            h="48px"
+            align="center"
+            gap="2px"
+            borderTop="1px solid"
+            borderColor={colors.patience}
+            bg={colors.background}
+          >
+            {tabs.find(t => t.id === 'monitoring')!.subtabs!.map((subtab) => (
+              <Box
+                key={subtab.id}
+                as="button"
+                px="16px"
+                py="8px"
+                fontSize="14px"
+                fontWeight="500"
+                color={
+                  !subtab.enabled
+                    ? colors.text.muted
+                    : activeTab === subtab.id
+                    ? colors.navy
+                    : colors.text.secondary
+                }
+                bg={activeTab === subtab.id ? 'white' : 'transparent'}
+                borderRadius="6px"
+                cursor={subtab.enabled ? 'pointer' : 'not-allowed'}
+                opacity={subtab.enabled ? 1 : 0.5}
+                transition="all 0.2s"
+                _hover={{
+                  bg: subtab.enabled
+                    ? activeTab === subtab.id
+                      ? 'white'
+                      : colors.mist
+                    : 'transparent',
+                }}
+                onClick={() => subtab.enabled && onTabChange(subtab.id)}
+              >
+                {subtab.label}
+              </Box>
+            ))}
+          </Flex>
+        )}
+      </Box>
     </Box>
   );
 }

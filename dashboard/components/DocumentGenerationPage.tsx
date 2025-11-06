@@ -268,8 +268,6 @@ export default function DocumentGenerationPage() {
             bg="#fef5e7"
             p="20px"
             borderRadius="12px"
-            borderLeft="4px solid"
-            borderLeftColor={colors.coral}
             mb="20px"
           >
             <Flex align="center" gap="12px" mb="12px">
@@ -390,8 +388,6 @@ export default function DocumentGenerationPage() {
       {error && (
         <Box
           bg="#fee"
-          borderLeft="4px solid"
-          borderLeftColor={colors.error}
           p="24px"
           borderRadius="12px"
           mb="32px"
@@ -410,8 +406,6 @@ export default function DocumentGenerationPage() {
       {downloadUrl && (
         <Box
           bg="#e8f5e9"
-          borderLeft="4px solid"
-          borderLeftColor={colors.success}
           p="24px"
           borderRadius="12px"
           mb="32px"

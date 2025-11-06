@@ -21,6 +21,7 @@ import DocumentationContent from '@/components/DocumentationContent';
 import ReportView from '@/components/ReportView';
 import HomePage from '@/components/HomePage';
 import DocumentGenerationPage from '@/components/DocumentGenerationPage';
+import Footer from '@/components/Footer';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors } from '@/theme/colors';
 
@@ -147,15 +148,15 @@ export default function Home() {
           <Box maxW="1200px" mx="auto">
             <Box mb="40px" textAlign="center">
               <Text
-                fontSize="28px"
+                fontSize="36px"
                 fontWeight="700"
                 color={colors.navy}
-                mb="8px"
-                letterSpacing="-0.5px"
+                mb="12px"
+                letterSpacing="-1px"
               >
                 Upload Evaluation Results
               </Text>
-              <Text fontSize="15px" color={colors.text.muted}>
+              <Text fontSize="18px" color={colors.text.secondary} lineHeight="1.6">
                 Load your CERT evaluation data to view compliance metrics and analysis
               </Text>
             </Box>
@@ -168,7 +169,7 @@ export default function Home() {
 
             <Box maxW="60%" mx="auto" mt="32px">
               <Card style={{ borderColor: colors.patience, background: 'white' }}>
-                <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="16px">
+                <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
                   How to generate evaluation results:
                 </Text>
                 <Code
@@ -176,7 +177,7 @@ export default function Home() {
                   whiteSpace="pre"
                   p="20px"
                   borderRadius="12px"
-                  fontSize="14px"
+                  fontSize="15px"
                   bg={colors.patience}
                   color={colors.navy}
                   lineHeight="1.6"
@@ -219,39 +220,43 @@ results = evaluator.evaluate_log_file(
                 value={`${(summary!.accuracy * 100).toFixed(1)}%`}
                 icon={MdAssessment}
                 color={summary!.accuracy >= 0.9 ? 'green' : summary!.accuracy >= 0.8 ? 'orange' : 'red'}
+                bgColor="rgba(251, 245, 240, 0.8)"
               />
               <MetricCard
                 label="Total Traces"
                 value={summary!.total_traces.toString()}
                 icon={MdList}
                 color="blue"
+                bgColor="rgba(251, 245, 240, 0.8)"
               />
               <MetricCard
                 label="Passed"
                 value={summary!.passed_traces.toString()}
                 icon={MdCheckCircle}
                 color="green"
+                bgColor="rgba(251, 245, 240, 0.8)"
               />
               <MetricCard
                 label="Failed"
                 value={summary!.failed_traces.toString()}
                 icon={MdCancel}
                 color="red"
+                bgColor="rgba(251, 245, 240, 0.8)"
               />
             </Grid>
 
             <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="20px" mb="20px">
-              <Card style={{ borderColor: colors.patience }}>
-                <Text fontSize="md" fontWeight="700" color={colors.text.muted} mb="4px">
+              <Card style={{ borderColor: colors.patience, backgroundColor: 'rgba(191, 200, 216, 0.9)' }}>
+                <Text fontSize="16px" fontWeight="600" color={colors.text.muted} mb="8px">
                   Mean Confidence
                 </Text>
-                <Text fontSize="48px" fontWeight="700" color={colors.cobalt}>
+                <Text fontSize="52px" fontWeight="700" color={colors.cobalt} lineHeight="1">
                   {summary!.mean_confidence.toFixed(3)}
                 </Text>
-                <Text fontSize="sm" color={colors.text.muted} mt="8px">
+                <Text fontSize="15px" color={colors.text.secondary} mt="12px">
                   Threshold: {summary!.threshold_used.toFixed(2)}
                 </Text>
-                <Text fontSize="14px" color={colors.text.muted} mt="16px" lineHeight="1.6">
+                <Text fontSize="15px" color={colors.text.secondary} mt="16px" lineHeight="1.6">
                   Mean confidence of {summary!.mean_confidence.toFixed(3)} suggests {' '}
                   {summary!.mean_confidence > 0.8
                     ? 'strong performance with most predictions highly confident.'
@@ -260,16 +265,16 @@ results = evaluator.evaluate_log_file(
               </Card>
 
               <Card style={{ borderColor: colors.patience }}>
-                <Text fontSize="md" fontWeight="700" color={colors.text.muted} mb="12px">
+                <Text fontSize="16px" fontWeight="600" color={colors.text.muted} mb="16px">
                   Evaluation Period
                 </Text>
-                <Text fontSize="sm" color={colors.text.primary} mb="4px">
+                <Text fontSize="15px" color={colors.text.primary} mb="8px" lineHeight="1.6">
                   <strong>Start:</strong> {summary!.date_range.start}
                 </Text>
-                <Text fontSize="sm" color={colors.text.primary}>
+                <Text fontSize="15px" color={colors.text.primary} mb="12px" lineHeight="1.6">
                   <strong>End:</strong> {summary!.date_range.end}
                 </Text>
-                <Text fontSize="sm" color={colors.text.muted} mt="12px">
+                <Text fontSize="15px" color={colors.text.secondary} mt="16px" pt="16px" borderTop="1px solid" borderColor={colors.patience}>
                   Total traces evaluated: {summary!.evaluated_traces.toLocaleString()}
                 </Text>
               </Card>
@@ -289,10 +294,10 @@ results = evaluator.evaluate_log_file(
           <FailedTracesView results={results} threshold={summary!.threshold_used} />
         ) : (
           <Card style={{ borderColor: colors.patience }}>
-            <Text fontSize="md" fontWeight="700" color={colors.navy} mb="8px">
+            <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
               No Detailed Trace Data
             </Text>
-            <Text fontSize="sm" color={colors.text.muted}>
+            <Text fontSize="16px" color={colors.text.secondary} lineHeight="1.6">
               This file contains summary metrics only. {summary!.failed_traces} traces failed based on summary data.
             </Text>
           </Card>
@@ -303,13 +308,13 @@ results = evaluator.evaluate_log_file(
         return (
           <Box maxW="900px" mx="auto">
             <Card style={{ borderColor: colors.patience, marginBottom: '24px' }}>
-              <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
+              <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="20px">
                 Score Distribution
               </Text>
               {results.length > 0 ? (
                 <DistributionChart results={results} threshold={summary!.threshold_used} />
               ) : (
-                <Text fontSize="14px" color={colors.text.muted}>
+                <Text fontSize="16px" color={colors.text.muted}>
                   No detailed trace data available for distribution analysis.
                 </Text>
               )}
@@ -317,10 +322,10 @@ results = evaluator.evaluate_log_file(
 
             {results.length > 0 && (
               <Card style={{ borderColor: colors.warning, background: '#FEF3C7' }}>
-                <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="8px">
+                <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
                   Critical Finding
                 </Text>
-                <Text fontSize="14px" color={colors.text.primary} lineHeight="1.7">
+                <Text fontSize="16px" color={colors.text.primary} lineHeight="1.7">
                   {(() => {
                     const borderlineCount = results.filter(r =>
                       r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
@@ -358,16 +363,18 @@ results = evaluator.evaluate_log_file(
   };
 
   return (
-    <Box minH="100vh" bg={colors.background}>
+    <Box minH="100vh" bg={colors.background} display="flex" flexDirection="column">
       <Navigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
         hasData={!!evaluationData}
       />
 
-      <Box maxW="1600px" mx="auto" px="32px" py="32px">
+      <Box maxW="1600px" mx="auto" px="32px" py="32px" flex="1">
         {renderTabContent()}
       </Box>
+
+      <Footer />
     </Box>
   );
 }

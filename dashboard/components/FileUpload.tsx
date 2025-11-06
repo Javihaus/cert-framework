@@ -146,8 +146,6 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         {error && (
           <Box
             bg="#fee"
-            borderLeft="4px solid"
-            borderLeftColor={colors.error}
             p="16px"
             borderRadius="8px"
           >

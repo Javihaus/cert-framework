@@ -38,8 +38,6 @@ export default function HomePage() {
           bg={colors.patience}
           p="24px"
           borderRadius="12px"
-          borderLeft="4px solid"
-          borderLeftColor={colors.cobalt}
         >
           <Flex align="center" gap="12px" mb="12px">
             <MdVerifiedUser size={28} color={colors.cobalt} />

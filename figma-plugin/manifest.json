@@ -1,0 +1,11 @@
+{
+  "name": "CERT Dashboard Auto-Setup",
+  "id": "cert-dashboard-setup",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
+}

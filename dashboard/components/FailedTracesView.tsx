@@ -131,10 +131,10 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
     <VStack gap="20px" align="stretch">
       {/* Pattern Cards */}
       <Card style={{ borderColor: colors.patience }}>
-        <Text fontSize="lg" fontWeight="700" color={colors.navy} mb="16px">
+        <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="12px">
           Failure Pattern Classification
         </Text>
-        <Text fontSize="14px" color={colors.text.muted} mb="16px">
+        <Text fontSize="16px" color={colors.text.secondary} mb="20px" lineHeight="1.6">
           {failedResults.length} failed traces grouped by failure type. Click a pattern to filter results.
         </Text>
         <Flex gap="12px" flexWrap="wrap">
@@ -163,25 +163,25 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
               >
                 <HStack mb="12px">
                   <Box
-                    w="32px"
-                    h="32px"
+                    w="40px"
+                    h="40px"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
                     bg={`${pattern.color}.100`}
                     color={`${pattern.color}.700`}
-                    borderRadius="6px"
+                    borderRadius="8px"
                   >
-                    <Icon size={16} />
+                    <Icon size={20} />
                   </Box>
-                  <Text fontSize="14px" fontWeight="600" color="secondaryGray.900">
+                  <Text fontSize="16px" fontWeight="600" color={colors.navy}>
                     {pattern.label}
                   </Text>
                 </HStack>
-                <Text fontSize="28px" fontWeight="700" color={`${pattern.color}.500`}>
+                <Text fontSize="32px" fontWeight="700" color={`${pattern.color}.500`} lineHeight="1">
                   {count}
                 </Text>
-                <Text fontSize="12px" color="secondaryGray.600">
+                <Text fontSize="14px" color={colors.text.muted} mt="4px">
                   {percentage}% of failures
                 </Text>
               </Box>
@@ -193,44 +193,54 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
       {/* Export Buttons & Table */}
       <Card style={{ borderColor: colors.patience }}>
         <Flex justify="space-between" align="center" mb="20px">
-          <Text fontSize="lg" fontWeight="700" color={colors.navy}>
+          <Text fontSize="24px" fontWeight="700" color={colors.navy}>
             {filterPattern
               ? `${PATTERNS[filterPattern].label} Traces (${filteredResults.length})`
               : `Failed Traces (${failedResults.length})`
             }
           </Text>
-          <HStack gap="8px">
+          <HStack gap="12px">
             <Button
-              size="sm"
               onClick={handleExportCSV}
               bg="white"
               border="1px solid"
               borderColor={colors.patience}
               color={colors.navy}
-              fontSize="14px"
+              fontSize="15px"
+              fontWeight="500"
+              px="18px"
+              py="10px"
+              h="auto"
               _hover={{ bg: colors.background }}
             >
-              <MdFileDownload style={{ marginRight: '8px' }} />
-              Export CSV
+              <Flex align="center" gap="8px">
+                <MdFileDownload size={18} />
+                <span>Export CSV</span>
+              </Flex>
             </Button>
             <Button
-              size="sm"
               onClick={handleExportJSON}
               bg="white"
               border="1px solid"
               borderColor={colors.patience}
               color={colors.navy}
-              fontSize="14px"
+              fontSize="15px"
+              fontWeight="500"
+              px="18px"
+              py="10px"
+              h="auto"
               _hover={{ bg: colors.background }}
             >
-              <MdFileDownload style={{ marginRight: '8px' }} />
-              Export JSON
+              <Flex align="center" gap="8px">
+                <MdFileDownload size={18} />
+                <span>Export JSON</span>
+              </Flex>
             </Button>
           </HStack>
         </Flex>
 
         {filteredResults.length === 0 ? (
-          <Text color={colors.text.muted} textAlign="center" py="40px">
+          <Text color={colors.text.muted} fontSize="16px" textAlign="center" py="60px">
             No traces match the selected filter
           </Text>
         ) : (
@@ -238,11 +248,11 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
             <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Th>Score</Th>
-                  <Th>Pattern</Th>
-                  <Th>Query</Th>
-                  <Th>Response</Th>
-                  <Th>Time</Th>
+                  <Th fontSize="14px">Score</Th>
+                  <Th fontSize="14px">Pattern</Th>
+                  <Th fontSize="14px">Query</Th>
+                  <Th fontSize="14px">Response</Th>
+                  <Th fontSize="14px">Time</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -251,21 +261,21 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
                   return (
                     <Tr key={idx}>
                       <Td>
-                        <Text fontSize="sm" fontWeight="700" color="red.500">
+                        <Text fontSize="15px" fontWeight="700" color="red.500">
                           {result.measurement.confidence.toFixed(3)}
                         </Text>
                       </Td>
                       <Td>
                         <HStack>
-                          <Icon size={16} color={`var(--chakra-colors-${result.pattern.color}-500)`} />
-                          <Badge colorScheme={result.pattern.color} fontSize="xs">
+                          <Icon size={18} color={`var(--chakra-colors-${result.pattern.color}-500)`} />
+                          <Badge colorScheme={result.pattern.color} fontSize="13px">
                             {result.pattern.label}
                           </Badge>
                         </HStack>
                       </Td>
                       <Td maxW="250px">
                         <Text
-                          fontSize="sm"
+                          fontSize="14px"
                           overflow="hidden"
                           textOverflow="ellipsis"
                           whiteSpace="nowrap"
@@ -276,7 +286,7 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
                       </Td>
                       <Td maxW="350px">
                         <Text
-                          fontSize="sm"
+                          fontSize="14px"
                           color="gray.600"
                           overflow="hidden"
                           textOverflow="ellipsis"
@@ -287,7 +297,7 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
                         </Text>
                       </Td>
                       <Td>
-                        <Text fontSize="xs" color="gray.500">
+                        <Text fontSize="13px" color="gray.500">
                           {new Date(result.timestamp).toLocaleString()}
                         </Text>
                       </Td>

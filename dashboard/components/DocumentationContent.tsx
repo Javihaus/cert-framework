@@ -29,8 +29,6 @@ function ExampleBox({ children }: ExampleBoxProps) {
       bg={colors.patience}
       p="16px"
       borderRadius="8px"
-      borderLeft="4px solid"
-      borderLeftColor={colors.cobalt}
       my="12px"
     >
       {children}

@@ -76,7 +76,7 @@ export default function DistributionChart({ results, threshold }: DistributionCh
 
   return (
     <Box>
-      <Text fontSize="14px" color={colors.text.muted} mb="24px">
+      <Text fontSize="16px" color={colors.text.secondary} mb="24px" lineHeight="1.6">
         Shows how scores cluster across the threshold. Red = failed, orange = near threshold, green = passed.
       </Text>
 
@@ -116,10 +116,10 @@ export default function DistributionChart({ results, threshold }: DistributionCh
                 {bucket.count > 0 && (
                   <Text
                     position="absolute"
-                    top="-22px"
+                    top="-24px"
                     left="50%"
                     transform="translateX(-50%)"
-                    fontSize="13px"
+                    fontSize="14px"
                     fontWeight="700"
                     color={colors.navy}
                     whiteSpace="nowrap"

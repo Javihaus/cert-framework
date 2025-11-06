@@ -80,14 +80,23 @@ export default function ReportView({ summary, results }: ReportViewProps) {
         borderColor={colors.patience}
         mb="24px"
       >
-        <Flex align="center" gap="12px" mb="24px">
-          <Icon as={MdDescription} w="32px" h="32px" color={colors.cobalt} />
-          <Text fontSize="24px" fontWeight="700" color={colors.navy}>
+        <Flex align="center" gap="16px" mb="24px">
+          <Flex
+            w="56px"
+            h="56px"
+            align="center"
+            justify="center"
+            bg={colors.patience}
+            borderRadius="12px"
+          >
+            <Icon as={MdDescription} w="32px" h="32px" color={colors.cobalt} />
+          </Flex>
+          <Text fontSize="28px" fontWeight="700" color={colors.navy}>
             Generate Compliance Report
           </Text>
         </Flex>
 
-        <Text fontSize="14px" color={colors.text.muted} mb="24px" lineHeight="1.7">
+        <Text fontSize="16px" color={colors.text.secondary} mb="28px" lineHeight="1.7">
           Generate a professional PDF report with comprehensive evaluation metrics,
           failure analysis, and compliance recommendations. This report is suitable
           for regulatory documentation and stakeholder review.
@@ -96,7 +105,7 @@ export default function ReportView({ summary, results }: ReportViewProps) {
         {/* Report Metadata Form */}
         <VStack gap="20px" align="stretch" mb="32px">
           <Box>
-            <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
               Report Title
             </Text>
             <Input
@@ -107,11 +116,13 @@ export default function ReportView({ summary, results }: ReportViewProps) {
               border="1px solid"
               borderColor={colors.patience}
               _focus={{ borderColor: colors.cobalt }}
+              fontSize="15px"
+              height="44px"
             />
           </Box>
 
           <Box>
-            <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
               Organization
             </Text>
             <Input
@@ -122,11 +133,13 @@ export default function ReportView({ summary, results }: ReportViewProps) {
               border="1px solid"
               borderColor={colors.patience}
               _focus={{ borderColor: colors.cobalt }}
+              fontSize="15px"
+              height="44px"
             />
           </Box>
 
           <Box>
-            <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
               Evaluator
             </Text>
             <Input
@@ -137,11 +150,13 @@ export default function ReportView({ summary, results }: ReportViewProps) {
               border="1px solid"
               borderColor={colors.patience}
               _focus={{ borderColor: colors.cobalt }}
+              fontSize="15px"
+              height="44px"
             />
           </Box>
 
           <Box>
-            <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
               Additional Notes
             </Text>
             <Textarea
@@ -152,6 +167,7 @@ export default function ReportView({ summary, results }: ReportViewProps) {
               border="1px solid"
               borderColor={colors.patience}
               _focus={{ borderColor: colors.cobalt }}
+              fontSize="15px"
               rows={4}
             />
           </Box>
@@ -166,22 +182,22 @@ export default function ReportView({ summary, results }: ReportViewProps) {
           borderColor={colors.patience}
           mb="24px"
         >
-          <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="16px">
+          <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
             Report Preview
           </Text>
 
           <VStack gap="12px" align="stretch">
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Total Traces:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.navy}>
+              <Text fontSize="15px" color={colors.text.muted}>Total Traces:</Text>
+              <Text fontSize="15px" fontWeight="600" color={colors.navy}>
                 {summary.total_traces.toLocaleString()}
               </Text>
             </Flex>
 
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Accuracy:</Text>
+              <Text fontSize="15px" color={colors.text.muted}>Accuracy:</Text>
               <Text
-                fontSize="14px"
+                fontSize="15px"
                 fontWeight="600"
                 color={isCompliant ? colors.success : colors.warning}
               >
@@ -190,30 +206,30 @@ export default function ReportView({ summary, results }: ReportViewProps) {
             </Flex>
 
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Passed Traces:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.success}>
+              <Text fontSize="15px" color={colors.text.muted}>Passed Traces:</Text>
+              <Text fontSize="15px" fontWeight="600" color={colors.success}>
                 {summary.passed_traces.toLocaleString()}
               </Text>
             </Flex>
 
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Failed Traces:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.error}>
+              <Text fontSize="15px" color={colors.text.muted}>Failed Traces:</Text>
+              <Text fontSize="15px" fontWeight="600" color={colors.error}>
                 {summary.failed_traces.toLocaleString()}
               </Text>
             </Flex>
 
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Mean Confidence:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.navy}>
+              <Text fontSize="15px" color={colors.text.muted}>Mean Confidence:</Text>
+              <Text fontSize="15px" fontWeight="600" color={colors.navy}>
                 {summary.mean_confidence.toFixed(3)}
               </Text>
             </Flex>
 
             <Flex justify="space-between">
-              <Text fontSize="14px" color={colors.text.muted}>Compliance Status:</Text>
+              <Text fontSize="15px" color={colors.text.muted}>Compliance Status:</Text>
               <Text
-                fontSize="14px"
+                fontSize="15px"
                 fontWeight="600"
                 color={isCompliant ? colors.success : colors.warning}
               >
@@ -226,10 +242,10 @@ export default function ReportView({ summary, results }: ReportViewProps) {
         {/* Download Button */}
         <Button
           w="100%"
-          h="52px"
+          h="56px"
           bg={colors.cobalt}
           color="white"
-          fontSize="16px"
+          fontSize="17px"
           fontWeight="600"
           borderRadius="8px"
           _hover={{ bg: colors.navy }}
@@ -240,7 +256,7 @@ export default function ReportView({ summary, results }: ReportViewProps) {
             'Generating Report...'
           ) : (
             <Flex align="center" gap="12px">
-              <Icon as={MdFileDownload} w="20px" h="20px" />
+              <Icon as={MdFileDownload} w="22px" h="22px" />
               <Text>Download PDF Report</Text>
             </Flex>
           )}
@@ -250,18 +266,30 @@ export default function ReportView({ summary, results }: ReportViewProps) {
       {/* Information Box */}
       <Box
         bg="#FEF3C7"
-        p="20px"
+        p="24px"
         borderRadius="12px"
         border="1px solid"
         borderColor={colors.warning}
       >
-        <Text fontSize="14px" fontWeight="600" color={colors.navy} mb="8px">
-          📄 Report Contents
-        </Text>
+        <Flex align="center" gap="12px" mb="12px">
+          <Flex
+            w="40px"
+            h="40px"
+            align="center"
+            justify="center"
+            bg="rgba(255, 255, 255, 0.5)"
+            borderRadius="8px"
+          >
+            <Icon as={MdDescription} w="24px" h="24px" color={colors.navy} />
+          </Flex>
+          <Text fontSize="18px" fontWeight="600" color={colors.navy}>
+            Report Contents
+          </Text>
+        </Flex>
         <Box
           as="ul"
           ml="20px"
-          fontSize="13px"
+          fontSize="15px"
           color={colors.text.primary}
           lineHeight="1.8"
           css={{ listStyleType: 'disc' }}

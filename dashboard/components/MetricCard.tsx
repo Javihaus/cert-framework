@@ -1,53 +1,55 @@
 import { Box, Flex, Icon, Text } from '@chakra-ui/react';
 import { IconType } from 'react-icons';
 import Card from './Card';
+import { colors } from '@/theme/colors';
 
 interface MetricCardProps {
   label: string;
   value: string;
   icon: IconType;
   color: 'green' | 'red' | 'blue' | 'orange';
+  bgColor?: string;
 }
 
 const colorSchemes = {
   green: {
-    bg: 'green.500',
-    light: 'green.50',
+    bg: colors.success,
+    light: '#e8f5e9',
   },
   red: {
-    bg: 'red.500',
-    light: 'red.50',
+    bg: colors.error,
+    light: '#fee',
   },
   blue: {
-    bg: 'brand.500',
-    light: 'brand.50',
+    bg: colors.cobalt,
+    light: colors.patience,
   },
   orange: {
-    bg: 'orange.500',
-    light: 'orange.50',
+    bg: colors.coral,
+    light: '#fef5e7',
   },
 };
 
-export default function MetricCard({ label, value, icon, color }: MetricCardProps) {
+export default function MetricCard({ label, value, icon, color, bgColor }: MetricCardProps) {
   const scheme = colorSchemes[color];
 
   return (
-    <Card>
+    <Card style={{ borderColor: colors.patience, backgroundColor: bgColor }}>
       <Flex align="center" justify="space-between" w="100%">
         <Flex direction="column">
           <Text
-            color="secondaryGray.600"
-            fontSize="sm"
-            fontWeight="500"
-            mb="4px"
+            color={colors.text.muted}
+            fontSize="16px"
+            fontWeight="600"
+            mb="8px"
           >
             {label}
           </Text>
           <Text
-            color="secondaryGray.900"
-            fontSize="34px"
+            color={colors.navy}
+            fontSize="40px"
             fontWeight="700"
-            lineHeight="100%"
+            lineHeight="1"
           >
             {value}
           </Text>
@@ -56,11 +58,11 @@ export default function MetricCard({ label, value, icon, color }: MetricCardProp
           align="center"
           justify="center"
           bg={scheme.light}
-          borderRadius="50%"
-          w="56px"
-          h="56px"
+          borderRadius="12px"
+          w="64px"
+          h="64px"
         >
-          <Icon as={icon} w="28px" h="28px" color={scheme.bg} />
+          <Icon as={icon} w="32px" h="32px" color={scheme.bg} />
         </Flex>
       </Flex>
     </Card>
