@@ -749,11 +749,11 @@ async function setupDesignSystem() {
     blendMode: 'NORMAL'
   }];
 
-  const buttonText = figma.createText();
-  buttonText.characters = 'Generate Documents';
-  buttonText.fontSize = 15;
-  buttonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  generateButton.appendChild(buttonText);
+  const generateButtonText = figma.createText();
+  generateButtonText.characters = 'Generate Documents';
+  generateButtonText.fontSize = 15;
+  generateButtonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  generateButton.appendChild(generateButtonText);
 
   formCard.appendChild(generateButton);
 
