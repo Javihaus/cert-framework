@@ -12,3 +12,7 @@ coverage/
 __pycache__/
 *.egg-info/
 .vercel
+
+# Figma generated files (optional - you can commit these to track changes)
+# dashboard/generated/
+
