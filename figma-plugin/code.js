@@ -108,7 +108,20 @@ function sendProgress(text, percent) {
 // Main setup function
 async function setupDesignSystem() {
   console.log('📝 Creating Design System...');
-  sendProgress('Creating Design System page...', 5);
+  sendProgress('Loading fonts...', 5);
+
+  // Pre-load ALL fonts at the start to avoid any race conditions
+  try {
+    await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+    await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
+    await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  } catch (error) {
+    console.log('Inter font not available, using Roboto fallback');
+    await figma.loadFontAsync({ family: 'Roboto', style: 'Regular' });
+    await figma.loadFontAsync({ family: 'Roboto', style: 'Bold' });
+  }
+
+  sendProgress('Creating Design System page...', 10);
 
   // Create main page
   const page = figma.createPage();
@@ -121,7 +134,7 @@ async function setupDesignSystem() {
   // STEP 1: Create Color Styles & Palette
   // ============================================
   console.log('🎨 Creating color styles...');
-  sendProgress('Creating color styles...', 15);
+  sendProgress('Creating color styles...', 20);
 
   const colorFrame = figma.createFrame();
   colorFrame.name = 'Color Palette';
@@ -138,25 +151,16 @@ async function setupDesignSystem() {
 
   // Add title
   const colorTitle = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
-  );
   colorTitle.characters = 'Color Palette';
   colorTitle.fontSize = 32;
   colorFrame.appendChild(colorTitle);
 
-  // Create color swatches
-  let colorX = 0;
+  // Create color swatches row
   const colorRow = figma.createFrame();
   colorRow.name = 'Colors';
   colorRow.layoutMode = 'HORIZONTAL';
   colorRow.itemSpacing = 16;
   colorRow.fills = [];
-
-  // Pre-load font for all labels
-  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
-  );
 
   for (const color of Object.values(colors)) {
     // Create color style
@@ -209,17 +213,9 @@ async function setupDesignSystem() {
 
   // Add title
   const typoTitle = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
-  );
   typoTitle.characters = 'Typography';
   typoTitle.fontSize = 32;
   typoFrame.appendChild(typoTitle);
-
-  // Pre-load font for all samples
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
-  );
 
   // Create text samples
   for (const typo of typography) {
@@ -259,17 +255,9 @@ async function setupDesignSystem() {
 
   // Add title
   const componentTitle = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
-  );
   componentTitle.characters = 'Component Library';
   componentTitle.fontSize = 32;
   componentFrame.appendChild(componentTitle);
-
-  // Pre-load fonts for components
-  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
-  );
 
   // Component 1: Button/Primary
   const buttonPrimary = figma.createComponent();
@@ -340,11 +328,6 @@ async function setupDesignSystem() {
   homePage.resize(1440, 1024);
   homePage.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
 
-  // Pre-load font for hero text
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
-    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
-  );
-
   const heroText = figma.createText();
   heroText.characters = 'AI systems you can deploy\nwith confidence';
   heroText.fontSize = 56;
@@ -358,6 +341,8 @@ async function setupDesignSystem() {
 
   // Zoom to fit
   figma.viewport.scrollAndZoomIntoView([page]);
+
+  sendProgress('Finishing up...', 100);
 
   // Show completion message
   figma.notify('✅ Design system created successfully! 🎉');
