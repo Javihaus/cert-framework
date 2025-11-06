@@ -153,7 +153,12 @@ async function setupDesignSystem() {
   colorRow.itemSpacing = 16;
   colorRow.fills = [];
 
-  Object.values(colors).forEach((color) => {
+  // Pre-load font for all labels
+  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
+  );
+
+  for (const color of Object.values(colors)) {
     // Create color style
     createColorStyle(color.name, color.r, color.g, color.b);
 
@@ -166,16 +171,14 @@ async function setupDesignSystem() {
 
     // Add label
     const label = figma.createText();
-    figma.loadFontAsync({ family: 'Inter', style: 'Medium' }).then(() => {
-      label.characters = color.name;
-      label.fontSize = 14;
-      label.x = 8;
-      label.y = swatch.height + 8;
-      swatch.appendChild(label);
-    });
+    label.characters = color.name;
+    label.fontSize = 14;
+    label.x = 8;
+    label.y = swatch.height + 8;
+    swatch.appendChild(label);
 
     colorRow.appendChild(swatch);
-  });
+  }
 
   colorFrame.appendChild(colorRow);
   page.appendChild(colorFrame);
@@ -206,17 +209,23 @@ async function setupDesignSystem() {
 
   // Add title
   const typoTitle = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
+  );
   typoTitle.characters = 'Typography';
   typoTitle.fontSize = 32;
   typoFrame.appendChild(typoTitle);
+
+  // Pre-load font for all samples
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
+  );
 
   // Create text samples
   for (const typo of typography) {
     createTextStyle(typo.name, typo.fontSize, typo.fontWeight, typo.lineHeight, typo.letterSpacing);
 
     const sample = figma.createText();
-    await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
     sample.characters = `${typo.name} - ${typo.fontSize}px`;
     sample.fontSize = typo.fontSize;
     typoFrame.appendChild(sample);
@@ -250,10 +259,17 @@ async function setupDesignSystem() {
 
   // Add title
   const componentTitle = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
+  );
   componentTitle.characters = 'Component Library';
   componentTitle.fontSize = 32;
   componentFrame.appendChild(componentTitle);
+
+  // Pre-load fonts for components
+  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Regular' })
+  );
 
   // Component 1: Button/Primary
   const buttonPrimary = figma.createComponent();
@@ -263,7 +279,6 @@ async function setupDesignSystem() {
   buttonPrimary.cornerRadius = 8;
 
   const buttonText = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
   buttonText.characters = 'Button';
   buttonText.fontSize = 15;
   buttonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
@@ -282,7 +297,6 @@ async function setupDesignSystem() {
   buttonSecondary.cornerRadius = 8;
 
   const buttonText2 = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
   buttonText2.characters = 'Button';
   buttonText2.fontSize = 15;
   buttonText2.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
@@ -326,8 +340,12 @@ async function setupDesignSystem() {
   homePage.resize(1440, 1024);
   homePage.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
 
+  // Pre-load font for hero text
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).catch(() =>
+    figma.loadFontAsync({ family: 'Roboto', style: 'Bold' })
+  );
+
   const heroText = figma.createText();
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
   heroText.characters = 'AI systems you can deploy\nwith confidence';
   heroText.fontSize = 56;
   heroText.textAlignHorizontal = 'CENTER';
