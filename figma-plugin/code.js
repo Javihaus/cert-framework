@@ -317,27 +317,449 @@ async function setupDesignSystem() {
   sendProgress('Components created!', 85);
 
   // ============================================
-  // STEP 4: Create sample page layout
+  // STEP 4: Create Dashboard Pages
   // ============================================
-  sendProgress('Creating sample pages...', 90);
+  sendProgress('Creating dashboard pages...', 90);
   const layoutPage = figma.createPage();
-  layoutPage.name = '📱 Pages';
+  layoutPage.name = '📱 Dashboard Pages';
+  figma.currentPage = layoutPage;
 
+  let pageY = 0;
+
+  // ============================================
+  // PAGE 1: Home Page
+  // ============================================
   const homePage = figma.createFrame();
   homePage.name = 'Page/Home';
-  homePage.resize(1440, 1024);
+  homePage.x = 0;
+  homePage.y = pageY;
+  homePage.resize(1440, 3200);
   homePage.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
+  homePage.layoutMode = 'VERTICAL';
+  homePage.paddingTop = 80;
+  homePage.paddingLeft = 120;
+  homePage.paddingRight = 120;
+  homePage.itemSpacing = 72;
 
-  const heroText = figma.createText();
-  heroText.characters = 'AI systems you can deploy\nwith confidence';
-  heroText.fontSize = 56;
-  heroText.textAlignHorizontal = 'CENTER';
-  heroText.x = (homePage.width - 800) / 2;
-  heroText.y = 200;
-  heroText.resize(800, 200);
-  homePage.appendChild(heroText);
+  // Navigation Header
+  const navHome = figma.createFrame();
+  navHome.name = 'Navigation';
+  navHome.resize(1200, 64);
+  navHome.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  navHome.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  navHome.strokeWeight = 1;
+  navHome.cornerRadius = 8;
+  navHome.layoutMode = 'HORIZONTAL';
+  navHome.paddingLeft = 32;
+  navHome.paddingRight = 32;
+  navHome.itemSpacing = 32;
+  navHome.counterAxisAlignItems = 'CENTER';
+
+  const logoHome = figma.createText();
+  logoHome.characters = 'CERT';
+  logoHome.fontSize = 24;
+  logoHome.fills = [{ type: 'SOLID', color: hexToRgb('3C6098') }];
+  navHome.appendChild(logoHome);
+
+  homePage.appendChild(navHome);
+
+  // Hero Section
+  const heroSection = figma.createFrame();
+  heroSection.name = 'Hero';
+  heroSection.resize(1200, 280);
+  heroSection.fills = [];
+  heroSection.layoutMode = 'VERTICAL';
+  heroSection.primaryAxisAlignItems = 'CENTER';
+  heroSection.itemSpacing = 24;
+
+  const heroTitle = figma.createText();
+  heroTitle.characters = 'AI systems you can deploy\nwith confidence';
+  heroTitle.fontSize = 56;
+  heroTitle.textAlignHorizontal = 'CENTER';
+  heroTitle.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  heroTitle.resize(1000, 130);
+  heroSection.appendChild(heroTitle);
+
+  const heroSubtitle = figma.createText();
+  heroSubtitle.characters = 'Built for the August 2025 EU AI Act deadline. Trace analysis that proves 90%+ accuracy.\nDocumentation ready for conformity assessment.';
+  heroSubtitle.fontSize = 24;
+  heroSubtitle.textAlignHorizontal = 'CENTER';
+  heroSubtitle.fills = [{ type: 'SOLID', color: hexToRgb('3C6098') }];
+  heroSubtitle.resize(800, 100);
+  heroSection.appendChild(heroSubtitle);
+
+  homePage.appendChild(heroSection);
+
+  // Overview Card
+  const overviewCard = figma.createFrame();
+  overviewCard.name = 'Overview Card';
+  overviewCard.resize(1200, 280);
+  overviewCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  overviewCard.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  overviewCard.strokeWeight = 1;
+  overviewCard.cornerRadius = 12;
+  overviewCard.layoutMode = 'VERTICAL';
+  overviewCard.paddingTop = 32;
+  overviewCard.paddingBottom = 32;
+  overviewCard.paddingLeft = 32;
+  overviewCard.paddingRight = 32;
+  overviewCard.itemSpacing = 20;
+
+  const overviewTitle = figma.createText();
+  overviewTitle.characters = 'What CERT Does';
+  overviewTitle.fontSize = 28;
+  overviewTitle.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  overviewCard.appendChild(overviewTitle);
+
+  const overviewText = figma.createText();
+  overviewText.characters = 'CERT combines production LLM monitoring with EU AI Act compliance automation.\nTrack accuracy, analyze failures, and generate audit-ready documentation automatically.';
+  overviewText.fontSize = 18;
+  overviewText.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  overviewText.resize(1100, 80);
+  overviewCard.appendChild(overviewText);
+
+  homePage.appendChild(overviewCard);
+
+  // Features Grid
+  const featuresGrid = figma.createFrame();
+  featuresGrid.name = 'Features';
+  featuresGrid.resize(1200, 240);
+  featuresGrid.fills = [];
+  featuresGrid.layoutMode = 'HORIZONTAL';
+  featuresGrid.itemSpacing = 32;
+
+  // Feature 1: Monitoring
+  const feature1 = figma.createFrame();
+  feature1.name = 'Monitoring Card';
+  feature1.resize(584, 240);
+  feature1.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  feature1.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  feature1.strokeWeight = 1;
+  feature1.cornerRadius = 12;
+  feature1.layoutMode = 'VERTICAL';
+  feature1.paddingTop = 32;
+  feature1.paddingBottom = 32;
+  feature1.paddingLeft = 32;
+  feature1.paddingRight = 32;
+  feature1.itemSpacing = 16;
+
+  const featureTitle1 = figma.createText();
+  featureTitle1.characters = 'Production Monitoring';
+  featureTitle1.fontSize = 24;
+  featureTitle1.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  feature1.appendChild(featureTitle1);
+
+  const featureText1 = figma.createText();
+  featureText1.characters = 'Upload LLM traces to analyze accuracy, identify failures,\nand track performance metrics required by Article 15.';
+  featureText1.fontSize = 16;
+  featureText1.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  featureText1.resize(520, 60);
+  feature1.appendChild(featureText1);
+
+  featuresGrid.appendChild(feature1);
+
+  // Feature 2: Documents
+  const feature2 = figma.createFrame();
+  feature2.name = 'Documents Card';
+  feature2.resize(584, 240);
+  feature2.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  feature2.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  feature2.strokeWeight = 1;
+  feature2.cornerRadius = 12;
+  feature2.layoutMode = 'VERTICAL';
+  feature2.paddingTop = 32;
+  feature2.paddingBottom = 32;
+  feature2.paddingLeft = 32;
+  feature2.paddingRight = 32;
+  feature2.itemSpacing = 16;
+
+  const featureTitle2 = figma.createText();
+  featureTitle2.characters = 'Compliance Documents';
+  featureTitle2.fontSize = 24;
+  featureTitle2.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  feature2.appendChild(featureTitle2);
+
+  const featureText2 = figma.createText();
+  featureText2.characters = 'Generate 5 professional Word documents for EU AI Act\ncompliance: Risk Classification, Annex IV, and more.';
+  featureText2.fontSize = 16;
+  featureText2.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  featureText2.resize(520, 60);
+  feature2.appendChild(featureText2);
+
+  featuresGrid.appendChild(feature2);
+
+  homePage.appendChild(featuresGrid);
 
   layoutPage.appendChild(homePage);
+
+  pageY += 3300;
+
+  // ============================================
+  // PAGE 2: Monitoring Dashboard
+  // ============================================
+  sendProgress('Creating monitoring page...', 93);
+
+  const monitoringPage = figma.createFrame();
+  monitoringPage.name = 'Page/Monitoring';
+  monitoringPage.x = 0;
+  monitoringPage.y = pageY;
+  monitoringPage.resize(1440, 2400);
+  monitoringPage.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
+  monitoringPage.layoutMode = 'VERTICAL';
+  monitoringPage.paddingTop = 80;
+  monitoringPage.paddingLeft = 120;
+  monitoringPage.paddingRight = 120;
+  monitoringPage.itemSpacing = 40;
+
+  // Navigation
+  const navMonitoring = figma.createFrame();
+  navMonitoring.name = 'Navigation';
+  navMonitoring.resize(1200, 64);
+  navMonitoring.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  navMonitoring.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  navMonitoring.strokeWeight = 1;
+  navMonitoring.cornerRadius = 8;
+  navMonitoring.layoutMode = 'HORIZONTAL';
+  navMonitoring.paddingLeft = 32;
+  navMonitoring.paddingRight = 32;
+  navMonitoring.itemSpacing = 32;
+  navMonitoring.counterAxisAlignItems = 'CENTER';
+
+  const logoMonitoring = figma.createText();
+  logoMonitoring.characters = 'CERT';
+  logoMonitoring.fontSize = 24;
+  logoMonitoring.fills = [{ type: 'SOLID', color: hexToRgb('3C6098') }];
+  navMonitoring.appendChild(logoMonitoring);
+
+  monitoringPage.appendChild(navMonitoring);
+
+  // Status Banner
+  const statusBanner = figma.createFrame();
+  statusBanner.name = 'Status Banner';
+  statusBanner.resize(1200, 100);
+  statusBanner.fills = [{
+    type: 'GRADIENT_LINEAR',
+    gradientTransform: [
+      [0.8, -0.8, 0.4],
+      [0.8, 0.8, 0]
+    ],
+    gradientStops: [
+      { position: 0, color: { r: 72/255, g: 187/255, b: 120/255, a: 1 } },
+      { position: 1, color: { r: 56/255, g: 161/255, b: 105/255, a: 1 } }
+    ]
+  }];
+  statusBanner.cornerRadius = 12;
+  statusBanner.layoutMode = 'HORIZONTAL';
+  statusBanner.paddingLeft = 32;
+  statusBanner.paddingRight = 32;
+  statusBanner.itemSpacing = 20;
+  statusBanner.counterAxisAlignItems = 'CENTER';
+
+  const statusText = figma.createText();
+  statusText.characters = 'System Compliant';
+  statusText.fontSize = 20;
+  statusText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  statusBanner.appendChild(statusText);
+
+  monitoringPage.appendChild(statusBanner);
+
+  // Metrics Grid
+  const metricsGrid = figma.createFrame();
+  metricsGrid.name = 'Metrics';
+  metricsGrid.resize(1200, 200);
+  metricsGrid.fills = [];
+  metricsGrid.layoutMode = 'HORIZONTAL';
+  metricsGrid.itemSpacing = 24;
+
+  for (let i = 0; i < 4; i++) {
+    const metricCard = figma.createFrame();
+    metricCard.name = `Metric ${i + 1}`;
+    metricCard.resize(282, 200);
+    metricCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    metricCard.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+    metricCard.strokeWeight = 1;
+    metricCard.cornerRadius = 12;
+    metricCard.layoutMode = 'VERTICAL';
+    metricCard.paddingTop = 24;
+    metricCard.paddingBottom = 24;
+    metricCard.paddingLeft = 24;
+    metricCard.paddingRight = 24;
+    metricCard.itemSpacing = 16;
+
+    const metricLabel = figma.createText();
+    metricLabel.characters = ['Accuracy', 'Total Traces', 'Passed', 'Failed'][i];
+    metricLabel.fontSize = 16;
+    metricLabel.fills = [{ type: 'SOLID', color: hexToRgb('718096') }];
+    metricCard.appendChild(metricLabel);
+
+    const metricValue = figma.createText();
+    metricValue.characters = ['92.5%', '1,234', '1,142', '92'][i];
+    metricValue.fontSize = 40;
+    metricValue.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+    metricCard.appendChild(metricValue);
+
+    metricsGrid.appendChild(metricCard);
+  }
+
+  monitoringPage.appendChild(metricsGrid);
+
+  // Chart Placeholder
+  const chartCard = figma.createFrame();
+  chartCard.name = 'Distribution Chart';
+  chartCard.resize(1200, 400);
+  chartCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  chartCard.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  chartCard.strokeWeight = 1;
+  chartCard.cornerRadius = 12;
+  chartCard.layoutMode = 'VERTICAL';
+  chartCard.paddingTop = 32;
+  chartCard.paddingBottom = 32;
+  chartCard.paddingLeft = 32;
+  chartCard.paddingRight = 32;
+  chartCard.primaryAxisAlignItems = 'CENTER';
+  chartCard.counterAxisAlignItems = 'CENTER';
+
+  const chartTitle = figma.createText();
+  chartTitle.characters = 'Confidence Score Distribution';
+  chartTitle.fontSize = 24;
+  chartTitle.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  chartCard.appendChild(chartTitle);
+
+  const chartPlaceholder = figma.createFrame();
+  chartPlaceholder.resize(1000, 250);
+  chartPlaceholder.fills = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  chartPlaceholder.cornerRadius = 8;
+  chartCard.appendChild(chartPlaceholder);
+
+  monitoringPage.appendChild(chartCard);
+
+  layoutPage.appendChild(monitoringPage);
+
+  pageY += 2500;
+
+  // ============================================
+  // PAGE 3: Document Generation
+  // ============================================
+  sendProgress('Creating documents page...', 96);
+
+  const docsPage = figma.createFrame();
+  docsPage.name = 'Page/Documents';
+  docsPage.x = 0;
+  docsPage.y = pageY;
+  docsPage.resize(1440, 2000);
+  docsPage.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
+  docsPage.layoutMode = 'VERTICAL';
+  docsPage.paddingTop = 80;
+  docsPage.paddingLeft = 120;
+  docsPage.paddingRight = 120;
+  docsPage.itemSpacing = 40;
+
+  // Navigation
+  const navDocs = figma.createFrame();
+  navDocs.name = 'Navigation';
+  navDocs.resize(1200, 64);
+  navDocs.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  navDocs.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  navDocs.strokeWeight = 1;
+  navDocs.cornerRadius = 8;
+  navDocs.layoutMode = 'HORIZONTAL';
+  navDocs.paddingLeft = 32;
+  navDocs.paddingRight = 32;
+  navDocs.itemSpacing = 32;
+  navDocs.counterAxisAlignItems = 'CENTER';
+
+  const logoDocs = figma.createText();
+  logoDocs.characters = 'CERT';
+  logoDocs.fontSize = 24;
+  logoDocs.fills = [{ type: 'SOLID', color: hexToRgb('3C6098') }];
+  navDocs.appendChild(logoDocs);
+
+  docsPage.appendChild(navDocs);
+
+  // Page Title
+  const docsTitle = figma.createText();
+  docsTitle.characters = 'Generate Compliance Documents';
+  docsTitle.fontSize = 36;
+  docsTitle.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  docsPage.appendChild(docsTitle);
+
+  // Form Sections
+  const formCard = figma.createFrame();
+  formCard.name = 'Form';
+  formCard.resize(1200, 800);
+  formCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  formCard.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  formCard.strokeWeight = 1;
+  formCard.cornerRadius = 12;
+  formCard.layoutMode = 'VERTICAL';
+  formCard.paddingTop = 32;
+  formCard.paddingBottom = 32;
+  formCard.paddingLeft = 32;
+  formCard.paddingRight = 32;
+  formCard.itemSpacing = 32;
+
+  // Form Section 1
+  const formSection1 = figma.createFrame();
+  formSection1.name = 'Section';
+  formSection1.resize(1100, 120);
+  formSection1.fills = [];
+  formSection1.layoutMode = 'VERTICAL';
+  formSection1.itemSpacing = 12;
+
+  const sectionTitle1 = figma.createText();
+  sectionTitle1.characters = 'System Information';
+  sectionTitle1.fontSize = 20;
+  sectionTitle1.fills = [{ type: 'SOLID', color: hexToRgb('112358') }];
+  formSection1.appendChild(sectionTitle1);
+
+  const inputField1 = figma.createFrame();
+  inputField1.resize(1100, 44);
+  inputField1.fills = [{ type: 'SOLID', color: hexToRgb('FBF5F0') }];
+  inputField1.strokes = [{ type: 'SOLID', color: hexToRgb('E6DDD6') }];
+  inputField1.strokeWeight = 1;
+  inputField1.cornerRadius = 8;
+  inputField1.layoutMode = 'HORIZONTAL';
+  inputField1.paddingLeft = 16;
+  inputField1.counterAxisAlignItems = 'CENTER';
+
+  const inputText1 = figma.createText();
+  inputText1.characters = 'AI System Name';
+  inputText1.fontSize = 15;
+  inputText1.fills = [{ type: 'SOLID', color: hexToRgb('718096') }];
+  inputField1.appendChild(inputText1);
+
+  formSection1.appendChild(inputField1);
+  formCard.appendChild(formSection1);
+
+  // Generate Button
+  const generateButton = figma.createFrame();
+  generateButton.name = 'Generate Button';
+  generateButton.resize(280, 56);
+  generateButton.fills = [{ type: 'SOLID', color: hexToRgb('3C6098') }];
+  generateButton.cornerRadius = 8;
+  generateButton.layoutMode = 'HORIZONTAL';
+  generateButton.primaryAxisAlignItems = 'CENTER';
+  generateButton.counterAxisAlignItems = 'CENTER';
+  generateButton.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 60/255, g: 96/255, b: 152/255, a: 0.2 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const buttonText = figma.createText();
+  buttonText.characters = 'Generate Documents';
+  buttonText.fontSize = 15;
+  buttonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  generateButton.appendChild(buttonText);
+
+  formCard.appendChild(generateButton);
+
+  docsPage.appendChild(formCard);
+
+  layoutPage.appendChild(docsPage);
 
   // Zoom to fit
   figma.viewport.scrollAndZoomIntoView([page]);
@@ -352,13 +774,13 @@ async function setupDesignSystem() {
     colors: Object.keys(colors).length,
     textStyles: typography.length,
     components: 3,
-    pages: 2
+    pages: 5  // Design System + 3 Dashboard Pages + Pages page
   };
   console.log(`Created:
   - ${stats.colors} color styles
   - ${stats.textStyles} text styles
   - ${stats.components} components
-  - ${stats.pages} pages`);
+  - ${stats.pages} pages (including 3 full dashboard pages)`);
 
   // Send completion to UI
   figma.ui.postMessage({
