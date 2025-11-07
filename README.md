@@ -13,7 +13,6 @@
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org)
 [![Tests](https://img.shields.io/badge/tests-passing-success?logo=pytest&logoColor=white)](https://github.com/Javihaus/cert-framework/actions)
 [![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-
 [![PyPI](https://img.shields.io/pypi/v/cert-framework?color=4B8BBE&logo=python&logoColor=white)](https://pypi.org/project/cert-framework/)
 [![GitHub release](https://img.shields.io/github/v/release/javihaus/cert-framework)](https://github.com/javihaus/cert-framework/releases/latest)
 
@@ -52,7 +51,9 @@ CERT combines two measurement components validated on Stanford SQuAD v2.0:
 | **Semantic Similarity** | 50% | Topic drift, paraphrase errors | r = 0.644 |
 | **Term Grounding** | 50% | Factual hallucinations, numerical errors | r = 0.899 |
 
-**Combined formula:** `accuracy = 0.5 × semantic_similarity + 0.5 × term_grounding`
+**Weighted formula:** 
+
+$accuracy = 0.5 \times semantic-similarity + 0.5 \times term-grounding$
 
 This dual-component approach achieves:
 - **ROC AUC: 0.961** (near-perfect discrimination between accurate and hallucinated outputs)
