@@ -14,6 +14,7 @@ import {
 import { MdFileDownload, MdDescription } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
+import { Article15Report } from '@/types/report-schema';
 
 interface ReportViewProps {
   summary: EvaluationSummary;
@@ -31,22 +32,58 @@ export default function ReportView({ summary, results }: ReportViewProps) {
     setLoading(true);
 
     try {
+      // Convert old format to Article15Report schema
+      const failedTraces = results
+        .filter((r) => !r.passed)
+        .map((r) => ({
+          timestamp: r.timestamp,
+          input_query: r.query,
+          context: '', // Not available in old format
+          answer: r.response || '',
+          confidence: r.measurement.confidence,
+          reason: `Low confidence (${r.measurement.confidence.toFixed(3)})`,
+        }));
+
+      const report: Article15Report = {
+        metadata: {
+          system_name: reportTitle,
+          system_version: 'v1.0',
+          provider_name: organization || 'Not specified',
+          intended_purpose: notes || 'AI system evaluation',
+          report_date: new Date().toISOString(),
+          evaluator_name: evaluator || undefined,
+        },
+        performance: {
+          total_traces: summary.total_traces,
+          evaluated_traces: summary.evaluated_traces,
+          passed_traces: summary.passed_traces,
+          failed_traces: summary.failed_traces,
+          accuracy_percentage: summary.accuracy * 100,
+          mean_confidence: summary.mean_confidence,
+          median_confidence: summary.mean_confidence, // Approximation
+          threshold_used: summary.threshold_used,
+        },
+        temporal: {
+          period_start: summary.date_range.start,
+          period_end: summary.date_range.end,
+          daily_accuracy: [
+            {
+              date: new Date(summary.date_range.start).toISOString().split('T')[0],
+              accuracy: summary.accuracy,
+            },
+          ],
+        },
+        failed_traces: failedTraces,
+        evaluation_methodology: `CERT Framework dual-component measurement approach. Threshold: ${summary.threshold_used}`,
+        compliance_statement: `This system ${summary.accuracy >= 0.9 ? 'meets' : 'does not meet'} EU AI Act Article 15 requirements for accuracy monitoring. Evaluation conducted with ${summary.total_traces} traces. Pass rate of ${(summary.accuracy * 100).toFixed(1)}% ${summary.accuracy >= 0.9 ? 'exceeds' : 'is below'} the 90% compliance threshold.`,
+      };
+
       const response = await fetch('/api/generate-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          summary,
-          results,
-          metadata: {
-            title: reportTitle,
-            organization,
-            evaluator,
-            notes,
-            generated_date: new Date().toISOString(),
-          },
-        }),
+        body: JSON.stringify({ report }),
       });
 
       if (!response.ok) {
