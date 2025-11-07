@@ -304,7 +304,8 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
 
         if not output:
             click.echo(
-                "Error: --output is required for .docx format (e.g., --output report.docx)", err=True
+                "Error: --output is required for .docx format (e.g., --output report.docx)",
+                err=True,
             )
             sys.exit(1)
 
@@ -315,9 +316,7 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
             click.echo(f"  Open with: open {output}", err=True)
         except FileNotFoundError as e:
             click.echo(f"Error: {e}", err=True)
-            click.echo(
-                "  Create template with: python templates/generate_templates.py", err=True
-            )
+            click.echo("  Create template with: python templates/generate_templates.py", err=True)
             sys.exit(1)
 
     elif format == "html":
