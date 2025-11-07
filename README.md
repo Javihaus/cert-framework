@@ -688,36 +688,10 @@ Generated reports include:
 
 ## Dashboard
 
-The dashboard generates PDF reports for visual review. For editable .docx documents (required for regulatory submission), use the CLI. Both formats contain identical information.
+<img src="docs/dashboard_main.png" alt="CERT Dashboard" width="100%" />
 
-The dashboard is optional - you can use CLI-only for automated compliance workflows. Deploy the dashboard when non-technical stakeholders need visual access to compliance metrics.
+Go to the dashboard: https://dashboard.cert-framework.com/
 
-**Setup:**
-
-```bash
-cd dashboard
-npm install
-npm run dev
-# Open http://localhost:3000
-```
-
-**Features:**
-- Upload evaluation JSON files
-- Interactive accuracy distribution charts
-- Failed trace browser
-- Export PDF reports (uses @react-pdf/renderer)
-
-**When to use the dashboard:**
-- Multiple stakeholders need to review results
-- You want professional PDF exports for auditors
-- You need visual trend analysis (upcoming feature)
-
-**When to skip it:**
-- CLI HTML reports are sufficient
-- You prefer static files over web applications
-- You don't want to maintain a separate Node.js deployment
-
-The dashboard adds convenience but isn't required for compliance. The CLI generates self-contained HTML reports with all necessary information.
 
 ---
 
