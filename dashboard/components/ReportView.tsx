@@ -12,9 +12,11 @@ import {
   Textarea,
 } from '@chakra-ui/react';
 import { MdFileDownload, MdDescription } from 'react-icons/md';
+import { pdf } from '@react-pdf/renderer';
 import { colors } from '@/theme/colors';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { Article15Report } from '@/types/report-schema';
+import { CERTReportPDF } from './CERTReportPDF';
 
 interface ReportViewProps {
   summary: EvaluationSummary;
@@ -78,19 +80,10 @@ export default function ReportView({ summary, results }: ReportViewProps) {
         compliance_statement: `This system ${summary.accuracy >= 0.9 ? 'meets' : 'does not meet'} EU AI Act Article 15 requirements for accuracy monitoring. Evaluation conducted with ${summary.total_traces} traces. Pass rate of ${(summary.accuracy * 100).toFixed(1)}% ${summary.accuracy >= 0.9 ? 'exceeds' : 'is below'} the 90% compliance threshold.`,
       };
 
-      const response = await fetch('/api/generate-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ report }),
-      });
+      // Generate PDF entirely in the browser - NO SERVER CALL
+      const blob = await pdf(<CERTReportPDF report={report} />).toBlob();
 
-      if (!response.ok) {
-        throw new Error('Failed to generate report');
-      }
-
-      const blob = await response.blob();
+      // Download directly
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
