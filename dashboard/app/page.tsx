@@ -104,6 +104,26 @@ export default function Home() {
     };
 
     setEvaluationData({ summary: normalizedSummary, results });
+
+    // Store data to sessionStorage for Document Generation page
+    const complianceData = {
+      metadata: {
+        system_name: data.metadata?.system_name || 'AI System',
+        system_version: data.metadata?.system_version || 'v1.0',
+        provider_name: data.metadata?.provider_name || 'Organization',
+      },
+      performance: normalizedSummary,
+    };
+
+    const riskData = {
+      classification: {
+        risk_level: data.metadata?.risk_level || 'high',
+      },
+    };
+
+    sessionStorage.setItem('compliance_data', JSON.stringify(complianceData));
+    sessionStorage.setItem('risk_classification', JSON.stringify(riskData));
+
     // Switch to overview tab after loading data
     setActiveTab('overview');
   };

@@ -56,16 +56,26 @@ export default function DocumentGenerationPage() {
     const riskDataStr = sessionStorage.getItem('risk_classification');
 
     if (complianceDataStr && riskDataStr) {
-      const complianceData = JSON.parse(complianceDataStr);
-      const riskData = JSON.parse(riskDataStr);
+      try {
+        const complianceData = JSON.parse(complianceDataStr);
+        const riskData = JSON.parse(riskDataStr);
 
-      setFormData(prev => ({
-        ...prev,
-        systemName: complianceData.metadata?.system_name || prev.systemName,
-        systemVersion: complianceData.metadata?.system_version || prev.systemVersion,
-        providerName: complianceData.metadata?.provider_name || prev.providerName,
-        riskLevel: riskData.classification?.risk_level || prev.riskLevel,
-      }));
+        setFormData(prev => ({
+          ...prev,
+          systemName: complianceData.metadata?.system_name || prev.systemName,
+          systemVersion: complianceData.metadata?.system_version || prev.systemVersion,
+          providerName: complianceData.metadata?.provider_name || prev.providerName,
+          riskLevel: riskData.classification?.risk_level || prev.riskLevel,
+        }));
+
+        // Clear any previous errors and show success feedback
+        setError(null);
+        alert('✓ Data loaded successfully from evaluation traces!');
+      } catch (err) {
+        alert('Failed to load trace data. Please check the data format.');
+      }
+    } else {
+      alert('No trace data found. Please upload evaluation results in the Monitoring tab first.');
     }
   };
 
