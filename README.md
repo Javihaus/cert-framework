@@ -383,16 +383,22 @@ Annex IV: INCOMPLETE (6/9 sections)
 ### Generate Reports
 
 ```bash
-# HTML report (standalone file)
+# .docx report (editable, for regulatory submission) - v1.0
 cert report traces.jsonl \
   --system-name "CustomerBot" \
-  --format html \
-  --output report.html
+  --provider-name "Acme Corp" \
+  --format docx \
+  --output report.docx
 
-# JSON report (for programmatic access)
+# JSON report (for dashboard consumption)
 cert report traces.jsonl \
   --format json \
   --output report.json
+
+# HTML report (standalone file)
+cert report traces.jsonl \
+  --format html \
+  --output report.html
 ```
 
 ### Measure Single Text Pair
@@ -414,6 +420,46 @@ cert measure "Apple's Q4 revenue was $450B" "Apple reported $89.5B Q4" --detaile
 ```
 
 ---
+
+## Document Generation: CLI vs Dashboard
+
+CERT generates compliance reports in two formats for different workflows:
+
+### CLI: Editable documentation (In Progress)
+
+**Format:** .docx  
+**Purpose:** Regulatory submission and internal review  
+**Status:** Planned for v1.0
+```bash
+cert report traces.jsonl \
+  --format docx \
+  --output article15_report.docx \
+  --system-name "CustomerBot" \
+  --provider-name "Acme Corp"
+```
+
+Use .docx when:
+- Submitting to regulators who require editable documents
+- Internal compliance reviews need annotations
+- Automating report generation in CI/CD
+- Version controlling compliance documentation (docx is XML-based)
+
+### Dashboard: Professional presentations
+
+**Format:** PDF  
+**Purpose:** Stakeholder review and presentations  
+**Status:** Implemented
+
+Upload evaluation JSON to dashboard → review metrics → download polished PDF.
+
+Use PDF when:
+- Presenting to non-technical stakeholders
+- Quick visual review without CLI access
+- Final read-only reports for executive review
+
+### Format Consistency
+
+Both systems consume identical JSON structure (see `Article15Report` schema). The CLI and dashboard always generate the same logical document - different rendering engines, same content.
 
 ## API Documentation
 
@@ -639,9 +685,11 @@ Generated reports include:
 
 ---
 
-## Dashboard (Optional)
+## Dashboard
 
-The dashboard is a separate Next.js application for visualizing compliance reports. It's optional - you can generate HTML reports via CLI without deploying the dashboard.
+The dashboard generates PDF reports for visual review. For editable .docx documents (required for regulatory submission), use the CLI. Both formats contain identical information.
+
+The dashboard is optional - you can use CLI-only for automated compliance workflows. Deploy the dashboard when non-technical stakeholders need visual access to compliance metrics.
 
 **Setup:**
 
