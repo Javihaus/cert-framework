@@ -169,9 +169,10 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
         cert audit traces.jsonl --evaluator exact --threshold 0.9
     """
     try:
-        from cert.evaluation import Evaluator, ExactMatchEvaluator, SemanticEvaluator
-        from datetime import datetime
         import json as json_lib
+        from datetime import datetime
+
+        from cert.evaluation import Evaluator, ExactMatchEvaluator, SemanticEvaluator
     except ImportError:
         click.echo("Error: Install evaluation features with: pip install cert-framework[evaluation]", err=True)
         sys.exit(1)
