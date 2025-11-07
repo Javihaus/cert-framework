@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Box, Button, Flex, Text, Grid, Input, Textarea } from '@chakra-ui/react';
-import { MdFileDownload, MdRocketLaunch, MdDescription, MdFolder } from 'react-icons/md';
+import { MdFileDownload, MdFolderZip, MdDescription, MdFolder } from 'react-icons/md';
 import { pdf } from '@react-pdf/renderer';
 import { colors } from '@/theme/colors';
 import Card from '@/components/Card';
@@ -479,7 +479,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
             >
               {complianceGenerating ? 'Generating...' : (
                 <Flex align="center" gap="10px">
-                  <MdRocketLaunch size={20} />
+                  <MdFolderZip size={20} />
                   <span>Generate Compliance Package</span>
                 </Flex>
               )}
