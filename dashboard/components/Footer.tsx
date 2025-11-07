@@ -1,4 +1,4 @@
-import { Box, Text, Flex } from '@chakra-ui/react';
+import { Box, Text, Flex, Link } from '@chakra-ui/react';
 import { colors } from '@/theme/colors';
 
 export default function Footer() {
@@ -24,17 +24,15 @@ export default function Footer() {
             flexWrap="wrap"
             justify="center"
           >
-            <Text
-              as="a"
+            <Link
               href="/privacy"
               _hover={{ color: colors.cobalt, textDecoration: 'underline' }}
               cursor="pointer"
             >
               Privacy Policy
-            </Text>
+            </Link>
             <Text color={colors.patience}>·</Text>
-            <Text
-              as="a"
+            <Link
               href="https://github.com/Javihaus/cert-framework"
               target="_blank"
               rel="noopener noreferrer"
@@ -42,16 +40,15 @@ export default function Footer() {
               cursor="pointer"
             >
               GitHub
-            </Text>
+            </Link>
             <Text color={colors.patience}>·</Text>
-            <Text
-              as="a"
+            <Link
               href="mailto:privacy@cert-framework.com"
               _hover={{ color: colors.cobalt, textDecoration: 'underline' }}
               cursor="pointer"
             >
               Contact
-            </Text>
+            </Link>
           </Flex>
           <Text
             fontSize="14px"

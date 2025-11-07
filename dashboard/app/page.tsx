@@ -7,6 +7,7 @@ import {
   Grid,
   Text,
   Code,
+  Link,
 } from '@chakra-ui/react';
 import { MdCheckCircle, MdCancel, MdAssessment, MdList, MdLock } from 'react-icons/md';
 import Navigation from '@/components/Navigation';
@@ -191,8 +192,7 @@ export default function Home() {
                   <Text fontSize="15px" color="#1E40AF" lineHeight="1.6" mb="12px">
                     All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
                   </Text>
-                  <Text
-                    as="a"
+                  <Link
                     href="/privacy"
                     fontSize="14px"
                     color="#2563EB"
@@ -200,7 +200,7 @@ export default function Home() {
                     _hover={{ color: '#1D4ED8' }}
                   >
                     Learn more about our privacy practices →
-                  </Text>
+                  </Link>
                 </Box>
               </Grid>
             </Card>

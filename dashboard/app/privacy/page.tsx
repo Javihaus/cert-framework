@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
 
       <Box maxW="900px" mx="auto" px="32px" py="48px" flex="1">
         <Card style={{ borderColor: colors.patience }}>
-          <VStack align="stretch" spacing="32px">
+          <VStack align="stretch" gap="32px">
             {/* Header */}
             <Box>
               <Heading as="h1" fontSize="42px" fontWeight="700" color={colors.navy} mb="12px">
