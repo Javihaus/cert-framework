@@ -2,38 +2,28 @@ import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { CERTReportPDF } from '@/components/CERTReportPDF';
-import { EvaluationSummary, EvaluationResult } from '@/types/cert';
-
-interface ReportMetadata {
-  title: string;
-  organization?: string;
-  evaluator?: string;
-  notes?: string;
-  generated_date: string;
-}
+import { Article15Report } from '@/types/report-schema';
 
 interface GenerateReportRequest {
-  summary: EvaluationSummary;
-  results: EvaluationResult[];
-  metadata: ReportMetadata;
+  report: Article15Report;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateReportRequest = await request.json();
-    const { summary, results, metadata } = body;
+    const { report } = body;
 
     // Validate required fields
-    if (!summary || !results || !metadata) {
+    if (!report || !report.metadata || !report.performance || !report.temporal) {
       return NextResponse.json(
-        { error: 'Missing required fields: summary, results, or metadata' },
+        { error: 'Missing required fields in Article15Report' },
         { status: 400 }
       );
     }
 
     // Generate PDF using @react-pdf/renderer
     const pdfBuffer = await renderToBuffer(
-      <CERTReportPDF summary={summary} results={results} metadata={metadata} />
+      <CERTReportPDF report={report} />
     );
 
     // Convert Buffer to Uint8Array for NextResponse

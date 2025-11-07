@@ -90,6 +90,8 @@ setup(
         "compliance": [
             "jinja2>=3.0.0",  # Template engine
             "markdown>=3.3.0",  # Markdown to HTML
+            "python-docx>=0.8.11",  # Word document generation
+            "docxtpl>=0.16.7",  # Word document templating
         ],
         # Observability exports
         "observability": [

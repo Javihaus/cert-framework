@@ -7,7 +7,15 @@ import {
   StyleSheet,
   Font,
 } from '@react-pdf/renderer';
-import { EvaluationSummary, EvaluationResult } from '@/types/cert';
+import { Article15Report } from '@/types/report-schema';
+import { COMPLIANCE_TEXT } from '@/content/compliance-text';
+import {
+  generateExecutiveSummary,
+  generateComplianceAssessment,
+  generateRiskClassification,
+  generateConfidenceAnalysis,
+  generateRecommendations,
+} from '@/lib/generate-recommendations';
 
 // Register fonts (using built-in fonts)
 Font.register({
@@ -146,28 +154,20 @@ const styles = StyleSheet.create({
   },
 });
 
-interface ReportMetadata {
-  title: string;
-  organization?: string;
-  evaluator?: string;
-  notes?: string;
-  generated_date: string;
-}
-
 interface CERTReportPDFProps {
-  summary: EvaluationSummary;
-  results: EvaluationResult[];
-  metadata: ReportMetadata;
+  report: Article15Report;
 }
 
-export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
-  summary,
-  results,
-  metadata,
-}) => {
-  const isCompliant = summary.accuracy >= 0.9;
-  const failedTraces = results.filter((r) => !r.passed);
-  const topFailures = failedTraces.slice(0, 10);
+export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({ report }) => {
+  const isCompliant = report.performance.accuracy_percentage >= 90;
+  const topFailures = report.failed_traces.slice(0, 10);
+
+  // Generate dynamic content
+  const executiveSummary = generateExecutiveSummary(report.performance);
+  const complianceAssessment = generateComplianceAssessment(report.performance);
+  const riskClassification = generateRiskClassification(report.performance);
+  const confidenceAnalysis = generateConfidenceAnalysis(report.performance);
+  const recommendations = generateRecommendations(report.performance);
 
   return (
     <Document>
@@ -175,29 +175,23 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>{metadata.title}</Text>
-          {metadata.organization && (
-            <Text style={styles.subtitle}>Organization: {metadata.organization}</Text>
-          )}
-          {metadata.evaluator && (
-            <Text style={styles.subtitle}>Evaluator: {metadata.evaluator}</Text>
+          <Text style={styles.title}>EU AI Act Article 15 Compliance Report</Text>
+          <Text style={styles.subtitle}>System: {report.metadata.system_name} {report.metadata.system_version}</Text>
+          <Text style={styles.subtitle}>Provider: {report.metadata.provider_name}</Text>
+          {report.metadata.evaluator_name && (
+            <Text style={styles.subtitle}>Evaluator: {report.metadata.evaluator_name}</Text>
           )}
           <Text style={styles.subtitle}>
-            Generated: {new Date(metadata.generated_date).toLocaleString()}
+            Generated: {new Date(report.metadata.report_date).toLocaleString()}
           </Text>
         </View>
 
-        {/* Executive Summary */}
+        {/* Executive Summary - Dynamic */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Executive Summary</Text>
-          <Text style={styles.paragraph}>
-            This report provides a comprehensive evaluation of AI system outputs against
-            compliance requirements defined in the EU AI Act (Articles 15 & 19). The
-            evaluation assesses {summary.total_traces} traces for accuracy, relevance,
-            and regulatory alignment.
-          </Text>
+          <Text style={styles.paragraph}>{executiveSummary}</Text>
 
-          {/* Compliance Status */}
+          {/* Compliance Status Badge */}
           <View
             style={[
               styles.statusBadge,
@@ -212,67 +206,65 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
           </View>
         </View>
 
+        {/* Regulatory Framework - Static */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Regulatory Framework</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.article15_definition}</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.article15_requirements}</Text>
+        </View>
+
         {/* Key Metrics */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Evaluation Metrics</Text>
           <View style={styles.metricsBox}>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Total Traces Evaluated</Text>
-              <Text style={styles.metricValue}>{summary.total_traces}</Text>
+              <Text style={styles.metricValue}>{report.performance.total_traces}</Text>
             </View>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Overall Accuracy</Text>
               <Text style={styles.metricValue}>
-                {(summary.accuracy * 100).toFixed(2)}%
+                {report.performance.accuracy_percentage.toFixed(2)}%
               </Text>
             </View>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Passed Traces</Text>
               <Text style={[styles.metricValue, { color: '#22543D' }]}>
-                {summary.passed_traces}
+                {report.performance.passed_traces}
               </Text>
             </View>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Failed Traces</Text>
               <Text style={[styles.metricValue, { color: '#742A2A' }]}>
-                {summary.failed_traces}
+                {report.performance.failed_traces}
               </Text>
             </View>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Mean Confidence Score</Text>
               <Text style={styles.metricValue}>
-                {summary.mean_confidence.toFixed(3)}
+                {report.performance.mean_confidence.toFixed(3)}
               </Text>
             </View>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>Threshold Applied</Text>
-              <Text style={styles.metricValue}>{summary.threshold_used}</Text>
+              <Text style={styles.metricValue}>{report.performance.threshold_used}</Text>
             </View>
           </View>
         </View>
 
-        {/* Compliance Assessment */}
+        {/* Evaluation Methodology - Static */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Compliance Assessment</Text>
-          <Text style={styles.paragraph}>
-            <Text style={{ fontWeight: 'bold' }}>EU AI Act Alignment:</Text> This
-            evaluation addresses requirements under Article 15 (Accuracy, Robustness,
-            Cybersecurity) and Article 19 (Transparency Obligations for High-Risk AI Systems).
-          </Text>
-          <Text style={styles.paragraph}>
-            <Text style={{ fontWeight: 'bold' }}>Risk Classification:</Text> Based on
-            the evaluation results, the system demonstrates{' '}
-            {isCompliant
-              ? 'strong compliance with regulatory accuracy thresholds (≥90%).'
-              : 'accuracy below the recommended threshold, indicating potential compliance gaps.'}
-          </Text>
+          <Text style={styles.sectionTitle}>Evaluation Methodology</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.methodology_overview}</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.evaluation_process}</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.compliance_interpretation}</Text>
         </View>
 
         {/* Footer */}
         <Text
           style={styles.footer}
           render={({ pageNumber, totalPages }) =>
-            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • Generated by CERT Framework v4.0`
+            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • ${COMPLIANCE_TEXT.footer_note}`
           }
           fixed
         />
@@ -280,54 +272,60 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
 
       {/* Page 2: Detailed Analysis */}
       <Page size="A4" style={styles.page}>
-        {/* Score Distribution */}
+        {/* Confidence Analysis - Dynamic */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Score Distribution Analysis</Text>
-          <Text style={styles.paragraph}>
-            The confidence score distribution provides insights into the reliability of
-            system outputs:
-          </Text>
-          <Text style={styles.bulletPoint}>
-            • High Confidence (≥0.9): {results.filter((r) => r.measurement.confidence >= 0.9).length} traces
-          </Text>
-          <Text style={styles.bulletPoint}>
-            • Medium Confidence (0.7-0.9): {results.filter((r) => r.measurement.confidence >= 0.7 && r.measurement.confidence < 0.9).length} traces
-          </Text>
-          <Text style={styles.bulletPoint}>
-            • Low Confidence (&lt; 0.7): {results.filter((r) => r.measurement.confidence < 0.7).length} traces
-          </Text>
+          <Text style={styles.sectionTitle}>Confidence Score Analysis</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.score_distribution_intro}</Text>
+          <Text style={styles.paragraph}>{confidenceAnalysis}</Text>
+
+          {/* Confidence Metrics */}
+          <View style={styles.metricsBox}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Mean Confidence</Text>
+              <Text style={styles.metricValue}>{report.performance.mean_confidence.toFixed(3)}</Text>
+            </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Median Confidence</Text>
+              <Text style={styles.metricValue}>{report.performance.median_confidence.toFixed(3)}</Text>
+            </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Threshold Applied</Text>
+              <Text style={styles.metricValue}>{report.performance.threshold_used}</Text>
+            </View>
+          </View>
         </View>
 
         {/* Failed Trace Analysis */}
-        {failedTraces.length > 0 && (
+        {report.failed_traces.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Failed Trace Analysis</Text>
-            <Text style={styles.paragraph}>
-              Analysis of failed traces reveals patterns requiring attention:
-            </Text>
+            <Text style={styles.paragraph}>{COMPLIANCE_TEXT.failed_trace_intro}</Text>
 
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={[styles.tableCell, { flex: 2 }]}>Query</Text>
                 <Text style={styles.tableCell}>Confidence</Text>
-                <Text style={styles.tableCell}>Status</Text>
+                <Text style={[styles.tableCell, { flex: 2 }]}>Reason</Text>
               </View>
               {topFailures.map((trace, idx) => (
                 <View key={idx} style={styles.tableRow}>
                   <Text style={[styles.tableCell, { flex: 2 }]}>
-                    {trace.query.substring(0, 60)}
-                    {trace.query.length > 60 ? '...' : ''}
+                    {trace.input_query?.substring(0, 40) || 'N/A'}
+                    {(trace.input_query?.length || 0) > 40 ? '...' : ''}
                   </Text>
                   <Text style={styles.tableCell}>
-                    {trace.measurement.confidence.toFixed(3)}
+                    {trace.confidence.toFixed(3)}
                   </Text>
-                  <Text style={[styles.tableCell, { color: '#742A2A' }]}>Failed</Text>
+                  <Text style={[styles.tableCell, { flex: 2 }]}>
+                    {trace.reason.substring(0, 50)}
+                    {trace.reason.length > 50 ? '...' : ''}
+                  </Text>
                 </View>
               ))}
             </View>
-            {failedTraces.length > 10 && (
+            {report.failed_traces.length > 10 && (
               <Text style={[styles.paragraph, { fontSize: 9, fontStyle: 'italic' }]}>
-                Showing top 10 of {failedTraces.length} failed traces
+                Showing top 10 of {report.failed_traces.length} failed traces
               </Text>
             )}
           </View>
@@ -337,93 +335,82 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
         <Text
           style={styles.footer}
           render={({ pageNumber, totalPages }) =>
-            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • Generated by CERT Framework v4.0`
+            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • ${COMPLIANCE_TEXT.footer_note}`
           }
           fixed
         />
       </Page>
 
-      {/* Page 3: Recommendations */}
+      {/* Page 3: Compliance Assessment & Recommendations */}
       <Page size="A4" style={styles.page}>
+        {/* Compliance Assessment - Dynamic */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Compliance Assessment</Text>
+          <Text style={styles.paragraph}>{complianceAssessment}</Text>
+        </View>
+
+        {/* Risk Classification - Dynamic */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Risk Classification</Text>
+          <Text style={styles.paragraph}>{riskClassification}</Text>
+        </View>
+
+        {/* Recommendations - Dynamic */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recommendations</Text>
-          {isCompliant ? (
-            <>
-              <Text style={styles.paragraph}>
-                <Text style={{ fontWeight: 'bold' }}>Maintain Compliance:</Text> The system
-                demonstrates strong performance. Continue monitoring to ensure sustained
-                compliance:
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Implement continuous monitoring to detect performance degradation
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Document evaluation procedures for regulatory audits
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Establish periodic re-evaluation schedules (quarterly recommended)
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Maintain audit trails for all system outputs
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.paragraph}>
-                <Text style={{ fontWeight: 'bold' }}>Immediate Action Required:</Text> The
-                system accuracy falls below compliance thresholds. Recommended actions:
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Review and address failed trace patterns systematically
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Enhance training data quality and coverage
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Implement stricter output validation mechanisms
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Consider human oversight for low-confidence outputs
-              </Text>
-              <Text style={styles.bulletPoint}>
-                • Re-evaluate after implementing corrective measures
-              </Text>
-            </>
-          )}
+
+          <Text style={[styles.paragraph, { fontWeight: 'bold', marginTop: 5 }]}>
+            Immediate Actions:
+          </Text>
+          {recommendations.immediate.map((rec, idx) => (
+            <Text key={idx} style={styles.bulletPoint}>• {rec}</Text>
+          ))}
+
+          <Text style={[styles.paragraph, { fontWeight: 'bold', marginTop: 10 }]}>
+            Short-Term (30-90 days):
+          </Text>
+          {recommendations.shortTerm.map((rec, idx) => (
+            <Text key={idx} style={styles.bulletPoint}>• {rec}</Text>
+          ))}
+
+          <Text style={[styles.paragraph, { fontWeight: 'bold', marginTop: 10 }]}>
+            Long-Term (6-12 months):
+          </Text>
+          {recommendations.longTerm.map((rec, idx) => (
+            <Text key={idx} style={styles.bulletPoint}>• {rec}</Text>
+          ))}
         </View>
 
-        {/* EU AI Act Alignment Notes */}
+        {/* EU AI Act Alignment Notes - Static */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Regulatory Alignment Notes</Text>
-          <Text style={styles.paragraph}>
-            <Text style={{ fontWeight: 'bold' }}>Article 15 (Accuracy & Robustness):</Text>{' '}
-            This evaluation assesses accuracy across a representative dataset. Systems must
-            achieve and maintain appropriate levels of accuracy throughout their lifecycle.
-          </Text>
-          <Text style={styles.paragraph}>
-            <Text style={{ fontWeight: 'bold' }}>Article 19 (Transparency):</Text> High-risk
-            AI systems must provide sufficient information to enable users to interpret and
-            use system outputs appropriately. This report serves as documentation of system
-            performance and reliability.
-          </Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.article15_detailed}</Text>
+          <Text style={styles.paragraph}>{COMPLIANCE_TEXT.article19_detailed}</Text>
         </View>
 
-        {/* Additional Notes */}
-        {metadata.notes && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Additional Notes</Text>
-            <Text style={styles.paragraph}>{metadata.notes}</Text>
-          </View>
-        )}
+        {/* System-Specific Methodology */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>System-Specific Evaluation Details</Text>
+          <Text style={styles.paragraph}>{report.evaluation_methodology}</Text>
+        </View>
+
+        {/* Compliance Statement */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Compliance Statement</Text>
+          <Text style={styles.paragraph}>{report.compliance_statement}</Text>
+        </View>
 
         {/* Evaluation Period */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Evaluation Period</Text>
           <Text style={styles.paragraph}>
-            Start: {new Date(summary.date_range.start).toLocaleString()}
+            Start: {new Date(report.temporal.period_start).toLocaleString()}
           </Text>
           <Text style={styles.paragraph}>
-            End: {new Date(summary.date_range.end).toLocaleString()}
+            End: {new Date(report.temporal.period_end).toLocaleString()}
+          </Text>
+          <Text style={styles.paragraph}>
+            Duration: {report.temporal.daily_accuracy.length} days of monitoring
           </Text>
         </View>
 
@@ -431,7 +418,7 @@ export const CERTReportPDF: React.FC<CERTReportPDFProps> = ({
         <Text
           style={styles.footer}
           render={({ pageNumber, totalPages }) =>
-            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • Generated by CERT Framework v4.0`
+            `CERT Compliance Report • Page ${pageNumber} of ${totalPages} • ${COMPLIANCE_TEXT.footer_note}`
           }
           fixed
         />

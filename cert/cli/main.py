@@ -132,7 +132,7 @@ def version():
 @click.option(
     "--format",
     "-f",
-    type=click.Choice(["json", "html"]),
+    type=click.Choice(["json", "html", "docx"]),
     default="json",
     help="Output format (default: json)",
 )
@@ -161,6 +161,9 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
 
         # With metadata and HTML report
         cert audit traces.jsonl --metadata system.json --output report.html --format html
+
+        # Generate Word document for regulatory submission
+        cert audit traces.jsonl --metadata system.json --output report.docx --format docx
 
         # Programmatic access
         cert audit traces.jsonl --format json | jq '.article_15.accuracy'
@@ -224,7 +227,100 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
     }
 
     # Output
-    if format == "html":
+    if format == "docx":
+        # Generate .docx using Article15Report schema
+        try:
+            from cert.compliance.docx_generator import DocxReportGenerator
+            from cert.compliance.schemas import (
+                Article15Report,
+                FailedTrace,
+                PerformanceMetrics,
+                SystemMetadata,
+                TemporalAnalysis,
+            )
+        except ImportError:
+            click.echo(
+                "Error: Install compliance features with: pip install cert-framework[compliance]",
+                err=True,
+            )
+            sys.exit(1)
+
+        # Build Article15Report from evaluation results
+        metadata_obj = SystemMetadata(
+            system_name=system_metadata.get("system_name", "AI System"),
+            system_version=system_metadata.get("system_version", "v1.0"),
+            provider_name=system_metadata.get("provider_name", "Organization"),
+            intended_purpose=system_metadata.get(
+                "intended_purpose", "AI-powered system for production use"
+            ),
+            report_date=datetime.utcnow().isoformat() + "Z",
+            evaluator_name=system_metadata.get("evaluator_name"),
+        )
+
+        performance_obj = PerformanceMetrics(
+            total_traces=results["total_traces"],
+            evaluated_traces=results["total_traces"],
+            passed_traces=results["passed"],
+            failed_traces=results["failed"],
+            accuracy_percentage=results["pass_rate"] * 100,
+            mean_confidence=results.get("mean_confidence", 0.0),
+            median_confidence=results.get("median_confidence", 0.0),
+            threshold_used=threshold,
+        )
+
+        # Build temporal analysis (simplified - single day)
+        temporal_obj = TemporalAnalysis(
+            period_start=datetime.utcnow().isoformat() + "Z",
+            period_end=datetime.utcnow().isoformat() + "Z",
+            daily_accuracy=[
+                {"date": datetime.utcnow().strftime("%Y-%m-%d"), "accuracy": results["pass_rate"]}
+            ],
+        )
+
+        # Build failed traces list
+        failed_traces_list = []
+        if results.get("results"):
+            for trace_result in results["results"]:
+                if not trace_result.get("passed", True):
+                    failed_traces_list.append(
+                        FailedTrace(
+                            timestamp=datetime.utcnow().isoformat() + "Z",
+                            input_query=trace_result.get("input_query"),
+                            context=trace_result.get("context", ""),
+                            answer=trace_result.get("answer", ""),
+                            confidence=trace_result.get("confidence", 0.0),
+                            reason=trace_result.get("reason", "Below threshold"),
+                        )
+                    )
+
+        article15_report = Article15Report(
+            metadata=metadata_obj,
+            performance=performance_obj,
+            temporal=temporal_obj,
+            failed_traces=failed_traces_list,
+            evaluation_methodology=f"{accuracy_evaluator.description}. Threshold: {threshold}",
+            compliance_statement=f"This system {'meets' if report_data['article_15']['compliant'] else 'does not meet'} EU AI Act Article 15 requirements for accuracy monitoring. Evaluation conducted using {accuracy_evaluator.name} with {results['total_traces']} traces. Pass rate of {results['pass_rate']:.1%} {'exceeds' if report_data['article_15']['compliant'] else 'is below'} the 90% compliance threshold.",
+        )
+
+        if not output:
+            click.echo(
+                "Error: --output is required for .docx format (e.g., --output report.docx)", err=True
+            )
+            sys.exit(1)
+
+        try:
+            generator = DocxReportGenerator()
+            generator.generate_article15(article15_report, output)
+            click.echo(f"✓ DOCX report saved to {output}", err=True)
+            click.echo(f"  Open with: open {output}", err=True)
+        except FileNotFoundError as e:
+            click.echo(f"Error: {e}", err=True)
+            click.echo(
+                "  Create template with: python templates/generate_templates.py", err=True
+            )
+            sys.exit(1)
+
+    elif format == "html":
         html_output = generate_html_report(report_data)
         if output:
             with open(output, "w") as f:

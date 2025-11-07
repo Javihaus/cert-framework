@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "system_name": "CustomerBot RAG System",
+    "system_version": "v2.1.0",
+    "provider_name": "Acme Corporation",
+    "intended_purpose": "Automated customer support responses using retrieval-augmented generation",
+    "report_date": "2025-11-07T10:00:00Z",
+    "evaluator_name": "Jane Smith"
+  },
+  "performance": {
+    "total_traces": 1000,
+    "evaluated_traces": 950,
+    "passed_traces": 894,
+    "failed_traces": 56,
+    "accuracy_percentage": 94.1,
+    "mean_confidence": 0.847,
+    "median_confidence": 0.873,
+    "threshold_used": 0.7
+  },
+  "temporal": {
+    "period_start": "2025-10-01T00:00:00Z",
+    "period_end": "2025-10-31T23:59:59Z",
+    "daily_accuracy": [
+      {"date": "2025-10-01", "accuracy": 0.932},
+      {"date": "2025-10-02", "accuracy": 0.945},
+      {"date": "2025-10-03", "accuracy": 0.938},
+      {"date": "2025-10-04", "accuracy": 0.951},
+      {"date": "2025-10-05", "accuracy": 0.947}
+    ]
+  },
+  "failed_traces": [
+    {
+      "timestamp": "2025-10-15T14:23:00Z",
+      "input_query": "What was Apple's Q4 revenue?",
+      "context": "Apple reported Q4 2024 revenue of $89.5 billion, up 6% year-over-year.",
+      "answer": "Apple's Q4 revenue was $450 billion.",
+      "confidence": 0.42,
+      "reason": "Numerical hallucination - 5x overestimate of actual revenue"
+    },
+    {
+      "timestamp": "2025-10-18T09:15:00Z",
+      "input_query": "When does the warranty expire?",
+      "context": "Standard warranty: 12 months from purchase date. Extended warranty available for additional 24 months.",
+      "answer": "The warranty is valid for 6 months.",
+      "confidence": 0.38,
+      "reason": "Incorrect duration - stated 6 months instead of 12 months"
+    },
+    {
+      "timestamp": "2025-10-22T16:47:00Z",
+      "input_query": "What's the return policy?",
+      "context": "Returns accepted within 30 days with receipt. Items must be unused and in original packaging.",
+      "answer": "You can return items within 90 days without a receipt.",
+      "confidence": 0.35,
+      "reason": "Multiple errors - wrong timeframe (90 vs 30 days) and missing receipt requirement"
+    }
+  ],
+  "evaluation_methodology": "CERT uses dual-component measurement combining semantic similarity (cosine similarity of embeddings) and grounding analysis (NLI entailment + term overlap). Responses pass when confidence exceeds 0.7 threshold, indicating strong alignment between generated answer and source context.",
+  "compliance_statement": "This system meets EU AI Act Article 15 requirements for accuracy monitoring. Evaluation conducted on 950 production traces over 31-day period. Pass rate of 94.1% exceeds 90% compliance threshold. Mean confidence of 0.847 indicates strong grounding in source material. Failed traces analyzed for systematic issues - no bias patterns detected."
+}
