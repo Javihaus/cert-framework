@@ -44,25 +44,19 @@ CERT provides the measurement infrastructure. You run LLMs in production, CERT m
 
 ## Architecture
 
-CERT combines two measurement components validated on Stanford SQuAD v2.0:
+CERT combines two measurement components :
 
-| Component | Weight | What It Detects | Correlation with Ground Truth |
-|-----------|--------|-----------------|-------------------------------|
-| **Semantic Similarity** | 50% | Topic drift, paraphrase errors | r = 0.644 |
-| **Term Grounding** | 50% | Factual hallucinations, numerical errors | r = 0.899 |
 
-**Weighted formula:** 
+| Component | Weight | What It Catches |
+|-----------|--------|-----------------|
+| **Semantic Similarity** | 50% | Topic drift, paraphrasing errors | 
+| **Term Grounding** | 50% | Factual hallucinations, number errors | 
+ 
+Semantic similarity alone misses factual errors (high similarity, wrong facts).  
+Term grounding alone misses paraphrasing (low overlap, correct meaning).  
+Together they provide robust accuracy. We use simple weighted formula with fixed weights:
 
-$accuracy = 0.5 \times semantic-similarity + 0.5 \times term-grounding$
-
-This dual-component approach achieves:
-- **ROC AUC: 0.961** (near-perfect discrimination between accurate and hallucinated outputs)
-- **Accuracy: 95.3%** at optimal threshold (0.46)
-- **Cohen's d: 0.247σ** (strong effect size)
-
-Dataset: Stanford Question Answering Dataset v2.0 (Rajpurkar et al., 2018), CC BY-SA 4.0 license
-
-**Why this works:** Semantic similarity alone misses factual errors (high similarity, wrong facts). Term grounding alone misses paraphrasing (low overlap, correct meaning). Together they provide robust accuracy measurement validated on academic benchmarks.
+$\theta = \frac{0.5 \times \text{semantic similarity}}{0.5 \times \text{term grounding}}$
 
 ---
 
@@ -93,7 +87,7 @@ pip install cert-framework[all]
 | CLI | Command-line tools | click | <1MB |
 | All | Complete toolkit | All above | ~500MB |
 
-### Basic Usage
+### How to use CERT
 
 **Step 1: Trace your LLM calls**
 
@@ -216,7 +210,7 @@ def my_workflow(query: str):
     tracer.log_trace(trace_data)
 ```
 
-This pattern gives you full control over what gets logged. Use it when `@trace()` doesn't fit your architecture.
+This approach gives you full control over what gets logged. Use it when `@trace()` doesn't fit your architecture.
 
 ### Pattern 4: LangChain Integration
 
