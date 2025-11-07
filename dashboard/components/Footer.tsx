@@ -26,6 +26,8 @@ export default function Footer() {
           >
             <Link
               href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
               _hover={{ color: colors.cobalt, textDecoration: 'underline' }}
               cursor="pointer"
             >
@@ -43,7 +45,7 @@ export default function Footer() {
             </Link>
             <Text color={colors.patience}>·</Text>
             <Link
-              href="mailto:privacy@cert-framework.com"
+              href="mailto:javier@jmarin.info"
               _hover={{ color: colors.cobalt, textDecoration: 'underline' }}
               cursor="pointer"
             >

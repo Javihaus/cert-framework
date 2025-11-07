@@ -98,8 +98,8 @@ export default function PrivacyPolicy() {
               </Heading>
               <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="12px">
                 For privacy questions:{' '}
-                <Link href="mailto:privacy@cert-framework.com" color={colors.cobalt} textDecoration="underline">
-                  privacy@cert-framework.com
+                <Link href="mailto:javier@jmarin.info" color={colors.cobalt} textDecoration="underline">
+                  javier@jmarin.info
                 </Link>
               </Text>
               <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary}>

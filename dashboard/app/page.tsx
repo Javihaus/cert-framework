@@ -194,6 +194,8 @@ export default function Home() {
                   </Text>
                   <Link
                     href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     fontSize="14px"
                     color="#2563EB"
                     textDecoration="underline"
