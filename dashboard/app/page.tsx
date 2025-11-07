@@ -21,7 +21,7 @@ import DistributionChart from '@/components/DistributionChart';
 import DocumentationContent from '@/components/DocumentationContent';
 import ReportView from '@/components/ReportView';
 import HomePage from '@/components/HomePage';
-import DocumentGenerationPage from '@/components/DocumentGenerationPage';
+import DocumentsView from '@/components/DocumentsView';
 import Footer from '@/components/Footer';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors } from '@/theme/colors';
@@ -160,9 +160,6 @@ export default function Home() {
     switch (activeTab) {
       case 'home':
         return <HomePage />;
-
-      case 'documents':
-        return <DocumentGenerationPage />;
 
       case 'load':
         return (
@@ -413,9 +410,9 @@ results = evaluator.evaluate_log_file(
           </Box>
         );
 
-      case 'report':
+      case 'documents':
         if (!evaluationData) return null;
-        return <ReportView summary={summary!} results={results} />;
+        return <DocumentsView summary={summary!} results={results} />;
 
       case 'documentation':
         return (
