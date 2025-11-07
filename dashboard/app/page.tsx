@@ -8,7 +8,7 @@ import {
   Text,
   Code,
 } from '@chakra-ui/react';
-import { MdCheckCircle, MdCancel, MdAssessment, MdList } from 'react-icons/md';
+import { MdCheckCircle, MdCancel, MdAssessment, MdList, MdLock } from 'react-icons/md';
 import Navigation from '@/components/Navigation';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
@@ -160,6 +160,50 @@ export default function Home() {
                 Load your CERT evaluation data to view compliance metrics and analysis
               </Text>
             </Box>
+
+            {/* Privacy Notice */}
+            <Card style={{
+              borderColor: '#3B82F6',
+              background: '#EFF6FF',
+              marginBottom: '24px',
+              maxWidth: '800px',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}>
+              <Grid templateColumns="auto 1fr" gap="16px" alignItems="start">
+                <Box
+                  w="48px"
+                  h="48px"
+                  bg="#3B82F6"
+                  borderRadius="8px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  color="white"
+                  flexShrink={0}
+                >
+                  <MdLock size={24} />
+                </Box>
+                <Box>
+                  <Text fontSize="18px" fontWeight="700" color="#1E40AF" mb="12px">
+                    Your Data Stays Private
+                  </Text>
+                  <Text fontSize="15px" color="#1E40AF" lineHeight="1.6" mb="12px">
+                    All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
+                  </Text>
+                  <Text
+                    as="a"
+                    href="/privacy"
+                    fontSize="14px"
+                    color="#2563EB"
+                    textDecoration="underline"
+                    _hover={{ color: '#1D4ED8' }}
+                  >
+                    Learn more about our privacy practices →
+                  </Text>
+                </Box>
+              </Grid>
+            </Card>
 
             <FileUpload
               onFileLoad={handleEvaluationFileLoad}
