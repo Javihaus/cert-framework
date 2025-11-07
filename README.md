@@ -629,7 +629,7 @@ reporter.save_report(
 |-------------|----------|--------|
 | Prohibited AI systems ban | August 2, 2025 | Active |
 | GPAI transparency obligations | August 2, 2025 | Active |
-| High-risk system requirements | August 2, 2026 | 9 months |
+| High-risk system requirements | August 2, 2026 | On Work |
 
 **Penalties:**
 - Up to €35M or 7% global revenue for prohibited AI
@@ -828,7 +828,6 @@ CERT's measurement system was validated on Stanford SQuAD v2.0:
 **Threshold analysis:**
 - At threshold 0.46: 95.3% accuracy (optimal)
 - At threshold 0.70: 89.2% accuracy (recommended for production)
-- False positive rate: <5% at recommended threshold
 
 **Dataset citation:** Rajpurkar et al., "Know What You Don't Know: Unanswerable Questions for SQuAD" (2018), CC BY-SA 4.0
 
@@ -914,6 +913,7 @@ ruff check .
 ```
 
 **Areas for contribution:**
+- Accuracy measurement approaches (sync and async)
 - Additional industry presets with validated thresholds
 - Framework-specific integration adapters
 - Multi-language support
@@ -929,38 +929,6 @@ Apache 2.0 - see [LICENSE](LICENSE)
 Commercial use, modification, distribution, and private use permitted.
 
 ---
-
-## FAQ
-
-**Q: Do I need to download 500MB of models?**
-
-A: The evaluation features require sentence-transformers and PyTorch (~500MB total). The core tracer has zero dependencies. Install only what you need:
-- `pip install cert-framework` - tracer only
-- `pip install cert-framework[evaluation]` - adds models
-
-**Q: Can I use this with Langfuse/Arize?**
-
-A: Yes. Export your traces and convert to CERT's JSONL format (see Integration Patterns section). CERT complements existing monitoring, doesn't replace it.
-
-**Q: What if my accuracy definition is different?**
-
-A: Current version uses semantic + grounding with configurable thresholds via presets. For fundamentally different evaluation logic, see Roadmap Q2 2026 for pluggable evaluator architecture.
-
-**Q: Does this work in CI/CD?**
-
-A: The tracer works in CI (zero dependencies). Skip evaluation in CI to avoid model downloads:
-
-```python
-if not os.getenv("CI"):
-    evaluator.evaluate_log_file("traces.jsonl")
-```
-
-**Q: Is the dashboard required?**
-
-A: No. Use `cert report` CLI to generate standalone HTML files. The dashboard adds convenience for PDF exports and multi-user access but isn't required for compliance.
-
----
-
 ## Contact
 
 **Javier Marin**  
