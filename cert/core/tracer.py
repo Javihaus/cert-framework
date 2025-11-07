@@ -43,6 +43,9 @@ def trace(
     *,
     log_path: str = "cert_traces.jsonl",
     metadata: Optional[Dict] = None,
+    input_key: Optional[str] = None,
+    output_key: Optional[str] = None,
+    context_key: Optional[str] = None,
 ) -> Callable:
     """Lightweight decorator for tracing LLM function calls.
 
@@ -51,6 +54,9 @@ def trace(
     Args:
         log_path: Path to JSONL log file (default: cert_traces.jsonl)
         metadata: Optional metadata to include in traces
+        input_key: Explicit key name for input in kwargs or result dict (e.g., "query", "question")
+        output_key: Explicit key name for output in result dict (e.g., "response", "answer")
+        context_key: Explicit key name for context in result dict (e.g., "context", "retrieved_docs")
 
     Returns:
         Decorated function that logs all calls
@@ -63,6 +69,13 @@ def trace(
         ...     context = retrieve_documents(query)
         ...     answer = llm.generate(context, query)
         ...     return {"context": context, "answer": answer}
+        >>>
+        >>> # With explicit key mapping for evaluator compatibility
+        >>> @trace(input_key="query", output_key="response", context_key="docs")
+        ... def my_rag_pipeline(query):
+        ...     docs = retrieve_documents(query)
+        ...     response = llm.generate(docs, query)
+        ...     return {"docs": docs, "response": response}
         >>>
         >>> # With custom log path
         >>> @trace(log_path="production_traces.jsonl")
@@ -117,28 +130,49 @@ def trace(
                 if metadata:
                     trace_data["metadata"] = metadata
 
-                # Extract context/answer if result is dict-like
-                if result is not None and isinstance(result, dict):
-                    # Try common keys for RAG outputs
-                    if "context" in result:
-                        trace_data["context"] = result["context"]
-                    if "answer" in result:
-                        trace_data["answer"] = result["answer"]
-                    elif "response" in result:
-                        trace_data["answer"] = result["response"]
-
-                    # Try common keys for inputs
-                    if "query" in result:
-                        trace_data["input"] = result["query"]
-                    elif "question" in result:
-                        trace_data["input"] = result["question"]
-
-                # Try to extract input from kwargs
-                if "input" not in trace_data:
+                # Extract input from kwargs using explicit key or fallback
+                if input_key and input_key in kwargs:
+                    trace_data["input"] = kwargs[input_key]
+                elif "input" not in trace_data:
+                    # Fallback to common keys
                     for key in ["query", "question", "prompt", "input"]:
                         if key in kwargs:
                             trace_data["input"] = kwargs[key]
                             break
+
+                # Extract context/answer if result is dict-like
+                if result is not None and isinstance(result, dict):
+                    # Use explicit keys if provided
+                    if context_key and context_key in result:
+                        trace_data["context"] = result[context_key]
+                    elif "context" not in trace_data:
+                        # Fallback to common keys
+                        if "context" in result:
+                            trace_data["context"] = result["context"]
+                        elif "retrieved_docs" in result:
+                            trace_data["context"] = result["retrieved_docs"]
+                        elif "docs" in result:
+                            trace_data["context"] = result["docs"]
+
+                    if output_key and output_key in result:
+                        trace_data["answer"] = result[output_key]
+                    elif "answer" not in trace_data:
+                        # Fallback to common keys
+                        if "answer" in result:
+                            trace_data["answer"] = result["answer"]
+                        elif "response" in result:
+                            trace_data["answer"] = result["response"]
+                        elif "output" in result:
+                            trace_data["answer"] = result["output"]
+
+                    # Also try to get input from result if not already captured
+                    if "input" not in trace_data:
+                        if input_key and input_key in result:
+                            trace_data["input"] = result[input_key]
+                        elif "query" in result:
+                            trace_data["input"] = result["query"]
+                        elif "question" in result:
+                            trace_data["input"] = result["question"]
 
                 # Log the trace
                 tracer.log_trace(trace_data)

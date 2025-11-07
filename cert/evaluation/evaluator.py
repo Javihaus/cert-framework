@@ -12,41 +12,78 @@ from cert.core.tracer import CertTracer
 
 
 class Evaluator:
-    """Offline evaluation layer - requires [evaluation] extras."""
+    """Offline evaluation layer - requires [evaluation] extras.
+
+    Supports pluggable accuracy evaluators for domain-specific compliance:
+    - SemanticEvaluator (default): General-purpose semantic similarity
+    - ExactMatchEvaluator: Financial/medical/legal exact matching
+    - Custom: Implement AccuracyEvaluator interface for your domain
+    """
 
     def __init__(
-        self, preset: str = "general", threshold: float = 0.7, tracer: Optional[CertTracer] = None
+        self,
+        preset: str = "general",
+        threshold: float = 0.7,
+        tracer: Optional[CertTracer] = None,
+        accuracy_evaluator: Optional[Any] = None,
     ):
-        """Initialize evaluator with preset configuration.
+        """Initialize evaluator with preset or custom accuracy evaluator.
 
         Args:
-            preset: Industry preset (general, financial, healthcare, legal)
+            preset: Industry preset (general, financial, healthcare, legal) - DEPRECATED if accuracy_evaluator provided
             threshold: Confidence threshold for pass/fail
             tracer: Optional tracer for logging evaluation results
+            accuracy_evaluator: Custom AccuracyEvaluator instance (overrides preset)
 
         Requires:
             pip install cert-framework[evaluation]
-        """
-        # Import measurement dependencies (only when evaluator is created)
-        try:
-            from cert.measure import measure
-            from cert.utils.presets import get_preset
-        except ImportError as e:
-            raise ImportError(
-                f"Evaluator requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
-            )
 
-        # Load preset configuration
-        config = get_preset(preset)
-        self.threshold = threshold or config["accuracy_threshold"]
+        Examples:
+            >>> # Default semantic evaluator
+            >>> evaluator = Evaluator(threshold=0.7)
+            >>>
+            >>> # Exact match for financial domain
+            >>> from cert.evaluation import ExactMatchEvaluator
+            >>> evaluator = Evaluator(accuracy_evaluator=ExactMatchEvaluator())
+            >>>
+            >>> # Custom evaluator
+            >>> class MyEvaluator(AccuracyEvaluator):
+            ...     def evaluate(self, context, answer, threshold):
+            ...         # Your domain logic here
+            ...         return {"matched": True, "confidence": 0.95}
+            >>> evaluator = Evaluator(accuracy_evaluator=MyEvaluator())
+        """
+        self.threshold = threshold
         self.preset = preset
         self.tracer = tracer or CertTracer()
-        self._measure = measure
+
+        # Use custom evaluator if provided, otherwise default to semantic
+        if accuracy_evaluator is not None:
+            self.accuracy_evaluator = accuracy_evaluator
+        else:
+            # Import and instantiate default semantic evaluator
+            try:
+                from cert.evaluation.semantic import SemanticEvaluator
+            except ImportError as e:
+                raise ImportError(
+                    f"Evaluator requires: pip install cert-framework[evaluation]\nOriginal error: {e}"
+                )
+            self.accuracy_evaluator = SemanticEvaluator()
+
+        # For backwards compatibility, keep preset logic
+        if preset != "general" and accuracy_evaluator is None:
+            try:
+                from cert.utils.presets import get_preset
+
+                config = get_preset(preset)
+                self.threshold = threshold or config["accuracy_threshold"]
+            except ImportError:
+                pass  # Presets are optional if using custom evaluator
 
     def evaluate_trace(
         self, context: str, answer: str, input_query: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Evaluate a single trace.
+        """Evaluate a single trace using the configured evaluator.
 
         Args:
             context: Source context (retrieved documents, etc.)
@@ -57,23 +94,19 @@ class Evaluator:
             Dictionary with evaluation results including:
                 - matched: Boolean pass/fail
                 - confidence: Overall confidence score
-                - semantic_score: Semantic similarity score
-                - nli_score: NLI entailment score
-                - grounding_score: Term grounding score
-                - preset: Preset used for evaluation
+                - Additional metrics specific to the evaluator used
+                - preset: Preset used for evaluation (if applicable)
         """
-        # Use measure function for evaluation
-        result = self._measure(text1=answer, text2=context, threshold=self.threshold)
+        # Use pluggable accuracy evaluator
+        result = self.accuracy_evaluator.evaluate(
+            context=context, answer=answer, threshold=self.threshold
+        )
 
-        return {
-            "matched": result.matched,
-            "confidence": result.confidence,
-            "semantic_score": result.semantic_score,
-            "nli_score": result.nli_score,
-            "grounding_score": result.grounding_score,
-            "preset": self.preset,
-            "input": input_query,
-        }
+        # Add common fields
+        result["preset"] = self.preset
+        result["input"] = input_query
+
+        return result
 
     def evaluate_log_file(self, log_path: str) -> Dict[str, Any]:
         """Batch evaluate all traces in a log file.

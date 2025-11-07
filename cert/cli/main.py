@@ -120,6 +120,182 @@ def version():
     click.echo(f"CERT Framework v{__version__}")
 
 
+@cli.command()
+@click.argument("trace_file", type=click.Path(exists=True))
+@click.option("--metadata", "-m", type=click.Path(exists=True), help="System metadata JSON file")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    help="Output file (default: print to stdout)",
+)
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["json", "html"]),
+    default="json",
+    help="Output format (default: json)",
+)
+@click.option(
+    "--threshold",
+    "-t",
+    type=float,
+    default=0.7,
+    help="Accuracy threshold (default: 0.7)",
+)
+@click.option(
+    "--evaluator",
+    "-e",
+    type=click.Choice(["semantic", "exact"]),
+    default="semantic",
+    help="Accuracy evaluator type (default: semantic)",
+)
+def audit(trace_file, metadata, output, format, threshold, evaluator):
+    """One-command EU AI Act Article 15 compliance check.
+
+    Evaluates traces for accuracy and generates compliance report.
+
+    Examples:
+        # Quick JSON output
+        cert audit traces.jsonl
+
+        # With metadata and HTML report
+        cert audit traces.jsonl --metadata system.json --output report.html --format html
+
+        # Programmatic access
+        cert audit traces.jsonl --format json | jq '.article_15.accuracy'
+
+        # Financial domain with exact matching
+        cert audit traces.jsonl --evaluator exact --threshold 0.9
+    """
+    try:
+        from cert.evaluation import Evaluator, ExactMatchEvaluator, SemanticEvaluator
+        from datetime import datetime
+        import json as json_lib
+    except ImportError:
+        click.echo("Error: Install evaluation features with: pip install cert-framework[evaluation]", err=True)
+        sys.exit(1)
+
+    # Select evaluator
+    if evaluator == "exact":
+        accuracy_evaluator = ExactMatchEvaluator()
+    else:
+        accuracy_evaluator = SemanticEvaluator()
+
+    # Run evaluation
+    click.echo(f"Evaluating {trace_file} with {accuracy_evaluator.name}...", err=True)
+
+    evaluator_instance = Evaluator(threshold=threshold, accuracy_evaluator=accuracy_evaluator)
+
+    try:
+        results = evaluator_instance.evaluate_log_file(trace_file)
+    except Exception as e:
+        click.echo(f"Error evaluating traces: {e}", err=True)
+        sys.exit(1)
+
+    # Load metadata if provided
+    system_metadata = {}
+    if metadata:
+        try:
+            with open(metadata) as f:
+                system_metadata = json_lib.load(f)
+        except Exception as e:
+            click.echo(f"Warning: Could not load metadata: {e}", err=True)
+
+    # Build compliance report
+    report_data = {
+        "audit_timestamp": datetime.utcnow().isoformat() + "Z",
+        "system_metadata": system_metadata,
+        "article_15": {
+            "accuracy": results["pass_rate"],
+            "threshold": threshold,
+            "total_traces": results["total_traces"],
+            "passed_traces": results["passed"],
+            "failed_traces": results["failed"],
+            "compliant": results["pass_rate"] >= 0.9,
+            "evaluator_type": accuracy_evaluator.name,
+            "evaluator_description": accuracy_evaluator.description,
+        },
+        "traces": results["results"] if format == "json" else None,
+    }
+
+    # Output
+    if format == "html":
+        html_output = generate_html_report(report_data)
+        if output:
+            with open(output, "w") as f:
+                f.write(html_output)
+            click.echo(f"✓ HTML report saved to {output}", err=True)
+            click.echo(f"  Open with: open {output}", err=True)
+        else:
+            click.echo(html_output)
+    else:
+        json_output = json_lib.dumps(report_data, indent=2)
+        if output:
+            with open(output, "w") as f:
+                f.write(json_output)
+            click.echo(f"✓ JSON report saved to {output}", err=True)
+        else:
+            click.echo(json_output)
+
+
+def generate_html_report(data: dict) -> str:
+    """Generate a simple HTML compliance report."""
+    article_15 = data["article_15"]
+    compliant = article_15["compliant"]
+    status_color = "#48bb78" if compliant else "#fc8181"
+    status_text = "COMPLIANT" if compliant else "NON-COMPLIANT"
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>EU AI Act Compliance Report</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }}
+        h1 {{ color: #112358; }}
+        .status {{ padding: 20px; border-radius: 8px; background: {status_color}; color: white; font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }}
+        .metric {{ background: #f7fafc; padding: 15px; border-radius: 8px; margin: 10px 0; }}
+        .metric-label {{ color: #718096; font-size: 14px; }}
+        .metric-value {{ font-size: 28px; font-weight: bold; color: #112358; }}
+        .info {{ background: #e6f7ff; border-left: 4px solid #1890ff; padding: 12px; margin: 15px 0; }}
+    </style>
+</head>
+<body>
+    <h1>EU AI Act Compliance Report</h1>
+    <p><strong>Generated:</strong> {data["audit_timestamp"]}</p>
+
+    <div class="status">Article 15: {status_text}</div>
+
+    <h2>Accuracy Metrics</h2>
+    <div class="metric">
+        <div class="metric-label">Accuracy Rate</div>
+        <div class="metric-value">{article_15["accuracy"]:.1%}</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Threshold Required</div>
+        <div class="metric-value">{article_15["threshold"]:.0%}</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Total Traces</div>
+        <div class="metric-value">{article_15["total_traces"]}</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Passed / Failed</div>
+        <div class="metric-value">{article_15["passed_traces"]} / {article_15["failed_traces"]}</div>
+    </div>
+
+    <div class="info">
+        <strong>Evaluator:</strong> {article_15["evaluator_type"]}<br>
+        <strong>Method:</strong> {article_15["evaluator_description"]}
+    </div>
+
+    <hr style="margin: 40px 0; border: none; border-top: 1px solid #e2e8f0;">
+    <p style="color: #718096; font-size: 14px;">Generated with CERT Framework - EU AI Act Compliance Toolkit</p>
+</body>
+</html>"""
+    return html
+
+
 # Register new compliance commands
 try:
     from cert.cli.audit import audit_status
