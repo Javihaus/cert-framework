@@ -9,12 +9,16 @@
 
 ---
 
-[![PyPI](https://img.shields.io/pypi/v/cert-framework?color=4B8BBE&logo=python&logoColor=white)](https://pypi.org/project/cert-framework/)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?logo=apache&logoColor=white)](LICENSE)
+
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org)
 [![Tests](https://img.shields.io/badge/tests-passing-success?logo=pytest&logoColor=white)](https://github.com/Javihaus/cert-framework/actions)
 [![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-[![Downloads](https://img.shields.io/pypi/dm/cert-framework?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/cert-framework/)
+
+[![PyPI](https://img.shields.io/pypi/v/cert-framework?color=4B8BBE&logo=python&logoColor=white)](https://pypi.org/project/cert-framework/)
+[![GitHub release](https://img.shields.io/github/v/release/javihaus/cert-framework)](https://github.com/javihaus/cert-framework/releases/latest)
+
+
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?logo=apache&logoColor=white)](LICENSE)
 
 **[Quick Start](#quick-start)** • 
 **[CLI Reference](#cli-reference)** • 
