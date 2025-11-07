@@ -22,8 +22,9 @@
 **[Quick Start](#quick-start)** • 
 **[CLI Reference](#cli-reference)** • 
 **[API Documentation](#api-documentation)** • 
-**[Compliance Guide](#eu-ai-act-compliance)**
-
+**[Compliance Guide](#eu-ai-act-compliance)** • 
+**[Dashboard](#dashboard)** • 
+**[Examples](#examples)** •
 </div>
 
 ---
@@ -154,11 +155,11 @@ This generates an Article 15 technical documentation report including:
 
 ---
 
-## Integration Patterns
+## Integration Options
 
 CERT's tracer works with any LLM framework. The key requirement: your function must return or log data that includes both the LLM output and the ground truth context for comparison.
 
-### Pattern 1: Direct Return (Recommended)
+### Option 1: Direct Return (Recommended)
 
 ```python
 from cert import trace
@@ -174,7 +175,7 @@ def my_rag(query: str) -> dict:
 
 This is the simplest pattern. The tracer looks for `context` and `answer` keys in the return value.
 
-### Pattern 2: Explicit Metadata
+### Option 2: Explicit Metadata
 
 ```python
 @trace(metadata={"service": "customer-bot", "version": "2.1"})
@@ -185,7 +186,7 @@ def my_function(query: str) -> str:
 
 For functions that don't return dicts, use the `metadata` parameter to add context. You'll need to structure your logs manually for evaluation.
 
-### Pattern 3: Generic Adapter (for any framework)
+### Option 3: Generic Adapter (for any framework)
 
 ```python
 from cert.integrations import wrap_llm_call
@@ -212,7 +213,7 @@ def my_workflow(query: str):
 
 This approach gives you full control over what gets logged. Use it when `@trace()` doesn't fit your architecture.
 
-### Pattern 4: LangChain Integration
+### Option 4: LangChain Integration
 
 ```python
 from langchain.chains import RetrievalQA
@@ -244,7 +245,7 @@ def traced_qa(query: str) -> dict:
     return {"context": context, "answer": answer}
 ```
 
-### Pattern 5: Batch Import from Existing Logs
+### Option 5: Batch Import from Existing Logs
 
 If you already have LLM monitoring (Langfuse, Arize, custom), convert your traces to CERT's JSONL format:
 
