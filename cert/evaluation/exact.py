@@ -40,11 +40,11 @@ class ExactMatchEvaluator(AccuracyEvaluator):
             Dict with matched, confidence, and precision metrics
         """
         # Extract numbers (integers and decimals)
-        context_numbers = set(re.findall(r'\b\d+\.?\d*\b', context))
-        answer_numbers = set(re.findall(r'\b\d+\.?\d*\b', answer))
+        context_numbers = set(re.findall(r"\b\d+\.?\d*\b", context))
+        answer_numbers = set(re.findall(r"\b\d+\.?\d*\b", answer))
 
         # Extract dates (simple pattern)
-        date_pattern = r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b'
+        date_pattern = r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b"
         context_dates = set(re.findall(date_pattern, context))
         answer_dates = set(re.findall(date_pattern, answer))
 

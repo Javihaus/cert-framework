@@ -174,7 +174,10 @@ def audit(trace_file, metadata, output, format, threshold, evaluator):
 
         from cert.evaluation import Evaluator, ExactMatchEvaluator, SemanticEvaluator
     except ImportError:
-        click.echo("Error: Install evaluation features with: pip install cert-framework[evaluation]", err=True)
+        click.echo(
+            "Error: Install evaluation features with: pip install cert-framework[evaluation]",
+            err=True,
+        )
         sys.exit(1)
 
     # Select evaluator
