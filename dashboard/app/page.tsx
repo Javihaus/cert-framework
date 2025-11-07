@@ -19,7 +19,6 @@ import QuickActions from '@/components/QuickActions';
 import FailedTracesView from '@/components/FailedTracesView';
 import DistributionChart from '@/components/DistributionChart';
 import DocumentationContent from '@/components/DocumentationContent';
-import ReportView from '@/components/ReportView';
 import HomePage from '@/components/HomePage';
 import DocumentsView from '@/components/DocumentsView';
 import Footer from '@/components/Footer';
