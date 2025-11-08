@@ -1,5 +1,5 @@
 import { Box, Text, Flex, Link } from '@chakra-ui/react';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography } from '@/theme';
 
 export default function Footer() {
   return (
@@ -7,19 +7,19 @@ export default function Footer() {
       as="footer"
       borderTop="1px solid"
       borderColor={colors.patience}
-      py="24px"
+      py={spacing.lg}
       mt="auto"
       bg="white"
     >
-      <Box maxW="1600px" mx="auto" px="32px">
+      <Box maxW="1600px" mx="auto" px={spacing.xl}>
         <Flex
           direction="column"
           align="center"
-          gap="12px"
+          gap={spacing.sm}
         >
           <Flex
-            gap="16px"
-            fontSize="14px"
+            gap={spacing.md}
+            fontSize={typography.fontSize.sm}
             color={colors.text.muted}
             flexWrap="wrap"
             justify="center"
@@ -53,7 +53,7 @@ export default function Footer() {
             </Link>
           </Flex>
           <Text
-            fontSize="14px"
+            fontSize={typography.fontSize.sm}
             color={colors.text.muted}
             textAlign="center"
           >

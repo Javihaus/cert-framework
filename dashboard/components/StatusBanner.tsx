@@ -2,7 +2,7 @@
 
 import { Box, Flex, Text, Icon } from '@chakra-ui/react';
 import { MdCheckCircle, MdInfo } from 'react-icons/md';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography, borderRadius } from '@/theme';
 
 interface StatusBannerProps {
   isCompliant: boolean;
@@ -22,26 +22,34 @@ export default function StatusBanner({ isCompliant, accuracy, failedCount }: Sta
     <Box
       background={gradient}
       color="white"
-      p="24px 28px"
-      borderRadius="12px"
-      mb="24px"
+      p={`${spacing.lg} 28px`}
+      borderRadius={borderRadius.lg}
+      mb={spacing.lg}
     >
-      <Flex align="center" gap="20px">
+      <Flex align="center" gap={spacing.lg}>
         <Flex
           w="56px"
           h="56px"
           align="center"
           justify="center"
           bg="rgba(255, 255, 255, 0.2)"
-          borderRadius="12px"
+          borderRadius={borderRadius.lg}
         >
           <Icon as={IconComponent} w="32px" h="32px" />
         </Flex>
         <Box flex="1">
-          <Text fontSize="20px" fontWeight="700" mb="6px">
+          <Text
+            fontSize={typography.fontSize.xl}
+            fontWeight={typography.fontWeight.bold}
+            mb={spacing.xs}
+          >
             {title}
           </Text>
-          <Text fontSize="16px" opacity="0.95" lineHeight="1.5">
+          <Text
+            fontSize={typography.fontSize.base}
+            opacity="0.95"
+            lineHeight={typography.lineHeight.normal}
+          >
             {message}
           </Text>
         </Box>
