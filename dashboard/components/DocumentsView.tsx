@@ -190,7 +190,8 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
       setComplianceDownloadUrl(url);
 
     } catch (err) {
-      setComplianceError(err instanceof Error ? err.message : 'Unknown error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setComplianceError(`${errorMessage}. Note: Compliance package generation requires the CERT Python backend to be running. For now, use the PDF Report option instead.`);
     } finally {
       setComplianceGenerating(false);
     }
@@ -376,9 +377,16 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
             <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="16px">
               Generate Compliance Package
             </Text>
-            <Text fontSize="16px" color={colors.text.secondary} mb="24px" lineHeight="1.7">
+            <Text fontSize="16px" color={colors.text.secondary} mb="16px" lineHeight="1.7">
               Generate 5 professional Word documents (32 pages total) for EU AI Act compliance. Fill in the fields below.
             </Text>
+
+            {/* Info Notice */}
+            <Box bg="#FEF3C7" p="16px" borderRadius="8px" mb="24px" border="1px solid" borderColor={colors.warning}>
+              <Text fontSize="14px" color={colors.text.primary} lineHeight="1.6">
+                <strong>Note:</strong> This feature requires the CERT Python backend to be running locally. If generation fails, use the <strong>PDF Report</strong> option instead, which works entirely in your browser.
+              </Text>
+            </Box>
 
             {/* System Identification */}
             <Text fontSize="20px" fontWeight="700" color={colors.navy} mb="16px">
