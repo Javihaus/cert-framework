@@ -19,3 +19,4 @@ export {
   components,
   breakpoints,
 } from './tokens';
+export { icons, iconSizes } from './icons';

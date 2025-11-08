@@ -68,10 +68,10 @@ export default function DistributionChart({ results, threshold }: DistributionCh
   }, [results, threshold]);
 
   const getBarColor = (status: string) => {
-    // Professional muted colors instead of bright red/orange/green
-    if (status === 'fail') return '#EF4444';     // Muted red
-    if (status === 'warn') return '#F59E0B';     // Muted amber
-    return '#10B981';                             // Muted green
+    // Use colors from the palette
+    if (status === 'fail') return colors.error;     // Red from palette
+    if (status === 'warn') return colors.warning;   // Coral from palette
+    return colors.success;                          // Green from palette
   };
 
   const maxCount = Math.max(...buckets.map(b => b.count), 1);
@@ -81,19 +81,19 @@ export default function DistributionChart({ results, threshold }: DistributionCh
       {/* Professional Legend - not prose explanation */}
       <Flex gap={spacing.lg} mb={spacing.xl} align="center">
         <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg="#EF4444" borderRadius="2px" />
+          <Box w="12px" h="12px" bg={colors.error} borderRadius="2px" />
           <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
             Failed (&lt; 0.5)
           </Text>
         </Flex>
         <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg="#F59E0B" borderRadius="2px" />
+          <Box w="12px" h="12px" bg={colors.warning} borderRadius="2px" />
           <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
             Near threshold (0.5–{threshold.toFixed(1)})
           </Text>
         </Flex>
         <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg="#10B981" borderRadius="2px" />
+          <Box w="12px" h="12px" bg={colors.success} borderRadius="2px" />
           <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
             Passed (&gt; {threshold.toFixed(1)})
           </Text>

@@ -24,6 +24,7 @@ import DocumentsView from '@/components/DocumentsView';
 import Footer from '@/components/Footer';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors, spacing, typography, borderRadius } from '@/theme';
+import { InfoBox } from '@/components/ui';
 
 export default function Home() {
   const [evaluationData, setEvaluationData] = useState<{
@@ -183,43 +184,10 @@ export default function Home() {
             </Box>
 
             {/* Privacy Notice */}
-            <Card style={{
-              borderColor: colors.cobalt,
-              background: '#EFF6FF',
-              marginBottom: spacing.lg,
-              maxWidth: '800px',
-              marginLeft: 'auto',
-              marginRight: 'auto'
-            }}>
-              <Grid templateColumns="auto 1fr" gap={spacing.md} alignItems="start">
-                <Box
-                  w="48px"
-                  h="48px"
-                  bg={colors.cobalt}
-                  borderRadius={borderRadius.md}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  color="white"
-                  flexShrink={0}
-                >
-                  <MdLock size={24} />
-                </Box>
+            <Box maxW="800px" mx="auto" mb={spacing.lg}>
+              <InfoBox type="info" title="Your Data Stays Private">
                 <Box>
-                  <Text
-                    fontSize={typography.fontSize.lg}
-                    fontWeight={typography.fontWeight.bold}
-                    color={colors.navy}
-                    mb={spacing.sm}
-                  >
-                    Your Data Stays Private
-                  </Text>
-                  <Text
-                    fontSize={typography.fontSize.sm}
-                    color={colors.navy}
-                    lineHeight={typography.lineHeight.relaxed}
-                    mb={spacing.sm}
-                  >
+                  <Text mb={spacing.sm}>
                     All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
                   </Text>
                   <Link
@@ -234,8 +202,8 @@ export default function Home() {
                     Learn more about our privacy practices →
                   </Link>
                 </Box>
-              </Grid>
-            </Card>
+              </InfoBox>
+            </Box>
 
             <FileUpload
               onFileLoad={handleEvaluationFileLoad}
@@ -458,36 +426,22 @@ results = evaluator.evaluate_log_file(
             </Card>
 
             {results.length > 0 && (
-              <Card style={{ borderColor: colors.warning, background: '#FEF3C7' }}>
-                <Text
-                  fontSize={typography.fontSize.lg}
-                  fontWeight={typography.fontWeight.bold}
-                  color={colors.navy}
-                  mb={spacing.sm}
-                >
-                  Critical Finding
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.base}
-                  color={colors.text.primary}
-                  lineHeight={typography.lineHeight.loose}
-                >
-                  {(() => {
-                    const borderlineCount = results.filter(r =>
-                      r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
-                    ).length;
-                    const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
+              <InfoBox type="warning" title="Critical Finding">
+                {(() => {
+                  const borderlineCount = results.filter(r =>
+                    r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
+                  ).length;
+                  const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
 
-                    return (
-                      <>
-                        <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary!.threshold_used.toFixed(1)} - just below or near the threshold.
-                        These represent borderline cases where small improvements could push you to 90%+ compliance.
-                        Focus engineering effort here for maximum impact.
-                      </>
-                    );
-                  })()}
-                </Text>
-              </Card>
+                  return (
+                    <>
+                      <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary!.threshold_used.toFixed(1)} - just below or near the threshold.
+                      These represent borderline cases where small improvements could push you to 90%+ compliance.
+                      Focus engineering effort here for maximum impact.
+                    </>
+                  );
+                })()}
+              </InfoBox>
             )}
           </Box>
         );

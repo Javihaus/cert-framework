@@ -5,6 +5,7 @@ import { Box, Button, Flex, Text, Grid, Input, Textarea, Code } from '@chakra-ui
 import { MdFileDownload } from 'react-icons/md';
 import { pdf } from '@react-pdf/renderer';
 import { colors, spacing, typography, borderRadius, components } from '@/theme';
+import { InfoBox } from '@/components/ui';
 import Card from '@/components/Card';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { Article15Report } from '@/types/report-schema';
@@ -274,33 +275,21 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
       </Card>
 
       {/* CLI Instructions for Word Documents */}
-      <Card style={{ borderColor: colors.cobalt, background: '#EFF6FF', padding: spacing.lg }}>
-        <Text
-          fontSize={typography.fontSize.lg}
-          fontWeight={typography.fontWeight.bold}
-          color={colors.navy}
-          mb={spacing.sm}
-        >
-          Need Word Documents?
-        </Text>
-        <Text
-          fontSize={typography.fontSize.sm}
-          color={colors.text.primary}
-          mb={spacing.md}
-          lineHeight={typography.lineHeight.loose}
-        >
-          For the full EU AI Act compliance package (5 Word documents, 32 pages), use the CERT CLI. All processing happens locally on your machine - your traces never leave your computer.
-        </Text>
-        <Code
-          display="block"
-          whiteSpace="pre"
-          p={spacing.md}
-          borderRadius={borderRadius.md}
-          fontSize={typography.fontSize.sm}
-          bg="white"
-          color={colors.navy}
-          lineHeight={typography.lineHeight.relaxed}
-        >
+      <InfoBox type="info" title="Need Word Documents?">
+        <Box>
+          <Text mb={spacing.md}>
+            For the full EU AI Act compliance package (5 Word documents, 32 pages), use the CERT CLI. All processing happens locally on your machine - your traces never leave your computer.
+          </Text>
+          <Code
+            display="block"
+            whiteSpace="pre"
+            p={spacing.md}
+            borderRadius={borderRadius.md}
+            fontSize={typography.fontSize.sm}
+            bg="white"
+            color={colors.navy}
+            lineHeight={typography.lineHeight.relaxed}
+          >
 {`# Install CERT CLI
 pip install cert-framework
 
@@ -314,16 +303,12 @@ reporter = ComplianceReporter(
     provider_name="My Company"
 )
 reporter.save_report("traces.jsonl", "package.docx")`}
-        </Code>
-        <Text
-          fontSize={typography.fontSize.sm}
-          color={colors.text.secondary}
-          mt={spacing.sm}
-          lineHeight={typography.lineHeight.relaxed}
-        >
-          The CLI generates: Risk Classification Report (2p), Annex IV Technical Documentation (20-25p), Audit Trail Guide (3p), Monitoring Framework (5p), and Conformity Checklist (2p).
-        </Text>
-      </Card>
+          </Code>
+          <Text mt={spacing.sm} fontSize={typography.fontSize.xs} color={colors.text.muted}>
+            The CLI generates: Risk Classification Report (2p), Annex IV Technical Documentation (20-25p), Audit Trail Guide (3p), Monitoring Framework (5p), and Conformity Checklist (2p).
+          </Text>
+        </Box>
+      </InfoBox>
     </Box>
   );
 }

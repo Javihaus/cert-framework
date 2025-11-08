@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Box, Button, Text, VStack, Flex } from '@chakra-ui/react';
+import { MdCheckCircle, MdCancel } from 'react-icons/md';
 import { colors } from '@/theme/colors';
 
 /**
@@ -170,7 +171,7 @@ export default function DocumentsPage() {
               mb={4}
             >
               <Flex align="start" gap="12px">
-                <Text fontSize="20px">✅</Text>
+                <MdCheckCircle size={20} color={colors.success} />
                 <Text fontSize="14px" color="green.800" fontWeight="600">
                   Documents generated successfully!
                 </Text>
@@ -184,7 +185,7 @@ export default function DocumentsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#38a169',
+                backgroundColor: colors.success,
                 color: 'white',
                 padding: '12px 24px',
                 borderRadius: '6px',
@@ -193,17 +194,17 @@ export default function DocumentsPage() {
                 textDecoration: 'none',
                 width: '100%',
                 cursor: 'pointer',
-                transition: 'background-color 0.2s',
+                transition: 'opacity 0.2s',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2f855a')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#38a169')}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               Download Package (.zip)
             </a>
 
             <Box mt={6} p={4} bg="yellow.50" borderRadius="md" borderLeft="4px solid" borderLeftColor="yellow.400">
               <Text fontSize="14px" fontWeight="bold" mb={2}>
-                ⚠️ Next Steps - Expert Review Required
+                Next Steps - Expert Review Required
               </Text>
               <VStack align="start" gap={2} fontSize="14px">
                 <Text>1. Extract the ZIP file</Text>
@@ -226,7 +227,7 @@ export default function DocumentsPage() {
             borderRadius="8px"
           >
             <Flex align="start" gap="12px">
-              <Text fontSize="20px">❌</Text>
+              <MdCancel size={20} color={colors.error} />
               <Box>
                 <Text fontWeight="bold" color="red.800">Error generating documents</Text>
                 <Text fontSize="14px" color="red.700">{errorMessage}</Text>
