@@ -36,10 +36,10 @@ export default function Navigation({
       boxShadow="0 1px 2px rgba(0, 0, 0, 0.05)"
     >
       <Box maxW="1600px" mx="auto" px={spacing.xl}>
-        <Flex h="80px" align="center" justify="space-between">
+        <Flex h="80px" align="center" justify="center" position="relative">
 
-          {/* Logo */}
-          <Flex align="center" gap={spacing.sm}>
+          {/* Logo - Positioned on the left */}
+          <Flex align="center" gap={spacing.sm} position="absolute" left={spacing.xl}>
             <Box h="48px" display="flex" alignItems="center">
               <Image
                 src="/cert-logo.png"
@@ -58,7 +58,7 @@ export default function Navigation({
             </Text>
           </Flex>
 
-          {/* Main Navigation Tabs - ONLY 3 TABS */}
+          {/* Main Navigation Tabs - CENTERED */}
           <Flex gap={spacing.xs}>
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;

@@ -7,7 +7,7 @@ import {
   Text,
   Flex,
 } from '@chakra-ui/react';
-import { MdUpload, MdCheckCircle } from 'react-icons/md';
+import { Upload, CheckCircle2 } from 'lucide-react';
 import { colors } from '@/theme/colors';
 
 interface FileUploadProps {
@@ -67,7 +67,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
           _hover={{ bg: colors.mist }}
         >
           <Flex align="center" gap="8px">
-            <MdUpload size={20} />
+            <Upload size={20} strokeWidth={2} />
             <span>{label}</span>
           </Flex>
         </Button>
@@ -81,7 +81,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
           borderRadius="8px"
         >
           <Flex align="center" gap="12px">
-            <MdCheckCircle size={24} color={colors.success} />
+            <CheckCircle2 size={24} color={colors.success} strokeWidth={2} />
             <Box>
               <Text fontSize="15px" fontWeight="600" color={colors.success}>
                 File uploaded successfully

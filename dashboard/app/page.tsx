@@ -229,11 +229,13 @@ export default function Home() {
                 </InfoBox>
               </Box>
 
-              <FileUpload
-                onFileLoad={handleEvaluationFileLoad}
-                accept=".json"
-                label="Upload Evaluation Results"
-              />
+              <Box maxW="800px" mx="auto" display="flex" justifyContent="center">
+                <FileUpload
+                  onFileLoad={handleEvaluationFileLoad}
+                  accept=".json"
+                  label="Upload Evaluation Results"
+                />
+              </Box>
 
               <Box maxW="800px" mx="auto" mt={spacing.xl}>
                 <Card style={{ borderColor: colors.patience, background: 'white' }}>
