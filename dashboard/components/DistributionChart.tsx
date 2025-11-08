@@ -2,7 +2,7 @@
 
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { useMemo } from 'react';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography } from '@/theme';
 import { EvaluationResult } from '@/types/cert';
 
 interface DistributionChartProps {
@@ -21,16 +21,16 @@ export default function DistributionChart({ results, threshold }: DistributionCh
   const buckets = useMemo(() => {
     const bucketData: BucketData[] = [];
     const ranges = [
-      { min: 0.0, max: 0.1, label: '0.0-0.1' },
-      { min: 0.1, max: 0.2, label: '0.1-0.2' },
-      { min: 0.2, max: 0.3, label: '0.2-0.3' },
-      { min: 0.3, max: 0.4, label: '0.3-0.4' },
-      { min: 0.4, max: 0.5, label: '0.4-0.5' },
-      { min: 0.5, max: 0.6, label: '0.5-0.6' },
-      { min: 0.6, max: threshold, label: `0.6-${threshold.toFixed(1)}` },
-      { min: threshold, max: 0.8, label: `${threshold.toFixed(1)}-0.8` },
-      { min: 0.8, max: 0.9, label: '0.8-0.9' },
-      { min: 0.9, max: 1.0, label: '0.9-1.0' },
+      { min: 0.0, max: 0.1, label: '0.0' },
+      { min: 0.1, max: 0.2, label: '0.1' },
+      { min: 0.2, max: 0.3, label: '0.2' },
+      { min: 0.3, max: 0.4, label: '0.3' },
+      { min: 0.4, max: 0.5, label: '0.4' },
+      { min: 0.5, max: 0.6, label: '0.5' },
+      { min: 0.6, max: threshold, label: '0.6' },
+      { min: threshold, max: 0.8, label: threshold.toFixed(1) },
+      { min: 0.8, max: 0.9, label: '0.8' },
+      { min: 0.9, max: 1.0, label: '0.9' },
     ];
 
     const maxCount = Math.max(...ranges.map((range, idx) => {
@@ -44,7 +44,6 @@ export default function DistributionChart({ results, threshold }: DistributionCh
     }), 1);
 
     ranges.forEach((range, idx) => {
-      // For the last bucket, include values equal to max (e.g., 1.0)
       const isLastBucket = idx === ranges.length - 1;
       const count = results.filter(r =>
         r.measurement.confidence >= range.min &&
@@ -69,26 +68,73 @@ export default function DistributionChart({ results, threshold }: DistributionCh
   }, [results, threshold]);
 
   const getBarColor = (status: string) => {
-    if (status === 'fail') return colors.error;
-    if (status === 'warn') return colors.warning;
-    return colors.success;
+    // Professional muted colors instead of bright red/orange/green
+    if (status === 'fail') return '#EF4444';     // Muted red
+    if (status === 'warn') return '#F59E0B';     // Muted amber
+    return '#10B981';                             // Muted green
   };
+
+  const maxCount = Math.max(...buckets.map(b => b.count), 1);
 
   return (
     <Box>
-      <Text fontSize="16px" color={colors.text.secondary} mb="24px" lineHeight="1.6">
-        Shows how scores cluster across the threshold. Red = failed, orange = near threshold, green = passed.
-      </Text>
+      {/* Professional Legend - not prose explanation */}
+      <Flex gap={spacing.lg} mb={spacing.xl} align="center">
+        <Flex align="center" gap={spacing.xs}>
+          <Box w="12px" h="12px" bg="#EF4444" borderRadius="2px" />
+          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
+            Failed (&lt; 0.5)
+          </Text>
+        </Flex>
+        <Flex align="center" gap={spacing.xs}>
+          <Box w="12px" h="12px" bg="#F59E0B" borderRadius="2px" />
+          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
+            Near threshold (0.5–{threshold.toFixed(1)})
+          </Text>
+        </Flex>
+        <Flex align="center" gap={spacing.xs}>
+          <Box w="12px" h="12px" bg="#10B981" borderRadius="2px" />
+          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
+            Passed (&gt; {threshold.toFixed(1)})
+          </Text>
+        </Flex>
+      </Flex>
 
-      <Box position="relative" h="340px" pb="60px">
+      <Box position="relative" h="380px">
+        {/* Grid lines for reference */}
+        <Box position="absolute" left="0" right="0" top="0" bottom="60px">
+          {[0, 25, 50, 75, 100].map((percent) => (
+            <Box
+              key={percent}
+              position="absolute"
+              left="0"
+              right="0"
+              bottom={`${(percent / 100) * 300}px`}
+              borderTop="1px solid"
+              borderColor={percent === 0 ? colors.navy : colors.patience}
+              opacity={percent === 0 ? 1 : 0.4}
+            >
+              <Text
+                position="absolute"
+                left="-40px"
+                top="-8px"
+                fontSize={typography.fontSize.xs}
+                color={colors.text.muted}
+                fontWeight={typography.fontWeight.medium}
+              >
+                {Math.round((percent / 100) * maxCount)}
+              </Text>
+            </Box>
+          ))}
+        </Box>
+
         {/* Bar Chart */}
         <Flex
           align="flex-end"
-          h="260px"
-          gap="6px"
-          borderBottom="2px solid"
-          borderColor={colors.navy}
+          h="300px"
+          gap={spacing.xs}
           position="relative"
+          ml="40px"
         >
           {buckets.map((bucket, idx) => (
             <Flex
@@ -99,76 +145,82 @@ export default function DistributionChart({ results, threshold }: DistributionCh
               position="relative"
               h="100%"
               justify="flex-end"
+              role="group"
             >
               {/* Bar */}
               <Box
                 bg={getBarColor(bucket.status)}
                 w="100%"
                 h={bucket.count > 0 ? `${bucket.percentage}%` : '0%'}
-                minH={bucket.count > 0 ? '4px' : '0px'}
-                borderRadius="4px 4px 0 0"
-                transition="all 0.3s"
-                _hover={{ opacity: 0.85 }}
+                minH={bucket.count > 0 ? '8px' : '0px'}
+                borderRadius="3px 3px 0 0"
+                transition="all 0.2s"
+                opacity={0.9}
+                _groupHover={{ opacity: 1 }}
                 cursor="pointer"
                 position="relative"
               >
-                {/* Value on top */}
+                {/* Tooltip-style value on hover */}
                 {bucket.count > 0 && (
-                  <Text
+                  <Box
                     position="absolute"
-                    top="-24px"
+                    top="-32px"
                     left="50%"
                     transform="translateX(-50%)"
-                    fontSize="14px"
-                    fontWeight="700"
-                    color={colors.navy}
+                    bg={colors.navy}
+                    color="white"
+                    px={spacing.xs}
+                    py="4px"
+                    borderRadius="4px"
+                    fontSize={typography.fontSize.xs}
+                    fontWeight={typography.fontWeight.semibold}
                     whiteSpace="nowrap"
+                    opacity="0"
+                    transition="opacity 0.2s"
+                    _groupHover={{ opacity: 1 }}
+                    pointerEvents="none"
+                    zIndex="10"
                   >
-                    {bucket.count}
-                  </Text>
+                    {bucket.count} traces
+                  </Box>
                 )}
               </Box>
+
+              {/* Threshold marker - elegant vertical line */}
+              {idx === 6 && (
+                <Box
+                  position="absolute"
+                  right="-4px"
+                  bottom="0"
+                  w="2px"
+                  h="300px"
+                  bg={colors.navy}
+                  opacity="0.3"
+                  pointerEvents="none"
+                >
+                  <Box
+                    position="absolute"
+                    top="-28px"
+                    right="-2px"
+                    bg={colors.navy}
+                    color="white"
+                    px={spacing.xs}
+                    py="4px"
+                    borderRadius="4px"
+                    fontSize={typography.fontSize.xs}
+                    fontWeight={typography.fontWeight.semibold}
+                    whiteSpace="nowrap"
+                  >
+                    Threshold
+                  </Box>
+                </Box>
+              )}
             </Flex>
           ))}
-
-          {/* Threshold line */}
-          <Box
-            position="absolute"
-            left={`${(7 / 10) * 100}%`}
-            bottom="0"
-            w="2px"
-            h="260px"
-            borderLeft="2px dashed"
-            borderColor={colors.navy}
-            opacity="0.6"
-            pointerEvents="none"
-          >
-            <Box
-              position="absolute"
-              top="50%"
-              left="8px"
-              transform="translateY(-50%)"
-              bg={colors.background}
-              px="8px"
-              py="4px"
-              borderRadius="4px"
-              border="1px solid"
-              borderColor={colors.navy}
-            >
-              <Text
-                fontSize="11px"
-                fontWeight="700"
-                color={colors.navy}
-                whiteSpace="nowrap"
-              >
-                Threshold: {threshold.toFixed(2)}
-              </Text>
-            </Box>
-          </Box>
         </Flex>
 
-        {/* X-axis labels */}
-        <Flex mt="12px" gap="6px">
+        {/* X-axis labels - clean, not rotated */}
+        <Flex mt={spacing.md} gap={spacing.xs} ml="40px">
           {buckets.map((bucket, idx) => (
             <Box
               key={idx}
@@ -176,19 +228,29 @@ export default function DistributionChart({ results, threshold }: DistributionCh
               textAlign="center"
             >
               <Text
-                fontSize="10px"
+                fontSize={typography.fontSize.xs}
                 color={colors.text.muted}
-                fontWeight="500"
-                transform="rotate(-45deg)"
-                transformOrigin="center"
-                whiteSpace="nowrap"
-                mt="20px"
+                fontWeight={typography.fontWeight.medium}
               >
                 {bucket.label}
               </Text>
             </Box>
           ))}
         </Flex>
+
+        {/* Axis label */}
+        <Text
+          position="absolute"
+          bottom="0"
+          left="50%"
+          transform="translateX(-50%)"
+          fontSize={typography.fontSize.xs}
+          color={colors.text.secondary}
+          fontWeight={typography.fontWeight.semibold}
+          mt={spacing.xs}
+        >
+          Confidence Score
+        </Text>
       </Box>
     </Box>
   );
