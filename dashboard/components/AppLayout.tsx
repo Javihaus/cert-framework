@@ -37,7 +37,7 @@ export default function AppLayout({
       />
 
       {/* Main Content Area */}
-      <Flex flex="1" position="relative">
+      <Flex flex="1" position="relative" justify="center">
 
         {/* Conditional Sidebar - ONLY in Monitoring section */}
         {showSidebar && (
@@ -51,12 +51,10 @@ export default function AppLayout({
         {/* Main Content */}
         <Box
           as="main"
-          flex="1"
+          w="100%"
+          maxW={containers.content}
           ml={{ base: '0', md: showSidebar ? '240px' : '0' }}
           transition="margin-left 0.3s"
-          maxW={containers.content}
-          mx="auto"
-          w="100%"
           px={spacing.xl}
           py={spacing['2xl']}
         >

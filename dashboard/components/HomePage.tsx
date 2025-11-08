@@ -7,7 +7,7 @@ import Card from '@/components/Card';
 
 export default function HomePage() {
   return (
-    <Box maxW="1200px" mx="auto" p={spacing['2xl']}>
+    <Box>
       {/* Hero Section */}
       <Box mb={spacing['3xl']} textAlign="center">
         <Text
