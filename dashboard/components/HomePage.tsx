@@ -198,11 +198,11 @@ export default function HomePage() {
             </Box>
             <Box>
               <Text fontSize="20px" fontWeight="600" color={colors.navy} mb="8px">
-                Generate Compliance Package
+                Download Reports
               </Text>
               <Text fontSize="16px" lineHeight="1.6" color={colors.text.primary}>
-                Fill in system details (name, purpose, risk classification) and generate
-                5 Word documents: Risk Report, Annex IV, Audit Trail, Monitoring, and Checklist.
+                Generate a professional PDF report directly in your browser. For Word documents,
+                use the CERT CLI to generate the full compliance package locally.
               </Text>
             </Box>
           </Flex>
