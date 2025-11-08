@@ -1,60 +1,72 @@
-import { Box, Flex, Icon, Text } from '@chakra-ui/react';
-import { IconType } from 'react-icons';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import Card from './Card';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography } from '@/theme';
+import { LucideIcon } from 'lucide-react';
 
 interface MetricCardProps {
   label: string;
   value: string;
-  icon: IconType;
-  color: 'green' | 'red' | 'blue' | 'orange';
-  bgColor?: string;
+  icon: LucideIcon;
+  variant?: 'default' | 'success' | 'warning' | 'error';
 }
 
-const colorSchemes = {
-  green: {
-    bg: colors.success,
-    light: '#e8f5e9',
+const variants = {
+  default: {
+    iconColor: colors.cobalt,
+    valueColor: colors.navy,
   },
-  red: {
-    bg: colors.error,
-    light: '#fee',
+  success: {
+    iconColor: colors.success,
+    valueColor: colors.navy,
   },
-  blue: {
-    bg: colors.cobalt,
-    light: colors.patience,
+  warning: {
+    iconColor: colors.coral,
+    valueColor: colors.navy,
   },
-  orange: {
-    bg: colors.coral,
-    light: '#fef5e7',
+  error: {
+    iconColor: colors.error,
+    valueColor: colors.navy,
   },
 };
 
-export default function MetricCard({ label, value, icon, color, bgColor }: MetricCardProps) {
-  const scheme = colorSchemes[color];
+export default function MetricCard({
+  label,
+  value,
+  icon: Icon,
+  variant = 'default'
+}: MetricCardProps) {
+  const style = variants[variant];
 
   return (
-    <Card style={{ borderColor: colors.patience, backgroundColor: bgColor || 'white' }}>
-      <Flex align="center" justify="space-between" w="100%">
-        <Flex direction="column">
+    <Card>
+      <Flex direction="column" gap={spacing.md}>
+        {/* Icon + Label Row */}
+        <Flex align="center" justify="space-between">
           <Text
-            color={colors.text.muted}
-            fontSize="16px"
-            fontWeight="600"
-            mb="8px"
+            fontSize={typography.fontSize.sm}
+            fontWeight={typography.fontWeight.semibold}
+            color={colors.text.secondary}
+            textTransform="uppercase"
+            letterSpacing={typography.letterSpacing.wide}
           >
             {label}
           </Text>
-          <Text
-            color={colors.navy}
-            fontSize="40px"
-            fontWeight="700"
-            lineHeight="1"
-          >
-            {value}
-          </Text>
+          <Icon
+            size={20}
+            color={style.iconColor}
+            strokeWidth={2}
+          />
         </Flex>
-        <Icon as={icon} w="48px" h="48px" color={scheme.bg} />
+
+        {/* Value */}
+        <Text
+          fontSize={typography.fontSize['3xl']}
+          fontWeight={typography.fontWeight.bold}
+          color={style.valueColor}
+          lineHeight={typography.lineHeight.tight}
+        >
+          {value}
+        </Text>
       </Flex>
     </Card>
   );

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Box, Button, Flex, Text, Grid, Input, Textarea, Code } from '@chakra-ui/react';
-import { MdFileDownload } from 'react-icons/md';
+import { Download } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
-import { colors, spacing, typography, borderRadius, components } from '@/theme';
+import { colors, spacing, typography, borderRadius } from '@/theme';
 import { InfoBox } from '@/components/ui';
 import Card from '@/components/Card';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
@@ -142,7 +142,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               placeholder="Enter report title"
               bg={colors.background}
               fontSize={typography.fontSize.sm}
-              height={components.input.height}
+              height="44px"
             />
           </Box>
 
@@ -161,7 +161,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               placeholder="Your organization name"
               bg={colors.background}
               fontSize={typography.fontSize.sm}
-              height={components.input.height}
+              height="44px"
             />
           </Box>
 
@@ -180,7 +180,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               placeholder="Name of person conducting evaluation"
               bg={colors.background}
               fontSize={typography.fontSize.sm}
-              height={components.input.height}
+              height="44px"
             />
           </Box>
 
@@ -255,7 +255,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
 
         <Button
           w="100%"
-          h={components.button.height.lg}
+          h="48px"
           bg={colors.cobalt}
           color="white"
           fontSize={typography.fontSize.lg}
@@ -267,7 +267,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
         >
           {loading ? 'Generating Report...' : (
             <Flex align="center" gap={spacing.sm}>
-              <MdFileDownload size={22} />
+              <Download size={20} strokeWidth={2} />
               <Text>Download PDF Report</Text>
             </Flex>
           )}

@@ -1,103 +1,84 @@
 /**
- * CERT Icon System
- * Centralized icon definitions using react-icons
- * NEVER use emojis - always use these professional icons
+ * CERT Icon System - Using Lucide Icons
+ * Professional, consistent, clean Swiss design
+ *
+ * WHY LUCIDE:
+ * - Consistent 2px stroke width
+ * - Clean, minimal style
+ * - Professional appearance
+ * - Used by Linear, Vercel, Stripe
  */
 
 import {
-  // Navigation & Actions
-  MdHome,
-  MdUpload,
-  MdMenu,
-  MdClose,
-  MdArrowForward,
-  MdArrowBack,
+  // Navigation
+  Home,
+  Upload,
+  Menu,
+  X,
+  ArrowRight,
+  ArrowLeft,
 
-  // Monitoring Section
-  MdDashboard,
-  MdWarning,
-  MdBarChart,
-  MdDescription,
-  MdCheckCircle,
-  MdError,
-  MdInfo,
-  MdCancel,
-  MdAssessment,
-  MdList,
+  // Monitoring
+  LayoutDashboard,
+  AlertTriangle,
+  BarChart3,
+  FileText,
+  CheckCircle2,
+  XCircle,
+  Info,
 
-  // Data & Files
-  MdFileUpload,
-  MdFileDownload,
-  MdInsertDriveFile,
-  MdFolder,
-  MdFolderZip,
-
-  // Status & Feedback
-  MdLock,
-  MdVisibility,
-  MdVisibilityOff,
-  MdSecurity,
-  MdSpeed,
-  MdVerifiedUser,
-
-  // UI Controls
-  MdExpandMore,
-  MdExpandLess,
-  MdSearch,
-  MdFilterList,
-
-} from 'react-icons/md';
-
-export const icons = {
-  // Main Navigation
-  home: MdHome,
-  menu: MdMenu,
-  close: MdClose,
-
-  // Monitoring Navigation
-  upload: MdUpload,
-  dashboard: MdDashboard,
-  warning: MdWarning,
-  chart: MdBarChart,
-  document: MdDescription,
+  // Files
+  File,
+  Download,
+  FolderOpen,
 
   // Status
-  success: MdCheckCircle,
-  error: MdError,
-  cancel: MdCancel,
-  info: MdInfo,
-  lock: MdLock,
-  assessment: MdAssessment,
-  list: MdList,
+  Lock,
+  Shield,
+  Zap,
+  Eye,
+  EyeOff,
 
-  // File Operations
-  fileUpload: MdFileUpload,
-  fileDownload: MdFileDownload,
-  file: MdInsertDriveFile,
-  folder: MdFolder,
-  folderZip: MdFolderZip,
+} from 'lucide-react';
 
-  // Features
-  security: MdSecurity,
-  speed: MdSpeed,
-  verified: MdVerifiedUser,
+export const icons = {
+  // Navigation
+  home: Home,
+  upload: Upload,
+  menu: Menu,
+  close: X,
+  arrowRight: ArrowRight,
+  arrowLeft: ArrowLeft,
+
+  // Monitoring
+  dashboard: LayoutDashboard,
+  warning: AlertTriangle,
+  chart: BarChart3,
+  document: FileText,
+
+  // Status
+  success: CheckCircle2,
+  error: XCircle,
+  info: Info,
+  lock: Lock,
+  shield: Shield,
+  zap: Zap,
+
+  // Files
+  file: File,
+  download: Download,
+  folder: FolderOpen,
 
   // UI
-  expandMore: MdExpandMore,
-  expandLess: MdExpandLess,
-  search: MdSearch,
-  filter: MdFilterList,
-  arrowForward: MdArrowForward,
-  arrowBack: MdArrowBack,
-  visibility: MdVisibility,
-  visibilityOff: MdVisibilityOff,
+  eye: Eye,
+  eyeOff: EyeOff,
 } as const;
 
-// Icon sizes (consistent across app)
+// Icon sizes - smaller, more refined
 export const iconSizes = {
-  xs: 16,
-  sm: 20,
-  md: 24,
-  lg: 32,
-  xl: 48,
+  xs: 14,   // Very small inline icons
+  sm: 16,   // Standard inline icons
+  md: 20,   // Card/section icons
+  lg: 24,   // Feature/heading icons
+  xl: 32,   // Hero/large display icons
 } as const;

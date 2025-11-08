@@ -15,8 +15,10 @@ export {
   spacing,
   typography,
   borderRadius,
+  radius,
+  borderWidth,
   shadows,
-  components,
-  breakpoints,
+  containers,
+  transitions,
 } from './tokens';
 export { icons, iconSizes } from './icons';

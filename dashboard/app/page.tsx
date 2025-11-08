@@ -9,7 +9,7 @@ import {
   Code,
   Link,
 } from '@chakra-ui/react';
-import { MdCheckCircle, MdCancel, MdAssessment, MdList, MdLock } from 'react-icons/md';
+import { CheckCircle2, XCircle, BarChart3, List } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
@@ -194,7 +194,7 @@ export default function Home() {
                   fontWeight={typography.fontWeight.bold}
                   color={colors.navy}
                   mb={spacing.sm}
-                  letterSpacing={typography.letterSpacing.snug}
+                  letterSpacing={typography.letterSpacing.tight}
                 >
                   Upload Evaluation Results
                 </Text>
@@ -292,30 +292,26 @@ results = evaluator.evaluate_log_file(
                 <MetricCard
                   label="Accuracy"
                   value={`${(summary!.accuracy * 100).toFixed(1)}%`}
-                  icon={MdAssessment}
-                  color={summary!.accuracy >= 0.9 ? 'green' : summary!.accuracy >= 0.8 ? 'orange' : 'red'}
-                  bgColor="rgba(251, 245, 240, 0.8)"
+                  icon={BarChart3}
+                  variant={summary!.accuracy >= 0.9 ? 'success' : summary!.accuracy >= 0.8 ? 'warning' : 'error'}
                 />
                 <MetricCard
                   label="Total Traces"
                   value={summary!.total_traces.toString()}
-                  icon={MdList}
-                  color="blue"
-                  bgColor="rgba(251, 245, 240, 0.8)"
+                  icon={List}
+                  variant="default"
                 />
                 <MetricCard
                   label="Passed"
                   value={summary!.passed_traces.toString()}
-                  icon={MdCheckCircle}
-                  color="green"
-                  bgColor="rgba(251, 245, 240, 0.8)"
+                  icon={CheckCircle2}
+                  variant="success"
                 />
                 <MetricCard
                   label="Failed"
                   value={summary!.failed_traces.toString()}
-                  icon={MdCancel}
-                  color="red"
-                  bgColor="rgba(251, 245, 240, 0.8)"
+                  icon={XCircle}
+                  variant="error"
                 />
               </Grid>
 
