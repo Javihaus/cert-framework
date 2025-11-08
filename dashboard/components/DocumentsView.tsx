@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Box, Button, Flex, Text, Grid, Input, Textarea, Code } from '@chakra-ui/react';
 import { MdFileDownload } from 'react-icons/md';
 import { pdf } from '@react-pdf/renderer';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography, borderRadius, components } from '@/theme';
 import Card from '@/components/Card';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { Article15Report } from '@/types/report-schema';
@@ -107,17 +107,32 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
   return (
     <Box maxW="900px" mx="auto">
       {/* PDF Report Section */}
-      <Card style={{ borderColor: colors.patience, padding: '32px', marginBottom: '24px' }}>
-        <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="16px">
+      <Card style={{ borderColor: colors.patience, padding: spacing.xl, marginBottom: spacing.lg }}>
+        <Text
+          fontSize={typography.fontSize['2xl']}
+          fontWeight={typography.fontWeight.bold}
+          color={colors.navy}
+          mb={spacing.md}
+        >
           Download PDF Compliance Report
         </Text>
-        <Text fontSize="16px" color={colors.text.secondary} mb="24px" lineHeight="1.7">
+        <Text
+          fontSize={typography.fontSize.base}
+          color={colors.text.secondary}
+          mb={spacing.lg}
+          lineHeight={typography.lineHeight.loose}
+        >
           Generate a professional PDF report with comprehensive evaluation metrics, failure analysis, and compliance recommendations. Generated entirely in your browser - no data sent to servers.
         </Text>
 
-        <Grid templateColumns="1fr" gap="20px" mb="24px">
+        <Grid templateColumns="1fr" gap={spacing.lg} mb={spacing.lg}>
           <Box>
-            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text
+              fontSize={typography.fontSize.sm}
+              fontWeight={typography.fontWeight.semibold}
+              color={colors.navy}
+              mb={spacing.xs}
+            >
               Report Title
             </Text>
             <Input
@@ -125,13 +140,18 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               onChange={(e) => setReportTitle(e.target.value)}
               placeholder="Enter report title"
               bg={colors.background}
-              fontSize="15px"
-              height="44px"
+              fontSize={typography.fontSize.sm}
+              height={components.input.height}
             />
           </Box>
 
           <Box>
-            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text
+              fontSize={typography.fontSize.sm}
+              fontWeight={typography.fontWeight.semibold}
+              color={colors.navy}
+              mb={spacing.xs}
+            >
               Organization
             </Text>
             <Input
@@ -139,13 +159,18 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               onChange={(e) => setOrganization(e.target.value)}
               placeholder="Your organization name"
               bg={colors.background}
-              fontSize="15px"
-              height="44px"
+              fontSize={typography.fontSize.sm}
+              height={components.input.height}
             />
           </Box>
 
           <Box>
-            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text
+              fontSize={typography.fontSize.sm}
+              fontWeight={typography.fontWeight.semibold}
+              color={colors.navy}
+              mb={spacing.xs}
+            >
               Evaluator
             </Text>
             <Input
@@ -153,13 +178,18 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               onChange={(e) => setEvaluator(e.target.value)}
               placeholder="Name of person conducting evaluation"
               bg={colors.background}
-              fontSize="15px"
-              height="44px"
+              fontSize={typography.fontSize.sm}
+              height={components.input.height}
             />
           </Box>
 
           <Box>
-            <Text fontSize="15px" fontWeight="600" color={colors.navy} mb="8px">
+            <Text
+              fontSize={typography.fontSize.sm}
+              fontWeight={typography.fontWeight.semibold}
+              color={colors.navy}
+              mb={spacing.xs}
+            >
               Additional Notes
             </Text>
             <Textarea
@@ -167,53 +197,75 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any additional context or notes for this report"
               bg={colors.background}
-              fontSize="15px"
+              fontSize={typography.fontSize.sm}
               rows={4}
             />
           </Box>
         </Grid>
 
         {/* Report Preview */}
-        <Box bg={colors.background} p="20px" borderRadius="8px" border="1px solid" borderColor={colors.patience} mb="24px">
-          <Text fontSize="16px" fontWeight="700" color={colors.navy} mb="12px">
+        <Box
+          bg={colors.background}
+          p={spacing.lg}
+          borderRadius={borderRadius.md}
+          border="1px solid"
+          borderColor={colors.patience}
+          mb={spacing.lg}
+        >
+          <Text
+            fontSize={typography.fontSize.base}
+            fontWeight={typography.fontWeight.bold}
+            color={colors.navy}
+            mb={spacing.sm}
+          >
             Report Preview
           </Text>
-          <Grid templateColumns="1fr 1fr" gap="12px">
+          <Grid templateColumns="1fr 1fr" gap={spacing.sm}>
             <Box>
-              <Text fontSize="14px" color={colors.text.muted}>Total Traces:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.navy}>{summary.total_traces.toLocaleString()}</Text>
+              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Total Traces:</Text>
+              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+                {summary.total_traces.toLocaleString()}
+              </Text>
             </Box>
             <Box>
-              <Text fontSize="14px" color={colors.text.muted}>Accuracy:</Text>
-              <Text fontSize="14px" fontWeight="600" color={isCompliant ? colors.success : colors.warning}>
+              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Accuracy:</Text>
+              <Text
+                fontSize={typography.fontSize.sm}
+                fontWeight={typography.fontWeight.semibold}
+                color={isCompliant ? colors.success : colors.warning}
+              >
                 {(summary.accuracy * 100).toFixed(1)}%
               </Text>
             </Box>
             <Box>
-              <Text fontSize="14px" color={colors.text.muted}>Passed:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.success}>{summary.passed_traces.toLocaleString()}</Text>
+              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Passed:</Text>
+              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.success}>
+                {summary.passed_traces.toLocaleString()}
+              </Text>
             </Box>
             <Box>
-              <Text fontSize="14px" color={colors.text.muted}>Failed:</Text>
-              <Text fontSize="14px" fontWeight="600" color={colors.error}>{summary.failed_traces.toLocaleString()}</Text>
+              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Failed:</Text>
+              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.error}>
+                {summary.failed_traces.toLocaleString()}
+              </Text>
             </Box>
           </Grid>
         </Box>
 
         <Button
           w="100%"
-          h="56px"
+          h={components.button.height.lg}
           bg={colors.cobalt}
           color="white"
-          fontSize="17px"
-          fontWeight="600"
-          borderRadius="8px"
+          fontSize={typography.fontSize.lg}
+          fontWeight={typography.fontWeight.semibold}
+          borderRadius={borderRadius.md}
           _hover={{ bg: colors.navy }}
           onClick={handleDownloadReport}
           disabled={loading}
         >
           {loading ? 'Generating Report...' : (
-            <Flex align="center" gap="12px">
+            <Flex align="center" gap={spacing.sm}>
               <MdFileDownload size={22} />
               <Text>Download PDF Report</Text>
             </Flex>
@@ -222,22 +274,32 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
       </Card>
 
       {/* CLI Instructions for Word Documents */}
-      <Card style={{ borderColor: colors.cobalt, background: '#EFF6FF', padding: '24px' }}>
-        <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
+      <Card style={{ borderColor: colors.cobalt, background: '#EFF6FF', padding: spacing.lg }}>
+        <Text
+          fontSize={typography.fontSize.lg}
+          fontWeight={typography.fontWeight.bold}
+          color={colors.navy}
+          mb={spacing.sm}
+        >
           Need Word Documents?
         </Text>
-        <Text fontSize="15px" color={colors.text.primary} mb="16px" lineHeight="1.7">
+        <Text
+          fontSize={typography.fontSize.sm}
+          color={colors.text.primary}
+          mb={spacing.md}
+          lineHeight={typography.lineHeight.loose}
+        >
           For the full EU AI Act compliance package (5 Word documents, 32 pages), use the CERT CLI. All processing happens locally on your machine - your traces never leave your computer.
         </Text>
         <Code
           display="block"
           whiteSpace="pre"
-          p="16px"
-          borderRadius="8px"
-          fontSize="14px"
+          p={spacing.md}
+          borderRadius={borderRadius.md}
+          fontSize={typography.fontSize.sm}
           bg="white"
           color={colors.navy}
-          lineHeight="1.6"
+          lineHeight={typography.lineHeight.relaxed}
         >
 {`# Install CERT CLI
 pip install cert-framework
@@ -253,7 +315,12 @@ reporter = ComplianceReporter(
 )
 reporter.save_report("traces.jsonl", "package.docx")`}
         </Code>
-        <Text fontSize="14px" color={colors.text.secondary} mt="12px" lineHeight="1.6">
+        <Text
+          fontSize={typography.fontSize.sm}
+          color={colors.text.secondary}
+          mt={spacing.sm}
+          lineHeight={typography.lineHeight.relaxed}
+        >
           The CLI generates: Risk Classification Report (2p), Annex IV Technical Documentation (20-25p), Audit Trail Guide (3p), Monitoring Framework (5p), and Conformity Checklist (2p).
         </Text>
       </Card>

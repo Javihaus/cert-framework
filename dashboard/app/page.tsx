@@ -23,7 +23,7 @@ import HomePage from '@/components/HomePage';
 import DocumentsView from '@/components/DocumentsView';
 import Footer from '@/components/Footer';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography, borderRadius } from '@/theme';
 
 export default function Home() {
   const [evaluationData, setEvaluationData] = useState<{
@@ -163,36 +163,40 @@ export default function Home() {
       case 'load':
         return (
           <Box maxW="1200px" mx="auto">
-            <Box mb="40px" textAlign="center">
+            <Box mb={spacing['2xl']} textAlign="center">
               <Text
-                fontSize="36px"
-                fontWeight="700"
+                fontSize={typography.fontSize['4xl']}
+                fontWeight={typography.fontWeight.bold}
                 color={colors.navy}
-                mb="12px"
-                letterSpacing="-1px"
+                mb={spacing.sm}
+                letterSpacing={typography.letterSpacing.snug}
               >
                 Upload Evaluation Results
               </Text>
-              <Text fontSize="18px" color={colors.text.secondary} lineHeight="1.6">
+              <Text
+                fontSize={typography.fontSize.lg}
+                color={colors.text.secondary}
+                lineHeight={typography.lineHeight.relaxed}
+              >
                 Load your CERT evaluation data to view compliance metrics and analysis
               </Text>
             </Box>
 
             {/* Privacy Notice */}
             <Card style={{
-              borderColor: '#3B82F6',
+              borderColor: colors.cobalt,
               background: '#EFF6FF',
-              marginBottom: '24px',
+              marginBottom: spacing.lg,
               maxWidth: '800px',
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              <Grid templateColumns="auto 1fr" gap="16px" alignItems="start">
+              <Grid templateColumns="auto 1fr" gap={spacing.md} alignItems="start">
                 <Box
                   w="48px"
                   h="48px"
-                  bg="#3B82F6"
-                  borderRadius="8px"
+                  bg={colors.cobalt}
+                  borderRadius={borderRadius.md}
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
@@ -202,20 +206,30 @@ export default function Home() {
                   <MdLock size={24} />
                 </Box>
                 <Box>
-                  <Text fontSize="18px" fontWeight="700" color="#1E40AF" mb="12px">
+                  <Text
+                    fontSize={typography.fontSize.lg}
+                    fontWeight={typography.fontWeight.bold}
+                    color={colors.navy}
+                    mb={spacing.sm}
+                  >
                     Your Data Stays Private
                   </Text>
-                  <Text fontSize="15px" color="#1E40AF" lineHeight="1.6" mb="12px">
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.navy}
+                    lineHeight={typography.lineHeight.relaxed}
+                    mb={spacing.sm}
+                  >
                     All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
                   </Text>
                   <Link
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    fontSize="14px"
-                    color="#2563EB"
+                    fontSize={typography.fontSize.sm}
+                    color={colors.cobalt}
                     textDecoration="underline"
-                    _hover={{ color: '#1D4ED8' }}
+                    _hover={{ color: colors.navy }}
                   >
                     Learn more about our privacy practices →
                   </Link>
@@ -229,20 +243,25 @@ export default function Home() {
               label="Upload Evaluation Results"
             />
 
-            <Box maxW="800px" mx="auto" mt="32px">
+            <Box maxW="800px" mx="auto" mt={spacing.xl}>
               <Card style={{ borderColor: colors.patience, background: 'white' }}>
-                <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="16px">
+                <Text
+                  fontSize={typography.fontSize.lg}
+                  fontWeight={typography.fontWeight.bold}
+                  color={colors.navy}
+                  mb={spacing.md}
+                >
                   How to generate evaluation results:
                 </Text>
                 <Code
                   display="block"
                   whiteSpace="pre"
-                  p="20px"
-                  borderRadius="12px"
-                  fontSize="15px"
+                  p={spacing.lg}
+                  borderRadius={borderRadius.lg}
+                  fontSize={typography.fontSize.sm}
                   bg={colors.patience}
                   color={colors.navy}
-                  lineHeight="1.6"
+                  lineHeight={typography.lineHeight.relaxed}
                   minW="450px"
                 >
 {`from cert.evaluation import Evaluator
@@ -275,8 +294,8 @@ results = evaluator.evaluate_log_file(
                 md: 'repeat(2, 1fr)',
                 lg: 'repeat(4, 1fr)',
               }}
-              gap="20px"
-              mb="20px"
+              gap={spacing.lg}
+              mb={spacing.lg}
             >
               <MetricCard
                 label="Accuracy"
@@ -308,18 +327,37 @@ results = evaluator.evaluate_log_file(
               />
             </Grid>
 
-            <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="20px" mb="20px">
+            <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={spacing.lg} mb={spacing.lg}>
               <Card style={{ borderColor: colors.patience, backgroundColor: 'rgba(191, 200, 216, 0.9)' }}>
-                <Text fontSize="16px" fontWeight="600" color={colors.text.muted} mb="8px">
+                <Text
+                  fontSize={typography.fontSize.base}
+                  fontWeight={typography.fontWeight.semibold}
+                  color={colors.text.muted}
+                  mb={spacing.xs}
+                >
                   Mean Confidence
                 </Text>
-                <Text fontSize="52px" fontWeight="700" color={colors.cobalt} lineHeight="1">
+                <Text
+                  fontSize="52px"
+                  fontWeight={typography.fontWeight.bold}
+                  color={colors.cobalt}
+                  lineHeight={typography.lineHeight.tight}
+                >
                   {summary!.mean_confidence.toFixed(3)}
                 </Text>
-                <Text fontSize="15px" color={colors.text.secondary} mt="12px">
+                <Text
+                  fontSize={typography.fontSize.sm}
+                  color={colors.text.secondary}
+                  mt={spacing.sm}
+                >
                   Threshold: {summary!.threshold_used.toFixed(2)}
                 </Text>
-                <Text fontSize="15px" color={colors.text.secondary} mt="16px" lineHeight="1.6">
+                <Text
+                  fontSize={typography.fontSize.sm}
+                  color={colors.text.secondary}
+                  mt={spacing.md}
+                  lineHeight={typography.lineHeight.relaxed}
+                >
                   Mean confidence of {summary!.mean_confidence.toFixed(3)} suggests {' '}
                   {summary!.mean_confidence > 0.8
                     ? 'strong performance with most predictions highly confident.'
@@ -328,16 +366,38 @@ results = evaluator.evaluate_log_file(
               </Card>
 
               <Card style={{ borderColor: colors.patience }}>
-                <Text fontSize="16px" fontWeight="600" color={colors.text.muted} mb="16px">
+                <Text
+                  fontSize={typography.fontSize.base}
+                  fontWeight={typography.fontWeight.semibold}
+                  color={colors.text.muted}
+                  mb={spacing.md}
+                >
                   Evaluation Period
                 </Text>
-                <Text fontSize="15px" color={colors.text.primary} mb="8px" lineHeight="1.6">
+                <Text
+                  fontSize={typography.fontSize.sm}
+                  color={colors.text.primary}
+                  mb={spacing.xs}
+                  lineHeight={typography.lineHeight.relaxed}
+                >
                   <strong>Start:</strong> {summary!.date_range.start}
                 </Text>
-                <Text fontSize="15px" color={colors.text.primary} mb="12px" lineHeight="1.6">
+                <Text
+                  fontSize={typography.fontSize.sm}
+                  color={colors.text.primary}
+                  mb={spacing.sm}
+                  lineHeight={typography.lineHeight.relaxed}
+                >
                   <strong>End:</strong> {summary!.date_range.end}
                 </Text>
-                <Text fontSize="15px" color={colors.text.secondary} mt="16px" pt="16px" borderTop="1px solid" borderColor={colors.patience}>
+                <Text
+                  fontSize={typography.fontSize.sm}
+                  color={colors.text.secondary}
+                  mt={spacing.md}
+                  pt={spacing.md}
+                  borderTop="1px solid"
+                  borderColor={colors.patience}
+                >
                   Total traces evaluated: {summary!.evaluated_traces.toLocaleString()}
                 </Text>
               </Card>
@@ -357,10 +417,19 @@ results = evaluator.evaluate_log_file(
           <FailedTracesView results={results} threshold={summary!.threshold_used} />
         ) : (
           <Card style={{ borderColor: colors.patience }}>
-            <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
+            <Text
+              fontSize={typography.fontSize.lg}
+              fontWeight={typography.fontWeight.bold}
+              color={colors.navy}
+              mb={spacing.sm}
+            >
               No Detailed Trace Data
             </Text>
-            <Text fontSize="16px" color={colors.text.secondary} lineHeight="1.6">
+            <Text
+              fontSize={typography.fontSize.base}
+              color={colors.text.secondary}
+              lineHeight={typography.lineHeight.relaxed}
+            >
               This file contains summary metrics only. {summary!.failed_traces} traces failed based on summary data.
             </Text>
           </Card>
@@ -370,14 +439,19 @@ results = evaluator.evaluate_log_file(
         if (!evaluationData) return null;
         return (
           <Box maxW="900px" mx="auto">
-            <Card style={{ borderColor: colors.patience, marginBottom: '24px' }}>
-              <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="20px">
+            <Card style={{ borderColor: colors.patience, marginBottom: spacing.lg }}>
+              <Text
+                fontSize={typography.fontSize['2xl']}
+                fontWeight={typography.fontWeight.bold}
+                color={colors.navy}
+                mb={spacing.lg}
+              >
                 Score Distribution
               </Text>
               {results.length > 0 ? (
                 <DistributionChart results={results} threshold={summary!.threshold_used} />
               ) : (
-                <Text fontSize="16px" color={colors.text.muted}>
+                <Text fontSize={typography.fontSize.base} color={colors.text.muted}>
                   No detailed trace data available for distribution analysis.
                 </Text>
               )}
@@ -385,10 +459,19 @@ results = evaluator.evaluate_log_file(
 
             {results.length > 0 && (
               <Card style={{ borderColor: colors.warning, background: '#FEF3C7' }}>
-                <Text fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
+                <Text
+                  fontSize={typography.fontSize.lg}
+                  fontWeight={typography.fontWeight.bold}
+                  color={colors.navy}
+                  mb={spacing.sm}
+                >
                   Critical Finding
                 </Text>
-                <Text fontSize="16px" color={colors.text.primary} lineHeight="1.7">
+                <Text
+                  fontSize={typography.fontSize.base}
+                  color={colors.text.primary}
+                  lineHeight={typography.lineHeight.loose}
+                >
                   {(() => {
                     const borderlineCount = results.filter(r =>
                       r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
@@ -433,7 +516,7 @@ results = evaluator.evaluate_log_file(
         hasData={!!evaluationData}
       />
 
-      <Box maxW="1600px" mx="auto" px="32px" py="32px" flex="1">
+      <Box maxW="1600px" mx="auto" px={spacing.xl} py={spacing.xl} flex="1">
         {renderTabContent()}
       </Box>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors } from '@/theme/colors';
+import { colors, spacing, typography, components } from '@/theme';
 
 interface Tab {
   id: string;
@@ -52,28 +52,28 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
       borderColor={colors.patience}
       boxShadow="sm"
     >
-      <Box maxW="1600px" mx="auto" px="32px">
+      <Box maxW="1600px" mx="auto" px={spacing.xl}>
         {/* Main Navigation Bar */}
-        <Flex h="64px" align="center">
-          <Flex align="center" gap="12px">
-            <Box h="40px" display="flex" alignItems="center">
+        <Flex h={components.navigation.height} align="center">
+          <Flex align="center" gap={spacing.sm}>
+            <Box h={components.navigation.logoSize} display="flex" alignItems="center">
               <img
                 src="/cert-logo.png"
                 alt="CERT Logo"
-                style={{ height: '40px', width: 'auto' }}
+                style={{ height: components.navigation.logoSize, width: 'auto' }}
               />
             </Box>
             <Text
-              fontSize="24px"
-              fontWeight="700"
+              fontSize={typography.fontSize['2xl']}
+              fontWeight={typography.fontWeight.bold}
               color={colors.cobalt}
-              letterSpacing="-0.5px"
+              letterSpacing={typography.letterSpacing.normal}
             >
               CERT
             </Text>
           </Flex>
 
-          <Flex ml="48px" gap="4px">
+          <Flex ml={spacing['2xl']} gap={spacing.xs}>
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id || isParentActive(tab);
 
@@ -81,10 +81,10 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
                 <Box
                   key={tab.id}
                   as="button"
-                  px="16px"
-                  py="8px"
-                  fontSize="15px"
-                  fontWeight="500"
+                  px={spacing.md}
+                  py={spacing.xs}
+                  fontSize={typography.fontSize.sm}
+                  fontWeight={typography.fontWeight.medium}
                   color={
                     !tab.enabled
                       ? colors.text.muted
@@ -128,9 +128,9 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
         {/* Horizontal Subtabs for Monitoring */}
         {tabs.find(t => t.id === 'monitoring')?.subtabs && isParentActive(tabs.find(t => t.id === 'monitoring')!) && (
           <Flex
-            h="48px"
+            h={components.navigation.subnavHeight}
             align="center"
-            gap="2px"
+            gap={spacing.xs}
             borderTop="1px solid"
             borderColor={colors.patience}
             bg={colors.background}
@@ -139,10 +139,10 @@ export default function Navigation({ activeTab, onTabChange, hasData }: Navigati
               <Box
                 key={subtab.id}
                 as="button"
-                px="16px"
-                py="8px"
-                fontSize="14px"
-                fontWeight="500"
+                px={spacing.md}
+                py={spacing.xs}
+                fontSize={typography.fontSize.sm}
+                fontWeight={typography.fontWeight.medium}
                 color={
                   !subtab.enabled
                     ? colors.text.muted

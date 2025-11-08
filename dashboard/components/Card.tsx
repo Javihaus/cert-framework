@@ -1,4 +1,5 @@
 import { Box } from '@chakra-ui/react';
+import { spacing, borderRadius, shadows, components } from '@/theme';
 
 export default function Card(props: {
   variant?: string;
@@ -10,9 +11,11 @@ export default function Card(props: {
   return (
     <Box
       bg="white"
-      boxShadow="14px 17px 40px 4px rgba(112, 144, 176, 0.08)"
-      borderRadius="20px"
-      p="20px"
+      boxShadow={shadows.md}
+      borderRadius={borderRadius.lg}
+      p={components.card.padding.md}
+      border={components.card.borderWidth}
+      borderColor="transparent"
       {...rest}
     >
       {children}
