@@ -10,7 +10,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { MdCheckCircle, MdCancel, MdAssessment, MdList, MdLock } from 'react-icons/md';
-import Navigation from '@/components/Navigation';
+import AppLayout from '@/components/AppLayout';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
@@ -21,7 +21,6 @@ import DistributionChart from '@/components/DistributionChart';
 import DocumentationContent from '@/components/DocumentationContent';
 import HomePage from '@/components/HomePage';
 import DocumentsView from '@/components/DocumentsView';
-import Footer from '@/components/Footer';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { colors, spacing, typography, borderRadius } from '@/theme';
 import { InfoBox } from '@/components/ui';
@@ -31,7 +30,9 @@ export default function Home() {
     summary: EvaluationSummary;
     results: EvaluationResult[];
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('home');
+  // NEW - Two-level state: section + monitoring tab
+  const [activeSection, setActiveSection] = useState<'home' | 'monitoring' | 'documentation'>('home');
+  const [activeMonitoringTab, setActiveMonitoringTab] = useState('load');
 
   const handleEvaluationFileLoad = (data: any) => {
     console.log('Loaded data:', data);
@@ -125,7 +126,8 @@ export default function Home() {
     sessionStorage.setItem('risk_classification', JSON.stringify(riskData));
 
     // Switch to overview tab after loading data
-    setActiveTab('overview');
+    setActiveSection('monitoring');
+    setActiveMonitoringTab('overview');
   };
 
   const handleExportCSV = () => {
@@ -155,83 +157,105 @@ export default function Home() {
   const results = evaluationData?.results || [];
   const isCompliant = summary ? summary.accuracy >= 0.9 : false;
 
-  // Render active tab content
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return <HomePage />;
+  // Handle section changes
+  const handleSectionChange = (section: 'home' | 'monitoring' | 'documentation') => {
+    setActiveSection(section);
+    // When entering Monitoring, default to Load Data
+    if (section === 'monitoring') {
+      setActiveMonitoringTab('load');
+    }
+  };
 
-      case 'load':
-        return (
-          <Box maxW="1200px" mx="auto">
-            <Box mb={spacing['2xl']} textAlign="center">
-              <Text
-                fontSize={typography.fontSize['4xl']}
-                fontWeight={typography.fontWeight.bold}
-                color={colors.navy}
-                mb={spacing.sm}
-                letterSpacing={typography.letterSpacing.snug}
-              >
-                Upload Evaluation Results
-              </Text>
-              <Text
-                fontSize={typography.fontSize.lg}
-                color={colors.text.secondary}
-                lineHeight={typography.lineHeight.relaxed}
-              >
-                Load your CERT evaluation data to view compliance metrics and analysis
-              </Text>
-            </Box>
+  // Render active content based on section and monitoring tab
+  const renderContent = () => {
+    // Home Section
+    if (activeSection === 'home') {
+      return <HomePage />;
+    }
 
-            {/* Privacy Notice */}
-            <Box maxW="800px" mx="auto" mb={spacing.lg}>
-              <InfoBox type="info" title="Your Data Stays Private">
-                <Box>
-                  <Text mb={spacing.sm}>
-                    All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
-                  </Text>
-                  <Link
-                    href="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    fontSize={typography.fontSize.sm}
-                    color={colors.cobalt}
-                    textDecoration="underline"
-                    _hover={{ color: colors.navy }}
-                  >
-                    Learn more about our privacy practices →
-                  </Link>
-                </Box>
-              </InfoBox>
-            </Box>
+    // Documentation Section
+    if (activeSection === 'documentation') {
+      return (
+        <Card style={{ borderColor: colors.patience }}>
+          <DocumentationContent />
+        </Card>
+      );
+    }
 
-            <FileUpload
-              onFileLoad={handleEvaluationFileLoad}
-              accept=".json"
-              label="Upload Evaluation Results"
-            />
-
-            <Box maxW="800px" mx="auto" mt={spacing.xl}>
-              <Card style={{ borderColor: colors.patience, background: 'white' }}>
+    // Monitoring Section - check sub-tab
+    if (activeSection === 'monitoring') {
+      switch (activeMonitoringTab) {
+        case 'load':
+          return (
+            <Box maxW="1200px" mx="auto">
+              <Box mb={spacing['2xl']} textAlign="center">
                 <Text
-                  fontSize={typography.fontSize.lg}
+                  fontSize={typography.fontSize['4xl']}
                   fontWeight={typography.fontWeight.bold}
                   color={colors.navy}
-                  mb={spacing.md}
+                  mb={spacing.sm}
+                  letterSpacing={typography.letterSpacing.snug}
                 >
-                  How to generate evaluation results:
+                  Upload Evaluation Results
                 </Text>
-                <Code
-                  display="block"
-                  whiteSpace="pre"
-                  p={spacing.lg}
-                  borderRadius={borderRadius.lg}
-                  fontSize={typography.fontSize.sm}
-                  bg={colors.patience}
-                  color={colors.navy}
+                <Text
+                  fontSize={typography.fontSize.lg}
+                  color={colors.text.secondary}
                   lineHeight={typography.lineHeight.relaxed}
-                  minW="450px"
                 >
+                  Load your CERT evaluation data to view compliance metrics and analysis
+                </Text>
+              </Box>
+
+              {/* Privacy Notice */}
+              <Box maxW="800px" mx="auto" mb={spacing.lg}>
+                <InfoBox type="info" title="Your Data Stays Private">
+                  <Box>
+                    <Text mb={spacing.sm}>
+                      All processing happens locally in your browser. Your uploaded files are never transmitted to our servers or stored anywhere. When you close this tab, your data is permanently deleted from memory.
+                    </Text>
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      fontSize={typography.fontSize.sm}
+                      color={colors.cobalt}
+                      textDecoration="underline"
+                      _hover={{ color: colors.navy }}
+                    >
+                      Learn more about our privacy practices →
+                    </Link>
+                  </Box>
+                </InfoBox>
+              </Box>
+
+              <FileUpload
+                onFileLoad={handleEvaluationFileLoad}
+                accept=".json"
+                label="Upload Evaluation Results"
+              />
+
+              <Box maxW="800px" mx="auto" mt={spacing.xl}>
+                <Card style={{ borderColor: colors.patience, background: 'white' }}>
+                  <Text
+                    fontSize={typography.fontSize.lg}
+                    fontWeight={typography.fontWeight.bold}
+                    color={colors.navy}
+                    mb={spacing.md}
+                  >
+                    How to generate evaluation results:
+                  </Text>
+                  <Code
+                    display="block"
+                    whiteSpace="pre"
+                    p={spacing.lg}
+                    borderRadius={borderRadius.lg}
+                    fontSize={typography.fontSize.sm}
+                    bg={colors.patience}
+                    color={colors.navy}
+                    lineHeight={typography.lineHeight.relaxed}
+                    minW="450px"
+                  >
 {`from cert.evaluation import Evaluator
 
 evaluator = Evaluator(threshold=0.7)
@@ -239,242 +263,244 @@ results = evaluator.evaluate_log_file(
     log_file="production_traces.jsonl",
     output="evaluation_results.json"
 )`}
-                </Code>
-              </Card>
+                  </Code>
+                </Card>
+              </Box>
             </Box>
-          </Box>
-        );
+          );
 
-      case 'overview':
-        if (!evaluationData) return null;
-        return (
-          <>
-            <StatusBanner
-              isCompliant={isCompliant}
-              accuracy={summary!.accuracy}
-              failedCount={summary!.failed_traces}
-            />
-
-            {/* Metrics Grid */}
-            <Grid
-              templateColumns={{
-                base: '1fr',
-                md: 'repeat(2, 1fr)',
-                lg: 'repeat(4, 1fr)',
-              }}
-              gap={spacing.lg}
-              mb={spacing.lg}
-            >
-              <MetricCard
-                label="Accuracy"
-                value={`${(summary!.accuracy * 100).toFixed(1)}%`}
-                icon={MdAssessment}
-                color={summary!.accuracy >= 0.9 ? 'green' : summary!.accuracy >= 0.8 ? 'orange' : 'red'}
-                bgColor="rgba(251, 245, 240, 0.8)"
+        case 'overview':
+          if (!evaluationData) return null;
+          return (
+            <>
+              <StatusBanner
+                isCompliant={isCompliant}
+                accuracy={summary!.accuracy}
+                failedCount={summary!.failed_traces}
               />
-              <MetricCard
-                label="Total Traces"
-                value={summary!.total_traces.toString()}
-                icon={MdList}
-                color="blue"
-                bgColor="rgba(251, 245, 240, 0.8)"
-              />
-              <MetricCard
-                label="Passed"
-                value={summary!.passed_traces.toString()}
-                icon={MdCheckCircle}
-                color="green"
-                bgColor="rgba(251, 245, 240, 0.8)"
-              />
-              <MetricCard
-                label="Failed"
-                value={summary!.failed_traces.toString()}
-                icon={MdCancel}
-                color="red"
-                bgColor="rgba(251, 245, 240, 0.8)"
-              />
-            </Grid>
 
-            <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={spacing.lg} mb={spacing.lg}>
-              <Card style={{ borderColor: colors.patience, backgroundColor: 'rgba(191, 200, 216, 0.9)' }}>
-                <Text
-                  fontSize={typography.fontSize.base}
-                  fontWeight={typography.fontWeight.semibold}
-                  color={colors.text.muted}
-                  mb={spacing.xs}
-                >
-                  Mean Confidence
-                </Text>
-                <Text
-                  fontSize="52px"
-                  fontWeight={typography.fontWeight.bold}
-                  color={colors.cobalt}
-                  lineHeight={typography.lineHeight.tight}
-                >
-                  {summary!.mean_confidence.toFixed(3)}
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.sm}
-                  color={colors.text.secondary}
-                  mt={spacing.sm}
-                >
-                  Threshold: {summary!.threshold_used.toFixed(2)}
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.sm}
-                  color={colors.text.secondary}
-                  mt={spacing.md}
-                  lineHeight={typography.lineHeight.relaxed}
-                >
-                  Mean confidence of {summary!.mean_confidence.toFixed(3)} suggests {' '}
-                  {summary!.mean_confidence > 0.8
-                    ? 'strong performance with most predictions highly confident.'
-                    : 'moderate performance near the boundary - small improvements will increase compliance.'}
-                </Text>
-              </Card>
-
-              <Card style={{ borderColor: colors.patience }}>
-                <Text
-                  fontSize={typography.fontSize.base}
-                  fontWeight={typography.fontWeight.semibold}
-                  color={colors.text.muted}
-                  mb={spacing.md}
-                >
-                  Evaluation Period
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.sm}
-                  color={colors.text.primary}
-                  mb={spacing.xs}
-                  lineHeight={typography.lineHeight.relaxed}
-                >
-                  <strong>Start:</strong> {summary!.date_range.start}
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.sm}
-                  color={colors.text.primary}
-                  mb={spacing.sm}
-                  lineHeight={typography.lineHeight.relaxed}
-                >
-                  <strong>End:</strong> {summary!.date_range.end}
-                </Text>
-                <Text
-                  fontSize={typography.fontSize.sm}
-                  color={colors.text.secondary}
-                  mt={spacing.md}
-                  pt={spacing.md}
-                  borderTop="1px solid"
-                  borderColor={colors.patience}
-                >
-                  Total traces evaluated: {summary!.evaluated_traces.toLocaleString()}
-                </Text>
-              </Card>
-            </Grid>
-
-            <QuickActions
-              onViewFailed={() => setActiveTab('failed')}
-              onViewDistribution={() => setActiveTab('distribution')}
-              onExport={handleExportCSV}
-            />
-          </>
-        );
-
-      case 'failed':
-        if (!evaluationData) return null;
-        return results.length > 0 ? (
-          <FailedTracesView results={results} threshold={summary!.threshold_used} />
-        ) : (
-          <Card style={{ borderColor: colors.patience }}>
-            <Text
-              fontSize={typography.fontSize.lg}
-              fontWeight={typography.fontWeight.bold}
-              color={colors.navy}
-              mb={spacing.sm}
-            >
-              No Detailed Trace Data
-            </Text>
-            <Text
-              fontSize={typography.fontSize.base}
-              color={colors.text.secondary}
-              lineHeight={typography.lineHeight.relaxed}
-            >
-              This file contains summary metrics only. {summary!.failed_traces} traces failed based on summary data.
-            </Text>
-          </Card>
-        );
-
-      case 'distribution':
-        if (!evaluationData) return null;
-        return (
-          <Box maxW="900px" mx="auto">
-            <Card style={{ borderColor: colors.patience, marginBottom: spacing.lg }}>
-              <Text
-                fontSize={typography.fontSize['2xl']}
-                fontWeight={typography.fontWeight.bold}
-                color={colors.navy}
+              {/* Metrics Grid */}
+              <Grid
+                templateColumns={{
+                  base: '1fr',
+                  md: 'repeat(2, 1fr)',
+                  lg: 'repeat(4, 1fr)',
+                }}
+                gap={spacing.lg}
                 mb={spacing.lg}
               >
-                Score Distribution
+                <MetricCard
+                  label="Accuracy"
+                  value={`${(summary!.accuracy * 100).toFixed(1)}%`}
+                  icon={MdAssessment}
+                  color={summary!.accuracy >= 0.9 ? 'green' : summary!.accuracy >= 0.8 ? 'orange' : 'red'}
+                  bgColor="rgba(251, 245, 240, 0.8)"
+                />
+                <MetricCard
+                  label="Total Traces"
+                  value={summary!.total_traces.toString()}
+                  icon={MdList}
+                  color="blue"
+                  bgColor="rgba(251, 245, 240, 0.8)"
+                />
+                <MetricCard
+                  label="Passed"
+                  value={summary!.passed_traces.toString()}
+                  icon={MdCheckCircle}
+                  color="green"
+                  bgColor="rgba(251, 245, 240, 0.8)"
+                />
+                <MetricCard
+                  label="Failed"
+                  value={summary!.failed_traces.toString()}
+                  icon={MdCancel}
+                  color="red"
+                  bgColor="rgba(251, 245, 240, 0.8)"
+                />
+              </Grid>
+
+              <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={spacing.lg} mb={spacing.lg}>
+                <Card style={{ borderColor: colors.patience, backgroundColor: 'rgba(191, 200, 216, 0.9)' }}>
+                  <Text
+                    fontSize={typography.fontSize.base}
+                    fontWeight={typography.fontWeight.semibold}
+                    color={colors.text.muted}
+                    mb={spacing.xs}
+                  >
+                    Mean Confidence
+                  </Text>
+                  <Text
+                    fontSize="52px"
+                    fontWeight={typography.fontWeight.bold}
+                    color={colors.cobalt}
+                    lineHeight={typography.lineHeight.tight}
+                  >
+                    {summary!.mean_confidence.toFixed(3)}
+                  </Text>
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.text.secondary}
+                    mt={spacing.sm}
+                  >
+                    Threshold: {summary!.threshold_used.toFixed(2)}
+                  </Text>
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.text.secondary}
+                    mt={spacing.md}
+                    lineHeight={typography.lineHeight.relaxed}
+                  >
+                    Mean confidence of {summary!.mean_confidence.toFixed(3)} suggests {' '}
+                    {summary!.mean_confidence > 0.8
+                      ? 'strong performance with most predictions highly confident.'
+                      : 'moderate performance near the boundary - small improvements will increase compliance.'}
+                  </Text>
+                </Card>
+
+                <Card style={{ borderColor: colors.patience }}>
+                  <Text
+                    fontSize={typography.fontSize.base}
+                    fontWeight={typography.fontWeight.semibold}
+                    color={colors.text.muted}
+                    mb={spacing.md}
+                  >
+                    Evaluation Period
+                  </Text>
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.text.primary}
+                    mb={spacing.xs}
+                    lineHeight={typography.lineHeight.relaxed}
+                  >
+                    <strong>Start:</strong> {summary!.date_range.start}
+                  </Text>
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.text.primary}
+                    mb={spacing.sm}
+                    lineHeight={typography.lineHeight.relaxed}
+                  >
+                    <strong>End:</strong> {summary!.date_range.end}
+                  </Text>
+                  <Text
+                    fontSize={typography.fontSize.sm}
+                    color={colors.text.secondary}
+                    mt={spacing.md}
+                    pt={spacing.md}
+                    borderTop="1px solid"
+                    borderColor={colors.patience}
+                  >
+                    Total traces evaluated: {summary!.evaluated_traces.toLocaleString()}
+                  </Text>
+                </Card>
+              </Grid>
+
+              <QuickActions
+                onViewFailed={() => setActiveMonitoringTab('failed')}
+                onViewDistribution={() => setActiveMonitoringTab('distribution')}
+                onExport={handleExportCSV}
+              />
+            </>
+          );
+
+        case 'failed':
+          if (!evaluationData) return null;
+          return results.length > 0 ? (
+            <FailedTracesView results={results} threshold={summary!.threshold_used} />
+          ) : (
+            <Card style={{ borderColor: colors.patience }}>
+              <Text
+                fontSize={typography.fontSize.lg}
+                fontWeight={typography.fontWeight.bold}
+                color={colors.navy}
+                mb={spacing.sm}
+              >
+                No Detailed Trace Data
               </Text>
-              {results.length > 0 ? (
-                <DistributionChart results={results} threshold={summary!.threshold_used} />
-              ) : (
-                <Text fontSize={typography.fontSize.base} color={colors.text.muted}>
-                  No detailed trace data available for distribution analysis.
-                </Text>
-              )}
+              <Text
+                fontSize={typography.fontSize.base}
+                color={colors.text.secondary}
+                lineHeight={typography.lineHeight.relaxed}
+              >
+                This file contains summary metrics only. {summary!.failed_traces} traces failed based on summary data.
+              </Text>
             </Card>
+          );
 
-            {results.length > 0 && (
-              <InfoBox type="warning" title="Critical Finding">
-                {(() => {
-                  const borderlineCount = results.filter(r =>
-                    r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
-                  ).length;
-                  const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
+        case 'distribution':
+          if (!evaluationData) return null;
+          return (
+            <Box maxW="900px" mx="auto">
+              <Card style={{ borderColor: colors.patience, marginBottom: spacing.lg }}>
+                <Text
+                  fontSize={typography.fontSize['2xl']}
+                  fontWeight={typography.fontWeight.bold}
+                  color={colors.navy}
+                  mb={spacing.lg}
+                >
+                  Score Distribution
+                </Text>
+                {results.length > 0 ? (
+                  <DistributionChart results={results} threshold={summary!.threshold_used} />
+                ) : (
+                  <Text fontSize={typography.fontSize.base} color={colors.text.muted}>
+                    No detailed trace data available for distribution analysis.
+                  </Text>
+                )}
+              </Card>
 
-                  return (
-                    <>
-                      <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary!.threshold_used.toFixed(1)} - just below or near the threshold.
-                      These represent borderline cases where small improvements could push you to 90%+ compliance.
-                      Focus engineering effort here for maximum impact.
-                    </>
-                  );
-                })()}
-              </InfoBox>
-            )}
-          </Box>
-        );
+              {results.length > 0 && (
+                <InfoBox type="warning" title="Critical Finding">
+                  {(() => {
+                    const borderlineCount = results.filter(r =>
+                      r.measurement.confidence >= 0.5 && r.measurement.confidence < summary!.threshold_used
+                    ).length;
+                    const borderlinePercent = ((borderlineCount / results.length) * 100).toFixed(1);
 
-      case 'documents':
-        if (!evaluationData) return null;
-        return <DocumentsView summary={summary!} results={results} />;
+                    return (
+                      <>
+                        <strong>{borderlineCount} traces ({borderlinePercent}%)</strong> scored between 0.5-{summary!.threshold_used.toFixed(1)} - just below or near the threshold.
+                        These represent borderline cases where small improvements could push you to 90%+ compliance.
+                        Focus engineering effort here for maximum impact.
+                      </>
+                    );
+                  })()}
+                </InfoBox>
+              )}
+            </Box>
+          );
 
-      case 'documentation':
-        return (
-          <Card style={{ borderColor: colors.patience }}>
-            <DocumentationContent />
-          </Card>
-        );
+        case 'documents':
+          if (!evaluationData) return null;
+          return <DocumentsView summary={summary!} results={results} />;
 
-      default:
-        return null;
+        default:
+          return (
+            <Box maxW="1200px" mx="auto">
+              <Text>Select a tab from the sidebar</Text>
+            </Box>
+          );
+      }
     }
+
+    // Fallback
+    return (
+      <Box maxW="1200px" mx="auto">
+        <HomePage />
+      </Box>
+    );
   };
 
   return (
-    <Box minH="100vh" bg={colors.background} display="flex" flexDirection="column">
-      <Navigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        hasData={!!evaluationData}
-      />
-
-      <Box maxW="1600px" mx="auto" px={spacing.xl} py={spacing.xl} flex="1">
-        {renderTabContent()}
-      </Box>
-
-      <Footer />
-    </Box>
+    <AppLayout
+      activeSection={activeSection}
+      activeMonitoringTab={activeMonitoringTab}
+      onSectionChange={handleSectionChange}
+      onMonitoringTabChange={setActiveMonitoringTab}
+      hasData={!!evaluationData}
+    >
+      {renderContent()}
+    </AppLayout>
   );
 }
+

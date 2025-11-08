@@ -69,6 +69,9 @@ export const borderRadius = {
   full: '9999px',
 } as const;
 
+// Alias for consistency with new components
+export const radius = borderRadius;
+
 // =============================================================================
 // SHADOWS
 // =============================================================================
@@ -124,4 +127,16 @@ export const breakpoints = {
   lg: '1024px',
   xl: '1280px',
   '2xl': '1600px',
+} as const;
+
+// =============================================================================
+// CONTAINERS
+// =============================================================================
+
+export const containers = {
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  content: '1200px',
 } as const;

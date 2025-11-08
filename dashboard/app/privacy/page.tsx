@@ -9,7 +9,7 @@ import { colors } from '@/theme/colors';
 export default function PrivacyPolicy() {
   return (
     <Box minH="100vh" bg={colors.background} display="flex" flexDirection="column">
-      <Navigation activeTab="privacy" onTabChange={() => {}} hasData={false} />
+      <Navigation activeSection="documentation" onSectionChange={() => {}} />
 
       <Box maxW="900px" mx="auto" px="32px" py="48px" flex="1">
         <Card style={{ borderColor: colors.patience }}>
