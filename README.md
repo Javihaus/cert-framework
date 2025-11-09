@@ -3,7 +3,7 @@
 
 # CERT Framework
 
-### EU AI Act Article 15 Compliance from Production LLM Traces
+### EU AI Act Article 15 Documentation - Automatically Generated from Your Production LLM Data
 
 <img src="docs/dashboard-hero.png" alt="CERT Dashboard" width="100%" />
 
@@ -37,16 +37,18 @@ EU AI Act Article 15 requires high-risk AI systems to demonstrate "appropriate l
 2. Complete audit trails linking traces to accuracy metrics
 3. Technical documentation demonstrating compliance methodology
 
-CERT provides the measurement infrastructure. You run LLMs in production, CERT measures accuracy automatically, generates Article 15 compliance documentation from the same data your engineers use for debugging.
+CERT provides the measurement and compliance documentation generation infrastructure . You run LLMs in production, CERT measures accuracy automatically, generates  compliance documentation from the same data your engineers use for debugging.
 
-**The core insight:** Compliance documentation should be a side-effect of production monitoring, not a separate manual process.
-
+Compliance documentation is not only about tracing and evaluation: is about risk management and mitigation. 
 ---
 
 ## Architecture
 
-CERT combines two measurement components :
 
+
+### Measurements
+
+CERT combines two measurement components :
 
 | Component | Weight | What It Catches |
 |-----------|--------|-----------------|
