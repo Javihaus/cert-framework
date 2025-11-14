@@ -4,11 +4,11 @@ These tests verify that core functionality actually works,
 not just that imports succeed.
 """
 
-import pytest
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
-from conftest import requires_evaluation, requires_trajectory
+import pytest
+from conftest import requires_evaluation
 
 
 @requires_evaluation
@@ -105,8 +105,8 @@ class TestMonitorDecorator:
 
     def test_monitor_basic_function(self):
         """Test monitor decorator on simple function."""
+
         from cert import monitor
-        import sys
 
         # Skip if protobuf/tiktoken not available (CI environment)
         try:
@@ -277,8 +277,9 @@ class TestAuditLogger:
 
     def test_audit_logger_log_request(self):
         """Test logging a request."""
-        from cert.utils import AuditLogger
         import json
+
+        from cert.utils import AuditLogger
 
         with tempfile.TemporaryDirectory() as tmpdir:
             log_path = Path(tmpdir) / "test_audit.jsonl"

@@ -17,7 +17,7 @@ def test_import_cert():
 @requires_evaluation
 def test_import_public_api():
     """Test public API imports from cert package."""
-    from cert import measure, monitor, Preset, PRESETS, export_report
+    from cert import PRESETS, Preset, export_report, measure, monitor
 
     assert measure is not None
     assert monitor is not None
@@ -46,7 +46,7 @@ def test_import_monitor_module():
 
 def test_import_utils_module():
     """Test utils module imports."""
-    from cert.utils import Preset, PRESETS, get_preset, export_report, AuditLogger
+    from cert.utils import PRESETS, AuditLogger, Preset, export_report, get_preset
 
     assert Preset is not None
     assert PRESETS is not None

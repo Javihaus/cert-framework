@@ -4,19 +4,19 @@ Unit tests for Prometheus integration.
 Tests the Prometheus metrics export and server functionality.
 """
 
-import pytest
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
+import pytest
 
 # Skip all tests if prometheus_client not installed
 pytest.importorskip("prometheus_client")
 
 from cert.observability.prometheus import (
+    create_grafana_dashboard_json,
     export_metrics_from_audit_log,
     get_metrics_text,
-    create_grafana_dashboard_json,
 )
 
 

@@ -4,16 +4,17 @@ Unit tests for LlamaIndex integration.
 Tests the wrapping of LlamaIndex query engines, chat engines, and agents.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 # Skip all tests if llama_index not installed
 pytest.importorskip("llama_index")
 
 from cert.integrations.llamaindex import (
-    wrap_llamaindex_engine,
     wrap_llamaindex_agent,
     wrap_llamaindex_chat_engine,
+    wrap_llamaindex_engine,
 )
 
 

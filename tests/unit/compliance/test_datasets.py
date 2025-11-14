@@ -1,9 +1,7 @@
 """Tests for compliance datasets module."""
 
 import json
-import tempfile
 from datetime import datetime
-from pathlib import Path
 
 from cert.compliance.datasets import (
     EvaluationDataset,

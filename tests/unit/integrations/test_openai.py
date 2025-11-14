@@ -4,16 +4,17 @@ Unit tests for OpenAI SDK integration.
 Tests the wrapping of OpenAI clients and assistants.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 # Skip all tests if openai not installed
 pytest.importorskip("openai")
 
 from cert.integrations.openai import (
+    wrap_openai_assistants,
     wrap_openai_client,
     wrap_openai_completion,
-    wrap_openai_assistants,
 )
 
 

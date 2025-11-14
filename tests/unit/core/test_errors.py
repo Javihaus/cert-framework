@@ -1,13 +1,12 @@
 """Unit tests for error handling framework."""
 
-import pytest
 from cert.core.errors import (
+    AnalysisError,
     CERTError,
-    ResourceLoadError,
+    CircuitBreakerOpen,
     GPUOutOfMemoryError,
     InvalidInputError,
-    CircuitBreakerOpen,
-    AnalysisError,
+    ResourceLoadError,
 )
 
 

@@ -4,16 +4,17 @@ Unit tests for LangChain integration.
 Tests the wrapping of LangChain chains, agents, and callbacks.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 # Skip all tests if langchain not installed
 pytest.importorskip("langchain")
 
 from cert.integrations.langchain import (
-    wrap_langchain_chain,
-    wrap_langchain_agent,
     create_monitored_callback,
+    wrap_langchain_agent,
+    wrap_langchain_chain,
 )
 
 

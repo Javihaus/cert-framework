@@ -12,24 +12,24 @@ Run tests:
     pytest tests/integration/test_langchain_connector.py -v
 """
 
-import pytest
-from unittest.mock import Mock, MagicMock
 import uuid
+from unittest.mock import Mock
+
+import pytest
 
 # Try to import LangChain
 try:
     from langchain.callbacks.base import BaseCallbackHandler
-    from langchain.schema import LLMResult, Generation
+    from langchain.schema import Generation, LLMResult
+
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
 
-from cert.integrations.langchain_connector import LangChainConnector, CERTCallbackHandler
+from cert.integrations.langchain_connector import CERTCallbackHandler, LangChainConnector
 
 # Skip all tests if LangChain is not installed
-pytestmark = pytest.mark.skipif(
-    not LANGCHAIN_AVAILABLE, reason="LangChain not installed"
-)
+pytestmark = pytest.mark.skipif(not LANGCHAIN_AVAILABLE, reason="LangChain not installed")
 
 
 class TestLangChainConnector:

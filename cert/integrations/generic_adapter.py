@@ -2,10 +2,13 @@
 Generic LLM Integration Adapter
 ================================
 
+DEPRECATED: This module is deprecated. Use the automatic connector system instead:
+    >>> import cert.integrations.auto  # Auto-activates all connectors
+
 A simple, universal adapter for wrapping any LLM via callback pattern.
 This replaces 1400+ lines of provider-specific code with a single flexible interface.
 
-Usage:
+Legacy Usage (deprecated):
     >>> from cert.integrations.generic_adapter import wrap_llm_call
     >>> from cert import start_trace, end_trace
     >>>
@@ -20,9 +23,8 @@ Usage:
     >>> end_trace(trace_id)
 """
 
+import warnings
 from typing import Any, Callable, Dict, Optional
-
-from cert.core.api import get_tracer
 
 
 def wrap_llm_call(
@@ -34,11 +36,14 @@ def wrap_llm_call(
     """
     Wrap any LLM call with CERT tracing.
 
+    DEPRECATED: This function is deprecated. Use the automatic connector system instead:
+        >>> import cert.integrations.auto  # Auto-activates all connectors
+
     Args:
-        trace_id: Active trace ID from start_trace()
+        trace_id: Active trace ID from start_trace() (ignored)
         llm_callable: Function that executes the LLM call
-        expected: Expected output for evaluation (optional)
-        metadata: Additional metadata to attach (optional)
+        expected: Expected output for evaluation (ignored)
+        metadata: Additional metadata to attach (ignored)
 
     Returns:
         The result from llm_callable()
@@ -51,81 +56,16 @@ def wrap_llm_call(
         ...     expected="hola"
         ... )
     """
-    tracer = get_tracer()
+    warnings.warn(
+        "wrap_llm_call() is deprecated. Use the automatic connector system instead: "
+        "import cert.integrations.auto",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    try:
-        # Execute the LLM call
-        result = llm_callable()
-
-        # Extract response text (handle common response formats)
-        response_text = _extract_response_text(result)
-
-        # Update trace with response
-        if response_text:
-            tracer.add_response(trace_id, response_text)
-
-        # Add expected output if provided
-        if expected:
-            tracer.add_expected(trace_id, expected)
-
-        # Add metadata if provided
-        if metadata:
-            for key, value in metadata.items():
-                tracer.add_metadata(trace_id, key, value)
-
-        return result
-
-    except Exception as e:
-        # Log error and re-raise
-        tracer.add_metadata(trace_id, "error", str(e))
-        tracer.add_metadata(trace_id, "error_type", type(e).__name__)
-        raise
-
-
-def _extract_response_text(result: Any) -> Optional[str]:
-    """
-    Extract response text from various LLM response formats.
-    Handles OpenAI, Anthropic, LangChain, and plain string responses.
-    """
-    # Handle string responses
-    if isinstance(result, str):
-        return result
-
-    # Handle dict responses
-    if isinstance(result, dict):
-        # LangChain format
-        if "output" in result:
-            return str(result["output"])
-        # Generic content field
-        if "content" in result:
-            return str(result["content"])
-        if "text" in result:
-            return str(result["text"])
-
-    # Handle object responses with attributes
-    try:
-        # OpenAI format: result.choices[0].message.content
-        if hasattr(result, "choices") and len(result.choices) > 0:
-            choice = result.choices[0]
-            if hasattr(choice, "message") and hasattr(choice.message, "content"):
-                return choice.message.content
-
-        # Anthropic format: result.content[0].text
-        if hasattr(result, "content") and len(result.content) > 0:
-            content = result.content[0]
-            if hasattr(content, "text"):
-                return content.text
-
-        # LlamaIndex format
-        if hasattr(result, "response"):
-            return str(result.response)
-
-    except (AttributeError, IndexError, TypeError):
-        pass
-
-    # If we can't extract text, return None
-    # User can manually add response via tracer.add_response()
-    return None
+    # Simply execute the callable and return result
+    # The automatic connectors will handle tracing if activated
+    return llm_callable()
 
 
 def create_context_wrapper(trace_id: str):
