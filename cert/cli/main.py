@@ -408,6 +408,22 @@ except ImportError:
     # Commands will not be available if dependencies missing
     pass
 
+# Register assessment commands
+try:
+    from cert.cli.assess import register_assessment_commands
+    register_assessment_commands(cli)
+except ImportError:
+    # Assessment commands not available if dependencies missing
+    pass
+
+# Register value/cost commands
+try:
+    from cert.cli.costs import register_value_commands
+    register_value_commands(cli)
+except ImportError:
+    # Value commands not available if dependencies missing
+    pass
+
 
 if __name__ == "__main__":
     cli()
