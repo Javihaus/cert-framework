@@ -2,7 +2,7 @@
 
 import pytest
 
-from cert.measure.measure import measure, measure_detailed, measure_batch, BatchOptions
+from cert.measure.measure import BatchOptions, measure, measure_batch, measure_detailed
 
 # Check if optional ML dependencies are available
 try:
@@ -56,9 +56,7 @@ class TestMeasureBasicFunctionality:
     @skip_without_models
     def test_identical_texts_have_high_confidence(self):
         """Identical texts should produce high confidence score."""
-        score = measure(
-            text1="The revenue was $450 million", text2="The revenue was $450 million"
-        )
+        score = measure(text1="The revenue was $450 million", text2="The revenue was $450 million")
 
         assert score > 0.9
 

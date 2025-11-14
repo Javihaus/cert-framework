@@ -20,15 +20,14 @@ Usage:
             return "myplatform"
 """
 
+import json
 import time
-import pytest
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-import json
-import tempfile
-import os
 
-from cert.integrations.base import ConnectorAdapter, TracedCall
+import pytest
+
+from cert.integrations.base import ConnectorAdapter
 
 
 class MockTracer:
@@ -292,9 +291,7 @@ class ConnectorTestBase(ABC):
             response = self.make_test_call()
             assert response is not None, "Call failed when tracer was broken"
         except Exception as e:
-            pytest.fail(
-                f"Connector did not isolate tracer error - user code broke: {e}"
-            )
+            pytest.fail(f"Connector did not isolate tracer error - user code broke: {e}")
         finally:
             # Restore tracer
             self.tracer.log_trace = original_log
@@ -334,14 +331,15 @@ class ConnectorTestBase(ABC):
         # Verify overhead is acceptable
         assert overhead_ms < 10, (
             f"Connector overhead too high: {overhead_ms:.2f}ms "
-            f"(baseline: {baseline_avg*1000:.2f}ms, "
-            f"with connector: {connector_avg*1000:.2f}ms)"
+            f"(baseline: {baseline_avg * 1000:.2f}ms, "
+            f"with connector: {connector_avg * 1000:.2f}ms)"
         )
 
     def test_circuit_breaker_activates(self):
         """
         Verify that the circuit breaker opens after repeated failures.
         """
+
         # Make the tracer fail
         def failing_log(trace_data):
             raise Exception("Simulated failure")
@@ -412,6 +410,7 @@ class ConnectorTestBase(ABC):
 
         # Verify it can be parsed
         from datetime import datetime
+
         try:
             datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         except ValueError as e:

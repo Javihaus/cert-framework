@@ -1,11 +1,11 @@
 """Tests for enhanced industry presets with compliance mapping."""
 
 from cert.utils.presets import (
-    IndustryPreset,
-    ComplianceRequirement,
     INDUSTRY_PRESETS,
-    get_industry_preset,
+    ComplianceRequirement,
+    IndustryPreset,
     Preset,
+    get_industry_preset,
 )
 
 

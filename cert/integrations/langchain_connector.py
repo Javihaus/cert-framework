@@ -35,8 +35,11 @@ try:
 except ImportError:
     LANGCHAIN_AVAILABLE = False
 
-    # Create a dummy base class if LangChain is not installed
+    # Create dummy classes if LangChain is not installed
     class BaseCallbackHandler:
+        pass
+
+    class LLMResult:  # type: ignore
         pass
 
 

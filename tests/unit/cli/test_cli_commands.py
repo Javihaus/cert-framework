@@ -4,8 +4,6 @@ import json
 import tempfile
 from pathlib import Path
 
-import pytest
-
 
 class TestCLIModules:
     """Test that CLI modules can be imported."""
@@ -21,7 +19,7 @@ class TestCLIModules:
 
     def test_import_generate(self):
         """Test generate module imports."""
-        from cert.cli.generate import analyze_traces, load_traces
+        from cert.cli.generate import analyze_traces
 
         # Test empty traces
         metrics = analyze_traces([])

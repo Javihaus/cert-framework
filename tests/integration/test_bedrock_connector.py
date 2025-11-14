@@ -12,15 +12,17 @@ Run tests:
     pytest tests/integration/test_bedrock_connector.py -v
 """
 
-import pytest
 import json
-from unittest.mock import Mock, MagicMock, patch
 from io import BytesIO
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Try to import boto3
 try:
     import boto3
     from botocore.response import StreamingBody
+
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
@@ -28,9 +30,7 @@ except ImportError:
 from cert.integrations.bedrock_connector import BedrockConnector
 
 # Skip all tests if boto3 is not installed
-pytestmark = pytest.mark.skipif(
-    not BOTO3_AVAILABLE, reason="boto3 not installed"
-)
+pytestmark = pytest.mark.skipif(not BOTO3_AVAILABLE, reason="boto3 not installed")
 
 
 class TestBedrockConnector:
@@ -137,9 +137,7 @@ class TestBedrockConnector:
 
         # Mock the bedrock-runtime client
         mock_client = Mock()
-        mock_client.invoke_model = Mock(
-            return_value=self.create_mock_claude_response()
-        )
+        mock_client.invoke_model = Mock(return_value=self.create_mock_claude_response())
 
         with patch.object(self.connector, "_original_client", return_value=mock_client):
             # Wrap the client
@@ -170,9 +168,7 @@ class TestBedrockConnector:
             self.connector._wrap_client_methods(mock_client)
 
             try:
-                mock_client.invoke_model(
-                    modelId="anthropic.claude-v2", body=b'{"prompt": "test"}'
-                )
+                mock_client.invoke_model(modelId="anthropic.claude-v2", body=b'{"prompt": "test"}')
             except Exception:
                 pass  # Expected
 
@@ -187,7 +183,11 @@ class TestBedrockConnector:
         """Verify different model families are handled correctly."""
         test_cases = [
             ("anthropic.claude-v2", {"content": [{"text": "Claude response"}]}, "Claude response"),
-            ("amazon.titan-text", {"results": [{"outputText": "Titan response"}]}, "Titan response"),
+            (
+                "amazon.titan-text",
+                {"results": [{"outputText": "Titan response"}]},
+                "Titan response",
+            ),
             ("meta.llama2", {"generation": "Llama response"}, "Llama response"),
         ]
 

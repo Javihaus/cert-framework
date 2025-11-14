@@ -16,24 +16,24 @@ Run with real API calls (costs money!):
 """
 
 import os
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
 
 # Try to import OpenAI
 try:
     from openai import OpenAI
+
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
 
-from tests.integration.connector_test_base import ConnectorTestBase
 from cert.integrations.openai_connector import OpenAIConnector
 
+from .connector_test_base import ConnectorTestBase
 
 # Skip all tests if OpenAI is not installed
-pytestmark = pytest.mark.skipif(
-    not OPENAI_AVAILABLE, reason="OpenAI SDK not installed"
-)
+pytestmark = pytest.mark.skipif(not OPENAI_AVAILABLE, reason="OpenAI SDK not installed")
 
 
 class TestOpenAIConnector(ConnectorTestBase):
@@ -89,9 +89,7 @@ class TestOpenAIConnector(ConnectorTestBase):
             )
         else:
             # Mock call
-            with patch.object(
-                OpenAI.chat.completions, "create", return_value=self.mock_response
-            ):
+            with patch.object(OpenAI.chat.completions, "create", return_value=self.mock_response):
                 client = OpenAI(api_key=self.api_key)
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
@@ -135,9 +133,7 @@ class TestOpenAIConnector(ConnectorTestBase):
                 chunk.choices[0].finish_reason = None if i < 2 else "stop"
                 mock_chunks.append(chunk)
 
-            with patch.object(
-                OpenAI.chat.completions, "create", return_value=iter(mock_chunks)
-            ):
+            with patch.object(OpenAI.chat.completions, "create", return_value=iter(mock_chunks)):
                 client = OpenAI(api_key=self.api_key)
                 stream = client.chat.completions.create(
                     model="gpt-3.5-turbo",
@@ -275,13 +271,9 @@ class TestOpenAIConnector(ConnectorTestBase):
 
         if self.run_live_tests:
             client = OpenAI(api_key=self.api_key)
-            client.chat.completions.create(
-                model="gpt-3.5-turbo", messages=messages, max_tokens=5
-            )
+            client.chat.completions.create(model="gpt-3.5-turbo", messages=messages, max_tokens=5)
         else:
-            with patch.object(
-                OpenAI.chat.completions, "create", return_value=self.mock_response
-            ):
+            with patch.object(OpenAI.chat.completions, "create", return_value=self.mock_response):
                 client = OpenAI(api_key=self.api_key)
                 client.chat.completions.create(
                     model="gpt-3.5-turbo", messages=messages, max_tokens=5

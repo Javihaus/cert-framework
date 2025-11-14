@@ -4,8 +4,9 @@ Unit tests for Anthropic SDK integration.
 Tests the wrapping of Anthropic clients and streaming support.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 # Skip all tests if anthropic not installed
 pytest.importorskip("anthropic")
