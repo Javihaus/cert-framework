@@ -5,41 +5,30 @@ CERT Assessment CLI Commands
 Command-line interface for AI readiness assessment.
 """
 
-import sys
-import click
 import json
-from pathlib import Path
+import sys
+
+import click
 
 
 @click.command(name="assess")
-@click.option(
-    "--interactive",
-    "-i",
-    is_flag=True,
-    help="Run interactive questionnaire"
-)
+@click.option("--interactive", "-i", is_flag=True, help="Run interactive questionnaire")
 @click.option(
     "--output",
     "-o",
     default="assessment_report.json",
-    help="Output file path (default: assessment_report.json)"
+    help="Output file path (default: assessment_report.json)",
 )
 @click.option(
     "--format",
     "-f",
     type=click.Choice(["json", "txt"], case_sensitive=False),
     default="json",
-    help="Output format (json or txt)"
+    help="Output format (json or txt)",
 )
+@click.option("--risk-only", is_flag=True, help="Only assess risk classification (skip readiness)")
 @click.option(
-    "--risk-only",
-    is_flag=True,
-    help="Only assess risk classification (skip readiness)"
-)
-@click.option(
-    "--readiness-only",
-    is_flag=True,
-    help="Only assess readiness (skip risk classification)"
+    "--readiness-only", is_flag=True, help="Only assess readiness (skip risk classification)"
 )
 def assess_cmd(interactive, output, format, risk_only, readiness_only):
     """
@@ -54,13 +43,13 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
         cert assess -i --format txt --output report.txt
         cert assess --risk-only -i
     """
+    from cert.assessment.classifier import classify_risk
     from cert.assessment.questionnaire import (
         ANNEX_III_QUESTIONS,
         READINESS_QUESTIONS,
-        run_interactive_questionnaire,
         calculate_risk_score,
+        run_interactive_questionnaire,
     )
-    from cert.assessment.classifier import classify_risk
     from cert.assessment.readiness import assess_readiness
     from cert.assessment.report_generator import generate_report, save_report
 
@@ -95,10 +84,7 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
         click.echo("according to the EU AI Act.")
         click.echo("")
 
-        risk_answers = run_interactive_questionnaire(
-            ANNEX_III_QUESTIONS,
-            "Risk Classification"
-        )
+        risk_answers = run_interactive_questionnaire(ANNEX_III_QUESTIONS, "Risk Classification")
 
         # Calculate risk
         risk_score = calculate_risk_score(risk_answers)
@@ -132,8 +118,7 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
             all_readiness_questions.extend(dimension_questions)
 
         readiness_answers = run_interactive_questionnaire(
-            all_readiness_questions,
-            "Readiness Assessment"
+            all_readiness_questions, "Readiness Assessment"
         )
 
         # Calculate readiness scores
@@ -172,22 +157,22 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
         click.echo(f"📊 Readiness Score: {readiness_scores['overall']:.1f}/100")
 
         # Timeline and cost
-        timeline = report['timeline_cost']['estimated_timeline']
-        cost = report['timeline_cost']['estimated_cost']
+        timeline = report["timeline_cost"]["estimated_timeline"]
+        cost = report["timeline_cost"]["estimated_cost"]
 
         click.echo(f"\n⏱️  Estimated Timeline: {timeline['description']}")
         click.echo(f"💰 Estimated Cost: {cost['description']}")
 
         # Top priority actions
-        if 'recommendations' in report:
+        if "recommendations" in report:
             click.echo("\n🎯 TOP PRIORITY ACTIONS:")
-            for i, action in enumerate(report['recommendations']['priority_actions'][:5], 1):
+            for i, action in enumerate(report["recommendations"]["priority_actions"][:5], 1):
                 click.echo(f"   {i}. {action}")
 
         # CTA
-        cta = report['next_actions']
+        cta = report["next_actions"]
         click.echo("\n" + "=" * 70)
-        click.echo(cta['message'])
+        click.echo(cta["message"])
         click.echo(f"Contact: {cta['contact_url']}")
         click.echo("=" * 70 + "\n")
 
@@ -196,9 +181,9 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
         mini_report = {
             "risk_classification": {
                 "level": risk_level,
-                "score": calculate_risk_score(risk_answers)
+                "score": calculate_risk_score(risk_answers),
             },
-            "answers": risk_answers
+            "answers": risk_answers,
         }
         with open(output, "w") as f:
             json.dump(mini_report, f, indent=2)
@@ -206,10 +191,7 @@ def assess_cmd(interactive, output, format, risk_only, readiness_only):
 
     elif readiness_only:
         # Save readiness-only report
-        mini_report = {
-            "readiness_scores": readiness_scores,
-            "answers": readiness_answers
-        }
+        mini_report = {"readiness_scores": readiness_scores, "answers": readiness_answers}
         with open(output, "w") as f:
             json.dump(mini_report, f, indent=2)
         click.echo(f"\n✅ Readiness assessment saved to: {output}")
@@ -229,9 +211,16 @@ def assess_risk_cmd(interactive, output):
     """
     # This is a shortcut to assess --risk-only
     from click import Context
+
     ctx = Context(assess_cmd)
-    ctx.invoke(assess_cmd, interactive=interactive, output=output, format="json",
-               risk_only=True, readiness_only=False)
+    ctx.invoke(
+        assess_cmd,
+        interactive=interactive,
+        output=output,
+        format="json",
+        risk_only=True,
+        readiness_only=False,
+    )
 
 
 @click.command(name="assess-readiness")
@@ -248,9 +237,16 @@ def assess_readiness_cmd(interactive, output):
     """
     # This is a shortcut to assess --readiness-only
     from click import Context
+
     ctx = Context(assess_cmd)
-    ctx.invoke(assess_cmd, interactive=interactive, output=output, format="json",
-               risk_only=False, readiness_only=True)
+    ctx.invoke(
+        assess_cmd,
+        interactive=interactive,
+        output=output,
+        format="json",
+        risk_only=False,
+        readiness_only=True,
+    )
 
 
 def register_assessment_commands(cli_group):

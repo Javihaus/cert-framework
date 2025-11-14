@@ -5,9 +5,10 @@ CERT Cost Analysis CLI Commands
 Command-line interface for cost analysis and ROI calculation.
 """
 
-import click
 import json
 from datetime import datetime, timedelta
+
+import click
 
 
 @click.command(name="costs")
@@ -41,19 +42,27 @@ def costs_cmd(traces_file, days, format):
 
         click.echo("Top Models by Cost:")
         for i, (model, cost) in enumerate(list(summary["by_model"].items())[:5], 1):
-            percentage = (cost / costs['total'] * 100) if costs['total'] > 0 else 0
+            percentage = (cost / costs["total"] * 100) if costs["total"] > 0 else 0
             click.echo(f"  {i}. {model}: ${cost:.2f} ({percentage:.1f}%)")
 
         if summary["anomalies"]:
             click.echo(f"\n⚠️  {len(summary['anomalies'])} Cost Anomalies Detected:")
             for anomaly in summary["anomalies"][:3]:
-                click.echo(f"  - {anomaly['date']}: ${anomaly['cost']:.2f} "
-                          f"({anomaly['percent_increase']:.0f}% above average)")
+                click.echo(
+                    f"  - {anomaly['date']}: ${anomaly['cost']:.2f} "
+                    f"({anomaly['percent_increase']:.0f}% above average)"
+                )
 
 
 @click.command(name="roi")
 @click.argument("traces_file", type=click.Path(exists=True))
-@click.option("--value-per-task", "-v", type=float, required=True, help="Business value per successful task (USD)")
+@click.option(
+    "--value-per-task",
+    "-v",
+    type=float,
+    required=True,
+    help="Business value per successful task (USD)",
+)
 @click.option("--days", "-d", default=30, help="Number of days to analyze")
 def roi_cmd(traces_file, value_per_task, days):
     """
@@ -83,7 +92,7 @@ def roi_cmd(traces_file, value_per_task, days):
     click.echo(f"Cost per Task: ${roi['costs']['per_task']:.4f}")
     click.echo(f"Value per Task: ${roi['value']['per_task']:.2f}\n")
 
-    if roi['roi']['payback_months']:
+    if roi["roi"]["payback_months"]:
         click.echo(f"Payback Period: {roi['roi']['payback_months']:.1f} months")
 
 
@@ -113,19 +122,23 @@ def optimize_cmd(traces_file, format):
         click.echo(f"Total Potential Savings: ${summary['total_potential_savings']:.2f}")
         click.echo(f"Savings Percentage: {summary['potential_savings_percentage']:.1f}%\n")
 
-        opts = summary['optimizations']
+        opts = summary["optimizations"]
 
-        if opts['model_downgrades']['count'] > 0:
+        if opts["model_downgrades"]["count"] > 0:
             click.echo(f"🔄 Model Downgrades ({opts['model_downgrades']['count']} opportunities):")
             click.echo(f"   Potential savings: ${opts['model_downgrades']['savings']:.2f}/month\n")
-            for opp in opts['model_downgrades']['top_opportunities']:
-                click.echo(f"   • {opp['current_model']} → {', '.join(opp['recommended_models'][:2])}")
-                click.echo(f"     Savings: ${opp['estimated_savings']:.2f} ({opp['task_count']} tasks)\n")
+            for opp in opts["model_downgrades"]["top_opportunities"]:
+                click.echo(
+                    f"   • {opp['current_model']} → {', '.join(opp['recommended_models'][:2])}"
+                )
+                click.echo(
+                    f"     Savings: ${opp['estimated_savings']:.2f} ({opp['task_count']} tasks)\n"
+                )
 
-        if opts['caching']['count'] > 0:
+        if opts["caching"]["count"] > 0:
             click.echo(f"💾 Caching Opportunities ({opts['caching']['count']} found):")
             click.echo(f"   Potential savings: ${opts['caching']['savings']:.2f}/month\n")
-            for opp in opts['caching']['top_opportunities'][:2]:
+            for opp in opts["caching"]["top_opportunities"][:2]:
                 click.echo(f"   • {opp['repetitions']} repetitions")
                 click.echo(f"     Savings: ${opp['potential_savings']:.2f}\n")
 

@@ -12,8 +12,8 @@ Design:
 - Extensible: New connectors self-register with a decorator
 """
 
-from typing import List, Type, Optional
 import logging
+from typing import List, Optional, Type
 
 from cert.integrations.base import ConnectorAdapter
 
@@ -100,18 +100,13 @@ def activate_all(tracer, skip_on_import_error: bool = True) -> List[ConnectorAda
 
         except ImportError as e:
             if skip_on_import_error:
-                logger.debug(
-                    f"Skipping {connector_cls.__name__}: Platform not installed ({e})"
-                )
+                logger.debug(f"Skipping {connector_cls.__name__}: Platform not installed ({e})")
             else:
                 logger.error(f"Failed to activate {connector_cls.__name__}: {e}")
                 raise
 
         except Exception as e:
-            logger.error(
-                f"Failed to activate {connector_cls.__name__}: {e}",
-                exc_info=True
-            )
+            logger.error(f"Failed to activate {connector_cls.__name__}: {e}", exc_info=True)
             # Don't raise - we want other connectors to still activate
 
     logger.info(f"Activated {len(activated)}/{len(_active_connectors)} connectors")
@@ -175,12 +170,14 @@ def get_connector_status() -> List[dict]:
     status = []
 
     for connector in _activated_instances:
-        status.append({
-            "name": connector.__class__.__name__,
-            "enabled": connector.enabled,
-            "healthy": connector.is_healthy(),
-            "failure_count": connector.failure_count,
-        })
+        status.append(
+            {
+                "name": connector.__class__.__name__,
+                "enabled": connector.enabled,
+                "healthy": connector.is_healthy(),
+                "failure_count": connector.failure_count,
+            }
+        )
 
     return status
 

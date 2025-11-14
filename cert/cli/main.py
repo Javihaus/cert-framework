@@ -411,6 +411,7 @@ except ImportError:
 # Register assessment commands
 try:
     from cert.cli.assess import register_assessment_commands
+
     register_assessment_commands(cli)
 except ImportError:
     # Assessment commands not available if dependencies missing
@@ -419,6 +420,7 @@ except ImportError:
 # Register value/cost commands
 try:
     from cert.cli.costs import register_value_commands
+
     register_value_commands(cli)
 except ImportError:
     # Value commands not available if dependencies missing
@@ -427,6 +429,7 @@ except ImportError:
 # Register health/monitoring commands
 try:
     from cert.cli.health import register_health_commands
+
     register_health_commands(cli)
 except ImportError:
     # Health commands not available if dependencies missing

@@ -8,10 +8,10 @@ patterns, trends, and anomalies.
 
 import json
 import statistics
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
 from collections import defaultdict
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class CostAnalyzer:
@@ -47,7 +47,7 @@ class CostAnalyzer:
         if not Path(path).exists():
             return traces
 
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 try:
                     trace = json.loads(line.strip())
@@ -58,9 +58,7 @@ class CostAnalyzer:
         return traces
 
     def total_cost(
-        self,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
     ) -> float:
         """
         Calculate total spending over a time period.
@@ -76,9 +74,7 @@ class CostAnalyzer:
         return sum(t.get("cost", 0) or 0 for t in filtered)
 
     def cost_by_model(
-        self,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
     ) -> Dict[str, float]:
         """
         Break down costs by model.
@@ -101,9 +97,7 @@ class CostAnalyzer:
         return dict(costs)
 
     def cost_by_platform(
-        self,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
     ) -> Dict[str, float]:
         """
         Break down costs by platform.
@@ -129,7 +123,7 @@ class CostAnalyzer:
         self,
         granularity: str = "daily",
         start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None,
     ) -> Dict[str, float]:
         """
         Generate time series of costs.
@@ -156,10 +150,7 @@ class CostAnalyzer:
 
         return dict(sorted(trends.items()))
 
-    def detect_anomalies(
-        self,
-        threshold_stddev: float = 2.0
-    ) -> List[Dict[str, Any]]:
+    def detect_anomalies(self, threshold_stddev: float = 2.0) -> List[Dict[str, Any]]:
         """
         Detect unusual cost spikes.
 
@@ -183,21 +174,20 @@ class CostAnalyzer:
             if stddev > 0 and cost > mean + (threshold_stddev * stddev):
                 severity = "critical" if cost > mean + (3 * stddev) else "high"
 
-                anomalies.append({
-                    "date": date,
-                    "cost": round(cost, 2),
-                    "expected": round(mean, 2),
-                    "deviation": round((cost - mean) / stddev, 2),
-                    "severity": severity,
-                    "percent_increase": round(((cost - mean) / mean) * 100, 1),
-                })
+                anomalies.append(
+                    {
+                        "date": date,
+                        "cost": round(cost, 2),
+                        "expected": round(mean, 2),
+                        "deviation": round((cost - mean) / stddev, 2),
+                        "severity": severity,
+                        "percent_increase": round(((cost - mean) / mean) * 100, 1),
+                    }
+                )
 
         return sorted(anomalies, key=lambda x: x["deviation"], reverse=True)
 
-    def cost_per_successful_task(
-        self,
-        accuracy_threshold: float = 0.7
-    ) -> Optional[float]:
+    def cost_per_successful_task(self, accuracy_threshold: float = 0.7) -> Optional[float]:
         """
         Calculate cost divided by success rate.
 
@@ -210,7 +200,8 @@ class CostAnalyzer:
         total_cost = self.total_cost()
 
         successful = sum(
-            1 for t in self.traces
+            1
+            for t in self.traces
             if t.get("metadata", {}).get("confidence", 0) >= accuracy_threshold
             or (not t.get("error") and t.get("output_data"))
         )
@@ -220,10 +211,7 @@ class CostAnalyzer:
 
         return total_cost / successful
 
-    def get_summary(
-        self,
-        days: int = 30
-    ) -> Dict[str, Any]:
+    def get_summary(self, days: int = 30) -> Dict[str, Any]:
         """
         Get comprehensive cost summary.
 
@@ -239,7 +227,6 @@ class CostAnalyzer:
         total = self.total_cost(start_date, end_date)
         by_model = self.cost_by_model(start_date, end_date)
         by_platform = self.cost_by_platform(start_date, end_date)
-        daily_trend = self.cost_trend("daily", start_date, end_date)
 
         # Calculate daily average
         daily_avg = total / days if days > 0 else 0
@@ -264,12 +251,14 @@ class CostAnalyzer:
                 "daily_average": round(daily_avg, 2),
                 "monthly_projection": round(monthly_projection, 2),
             },
-            "by_model": {k: round(v, 2) for k, v in sorted(
-                by_model.items(), key=lambda x: x[1], reverse=True
-            )},
-            "by_platform": {k: round(v, 2) for k, v in sorted(
-                by_platform.items(), key=lambda x: x[1], reverse=True
-            )},
+            "by_model": {
+                k: round(v, 2)
+                for k, v in sorted(by_model.items(), key=lambda x: x[1], reverse=True)
+            },
+            "by_platform": {
+                k: round(v, 2)
+                for k, v in sorted(by_platform.items(), key=lambda x: x[1], reverse=True)
+            },
             "top_model": {
                 "name": top_model[0],
                 "cost": round(top_model[1], 2),
@@ -280,10 +269,7 @@ class CostAnalyzer:
         }
 
     def _filter_by_date(
-        self,
-        traces: List[Dict],
-        start_date: Optional[datetime],
-        end_date: Optional[datetime]
+        self, traces: List[Dict], start_date: Optional[datetime], end_date: Optional[datetime]
     ) -> List[Dict]:
         """
         Filter traces by date range.

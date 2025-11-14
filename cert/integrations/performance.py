@@ -6,12 +6,11 @@ Utilities for monitoring and profiling connector performance to ensure
 overhead remains < 5ms per traced call.
 """
 
-import time
-import statistics
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, field
-from collections import defaultdict
 import logging
+import statistics
+import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +18,11 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PerformanceMetrics:
     """Performance metrics for a connector."""
+
     connector_name: str
     call_count: int = 0
     total_overhead_ms: float = 0.0
-    min_overhead_ms: float = float('inf')
+    min_overhead_ms: float = float("inf")
     max_overhead_ms: float = 0.0
     measurements: List[float] = field(default_factory=list)
 
@@ -113,10 +113,7 @@ class PerformanceMonitor:
 
         # Warn if overhead is high
         if overhead_ms > 10.0:
-            logger.warning(
-                f"{connector_name} overhead high: {overhead_ms:.2f}ms "
-                f"(target: < 5ms)"
-            )
+            logger.warning(f"{connector_name} overhead high: {overhead_ms:.2f}ms (target: < 5ms)")
 
     def get_metrics(self, connector_name: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -132,10 +129,7 @@ class PerformanceMonitor:
             metrics = self.metrics.get(connector_name)
             return metrics.to_dict() if metrics else {}
 
-        return {
-            name: metrics.to_dict()
-            for name, metrics in self.metrics.items()
-        }
+        return {name: metrics.to_dict() for name, metrics in self.metrics.items()}
 
     def get_summary(self) -> Dict[str, Any]:
         """
@@ -156,14 +150,20 @@ class PerformanceMonitor:
         return {
             "total_calls": total_calls,
             "connector_count": len(self.metrics),
-            "overall_average_ms": round(statistics.mean(all_measurements), 3) if all_measurements else 0.0,
-            "overall_median_ms": round(statistics.median(all_measurements), 3) if all_measurements else 0.0,
+            "overall_average_ms": round(statistics.mean(all_measurements), 3)
+            if all_measurements
+            else 0.0,
+            "overall_median_ms": round(statistics.median(all_measurements), 3)
+            if all_measurements
+            else 0.0,
             "overall_p95_ms": round(
-                sorted(all_measurements)[int(len(all_measurements) * 0.95)] if all_measurements else 0.0, 3
+                sorted(all_measurements)[int(len(all_measurements) * 0.95)]
+                if all_measurements
+                else 0.0,
+                3,
             ),
             "connectors_exceeding_target": [
-                name for name, metrics in self.metrics.items()
-                if metrics.exceeds_target
+                name for name, metrics in self.metrics.items() if metrics.exceeds_target
             ],
             "by_connector": self.get_metrics(),
         }
@@ -207,11 +207,7 @@ class PerformanceTracker:
             _monitor.record_overhead(self.connector_name, duration_ms)
 
 
-def benchmark_connector(
-    connector_name: str,
-    test_func,
-    iterations: int = 100
-) -> Dict[str, Any]:
+def benchmark_connector(connector_name: str, test_func, iterations: int = 100) -> Dict[str, Any]:
     """
     Benchmark a connector's performance.
 

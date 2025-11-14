@@ -6,12 +6,11 @@ Provides structured logging capabilities for better observability
 and debugging.
 """
 
-import logging
 import json
+import logging
 import sys
-from typing import Any, Dict, Optional
 from datetime import datetime
-from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 class StructuredFormatter(logging.Formatter):
@@ -54,11 +53,29 @@ class StructuredFormatter(logging.Formatter):
 
         # Add any custom fields
         for key, value in record.__dict__.items():
-            if key not in ["name", "msg", "args", "created", "filename", "funcName",
-                          "levelname", "levelno", "lineno", "module", "msecs",
-                          "message", "pathname", "process", "processName",
-                          "relativeCreated", "thread", "threadName", "exc_info",
-                          "exc_text", "stack_info"]:
+            if key not in [
+                "name",
+                "msg",
+                "args",
+                "created",
+                "filename",
+                "funcName",
+                "levelname",
+                "levelno",
+                "lineno",
+                "module",
+                "msecs",
+                "message",
+                "pathname",
+                "process",
+                "processName",
+                "relativeCreated",
+                "thread",
+                "threadName",
+                "exc_info",
+                "exc_text",
+                "stack_info",
+            ]:
                 if not key.startswith("_"):
                     log_data[key] = value
 
@@ -184,11 +201,7 @@ class LoggerContext:
             logging.setLogRecordFactory(self.old_factory)
 
 
-def setup_logging(
-    level: str = "INFO",
-    structured: bool = False,
-    log_file: Optional[str] = None
-):
+def setup_logging(level: str = "INFO", structured: bool = False, log_file: Optional[str] = None):
     """
     Set up logging for CERT framework.
 

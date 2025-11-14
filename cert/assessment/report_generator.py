@@ -6,9 +6,9 @@ This module generates comprehensive assessment reports combining
 risk classification and readiness analysis.
 """
 
-from datetime import datetime
-from typing import Dict, Any, List, Optional
 import json
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 def generate_report(
@@ -30,15 +30,15 @@ def generate_report(
         Complete assessment report as dictionary
     """
     from cert.assessment.classifier import (
-        get_legal_basis,
-        get_compliance_requirements,
-        get_next_steps,
         analyze_prohibited_triggers,
+        get_compliance_requirements,
+        get_legal_basis,
+        get_next_steps,
     )
     from cert.assessment.readiness import (
-        identify_gaps,
-        generate_improvement_roadmap,
         calculate_readiness_percentile,
+        generate_improvement_roadmap,
+        identify_gaps,
     )
 
     # Identify gaps
@@ -55,7 +55,9 @@ def generate_report(
             "level": risk_level,
             "legal_basis": get_legal_basis(risk_level),
             "compliance_requirements": get_compliance_requirements(risk_level),
-            "prohibited_triggers": analyze_prohibited_triggers(answers) if risk_level == "PROHIBITED" else [],
+            "prohibited_triggers": analyze_prohibited_triggers(answers)
+            if risk_level == "PROHIBITED"
+            else [],
         },
         "readiness_assessment": {
             "scores": {k: round(v, 1) for k, v in readiness_scores.items()},
@@ -225,7 +227,9 @@ def estimate_cost(risk_level: str, readiness_score: float) -> Dict[str, Any]:
             # Significant additional work needed
             cost["min"] = int(cost["min"] * 1.5)
             cost["max"] = int(cost["max"] * 1.5)
-            cost["note"] = "Higher costs due to low readiness - significant infrastructure work needed"
+            cost["note"] = (
+                "Higher costs due to low readiness - significant infrastructure work needed"
+            )
         elif readiness_score < 60:
             cost["min"] = int(cost["min"] * 1.25)
             cost["max"] = int(cost["max"] * 1.25)
@@ -368,33 +372,35 @@ def format_report_text(report: Dict[str, Any]) -> str:
     # Risk Classification
     lines.append("RISK CLASSIFICATION")
     lines.append("-" * 70)
-    risk = report['risk_classification']
+    risk = report["risk_classification"]
     lines.append(f"Level: {risk['level']}")
-    lines.append(f"Legal Basis: {risk['legal_basis']['article']} - {risk['legal_basis']['description']}")
+    lines.append(
+        f"Legal Basis: {risk['legal_basis']['article']} - {risk['legal_basis']['description']}"
+    )
     lines.append("")
 
     lines.append("Compliance Requirements:")
-    for req in risk['compliance_requirements']:
+    for req in risk["compliance_requirements"]:
         lines.append(f"  {req}")
     lines.append("")
 
     # Readiness Assessment
     lines.append("READINESS ASSESSMENT")
     lines.append("-" * 70)
-    readiness = report['readiness_assessment']
+    readiness = report["readiness_assessment"]
     lines.append(f"Overall Score: {readiness['scores']['overall']}/100")
-    percentile = readiness['percentile']
+    percentile = readiness["percentile"]
     lines.append(f"Ranking: {percentile['ranking']} ({percentile['assessment']})")
     lines.append("")
 
     lines.append("Scores by Dimension:")
-    for dim, score in readiness['scores'].items():
-        if dim != 'overall':
+    for dim, score in readiness["scores"].items():
+        if dim != "overall":
             lines.append(f"  {dim.replace('_', ' ').title()}: {score}/100")
     lines.append("")
 
     # Gaps
-    if readiness['gaps']:
+    if readiness["gaps"]:
         lines.append(f"Identified Gaps: {len(readiness['gaps'])}")
         lines.append(f"  Critical: {readiness['gap_count']['critical']}")
         lines.append(f"  High: {readiness['gap_count']['high']}")
@@ -404,24 +410,24 @@ def format_report_text(report: Dict[str, Any]) -> str:
     # Timeline & Cost
     lines.append("TIMELINE & COST ESTIMATES")
     lines.append("-" * 70)
-    timeline = report['timeline_cost']['estimated_timeline']
-    cost = report['timeline_cost']['estimated_cost']
+    timeline = report["timeline_cost"]["estimated_timeline"]
+    cost = report["timeline_cost"]["estimated_cost"]
     lines.append(f"Timeline: {timeline['description']}")
     lines.append(f"Cost: {cost['description']}")
     lines.append("")
 
     # Next Steps
-    if 'recommendations' in report:
+    if "recommendations" in report:
         lines.append("RECOMMENDED NEXT STEPS")
         lines.append("-" * 70)
-        for i, step in enumerate(report['recommendations']['next_steps'][:5], 1):
+        for i, step in enumerate(report["recommendations"]["next_steps"][:5], 1):
             lines.append(f"{i}. {step}")
         lines.append("")
 
     # CTA
     lines.append("=" * 70)
-    cta = report['next_actions']
-    lines.append(cta['message'])
+    cta = report["next_actions"]
+    lines.append(cta["message"])
     lines.append(f"Contact: {cta['contact_url']}")
     lines.append("=" * 70)
 

@@ -6,8 +6,9 @@ Calculates return on investment for AI/LLM systems by comparing
 costs with business value generated.
 """
 
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from cert.value.analyzer import CostAnalyzer
 
 
@@ -19,11 +20,7 @@ class ROICalculator:
     calculate ROI and other financial metrics.
     """
 
-    def __init__(
-        self,
-        traces_path: str,
-        business_value_per_task: Optional[float] = None
-    ):
+    def __init__(self, traces_path: str, business_value_per_task: Optional[float] = None):
         """
         Initialize the ROI calculator.
 
@@ -38,7 +35,7 @@ class ROICalculator:
         self,
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
-        accuracy_threshold: float = 0.7
+        accuracy_threshold: float = 0.7,
     ) -> Dict[str, Any]:
         """
         Calculate return on investment.
@@ -55,16 +52,11 @@ class ROICalculator:
         total_cost = self.analyzer.total_cost(start_date, end_date)
 
         # Filter traces by date
-        filtered_traces = self.analyzer._filter_by_date(
-            self.analyzer.traces,
-            start_date,
-            end_date
-        )
+        filtered_traces = self.analyzer._filter_by_date(self.analyzer.traces, start_date, end_date)
 
         # Count successful tasks
         successful_tasks = sum(
-            1 for t in filtered_traces
-            if self._is_successful_task(t, accuracy_threshold)
+            1 for t in filtered_traces if self._is_successful_task(t, accuracy_threshold)
         )
 
         # Calculate business value
@@ -72,19 +64,16 @@ class ROICalculator:
             return {
                 "total_cost": round(total_cost, 2),
                 "successful_tasks": successful_tasks,
-                "cost_per_task": round(
-                    total_cost / successful_tasks, 4
-                ) if successful_tasks > 0 else None,
+                "cost_per_task": round(total_cost / successful_tasks, 4)
+                if successful_tasks > 0
+                else None,
                 "note": "Set business_value_per_task to calculate ROI",
             }
 
         total_value = successful_tasks * self.business_value_per_task
 
         # Calculate ROI: ((Value - Cost) / Cost) * 100
-        roi_percentage = (
-            ((total_value - total_cost) / total_cost) * 100
-            if total_cost > 0 else 0
-        )
+        roi_percentage = ((total_value - total_cost) / total_cost) * 100 if total_cost > 0 else 0
 
         # Calculate payback period (months to break even)
         if total_value > total_cost and start_date and end_date:
@@ -109,9 +98,7 @@ class ROICalculator:
             },
             "costs": {
                 "total": round(total_cost, 2),
-                "per_task": round(
-                    total_cost / successful_tasks, 4
-                ) if successful_tasks > 0 else 0,
+                "per_task": round(total_cost / successful_tasks, 4) if successful_tasks > 0 else 0,
             },
             "value": {
                 "total": round(total_value, 2),
@@ -124,20 +111,15 @@ class ROICalculator:
                 "payback_months": round(payback_months, 1) if payback_months else None,
             },
             "metrics": {
-                "value_cost_ratio": round(
-                    total_value / total_cost, 2
-                ) if total_cost > 0 else 0,
-                "margin_percentage": round(
-                    ((total_value - total_cost) / total_value) * 100, 2
-                ) if total_value > 0 else 0,
+                "value_cost_ratio": round(total_value / total_cost, 2) if total_cost > 0 else 0,
+                "margin_percentage": round(((total_value - total_cost) / total_value) * 100, 2)
+                if total_value > 0
+                else 0,
             },
         }
 
     def calculate_lifetime_value(
-        self,
-        monthly_tasks: int,
-        months: int = 12,
-        accuracy_rate: float = 0.85
+        self, monthly_tasks: int, months: int = 12, accuracy_rate: float = 0.85
     ) -> Dict[str, Any]:
         """
         Project lifetime value over a period.
@@ -178,24 +160,21 @@ class ROICalculator:
                 "value": round(monthly_value, 2),
                 "cost": round(monthly_cost, 2),
                 "net": round(monthly_net, 2),
-                "roi_percentage": round(
-                    ((monthly_value - monthly_cost) / monthly_cost) * 100, 2
-                ) if monthly_cost > 0 else 0,
+                "roi_percentage": round(((monthly_value - monthly_cost) / monthly_cost) * 100, 2)
+                if monthly_cost > 0
+                else 0,
             },
             "lifetime": {
                 "total_value": round(total_value, 2),
                 "total_cost": round(total_cost, 2),
                 "net_value": round(net_value, 2),
-                "roi_percentage": round(
-                    ((total_value - total_cost) / total_cost) * 100, 2
-                ) if total_cost > 0 else 0,
+                "roi_percentage": round(((total_value - total_cost) / total_cost) * 100, 2)
+                if total_cost > 0
+                else 0,
             },
         }
 
-    def compare_scenarios(
-        self,
-        scenarios: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def compare_scenarios(self, scenarios: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Compare ROI across different scenarios.
 
@@ -219,13 +198,15 @@ class ROICalculator:
                 accuracy_rate=scenario.get("accuracy_rate", 0.85),
             )
 
-            results.append({
-                "name": scenario.get("name", "Unnamed"),
-                "assumptions": ltv.get("assumptions", {}),
-                "monthly_net": ltv.get("monthly", {}).get("net", 0),
-                "annual_roi_percentage": ltv.get("lifetime", {}).get("roi_percentage", 0),
-                "annual_net_value": ltv.get("lifetime", {}).get("net_value", 0),
-            })
+            results.append(
+                {
+                    "name": scenario.get("name", "Unnamed"),
+                    "assumptions": ltv.get("assumptions", {}),
+                    "monthly_net": ltv.get("monthly", {}).get("net", 0),
+                    "annual_roi_percentage": ltv.get("lifetime", {}).get("roi_percentage", 0),
+                    "annual_net_value": ltv.get("lifetime", {}).get("net_value", 0),
+                }
+            )
 
             # Restore original value
             self.business_value_per_task = original_value
@@ -263,8 +244,7 @@ class ROICalculator:
 
 
 def calculate_cost_savings(
-    current_costs: Dict[str, float],
-    optimized_costs: Dict[str, float]
+    current_costs: Dict[str, float], optimized_costs: Dict[str, float]
 ) -> Dict[str, Any]:
     """
     Calculate cost savings from optimization.

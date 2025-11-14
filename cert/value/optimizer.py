@@ -7,8 +7,9 @@ model downgrades, caching, and prompt optimization.
 """
 
 import statistics
-from typing import Dict, List, Any, Optional
 from collections import Counter, defaultdict
+from typing import Any, Dict, List
+
 from cert.value.analyzer import CostAnalyzer
 
 
@@ -29,10 +30,7 @@ class Optimizer:
         """
         self.analyzer = CostAnalyzer(traces_path)
 
-    def recommend_model_changes(
-        self,
-        confidence_threshold: float = 0.85
-    ) -> List[Dict[str, Any]]:
+    def recommend_model_changes(self, confidence_threshold: float = 0.85) -> List[Dict[str, Any]]:
         """
         Suggest cheaper models for tasks with acceptable accuracy.
 
@@ -81,24 +79,23 @@ class Optimizer:
                     # Estimate savings (assume 50-70% cost reduction)
                     estimated_savings = total_cost * 0.6
 
-                    recommendations.append({
-                        "type": "model_downgrade",
-                        "current_model": model,
-                        "recommended_models": cheaper_models,
-                        "reason": f"High average confidence ({avg_confidence:.2f}) suggests cheaper model would suffice",
-                        "current_cost": round(total_cost, 2),
-                        "estimated_savings": round(estimated_savings, 2),
-                        "estimated_percentage": 60,
-                        "task_count": len(traces),
-                        "confidence_level": "high" if avg_confidence > 0.9 else "medium",
-                    })
+                    recommendations.append(
+                        {
+                            "type": "model_downgrade",
+                            "current_model": model,
+                            "recommended_models": cheaper_models,
+                            "reason": f"High average confidence ({avg_confidence:.2f}) suggests cheaper model would suffice",
+                            "current_cost": round(total_cost, 2),
+                            "estimated_savings": round(estimated_savings, 2),
+                            "estimated_percentage": 60,
+                            "task_count": len(traces),
+                            "confidence_level": "high" if avg_confidence > 0.9 else "medium",
+                        }
+                    )
 
         return sorted(recommendations, key=lambda x: x["estimated_savings"], reverse=True)
 
-    def find_caching_opportunities(
-        self,
-        min_repetitions: int = 5
-    ) -> List[Dict[str, Any]]:
+    def find_caching_opportunities(self, min_repetitions: int = 5) -> List[Dict[str, Any]]:
         """
         Identify repeated prompts that could be cached.
 
@@ -138,21 +135,22 @@ class Optimizer:
                 # Truncate long prompts for display
                 display_input = input_str[:100] + "..." if len(input_str) > 100 else input_str
 
-                opportunities.append({
-                    "type": "caching",
-                    "input_preview": display_input,
-                    "repetitions": count,
-                    "cost_per_call": round(cost_per_call, 4),
-                    "total_cost": round(total_cost, 2),
-                    "potential_savings": round(potential_savings, 2),
-                    "recommendation": "Implement prompt caching or memoization",
-                })
+                opportunities.append(
+                    {
+                        "type": "caching",
+                        "input_preview": display_input,
+                        "repetitions": count,
+                        "cost_per_call": round(cost_per_call, 4),
+                        "total_cost": round(total_cost, 2),
+                        "potential_savings": round(potential_savings, 2),
+                        "recommendation": "Implement prompt caching or memoization",
+                    }
+                )
 
         return sorted(opportunities, key=lambda x: x["potential_savings"], reverse=True)
 
     def suggest_prompt_optimizations(
-        self,
-        long_prompt_threshold: int = 1000
+        self, long_prompt_threshold: int = 1000
     ) -> List[Dict[str, Any]]:
         """
         Find prompts that could be shortened to reduce costs.
@@ -175,14 +173,16 @@ class Optimizer:
                 # Estimate savings from 30% prompt reduction
                 potential_savings = cost * 0.3
 
-                suggestions.append({
-                    "type": "prompt_shortening",
-                    "trace_id": trace.get("metadata", {}).get("response_id", "unknown"),
-                    "current_length_tokens": estimated_tokens,
-                    "cost": round(cost, 4),
-                    "potential_savings": round(potential_savings, 4),
-                    "recommendation": "Consider summarizing context or using retrieval to reduce prompt length",
-                })
+                suggestions.append(
+                    {
+                        "type": "prompt_shortening",
+                        "trace_id": trace.get("metadata", {}).get("response_id", "unknown"),
+                        "current_length_tokens": estimated_tokens,
+                        "cost": round(cost, 4),
+                        "potential_savings": round(potential_savings, 4),
+                        "recommendation": "Consider summarizing context or using retrieval to reduce prompt length",
+                    }
+                )
 
         return sorted(suggestions, key=lambda x: x["potential_savings"], reverse=True)
 
@@ -205,14 +205,16 @@ class Optimizer:
                 # Estimate 20% savings from batching
                 estimated_savings = total_cost * 0.2
 
-                opportunities.append({
-                    "type": "batching",
-                    "time_window": hour,
-                    "call_count": len(traces),
-                    "current_cost": round(total_cost, 2),
-                    "potential_savings": round(estimated_savings, 2),
-                    "recommendation": "Batch similar requests to reduce API overhead",
-                })
+                opportunities.append(
+                    {
+                        "type": "batching",
+                        "time_window": hour,
+                        "call_count": len(traces),
+                        "current_cost": round(total_cost, 2),
+                        "potential_savings": round(estimated_savings, 2),
+                        "recommendation": "Batch similar requests to reduce API overhead",
+                    }
+                )
 
         return sorted(opportunities, key=lambda x: x["potential_savings"], reverse=True)
 
@@ -229,10 +231,10 @@ class Optimizer:
         batch_opportunities = self.find_batch_opportunities()
 
         total_potential_savings = (
-            sum(r["estimated_savings"] for r in model_recommendations) +
-            sum(o["potential_savings"] for o in caching_opportunities) +
-            sum(s["potential_savings"] for s in prompt_optimizations) +
-            sum(o["potential_savings"] for o in batch_opportunities)
+            sum(r["estimated_savings"] for r in model_recommendations)
+            + sum(o["potential_savings"] for o in caching_opportunities)
+            + sum(s["potential_savings"] for s in prompt_optimizations)
+            + sum(o["potential_savings"] for o in batch_opportunities)
         )
 
         current_total = self.analyzer.total_cost()

@@ -17,26 +17,26 @@ Usage:
     'HIGH_RISK'
 """
 
-from cert.assessment.questionnaire import (
-    Question,
-    ANNEX_III_QUESTIONS,
-    READINESS_QUESTIONS,
-    run_interactive_questionnaire,
-)
 from cert.assessment.classifier import (
     classify_risk,
     get_compliance_requirements,
     get_legal_basis,
 )
+from cert.assessment.questionnaire import (
+    ANNEX_III_QUESTIONS,
+    READINESS_QUESTIONS,
+    Question,
+    run_interactive_questionnaire,
+)
 from cert.assessment.readiness import (
     assess_readiness,
-    identify_gaps,
     get_remediation_actions,
+    identify_gaps,
 )
 from cert.assessment.report_generator import (
-    generate_report,
-    estimate_timeline,
     estimate_cost,
+    estimate_timeline,
+    generate_report,
 )
 
 __all__ = [

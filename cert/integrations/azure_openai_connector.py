@@ -10,24 +10,24 @@ Usage:
 """
 
 import functools
+import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
-import logging
 
 try:
-    from openai import AzureOpenAI, AsyncAzureOpenAI
+    from openai import AzureOpenAI
+
     AZURE_OPENAI_AVAILABLE = True
 except ImportError:
     AZURE_OPENAI_AVAILABLE = False
 
 from cert.integrations.base import ConnectorAdapter, TracedCall
+from cert.integrations.openai_connector import (
+    OPENAI_PRICING as AZURE_PRICING,  # Azure OpenAI uses same pricing as OpenAI but may vary by region
+)
 from cert.integrations.registry import register_connector
 
 logger = logging.getLogger(__name__)
-
-
-# Azure OpenAI uses same pricing as OpenAI but may vary by region
-from cert.integrations.openai_connector import OPENAI_PRICING as AZURE_PRICING
 
 
 @register_connector
@@ -36,9 +36,7 @@ class AzureOpenAIConnector(ConnectorAdapter):
 
     def __init__(self, tracer):
         if not AZURE_OPENAI_AVAILABLE:
-            raise ImportError(
-                "Azure OpenAI not available. Install with: pip install openai"
-            )
+            raise ImportError("Azure OpenAI not available. Install with: pip install openai")
         super().__init__(tracer)
         self._original_create = None
 
@@ -148,7 +146,9 @@ class AzureOpenAIConnector(ConnectorAdapter):
 
         return self._calculate_estimated_cost(model, prompt_tokens, completion_tokens)
 
-    def _calculate_estimated_cost(self, model: str, prompt_tokens: int, completion_tokens: int) -> Optional[float]:
+    def _calculate_estimated_cost(
+        self, model: str, prompt_tokens: int, completion_tokens: int
+    ) -> Optional[float]:
         """Calculate estimated cost from token counts."""
         # Find pricing for this model
         pricing = None

@@ -7,13 +7,11 @@ Opt-in anonymous usage telemetry to help improve the framework.
 NO USER DATA OR TRACES ARE COLLECTED - only anonymous usage patterns.
 """
 
+import logging
 import os
-import json
-import hashlib
-from typing import Dict, Any, Optional
 from datetime import datetime
 from pathlib import Path
-import logging
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -42,16 +40,14 @@ def get_anonymous_id() -> str:
 
     # Generate new ID (hash of timestamp + random)
     import uuid
+
     installation_id = str(uuid.uuid4())
 
     id_file.write_text(installation_id)
     return installation_id
 
 
-def track_event(
-    event_name: str,
-    properties: Optional[Dict[str, Any]] = None
-):
+def track_event(event_name: str, properties: Optional[Dict[str, Any]] = None):
     """
     Track an anonymous event.
 
@@ -151,6 +147,7 @@ def get_cert_version() -> str:
     """Get CERT framework version."""
     try:
         from cert import __version__
+
         return __version__
     except ImportError:
         return "unknown"
@@ -174,35 +171,48 @@ def get_system_info() -> Dict[str, str]:
 
 # Event tracking functions
 
+
 def track_connector_activated(connector_name: str, platform: str):
     """Track connector activation."""
-    track_event("connector_activated", {
-        "connector_name": connector_name,
-        "platform": platform,
-        **get_system_info(),
-    })
+    track_event(
+        "connector_activated",
+        {
+            "connector_name": connector_name,
+            "platform": platform,
+            **get_system_info(),
+        },
+    )
 
 
 def track_connector_failed(connector_name: str):
     """Track connector failure (no error details)."""
-    track_event("connector_failed", {
-        "connector_name": connector_name,
-    })
+    track_event(
+        "connector_failed",
+        {
+            "connector_name": connector_name,
+        },
+    )
 
 
 def track_cli_command(command: str):
     """Track CLI command usage."""
-    track_event("cli_command_used", {
-        "command": command,
-        **get_system_info(),
-    })
+    track_event(
+        "cli_command_used",
+        {
+            "command": command,
+            **get_system_info(),
+        },
+    )
 
 
 def track_assessment_completed(risk_level: str):
     """Track assessment completion (no user data)."""
-    track_event("assessment_completed", {
-        "risk_level": risk_level,  # Public classification
-    })
+    track_event(
+        "assessment_completed",
+        {
+            "risk_level": risk_level,  # Public classification
+        },
+    )
 
 
 def enable_telemetry():
@@ -240,7 +250,8 @@ def show_telemetry_info():
 
     Prints what is tracked and what is NOT tracked.
     """
-    print("""
+    print(
+        """
 CERT Framework Telemetry
 ========================
 
@@ -280,7 +291,8 @@ Disable: unset CERT_TELEMETRY
 Check:   echo $CERT_TELEMETRY
 
 Learn more: https://cert-framework.com/telemetry
-""".format("ENABLED" if TELEMETRY_ENABLED else "DISABLED"))
+""".format("ENABLED" if TELEMETRY_ENABLED else "DISABLED")
+    )
 
 
 # Print notice on first import if enabled

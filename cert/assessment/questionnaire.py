@@ -7,7 +7,7 @@ readiness evaluation based on the EU AI Act Annex III.
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -22,6 +22,7 @@ class Question:
         risk_factors: Mapping of answers to risk scores
         category: Question category for grouping
     """
+
     id: str
     text: str
     options: List[str]
@@ -36,98 +37,98 @@ ANNEX_III_QUESTIONS = [
         text="Does the AI system use biometric identification or categorization of natural persons?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 100, "No": 0, "Not Sure": 50},
-        category="prohibited_use"
+        category="prohibited_use",
     ),
     Question(
         id="critical_infrastructure",
         text="Will the AI system be used as a safety component in the management and operation of critical infrastructure (energy, transport, water, health)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="education_training",
         text="Will the AI system be used to determine access to educational institutions or for evaluating learning outcomes?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="employment",
         text="Will the AI system be used for recruitment, selection of persons, or evaluation of workers (including promotion and termination decisions)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="essential_services",
         text="Will the AI system be used to evaluate creditworthiness, establish credit scores, or determine access to essential private/public services (insurance, healthcare benefits)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="law_enforcement",
         text="Will the AI system be used by law enforcement authorities (risk assessment, polygraph, emotion recognition, crime analytics)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 100, "No": 0, "Not Sure": 50},
-        category="prohibited_use"
+        category="prohibited_use",
     ),
     Question(
         id="migration_asylum",
         text="Will the AI system be used for migration, asylum, and border control management (including verification of documents, risk assessments)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="justice_democracy",
         text="Will the AI system be used to assist judicial authorities in researching and interpreting facts and the law?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 80, "No": 0, "Not Sure": 40},
-        category="high_risk"
+        category="high_risk",
     ),
     Question(
         id="high_volume_decisions",
         text="Will the AI system make more than 10,000 decisions affecting individuals per year?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 40, "No": 0, "Not Sure": 20},
-        category="scale"
+        category="scale",
     ),
     Question(
         id="automated_decision_making",
         text="Does the AI system make fully automated decisions without human oversight?",
         options=["Yes", "No", "Partial Automation"],
         risk_factors={"Yes": 60, "No": 0, "Partial Automation": 30},
-        category="automation_level"
+        category="automation_level",
     ),
     Question(
         id="vulnerable_groups",
         text="Does the AI system interact with or make decisions about vulnerable groups (children, elderly, people with disabilities)?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 60, "No": 0, "Not Sure": 30},
-        category="impact"
+        category="impact",
     ),
     Question(
         id="social_scoring",
         text="Does the AI system evaluate or classify individuals based on social behavior or personal characteristics?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 100, "No": 0, "Not Sure": 50},
-        category="prohibited_use"
+        category="prohibited_use",
     ),
     Question(
         id="manipulation",
         text="Does the AI system deploy subliminal techniques or exploit vulnerabilities to materially distort behavior?",
         options=["Yes", "No", "Not Sure"],
         risk_factors={"Yes": 100, "No": 0, "Not Sure": 50},
-        category="prohibited_use"
+        category="prohibited_use",
     ),
     Question(
         id="transparency_to_users",
         text="Are users informed that they are interacting with an AI system?",
         options=["Yes, Always", "Sometimes", "No", "Not Applicable"],
         risk_factors={"Yes, Always": 0, "Sometimes": 30, "No": 60, "Not Applicable": 0},
-        category="transparency"
+        category="transparency",
     ),
 ]
 
@@ -140,35 +141,35 @@ READINESS_QUESTIONS = {
             text="Do you have documented data collection procedures?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="data_governance"
+            category="data_governance",
         ),
         Question(
             id="data_versioning",
             text="Is training data versioned and stored securely?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="data_governance"
+            category="data_governance",
         ),
         Question(
             id="data_quality_metrics",
             text="Have you assessed data quality metrics (completeness, accuracy, representativeness)?",
             options=["Yes", "No", "In Progress"],
             risk_factors={},
-            category="data_governance"
+            category="data_governance",
         ),
         Question(
             id="bias_testing",
             text="Do you have bias testing procedures for your datasets?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="data_governance"
+            category="data_governance",
         ),
         Question(
             id="data_lineage",
             text="Is data lineage tracked from source to model?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="data_governance"
+            category="data_governance",
         ),
     ],
     "infrastructure": [
@@ -177,35 +178,35 @@ READINESS_QUESTIONS = {
             text="Do you have monitoring in production?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="infrastructure"
+            category="infrastructure",
         ),
         Question(
             id="prediction_logging",
             text="Are model predictions logged?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="infrastructure"
+            category="infrastructure",
         ),
         Question(
             id="rollback_procedures",
             text="Do you have rollback procedures for model deployments?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="infrastructure"
+            category="infrastructure",
         ),
         Question(
             id="version_control",
             text="Is infrastructure version controlled?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="infrastructure"
+            category="infrastructure",
         ),
         Question(
             id="cicd_pipelines",
             text="Do you have CI/CD pipelines for model deployment?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="infrastructure"
+            category="infrastructure",
         ),
     ],
     "team_skills": [
@@ -214,35 +215,35 @@ READINESS_QUESTIONS = {
             text="Do you have ML engineering expertise on your team?",
             options=["Yes", "No", "Limited"],
             risk_factors={},
-            category="team_skills"
+            category="team_skills",
         ),
         Question(
             id="domain_expertise",
             text="Do you have domain expertise for your use case?",
             options=["Yes", "No", "Limited"],
             risk_factors={},
-            category="team_skills"
+            category="team_skills",
         ),
         Question(
             id="governance_training",
             text="Has your team received AI governance training?",
             options=["Yes", "No", "In Progress"],
             risk_factors={},
-            category="team_skills"
+            category="team_skills",
         ),
         Question(
             id="legal_compliance_resources",
             text="Do you have legal/compliance resources?",
             options=["Yes", "No", "External Consultants"],
             risk_factors={},
-            category="team_skills"
+            category="team_skills",
         ),
         Question(
             id="security_expertise",
             text="Do you have security expertise on your team?",
             options=["Yes", "No", "Limited"],
             risk_factors={},
-            category="team_skills"
+            category="team_skills",
         ),
     ],
     "documentation": [
@@ -251,35 +252,35 @@ READINESS_QUESTIONS = {
             text="Do you have comprehensive model documentation?",
             options=["Yes", "No", "In Progress"],
             risk_factors={},
-            category="documentation"
+            category="documentation",
         ),
         Question(
             id="risk_assessment_docs",
             text="Have you documented risk assessments?",
             options=["Yes", "No", "In Progress"],
             risk_factors={},
-            category="documentation"
+            category="documentation",
         ),
         Question(
             id="testing_procedures",
             text="Are testing procedures documented?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="documentation"
+            category="documentation",
         ),
         Question(
             id="incident_response_plan",
             text="Do you have an incident response plan?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="documentation"
+            category="documentation",
         ),
         Question(
             id="compliance_documentation",
             text="Is compliance documentation maintained and up-to-date?",
             options=["Yes", "No", "Partially"],
             risk_factors={},
-            category="documentation"
+            category="documentation",
         ),
     ],
     "testing_validation": [
@@ -288,43 +289,42 @@ READINESS_QUESTIONS = {
             text="Do you have automated testing for your models?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="testing_validation"
+            category="testing_validation",
         ),
         Question(
             id="performance_benchmarks",
             text="Have you established performance benchmarks?",
             options=["Yes", "No", "In Progress"],
             risk_factors={},
-            category="testing_validation"
+            category="testing_validation",
         ),
         Question(
             id="fairness_testing",
             text="Do you perform fairness/bias testing?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="testing_validation"
+            category="testing_validation",
         ),
         Question(
             id="adversarial_testing",
             text="Do you perform adversarial/robustness testing?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="testing_validation"
+            category="testing_validation",
         ),
         Question(
             id="ongoing_validation",
             text="Is there ongoing validation of model performance in production?",
             options=["Yes", "No", "In Development"],
             risk_factors={},
-            category="testing_validation"
+            category="testing_validation",
         ),
     ],
 }
 
 
 def run_interactive_questionnaire(
-    questions: List[Question],
-    title: str = "CERT AI Assessment"
+    questions: List[Question], title: str = "CERT AI Assessment"
 ) -> Dict[str, str]:
     """
     Run an interactive questionnaire in the terminal.

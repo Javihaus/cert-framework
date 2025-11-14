@@ -5,8 +5,9 @@ CERT Health Check CLI Commands
 Commands for checking connector health and system status.
 """
 
-import click
 import json
+
+import click
 
 
 @click.command(name="health")
@@ -20,17 +21,15 @@ def health_cmd(format, verbose):
         cert health
         cert health --format json --verbose
     """
-    from cert.integrations.registry import (
-        get_connector_status,
-        check_connector_health,
-        get_active_connectors,
-    )
     from cert.integrations.performance import get_performance_monitor
+    from cert.integrations.registry import (
+        check_connector_health,
+        get_connector_status,
+    )
 
     # Get connector health
     health_status = check_connector_health()
     connector_status = get_connector_status()
-    active_connectors = get_active_connectors()
 
     # Get performance metrics
     perf_monitor = get_performance_monitor()
@@ -74,21 +73,21 @@ def health_cmd(format, verbose):
 
         # Performance metrics
         if perf_summary and perf_summary.get("total_calls", 0) > 0:
-            click.echo(f"\nPerformance Metrics:")
+            click.echo("\nPerformance Metrics:")
             click.echo(f"  Total Calls: {perf_summary['total_calls']}")
             click.echo(f"  Average Overhead: {perf_summary['overall_average_ms']:.2f}ms")
             click.echo(f"  Median Overhead: {perf_summary['overall_median_ms']:.2f}ms")
             click.echo(f"  P95 Overhead: {perf_summary['overall_p95_ms']:.2f}ms")
 
-            if perf_summary['connectors_exceeding_target']:
-                click.echo(f"\n  ⚠️  Connectors exceeding 5ms target:")
-                for name in perf_summary['connectors_exceeding_target']:
-                    conn_metrics = perf_summary['by_connector'][name]
+            if perf_summary["connectors_exceeding_target"]:
+                click.echo("\n  ⚠️  Connectors exceeding 5ms target:")
+                for name in perf_summary["connectors_exceeding_target"]:
+                    conn_metrics = perf_summary["by_connector"][name]
                     click.echo(f"     - {name}: {conn_metrics['average_overhead_ms']:.2f}ms")
 
             if verbose:
-                click.echo(f"\n  Per-Connector Performance:")
-                for name, metrics in perf_summary['by_connector'].items():
+                click.echo("\n  Per-Connector Performance:")
+                for name, metrics in perf_summary["by_connector"].items():
                     click.echo(f"     {name}:")
                     click.echo(f"       Calls: {metrics['call_count']}")
                     click.echo(f"       Avg: {metrics['average_overhead_ms']:.2f}ms")
@@ -108,8 +107,8 @@ def reset_health_cmd(connector):
         cert reset-health --connector openai  # Reset specific
     """
     from cert.integrations.registry import (
-        reset_all_circuit_breakers,
         find_connector_by_platform,
+        reset_all_circuit_breakers,
     )
 
     if connector:
@@ -176,27 +175,29 @@ def perf_cmd(traces_file, enable, disable, reset, format):
         click.echo(f"Total Calls: {summary['total_calls']}")
         click.echo(f"Connectors: {summary['connector_count']}\n")
 
-        click.echo(f"Overall Overhead:")
+        click.echo("Overall Overhead:")
         click.echo(f"  Average: {summary['overall_average_ms']:.2f}ms")
         click.echo(f"  Median:  {summary['overall_median_ms']:.2f}ms")
         click.echo(f"  P95:     {summary['overall_p95_ms']:.2f}ms\n")
 
-        if summary['connectors_exceeding_target']:
-            click.echo(f"⚠️  Connectors Exceeding 5ms Target:")
-            for name in summary['connectors_exceeding_target']:
-                metrics = summary['by_connector'][name]
+        if summary["connectors_exceeding_target"]:
+            click.echo("⚠️  Connectors Exceeding 5ms Target:")
+            for name in summary["connectors_exceeding_target"]:
+                metrics = summary["by_connector"][name]
                 click.echo(f"  - {name}: {metrics['average_overhead_ms']:.2f}ms")
             click.echo()
 
         click.echo("Per-Connector Metrics:")
-        for name, metrics in summary['by_connector'].items():
-            status = "⚠️" if metrics['exceeds_target'] else "✅"
+        for name, metrics in summary["by_connector"].items():
+            status = "⚠️" if metrics["exceeds_target"] else "✅"
             click.echo(f"  {status} {name}:")
             click.echo(f"     Calls:   {metrics['call_count']}")
             click.echo(f"     Average: {metrics['average_overhead_ms']:.2f}ms")
             click.echo(f"     Median:  {metrics['median_overhead_ms']:.2f}ms")
             click.echo(f"     P95:     {metrics['p95_overhead_ms']:.2f}ms")
-            click.echo(f"     Range:   {metrics['min_overhead_ms']:.2f}-{metrics['max_overhead_ms']:.2f}ms\n")
+            click.echo(
+                f"     Range:   {metrics['min_overhead_ms']:.2f}-{metrics['max_overhead_ms']:.2f}ms\n"
+            )
 
 
 def register_health_commands(cli_group):
