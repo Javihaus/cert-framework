@@ -39,6 +39,13 @@ from cert.integrations.registry import (
     get_connector_status,
     check_connector_health,
 )
+from cert.integrations.utils import (
+    format_timestamp,
+    safe_extract,
+    estimate_tokens,
+    estimate_tokens_from_messages,
+    CostCalculator,
+)
 
 __all__ = [
     # Generic adapter (manual integration)
@@ -53,4 +60,10 @@ __all__ = [
     "get_active_connectors",
     "get_connector_status",
     "check_connector_health",
+    # Utilities
+    "format_timestamp",
+    "safe_extract",
+    "estimate_tokens",
+    "estimate_tokens_from_messages",
+    "CostCalculator",
 ]
