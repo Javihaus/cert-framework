@@ -14,8 +14,8 @@ The connector architecture follows these principles:
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -36,6 +36,7 @@ class TracedCall:
         cost: Calculated cost in USD (None if unable to calculate)
         error: Error message if the call failed (None if successful)
     """
+
     timestamp: str
     platform: str
     model: str

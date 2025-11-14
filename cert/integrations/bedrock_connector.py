@@ -19,16 +19,15 @@ Usage:
     >>> connector.activate()
 """
 
-import json
 import functools
+import json
+import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
-import logging
-import io
 
 try:
     import boto3
-    from botocore.response import StreamingBody
+
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
@@ -56,9 +55,7 @@ class BedrockConnector(ConnectorAdapter):
 
     def __init__(self, tracer):
         if not BOTO3_AVAILABLE:
-            raise ImportError(
-                "boto3 not installed. Install with: pip install boto3"
-            )
+            raise ImportError("boto3 not installed. Install with: pip install boto3")
         super().__init__(tracer)
         self._original_client = None
 
@@ -165,9 +162,7 @@ class BedrockConnector(ConnectorAdapter):
             response = original_method(**kwargs)
 
             # Wrap the stream to accumulate chunks
-            response["body"] = self._wrap_stream(
-                response["body"], kwargs, response, start_time
-            )
+            response["body"] = self._wrap_stream(response["body"], kwargs, response, start_time)
 
             return response
 
@@ -223,9 +218,7 @@ class BedrockConnector(ConnectorAdapter):
             self.log_call(traced_call)
             raise
 
-    def _build_traced_call(
-        self, request: Dict, response: Dict, start_time: datetime
-    ) -> TracedCall:
+    def _build_traced_call(self, request: Dict, response: Dict, start_time: datetime) -> TracedCall:
         """
         Build a TracedCall from a Bedrock request/response.
 

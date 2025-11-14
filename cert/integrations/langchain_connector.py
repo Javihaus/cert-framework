@@ -22,20 +22,23 @@ Usage:
     >>> chain = LLMChain(llm=llm, callbacks=[connector.handler])
 """
 
+import logging
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
-import logging
 
 try:
     from langchain.callbacks.base import BaseCallbackHandler
     from langchain.schema import LLMResult
+
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
+
     # Create a dummy base class if LangChain is not installed
     class BaseCallbackHandler:
         pass
+
 
 from cert.integrations.base import ConnectorAdapter, TracedCall
 from cert.integrations.registry import register_connector
@@ -60,9 +63,7 @@ class LangChainConnector(ConnectorAdapter):
 
     def __init__(self, tracer):
         if not LANGCHAIN_AVAILABLE:
-            raise ImportError(
-                "LangChain not installed. Install with: pip install langchain"
-            )
+            raise ImportError("LangChain not installed. Install with: pip install langchain")
         super().__init__(tracer)
         self.handler = None
         self.active_llm_calls = {}
@@ -104,9 +105,7 @@ class LangChainConnector(ConnectorAdapter):
                 token_usage = call_data.llm_output.get("token_usage", {})
                 if token_usage:
                     metadata["prompt_tokens"] = token_usage.get("prompt_tokens", 0)
-                    metadata["completion_tokens"] = token_usage.get(
-                        "completion_tokens", 0
-                    )
+                    metadata["completion_tokens"] = token_usage.get("completion_tokens", 0)
                     metadata["total_tokens"] = token_usage.get("total_tokens", 0)
 
                 # Extract model name
@@ -141,10 +140,7 @@ class LangChainConnector(ConnectorAdapter):
         # Extract token usage and model
         metadata = self.extract_metadata(call_data)
 
-        if not all(
-            k in metadata
-            for k in ["prompt_tokens", "completion_tokens", "model_name"]
-        ):
+        if not all(k in metadata for k in ["prompt_tokens", "completion_tokens", "model_name"]):
             return None
 
         model_name = metadata["model_name"]
@@ -160,9 +156,7 @@ class LangChainConnector(ConnectorAdapter):
                 for model_prefix, pricing in OPENAI_PRICING.items():
                     if model_name.startswith(model_prefix):
                         input_cost = (prompt_tokens / 1_000_000) * pricing["input"]
-                        output_cost = (completion_tokens / 1_000_000) * pricing[
-                            "output"
-                        ]
+                        output_cost = (completion_tokens / 1_000_000) * pricing["output"]
                         return input_cost + output_cost
             except ImportError:
                 pass

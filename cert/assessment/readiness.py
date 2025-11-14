@@ -6,8 +6,7 @@ This module assesses organizational readiness for AI compliance
 across multiple dimensions.
 """
 
-from typing import Dict, List, Any
-
+from typing import Any, Dict, List
 
 # Scoring weights for different answer types
 ANSWER_SCORES = {
@@ -54,9 +53,7 @@ def assess_readiness(answers: Dict[str, str]) -> Dict[str, float]:
 
 
 def calculate_dimension_score(
-    dimension: str,
-    questions: List[Any],
-    answers: Dict[str, str]
+    dimension: str, questions: List[Any], answers: Dict[str, str]
 ) -> float:
     """
     Calculate score for a single dimension.
@@ -88,7 +85,9 @@ def calculate_dimension_score(
     return total_score / answered_questions
 
 
-def identify_gaps(readiness_scores: Dict[str, float], threshold: float = 60.0) -> List[Dict[str, Any]]:
+def identify_gaps(
+    readiness_scores: Dict[str, float], threshold: float = 60.0
+) -> List[Dict[str, Any]]:
     """
     Identify areas scoring below threshold.
 
@@ -117,10 +116,7 @@ def identify_gaps(readiness_scores: Dict[str, float], threshold: float = 60.0) -
             gaps.append(gap)
 
     # Sort by priority (critical first, then by gap size)
-    gaps.sort(key=lambda x: (
-        0 if x["severity"] == "critical" else 1,
-        -x["gap"]
-    ))
+    gaps.sort(key=lambda x: (0 if x["severity"] == "critical" else 1, -x["gap"]))
 
     return gaps
 
@@ -204,11 +200,14 @@ def get_remediation_actions(dimension: str) -> List[str]:
         ],
     }
 
-    return actions.get(dimension, [
-        "📋 Review and improve processes in this area",
-        "📚 Consult best practices and industry standards",
-        "🎯 Set specific, measurable improvement goals",
-    ])
+    return actions.get(
+        dimension,
+        [
+            "📋 Review and improve processes in this area",
+            "📚 Consult best practices and industry standards",
+            "🎯 Set specific, measurable improvement goals",
+        ],
+    )
 
 
 def generate_improvement_roadmap(gaps: List[Dict[str, Any]]) -> Dict[str, Any]:

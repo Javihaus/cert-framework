@@ -19,6 +19,8 @@ This module:
 """
 
 import logging
+import os
+
 from cert.integrations.registry import activate_all, get_connector_status
 
 logger = logging.getLogger(__name__)
@@ -43,6 +45,7 @@ def auto_activate(tracer=None):
     if tracer is None:
         try:
             from cert.core.api import get_tracer
+
             tracer = get_tracer()
         except ImportError:
             logger.warning(
@@ -102,7 +105,6 @@ def _import_all_connectors():
 
 
 # Auto-activate on module import if CERT_AUTO_ACTIVATE is set
-import os
 if os.environ.get("CERT_AUTO_ACTIVATE", "").lower() in ("1", "true", "yes"):
     logger.info("CERT_AUTO_ACTIVATE is set, auto-activating connectors")
     auto_activate()

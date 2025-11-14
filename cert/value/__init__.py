@@ -13,8 +13,8 @@ Usage:
 """
 
 from cert.value.analyzer import CostAnalyzer
-from cert.value.roi_calculator import ROICalculator
 from cert.value.optimizer import Optimizer
+from cert.value.roi_calculator import ROICalculator
 
 __all__ = [
     "CostAnalyzer",

@@ -10,13 +10,13 @@ Usage:
 """
 
 import functools
+import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
-import logging
 
 try:
-    import anthropic
-    from anthropic import Anthropic, AsyncAnthropic
+    from anthropic import Anthropic
+
     ANTHROPIC_AVAILABLE = True
 except ImportError:
     ANTHROPIC_AVAILABLE = False
@@ -44,9 +44,7 @@ class AnthropicConnector(ConnectorAdapter):
 
     def __init__(self, tracer):
         if not ANTHROPIC_AVAILABLE:
-            raise ImportError(
-                "Anthropic SDK not installed. Install with: pip install anthropic"
-            )
+            raise ImportError("Anthropic SDK not installed. Install with: pip install anthropic")
         super().__init__(tracer)
         self._original_create = None
 

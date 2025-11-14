@@ -184,39 +184,47 @@ def analyze_prohibited_triggers(answers: Dict[str, str]) -> List[Dict[str, str]]
 
     # Check biometric identification
     if answers.get("biometric_identification") == "Yes":
-        triggered.append({
-            "trigger": "Biometric identification",
-            "article": "Article 5(1)(d)",
-            "severity": "CRITICAL",
-            "action": "Cannot deploy - prohibited use case",
-        })
+        triggered.append(
+            {
+                "trigger": "Biometric identification",
+                "article": "Article 5(1)(d)",
+                "severity": "CRITICAL",
+                "action": "Cannot deploy - prohibited use case",
+            }
+        )
 
     # Check law enforcement use
     if answers.get("law_enforcement") == "Yes":
-        triggered.append({
-            "trigger": "Law enforcement use",
-            "article": "Article 5(1)(d)",
-            "severity": "CRITICAL",
-            "action": "Review specific use case - may be prohibited",
-        })
+        triggered.append(
+            {
+                "trigger": "Law enforcement use",
+                "article": "Article 5(1)(d)",
+                "severity": "CRITICAL",
+                "action": "Review specific use case - may be prohibited",
+            }
+        )
 
     # Check social scoring
     if answers.get("social_scoring") == "Yes":
-        triggered.append({
-            "trigger": "Social scoring",
-            "article": "Article 5(1)(c)",
-            "severity": "CRITICAL",
-            "action": "Cannot deploy - prohibited use case",
-        })
+        triggered.append(
+            {
+                "trigger": "Social scoring",
+                "article": "Article 5(1)(c)",
+                "severity": "CRITICAL",
+                "action": "Cannot deploy - prohibited use case",
+            }
+        )
 
     # Check manipulation
     if answers.get("manipulation") == "Yes":
-        triggered.append({
-            "trigger": "Subliminal manipulation",
-            "article": "Article 5(1)(a)",
-            "severity": "CRITICAL",
-            "action": "Cannot deploy - prohibited use case",
-        })
+        triggered.append(
+            {
+                "trigger": "Subliminal manipulation",
+                "article": "Article 5(1)(a)",
+                "severity": "CRITICAL",
+                "action": "Cannot deploy - prohibited use case",
+            }
+        )
 
     return triggered
 

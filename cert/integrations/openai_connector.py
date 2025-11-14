@@ -19,13 +19,13 @@ Usage:
 """
 
 import functools
-from datetime import datetime
-from typing import Any, Dict, Optional, Iterator
 import logging
+from datetime import datetime
+from typing import Any, Dict, Iterator, Optional
 
 try:
-    import openai
-    from openai import OpenAI, AsyncOpenAI
+    from openai import AsyncOpenAI, OpenAI
+
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
@@ -70,9 +70,7 @@ class OpenAIConnector(ConnectorAdapter):
 
     def __init__(self, tracer):
         if not OPENAI_AVAILABLE:
-            raise ImportError(
-                "OpenAI SDK not installed. Install with: pip install openai"
-            )
+            raise ImportError("OpenAI SDK not installed. Install with: pip install openai")
         super().__init__(tracer)
         self._original_create = None
         self._original_async_create = None
@@ -88,9 +86,7 @@ class OpenAIConnector(ConnectorAdapter):
 
         @functools.wraps(self._original_create)
         def wrapped_create(client_self, *args, **kwargs):
-            return self._trace_completion(
-                client_self, self._original_create, *args, **kwargs
-            )
+            return self._trace_completion(client_self, self._original_create, *args, **kwargs)
 
         OpenAI.chat.completions.create = wrapped_create
 
@@ -107,9 +103,7 @@ class OpenAIConnector(ConnectorAdapter):
 
         logger.info("OpenAI connector activated")
 
-    def _trace_completion(
-        self, client_self, original_method, *args, **kwargs
-    ) -> Any:
+    def _trace_completion(self, client_self, original_method, *args, **kwargs) -> Any:
         """
         Trace a synchronous completion call.
 
@@ -153,9 +147,7 @@ class OpenAIConnector(ConnectorAdapter):
             self.log_call(traced_call)
             raise
 
-    async def _trace_async_completion(
-        self, client_self, original_method, *args, **kwargs
-    ) -> Any:
+    async def _trace_async_completion(self, client_self, original_method, *args, **kwargs) -> Any:
         """
         Trace an asynchronous completion call.
 
@@ -246,9 +238,7 @@ class OpenAIConnector(ConnectorAdapter):
             self.log_call(traced_call)
             raise
 
-    async def _wrap_async_stream(
-        self, stream, request_kwargs: Dict, start_time: datetime
-    ):
+    async def _wrap_async_stream(self, stream, request_kwargs: Dict, start_time: datetime):
         """
         Wrap an async streaming response.
 
@@ -294,9 +284,7 @@ class OpenAIConnector(ConnectorAdapter):
             self.log_call(traced_call)
             raise
 
-    def _build_traced_call(
-        self, request: Dict, response: Any, start_time: datetime
-    ) -> TracedCall:
+    def _build_traced_call(self, request: Dict, response: Any, start_time: datetime) -> TracedCall:
         """
         Build a TracedCall from a non-streaming request/response.
 
@@ -367,9 +355,7 @@ class OpenAIConnector(ConnectorAdapter):
         metadata["estimated_prompt_tokens"] = self._estimate_tokens(
             str(request.get("messages", ""))
         )
-        metadata["estimated_completion_tokens"] = self._estimate_tokens(
-            accumulated_output
-        )
+        metadata["estimated_completion_tokens"] = self._estimate_tokens(accumulated_output)
 
         # Calculate estimated cost
         cost = self._calculate_estimated_cost(
@@ -437,9 +423,7 @@ class OpenAIConnector(ConnectorAdapter):
             return self._calculate_cost_from_usage(call_data.model, call_data)
         return None
 
-    def _calculate_cost_from_usage(
-        self, model: str, response: Any
-    ) -> Optional[float]:
+    def _calculate_cost_from_usage(self, model: str, response: Any) -> Optional[float]:
         """
         Calculate cost from usage data in response.
 
