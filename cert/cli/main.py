@@ -424,6 +424,14 @@ except ImportError:
     # Value commands not available if dependencies missing
     pass
 
+# Register health/monitoring commands
+try:
+    from cert.cli.health import register_health_commands
+    register_health_commands(cli)
+except ImportError:
+    # Health commands not available if dependencies missing
+    pass
+
 
 if __name__ == "__main__":
     cli()
