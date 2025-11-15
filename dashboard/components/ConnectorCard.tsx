@@ -2,7 +2,7 @@
 
 import { Box, Flex, Text, Badge } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import { colors, spacing, typography, borderRadius } from '@/theme';
 import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 
 interface ConnectorCardProps {
