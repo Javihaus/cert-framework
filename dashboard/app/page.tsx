@@ -11,6 +11,7 @@ import {
   FileCheck,
   ShieldCheck,
   ArrowRight,
+  Wand2,
 } from 'lucide-react';
 
 interface WorkflowCard {
@@ -24,11 +25,24 @@ interface WorkflowCard {
 
 const WORKFLOWS: WorkflowCard[] = [
   {
+    title: 'AI Implementation Wizard',
+    description: 'Step-by-step guided planning for production AI systems',
+    href: '/wizard',
+    icon: <Wand2 size={32} />,
+    color: colors.cobalt,
+    features: [
+      'ROI calculator',
+      'EU AI Act risk assessment',
+      'Architecture recommendations',
+      'Deployment roadmap',
+    ],
+  },
+  {
     title: 'Connectors',
     description: 'Automatic tracing for OpenAI, Anthropic, LangChain, and AWS Bedrock',
     href: '/connectors',
     icon: <Zap size={32} />,
-    color: colors.cobalt,
+    color: colors.olive,
     features: [
       'Zero-code instrumentation',
       'Automatic cost tracking',
