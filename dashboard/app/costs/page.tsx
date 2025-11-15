@@ -8,30 +8,19 @@ import CostTrendChart from '@/components/CostTrendChart';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
 import { DollarSign, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
-
-interface Trace {
-  timestamp?: string;
-  model?: string;
-  platform?: string;
-  cost?: number;
-  input_tokens?: number;
-  output_tokens?: number;
-  metadata?: any;
-}
-
-interface CostData {
-  totalCost: number;
-  avgCost: number;
-  byModel: Record<string, number>;
-  byPlatform: Record<string, number>;
-  trend: Array<{ date: string; cost: number; count: number }>;
-  projectedMonthlyCost: number;
-}
+import { Trace, CostSummary } from '@/types/trace';
+import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
 
 export default function CostsPage() {
   const [traces, setTraces] = useState<Trace[]>([]);
-  const [costData, setCostData] = useState<CostData | null>(null);
+  const [costData, setCostData] = useState<CostSummary | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
+
+  const handleFileLoad = (content: string) => {
+    const parsed = parseTraceFile(content);
+    setTraces(parsed);
+    analyzeCosts(parsed);
+  };
 
   const analyzeCosts = (allTraces: Trace[]) => {
     // Filter by time range
@@ -44,73 +33,39 @@ export default function CostsPage() {
       timeRange === 'all'
         ? allTraces
         : allTraces.filter((t) => {
-            const traceDate = new Date(t.timestamp || 0);
+            const traceDate = new Date(t.timestamp);
             return traceDate >= cutoff;
           });
 
-    // Calculate total cost
-    const totalCost = filteredTraces.reduce((sum, t) => sum + (t.cost || 0), 0);
-    const avgCost = filteredTraces.length > 0 ? totalCost / filteredTraces.length : 0;
-
-    // Cost by model
-    const byModel: Record<string, number> = {};
-    filteredTraces.forEach((t) => {
-      const model = t.model || 'unknown';
-      byModel[model] = (byModel[model] || 0) + (t.cost || 0);
-    });
-
-    // Cost by platform
-    const byPlatform: Record<string, number> = {};
-    filteredTraces.forEach((t) => {
-      const platform = t.platform || 'unknown';
-      byPlatform[platform] = (byPlatform[platform] || 0) + (t.cost || 0);
-    });
-
-    // Daily trend
-    const dailyCosts: Record<string, { cost: number; count: number }> = {};
-    filteredTraces.forEach((t) => {
-      const date = t.timestamp ? new Date(t.timestamp).toISOString().split('T')[0] : 'unknown';
-      if (!dailyCosts[date]) {
-        dailyCosts[date] = { cost: 0, count: 0 };
-      }
-      dailyCosts[date].cost += t.cost || 0;
-      dailyCosts[date].count += 1;
-    });
-
-    const trend = Object.entries(dailyCosts)
-      .map(([date, data]) => ({
-        date,
-        cost: data.cost,
-        count: data.count,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    // Project monthly cost
-    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 30;
-    const dailyAvg = totalCost / days;
-    const projectedMonthlyCost = dailyAvg * 30;
-
-    setCostData({
-      totalCost,
-      avgCost,
-      byModel,
-      byPlatform,
-      trend,
-      projectedMonthlyCost,
-    });
+    const analyzer = new TraceAnalyzer(filteredTraces);
+    const costs = analyzer.calculateCosts();
+    setCostData(costs);
   };
 
+  // Convert daily costs to chart format
+  const chartData = costData
+    ? Object.entries(costData.dailyCosts)
+        .map(([date, cost]) => ({
+          date,
+          cost,
+          count: traces.filter((t) => t.timestamp.split('T')[0] === date).length,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date))
+    : [];
+
+  // Calculate trend
+  const costTrend = costData && chartData.length >= 2
+    ? chartData[chartData.length - 1].cost > chartData[0].cost
+      ? 'up'
+      : 'down'
+    : undefined;
+
   return (
-    <Box maxW="1400px" mx="auto" p={spacing.xl}>
+    <Box p={spacing.xl}>
       {/* Header */}
-      <Flex justify="space-between" align="center" mb={spacing.xl}>
+      <Flex justify="space-between" align="start" mb={spacing.xl}>
         <Box>
-          <Text
-            fontSize={typography.fontSize['3xl']}
-            fontWeight={typography.fontWeight.bold}
-            color={colors.navy}
-            mb={spacing.xs}
-          >
+          <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
             Cost Analysis
           </Text>
           <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
@@ -154,105 +109,88 @@ export default function CostsPage() {
               Upload trace file to analyze costs
             </Text>
             <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} textAlign="center" maxW="500px">
-              Upload your cert_traces.jsonl file to see cost breakdowns, trends, and projections
+              Upload your cert_traces.jsonl file to see detailed cost breakdowns, trends, and projections
             </Text>
-            <FileUpload
-              onFileLoad={(data) => {
-                setTraces(data);
-                analyzeCosts(data);
-              }}
-              accept=".jsonl,.json"
-              label="Upload Trace File"
-            />
+            <Box w="100%" maxW="500px">
+              <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="Upload Trace File" />
+            </Box>
           </Flex>
         </Card>
       )}
 
-      {/* Cost summary */}
+      {/* Metrics */}
       {costData && (
         <>
-          {/* Metrics grid */}
-          <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={spacing.md} mb={spacing.lg}>
+          <Grid templateColumns="repeat(4, 1fr)" gap={spacing.md} mb={spacing.lg}>
             <MetricCard
               label="Total Cost"
-              value={`$${costData.totalCost.toFixed(4)}`}
-              icon={DollarSign}
-            />
-            <MetricCard
-              label="Average per Request"
-              value={`$${costData.avgCost.toFixed(6)}`}
-              icon={TrendingDown}
-              variant="success"
-            />
-            <MetricCard
-              label="Total Requests"
-              value={traces.length.toLocaleString()}
-              icon={TrendingUp}
+              value={`$${costData.totalCost.toFixed(2)}`}
+              subtitle={timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'All time'}
+              variant="default"
             />
             <MetricCard
               label="Projected Monthly"
               value={`$${costData.projectedMonthlyCost.toFixed(2)}`}
-              icon={Calendar}
-              variant="warning"
+              subtitle="Based on current trend"
+              variant={costTrend === 'up' ? 'warning' : 'success'}
+            />
+            <MetricCard
+              label="Avg per Task"
+              value={`$${costData.avgPerTask.toFixed(4)}`}
+              subtitle={`${traces.length} total traces`}
+              variant="default"
+            />
+            <MetricCard
+              label="Platforms Used"
+              value={Object.keys(costData.byPlatform).length.toString()}
+              subtitle={`${Object.keys(costData.byModel).length} models`}
+              variant="default"
             />
           </Grid>
 
           {/* Cost trend chart */}
           <Card mb={spacing.lg}>
-            <Text
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-              mb={spacing.md}
-            >
+            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
               Cost Trend
             </Text>
-            <CostTrendChart data={costData.trend} height={300} showCount />
+            <Box h="300px">
+              <CostTrendChart data={chartData} height={300} showCount={true} />
+            </Box>
           </Card>
 
-          {/* Cost breakdown tables */}
-          <Grid templateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={spacing.md}>
-            {/* By model */}
+          {/* Cost by Model */}
+          <Grid templateColumns="repeat(2, 1fr)" gap={spacing.lg}>
             <Card>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.md}
-              >
+              <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
                 Cost by Model
               </Text>
               <Box overflowX="auto">
-                {/* Header */}
-                <Flex
-                  bg={colors.background}
-                  p={spacing.sm}
-                  borderBottom="1px solid"
-                  borderColor={colors.patience}
-                  fontWeight={typography.fontWeight.semibold}
-                  fontSize={typography.fontSize.sm}
-                >
-                  <Box flex={1}>Model</Box>
-                  <Box flex={1} textAlign="right">Cost</Box>
-                  <Box flex={1} textAlign="right">% of Total</Box>
+                <Flex bg={colors.background} p={spacing.sm} borderBottom="1px solid" borderColor={colors.patience} fontWeight={typography.fontWeight.medium}>
+                  <Box flex={2}>Model</Box>
+                  <Box flex={1} textAlign="right">
+                    Cost
+                  </Box>
+                  <Box flex={1} textAlign="right">
+                    %
+                  </Box>
                 </Flex>
-                {/* Rows */}
                 {Object.entries(costData.byModel)
-                  .sort(([, a], [, b]) => b - a)
+                  .sort((a, b) => b[1] - a[1])
                   .map(([model, cost], idx) => (
                     <Flex
                       key={model}
                       p={spacing.sm}
+                      bg={idx % 2 === 0 ? 'white' : colors.background}
                       borderBottom="1px solid"
                       borderColor={colors.patience}
-                      bg={idx % 2 === 0 ? 'white' : colors.background}
-                      fontSize={typography.fontSize.sm}
                     >
-                      <Box flex={1}>{model}</Box>
-                      <Box flex={1} textAlign="right" fontWeight="medium">
-                        ${cost.toFixed(4)}
+                      <Box flex={2} fontSize={typography.fontSize.sm}>
+                        {model}
                       </Box>
-                      <Box flex={1} textAlign="right" color={colors.text.secondary}>
+                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium}>
+                        ${cost.toFixed(2)}
+                      </Box>
+                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} color={colors.text.secondary}>
                         {((cost / costData.totalCost) * 100).toFixed(1)}%
                       </Box>
                     </Flex>
@@ -260,47 +198,38 @@ export default function CostsPage() {
               </Box>
             </Card>
 
-            {/* By platform */}
+            {/* Cost by Platform */}
             <Card>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.md}
-              >
+              <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
                 Cost by Platform
               </Text>
               <Box overflowX="auto">
-                {/* Header */}
-                <Flex
-                  bg={colors.background}
-                  p={spacing.sm}
-                  borderBottom="1px solid"
-                  borderColor={colors.patience}
-                  fontWeight={typography.fontWeight.semibold}
-                  fontSize={typography.fontSize.sm}
-                >
-                  <Box flex={1}>Platform</Box>
-                  <Box flex={1} textAlign="right">Cost</Box>
-                  <Box flex={1} textAlign="right">% of Total</Box>
+                <Flex bg={colors.background} p={spacing.sm} borderBottom="1px solid" borderColor={colors.patience} fontWeight={typography.fontWeight.medium}>
+                  <Box flex={2}>Platform</Box>
+                  <Box flex={1} textAlign="right">
+                    Cost
+                  </Box>
+                  <Box flex={1} textAlign="right">
+                    %
+                  </Box>
                 </Flex>
-                {/* Rows */}
                 {Object.entries(costData.byPlatform)
-                  .sort(([, a], [, b]) => b - a)
+                  .sort((a, b) => b[1] - a[1])
                   .map(([platform, cost], idx) => (
                     <Flex
                       key={platform}
                       p={spacing.sm}
+                      bg={idx % 2 === 0 ? 'white' : colors.background}
                       borderBottom="1px solid"
                       borderColor={colors.patience}
-                      bg={idx % 2 === 0 ? 'white' : colors.background}
-                      fontSize={typography.fontSize.sm}
                     >
-                      <Box flex={1}>{platform}</Box>
-                      <Box flex={1} textAlign="right" fontWeight="medium">
-                        ${cost.toFixed(4)}
+                      <Box flex={2} fontSize={typography.fontSize.sm}>
+                        {platform}
                       </Box>
-                      <Box flex={1} textAlign="right" color={colors.text.secondary}>
+                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium}>
+                        ${cost.toFixed(2)}
+                      </Box>
+                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} color={colors.text.secondary}>
                         {((cost / costData.totalCost) * 100).toFixed(1)}%
                       </Box>
                     </Flex>
