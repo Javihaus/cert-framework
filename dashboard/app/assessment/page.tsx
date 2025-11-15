@@ -16,7 +16,6 @@ import {
   Grid,
   List,
   ListItem,
-  ListIcon,
 } from '@chakra-ui/react';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
