@@ -189,28 +189,26 @@ export default function CostsPage() {
           {/* Metrics grid */}
           <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={spacing.md} mb={spacing.lg}>
             <MetricCard
-              title="Total Cost"
+              label="Total Cost"
               value={`$${costData.totalCost.toFixed(4)}`}
               icon={DollarSign}
-              color={colors.cobalt}
             />
             <MetricCard
-              title="Average per Request"
+              label="Average per Request"
               value={`$${costData.avgCost.toFixed(6)}`}
               icon={TrendingDown}
-              color={colors.olive}
+              variant="success"
             />
             <MetricCard
-              title="Total Requests"
+              label="Total Requests"
               value={traces.length.toLocaleString()}
               icon={TrendingUp}
-              color={colors.navy}
             />
             <MetricCard
-              title="Projected Monthly"
+              label="Projected Monthly"
               value={`$${costData.projectedMonthlyCost.toFixed(2)}`}
               icon={Calendar}
-              color={colors.gold}
+              variant="warning"
             />
           </Grid>
 

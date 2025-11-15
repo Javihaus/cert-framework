@@ -247,22 +247,21 @@ export default function OptimizationPage() {
         <>
           <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={spacing.md} mb={spacing.lg}>
             <MetricCard
-              title="Total Potential Savings"
+              label="Total Potential Savings"
               value={`$${totalSavings.toFixed(2)}/month`}
               icon={DollarSign}
-              color={colors.olive}
+              variant="success"
             />
             <MetricCard
-              title="Recommendations"
+              label="Recommendations"
               value={recommendations.length.toString()}
               icon={Zap}
-              color={colors.cobalt}
             />
             <MetricCard
-              title="High Impact"
+              label="High Impact"
               value={highImpactCount.toString()}
               icon={TrendingDown}
-              color={colors.gold}
+              variant="warning"
             />
           </Grid>
 
