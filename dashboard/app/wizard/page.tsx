@@ -3,10 +3,15 @@
 import { useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { colors, spacing, typography } from '@/theme';
-import { WizardState, ROIInputs } from '@/types/wizard';
+import { WizardState, ROIInputs, RiskInputs, ArchitectureInputs, ArchitectureRecommendation } from '@/types/wizard';
 import { calculateROI } from '@/lib/roi-calculator';
+import { classifyRisk } from '@/lib/risk-classifier';
+import { selectArchitecture } from '@/lib/architecture-selector';
 import WizardROIForm from '@/components/WizardROIForm';
 import WizardROIResults from '@/components/WizardROIResults';
+import WizardRiskForm from '@/components/WizardRiskForm';
+import WizardRiskResults from '@/components/WizardRiskResults';
+import WizardArchitectureSelector from '@/components/WizardArchitectureSelector';
 
 const STEPS = [
   { id: 1, name: 'ROI', description: 'Calculate business case' },
@@ -95,6 +100,53 @@ export default function WizardPage() {
     setState(prev => ({ ...prev, currentStep: 2 }));
   };
 
+  const handleRiskSubmit = () => {
+    const outputs = classifyRisk(state.risk.inputs);
+    setState(prev => ({
+      ...prev,
+      risk: { ...prev.risk, outputs, completed: true }
+    }));
+  };
+
+  const handleRiskNext = () => {
+    // Populate architecture inputs from previous steps
+    const volumeFromROI = state.roi.inputs.tasksPerMonth;
+    const budgetFromROI = state.roi.outputs?.aiMonthlyCost || 500;
+
+    setState(prev => ({
+      ...prev,
+      currentStep: 3,
+      architecture: {
+        ...prev.architecture,
+        inputs: {
+          ...prev.architecture.inputs,
+          volumeQueriesPerMonth: volumeFromROI,
+          budgetPerMonth: budgetFromROI * 1.2 // Allow 20% buffer
+        },
+        recommendations: selectArchitecture({
+          ...prev.architecture.inputs,
+          volumeQueriesPerMonth: volumeFromROI,
+          budgetPerMonth: budgetFromROI * 1.2
+        })
+      }
+    }));
+  };
+
+  const handleArchitectureSelect = (architecture: ArchitectureRecommendation) => {
+    setState(prev => ({
+      ...prev,
+      architecture: { ...prev.architecture, selected: architecture }
+    }));
+  };
+
+  const handleArchitectureNext = () => {
+    setState(prev => ({
+      ...prev,
+      currentStep: 4,
+      architecture: { ...prev.architecture, completed: true }
+    }));
+  };
+
   return (
     <Box minH="100vh" bg={colors.background} py={spacing.xl}>
       <Box maxW="1200px" mx="auto" px={spacing.lg}>
@@ -171,25 +223,42 @@ export default function WizardPage() {
           )}
 
           {/* Step 2: Risk Assessment */}
-          {state.currentStep === 2 && (
-            <Box textAlign="center" py={spacing.xl}>
-              <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
-                Risk Assessment (Coming Soon)
-              </Text>
-              <Text fontSize={typography.fontSize.base} color={colors.text.secondary}>
-                EU AI Act compliance classification will be available in the next phase.
-              </Text>
-            </Box>
+          {state.currentStep === 2 && !state.risk.completed && (
+            <WizardRiskForm
+              inputs={state.risk.inputs}
+              onChange={(inputs: RiskInputs) => setState(prev => ({
+                ...prev,
+                risk: { ...prev.risk, inputs }
+              }))}
+              onSubmit={handleRiskSubmit}
+            />
           )}
 
-          {/* Placeholder for other steps */}
-          {state.currentStep > 2 && (
+          {state.currentStep === 2 && state.risk.completed && state.risk.outputs && (
+            <WizardRiskResults
+              outputs={state.risk.outputs}
+              onNext={handleRiskNext}
+            />
+          )}
+
+          {/* Step 3: Architecture Selection */}
+          {state.currentStep === 3 && (
+            <WizardArchitectureSelector
+              inputs={state.architecture.inputs}
+              selectedArchitecture={state.architecture.selected}
+              onSelect={handleArchitectureSelect}
+              onNext={handleArchitectureNext}
+            />
+          )}
+
+          {/* Placeholder for remaining steps */}
+          {state.currentStep > 3 && (
             <Box textAlign="center" py={spacing.xl}>
               <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
                 Step {state.currentStep} (Coming Soon)
               </Text>
               <Text fontSize={typography.fontSize.base} color={colors.text.secondary}>
-                Additional wizard steps will be implemented in future phases.
+                Readiness Assessment and Deployment Planning steps will be implemented in future phases.
               </Text>
             </Box>
           )}
