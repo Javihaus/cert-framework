@@ -1,22 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Button,
-  Progress,
-  Radio,
-  RadioGroup,
-  Stack,
-  Input,
-  FormControl,
-  FormLabel,
-  Grid,
-  List,
-  ListItem,
-} from '@chakra-ui/react';
+import { Box, Flex, Text, Button, Grid, Input } from '@chakra-ui/react';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
 import { CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
@@ -370,16 +355,14 @@ export default function AssessmentPage() {
             <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
               Compliance Requirements
             </Text>
-            <List spacing={spacing.xs}>
+            <Flex direction="column" gap={spacing.xs}>
               {report.requirements.map((req, i) => (
-                <ListItem key={i}>
-                  <Flex align="center" gap={spacing.xs}>
-                    <CheckCircle2 size={16} color={colors.cobalt} />
-                    <Text fontSize={typography.fontSize.sm}>{req}</Text>
-                  </Flex>
-                </ListItem>
+                <Flex key={i} align="center" gap={spacing.xs}>
+                  <CheckCircle2 size={16} color={colors.cobalt} />
+                  <Text fontSize={typography.fontSize.sm}>{req}</Text>
+                </Flex>
               ))}
-            </List>
+            </Flex>
           </Box>
 
           {/* Estimates */}
@@ -407,16 +390,14 @@ export default function AssessmentPage() {
             <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
               Recommended Next Steps
             </Text>
-            <List spacing={spacing.xs}>
+            <Flex direction="column" gap={spacing.xs}>
               {report.nextSteps.map((step, i) => (
-                <ListItem key={i}>
-                  <Flex align="center" gap={spacing.xs}>
-                    <Text fontSize={typography.fontSize.lg} color={colors.cobalt}>{i + 1}.</Text>
-                    <Text fontSize={typography.fontSize.sm}>{step}</Text>
-                  </Flex>
-                </ListItem>
+                <Flex key={i} align="center" gap={spacing.xs}>
+                  <Text fontSize={typography.fontSize.lg} color={colors.cobalt}>{i + 1}.</Text>
+                  <Text fontSize={typography.fontSize.sm}>{step}</Text>
+                </Flex>
               ))}
-            </List>
+            </Flex>
           </Box>
 
           {/* Email capture */}
@@ -424,8 +405,10 @@ export default function AssessmentPage() {
             <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
               Get Your Full Report
             </Text>
-            <FormControl>
-              <FormLabel fontSize={typography.fontSize.sm}>Email Address</FormLabel>
+            <Box>
+              <Text fontSize={typography.fontSize.sm} mb={spacing.xs} fontWeight={typography.fontWeight.medium} color={colors.navy}>
+                Email Address
+              </Text>
               <Flex gap={spacing.sm}>
                 <Input
                   type="email"
@@ -446,7 +429,7 @@ export default function AssessmentPage() {
                   Download Report
                 </Button>
               </Flex>
-            </FormControl>
+            </Box>
           </Box>
         </Card>
       </Box>
@@ -468,7 +451,9 @@ export default function AssessmentPage() {
             {progress.toFixed(0)}% Complete
           </Text>
         </Flex>
-        <Progress value={progress} colorScheme="blue" borderRadius="full" />
+        <Box w="100%" h="8px" bg={colors.background} borderRadius="full" overflow="hidden">
+          <Box h="100%" w={`${progress}%`} bg={colors.cobalt} borderRadius="full" transition="width 0.3s" />
+        </Box>
       </Box>
 
       {/* Question card */}
@@ -482,31 +467,40 @@ export default function AssessmentPage() {
           {question.question}
         </Text>
 
-        <RadioGroup
-          value={answers[question.id] || ''}
-          onChange={handleAnswer}
-        >
-          <Stack spacing={spacing.sm}>
-            {question.options.map((option) => (
-              <Box
-                key={option.value}
-                p={spacing.md}
-                border="2px solid"
-                borderColor={answers[question.id] === option.value ? colors.cobalt : colors.patience}
-                borderRadius="md"
-                bg={answers[question.id] === option.value ? colors.cobalt + '10' : 'transparent'}
-                cursor="pointer"
-                transition="all 0.2s"
-                _hover={{ borderColor: colors.cobalt }}
-                onClick={() => handleAnswer(option.value)}
-              >
-                <Radio value={option.value} colorScheme="blue">
-                  <Text fontSize={typography.fontSize.base}>{option.label}</Text>
-                </Radio>
-              </Box>
-            ))}
-          </Stack>
-        </RadioGroup>
+        <Flex direction="column" gap={spacing.sm}>
+          {question.options.map((option) => (
+            <Box
+              key={option.value}
+              p={spacing.md}
+              border="2px solid"
+              borderColor={answers[question.id] === option.value ? colors.cobalt : colors.patience}
+              borderRadius="md"
+              bg={answers[question.id] === option.value ? colors.cobalt + '10' : 'transparent'}
+              cursor="pointer"
+              transition="all 0.2s"
+              _hover={{ borderColor: colors.cobalt }}
+              onClick={() => handleAnswer(option.value)}
+            >
+              <Flex align="center" gap={spacing.sm}>
+                <Box
+                  w="20px"
+                  h="20px"
+                  border="2px solid"
+                  borderColor={answers[question.id] === option.value ? colors.cobalt : colors.patience}
+                  borderRadius="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  {answers[question.id] === option.value && (
+                    <Box w="10px" h="10px" bg={colors.cobalt} borderRadius="full" />
+                  )}
+                </Box>
+                <Text fontSize={typography.fontSize.base}>{option.label}</Text>
+              </Flex>
+            </Box>
+          ))}
+        </Flex>
 
         {/* Navigation */}
         <Flex justify="space-between" mt={spacing.xl}>
