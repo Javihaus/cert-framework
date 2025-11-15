@@ -7,7 +7,6 @@ import {
   Text,
   Grid,
   Button,
-  Select,
 } from '@chakra-ui/react';
 import FileUpload from '@/components/FileUpload';
 import RecommendationCard from '@/components/RecommendationCard';
@@ -194,14 +193,24 @@ export default function OptimizationPage() {
         </Box>
 
         {recommendations.length > 0 && (
-          <Select
+          <Box
+            as="select"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value as any)}
             w="200px"
+            px={spacing.sm}
+            py={spacing.xs}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={colors.patience}
+            bg="white"
+            fontSize={typography.fontSize.sm}
+            cursor="pointer"
+            _hover={{ borderColor: colors.cobalt }}
           >
             <option value="savings">Sort by Savings</option>
             <option value="impact">Sort by Impact</option>
-          </Select>
+          </Box>
         )}
       </Flex>
 

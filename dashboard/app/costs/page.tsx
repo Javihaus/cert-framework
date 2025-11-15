@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, Text, Grid, Select } from '@chakra-ui/react';
+import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import CostTrendChart from '@/components/CostTrendChart';
@@ -119,18 +119,28 @@ export default function CostsPage() {
         </Box>
 
         {costData && (
-          <Select
+          <Box
+            as="select"
             value={timeRange}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               setTimeRange(e.target.value as any);
               analyzeCosts(traces);
             }}
             w="150px"
+            px={spacing.sm}
+            py={spacing.xs}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={colors.patience}
+            bg="white"
+            fontSize={typography.fontSize.sm}
+            cursor="pointer"
+            _hover={{ borderColor: colors.cobalt }}
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="all">All time</option>
-          </Select>
+          </Box>
         )}
       </Flex>
 

@@ -417,7 +417,6 @@ export default function AssessmentPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <Button
-                  leftIcon={<Download size={16} />}
                   bg={colors.cobalt}
                   color="white"
                   _hover={{ bg: colors.navy }}
@@ -426,7 +425,10 @@ export default function AssessmentPage() {
                     alert('Report will be sent to: ' + email);
                   }}
                 >
-                  Download Report
+                  <Flex align="center" gap={spacing.xs}>
+                    <Download size={16} />
+                    <Text>Download Report</Text>
+                  </Flex>
                 </Button>
               </Flex>
             </Box>
@@ -505,23 +507,27 @@ export default function AssessmentPage() {
         {/* Navigation */}
         <Flex justify="space-between" mt={spacing.xl}>
           <Button
-            leftIcon={<ChevronLeft size={16} />}
             onClick={handlePrevious}
             isDisabled={currentQuestion === 0}
             variant="outline"
           >
-            Previous
+            <Flex align="center" gap={spacing.xs}>
+              <ChevronLeft size={16} />
+              <Text>Previous</Text>
+            </Flex>
           </Button>
 
           {currentQuestion === ALL_QUESTIONS.length - 1 && answers[question.id] && (
             <Button
-              rightIcon={<ChevronRight size={16} />}
               onClick={() => generateReport(answers)}
               bg={colors.cobalt}
               color="white"
               _hover={{ bg: colors.navy }}
             >
-              View Results
+              <Flex align="center" gap={spacing.xs}>
+                <Text>View Results</Text>
+                <ChevronRight size={16} />
+              </Flex>
             </Button>
           )}
         </Flex>

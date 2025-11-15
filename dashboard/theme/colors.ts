@@ -19,6 +19,11 @@ export const colors = {
   warning: '#E48B59',       // Coral for warnings
   error: '#fc8181',         // Red for failures
 
+  // Color Aliases (for backward compatibility)
+  olive: '#48bb78',         // Alias for success green
+  gold: '#E48B59',          // Alias for warning/coral
+  alert: '#fc8181',         // Alias for error red
+
   // Text
   text: {
     primary: '#112358',     // Fibonacci Blue

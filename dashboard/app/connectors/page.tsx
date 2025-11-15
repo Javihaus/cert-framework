@@ -126,14 +126,16 @@ export default function ConnectorsPage() {
 
         {mode === 'live' && (
           <Button
-            leftIcon={<RefreshCw size={16} />}
             onClick={fetchConnectorStatus}
             isLoading={loading}
             bg={colors.cobalt}
             color="white"
             _hover={{ bg: colors.navy }}
           >
-            Refresh
+            <Flex align="center" gap={spacing.xs}>
+              <RefreshCw size={16} />
+              <Text>Refresh</Text>
+            </Flex>
           </Button>
         )}
       </Flex>
