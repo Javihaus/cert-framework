@@ -1,19 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Grid,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Select,
-} from '@chakra-ui/react';
+import { Box, Flex, Text, Grid, Select } from '@chakra-ui/react';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import CostTrendChart from '@/components/CostTrendChart';
@@ -223,28 +211,42 @@ export default function CostsPage() {
               >
                 Cost by Model
               </Text>
-              <Table size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>Model</Th>
-                    <Th isNumeric>Cost</Th>
-                    <Th isNumeric>% of Total</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {Object.entries(costData.byModel)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([model, cost]) => (
-                      <Tr key={model}>
-                        <Td>{model}</Td>
-                        <Td isNumeric fontWeight="medium">${cost.toFixed(4)}</Td>
-                        <Td isNumeric color={colors.text.secondary}>
-                          {((cost / costData.totalCost) * 100).toFixed(1)}%
-                        </Td>
-                      </Tr>
-                    ))}
-                </Tbody>
-              </Table>
+              <Box overflowX="auto">
+                {/* Header */}
+                <Flex
+                  bg={colors.background}
+                  p={spacing.sm}
+                  borderBottom="1px solid"
+                  borderColor={colors.patience}
+                  fontWeight={typography.fontWeight.semibold}
+                  fontSize={typography.fontSize.sm}
+                >
+                  <Box flex={1}>Model</Box>
+                  <Box flex={1} textAlign="right">Cost</Box>
+                  <Box flex={1} textAlign="right">% of Total</Box>
+                </Flex>
+                {/* Rows */}
+                {Object.entries(costData.byModel)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([model, cost], idx) => (
+                    <Flex
+                      key={model}
+                      p={spacing.sm}
+                      borderBottom="1px solid"
+                      borderColor={colors.patience}
+                      bg={idx % 2 === 0 ? 'white' : colors.background}
+                      fontSize={typography.fontSize.sm}
+                    >
+                      <Box flex={1}>{model}</Box>
+                      <Box flex={1} textAlign="right" fontWeight="medium">
+                        ${cost.toFixed(4)}
+                      </Box>
+                      <Box flex={1} textAlign="right" color={colors.text.secondary}>
+                        {((cost / costData.totalCost) * 100).toFixed(1)}%
+                      </Box>
+                    </Flex>
+                  ))}
+              </Box>
             </Card>
 
             {/* By platform */}
@@ -257,28 +259,42 @@ export default function CostsPage() {
               >
                 Cost by Platform
               </Text>
-              <Table size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>Platform</Th>
-                    <Th isNumeric>Cost</Th>
-                    <Th isNumeric>% of Total</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {Object.entries(costData.byPlatform)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([platform, cost]) => (
-                      <Tr key={platform}>
-                        <Td>{platform}</Td>
-                        <Td isNumeric fontWeight="medium">${cost.toFixed(4)}</Td>
-                        <Td isNumeric color={colors.text.secondary}>
-                          {((cost / costData.totalCost) * 100).toFixed(1)}%
-                        </Td>
-                      </Tr>
-                    ))}
-                </Tbody>
-              </Table>
+              <Box overflowX="auto">
+                {/* Header */}
+                <Flex
+                  bg={colors.background}
+                  p={spacing.sm}
+                  borderBottom="1px solid"
+                  borderColor={colors.patience}
+                  fontWeight={typography.fontWeight.semibold}
+                  fontSize={typography.fontSize.sm}
+                >
+                  <Box flex={1}>Platform</Box>
+                  <Box flex={1} textAlign="right">Cost</Box>
+                  <Box flex={1} textAlign="right">% of Total</Box>
+                </Flex>
+                {/* Rows */}
+                {Object.entries(costData.byPlatform)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([platform, cost], idx) => (
+                    <Flex
+                      key={platform}
+                      p={spacing.sm}
+                      borderBottom="1px solid"
+                      borderColor={colors.patience}
+                      bg={idx % 2 === 0 ? 'white' : colors.background}
+                      fontSize={typography.fontSize.sm}
+                    >
+                      <Box flex={1}>{platform}</Box>
+                      <Box flex={1} textAlign="right" fontWeight="medium">
+                        ${cost.toFixed(4)}
+                      </Box>
+                      <Box flex={1} textAlign="right" color={colors.text.secondary}>
+                        {((cost / costData.totalCost) * 100).toFixed(1)}%
+                      </Box>
+                    </Flex>
+                  ))}
+              </Box>
             </Card>
           </Grid>
         </>

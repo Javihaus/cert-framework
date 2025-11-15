@@ -1,19 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Grid,
-  Button,
-  Code,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from '@chakra-ui/react';
+import { Box, Flex, Text, Grid, Button, Code } from '@chakra-ui/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/tabs';
 import ConnectorCard from '@/components/ConnectorCard';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
