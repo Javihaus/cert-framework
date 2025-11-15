@@ -7,7 +7,7 @@ import MetricCard from '@/components/MetricCard';
 import CostTrendChart from '@/components/CostTrendChart';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
-import { DollarSign, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Calendar, Package } from 'lucide-react';
 import { Trace, CostSummary } from '@/types/trace';
 import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
 
@@ -125,25 +125,25 @@ export default function CostsPage() {
             <MetricCard
               label="Total Cost"
               value={`$${costData.totalCost.toFixed(2)}`}
-              subtitle={timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'All time'}
+              icon={DollarSign}
               variant="default"
             />
             <MetricCard
               label="Projected Monthly"
               value={`$${costData.projectedMonthlyCost.toFixed(2)}`}
-              subtitle="Based on current trend"
+              icon={TrendingUp}
               variant={costTrend === 'up' ? 'warning' : 'success'}
             />
             <MetricCard
               label="Avg per Task"
               value={`$${costData.avgPerTask.toFixed(4)}`}
-              subtitle={`${traces.length} total traces`}
+              icon={Calendar}
               variant="default"
             />
             <MetricCard
               label="Platforms Used"
               value={Object.keys(costData.byPlatform).length.toString()}
-              subtitle={`${Object.keys(costData.byModel).length} models`}
+              icon={Package}
               variant="default"
             />
           </Grid>

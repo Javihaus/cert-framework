@@ -7,7 +7,7 @@ import RecommendationCard from '@/components/RecommendationCard';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
-import { Zap, DollarSign, TrendingDown } from 'lucide-react';
+import { Zap, DollarSign, TrendingDown, Target, Package } from 'lucide-react';
 import { Trace, OptimizationOpportunity } from '@/types/trace';
 import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
 
@@ -102,19 +102,19 @@ export default function OptimizationPage() {
             <MetricCard
               label="Potential Savings"
               value={`$${totalSavings.toFixed(2)}`}
-              subtitle="Per month"
+              icon={DollarSign}
               variant="success"
             />
             <MetricCard
               label="Opportunities Found"
               value={recommendations.length.toString()}
-              subtitle={`${highImpactCount} high impact`}
+              icon={Target}
               variant="default"
             />
             <MetricCard
               label="Traces Analyzed"
               value={traces.length.toString()}
-              subtitle="Total API calls"
+              icon={Package}
               variant="default"
             />
           </Grid>
@@ -134,9 +134,9 @@ export default function OptimizationPage() {
               {sortedRecommendations.map((rec, idx) => (
                 <RecommendationCard
                   key={idx}
-                  type={rec.type}
+                  type={rec.type === 'batch_processing' ? 'batching' : rec.type}
                   description={rec.description}
-                  savings={rec.potentialSavings}
+                  savings={`$${rec.potentialSavings.toFixed(2)}`}
                   impact={rec.impact}
                   details={rec.details}
                   onApply={() => {
