@@ -108,20 +108,42 @@ export interface ArchitectureRecommendation {
 // ============================================================================
 
 export interface ReadinessInputs {
+  // Data readiness
   hasDataStrategy: boolean;
+  hasLabeledData: boolean;
+  dataQuality: 'high' | 'medium' | 'low';
+
+  // Technical readiness
   hasMLExperience: boolean;
   hasInfrastructure: boolean;
-  hasComplianceFramework: boolean;
   teamSize: number;
+
+  // Organizational readiness
+  hasExecutiveSupport: boolean;
+  hasChangeManagement: boolean;
+  hasBudgetAllocated: boolean;
+
+  // Compliance readiness
+  hasComplianceFramework: boolean;
+  hasSecurityMeasures: boolean;
+
+  // Timeline
   timelineWeeks: number;
 }
 
 export interface ReadinessOutputs {
-  score: number;  // 0-100
-  strengths: string[];
+  overallScore: number;  // 0-100
+  readinessLevel: 'ready' | 'needs-preparation' | 'not-ready';
+  categoryScores: {
+    data: number;
+    technical: number;
+    organizational: number;
+    compliance: number;
+  };
   gaps: string[];
+  estimatedTimelineWeeks: number;
   recommendations: string[];
-  estimatedTimeToReady: number;  // weeks
+  riskFactors: string[];
 }
 
 // ============================================================================

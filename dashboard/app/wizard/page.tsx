@@ -3,15 +3,19 @@
 import { useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { colors, spacing, typography } from '@/theme';
-import { WizardState, ROIInputs, RiskInputs, ArchitectureInputs, ArchitectureRecommendation } from '@/types/wizard';
+import { WizardState, ROIInputs, RiskInputs, ArchitectureInputs, ArchitectureRecommendation, ReadinessInputs } from '@/types/wizard';
 import { calculateROI } from '@/lib/roi-calculator';
 import { classifyRisk } from '@/lib/risk-classifier';
 import { selectArchitecture } from '@/lib/architecture-selector';
+import { assessReadiness } from '@/lib/readiness-assessor';
 import WizardROIForm from '@/components/WizardROIForm';
 import WizardROIResults from '@/components/WizardROIResults';
 import WizardRiskForm from '@/components/WizardRiskForm';
 import WizardRiskResults from '@/components/WizardRiskResults';
 import WizardArchitectureSelector from '@/components/WizardArchitectureSelector';
+import WizardReadinessForm from '@/components/WizardReadinessForm';
+import WizardReadinessResults from '@/components/WizardReadinessResults';
+import WizardDeploymentPlan from '@/components/WizardDeploymentPlan';
 
 const STEPS = [
   { id: 1, name: 'ROI', description: 'Calculate business case' },
@@ -75,11 +79,17 @@ export default function WizardPage() {
     readiness: {
       inputs: {
         hasDataStrategy: false,
+        hasLabeledData: false,
+        dataQuality: 'medium',
         hasMLExperience: false,
         hasInfrastructure: false,
-        hasComplianceFramework: false,
         teamSize: 0,
-        timelineWeeks: 0
+        hasExecutiveSupport: false,
+        hasChangeManagement: false,
+        hasBudgetAllocated: false,
+        hasComplianceFramework: false,
+        hasSecurityMeasures: false,
+        timelineWeeks: 12
       },
       outputs: null,
       completed: false
@@ -145,6 +155,92 @@ export default function WizardPage() {
       currentStep: 4,
       architecture: { ...prev.architecture, completed: true }
     }));
+  };
+
+  const handleReadinessSubmit = () => {
+    const outputs = assessReadiness(state.readiness.inputs);
+    setState(prev => ({
+      ...prev,
+      readiness: { ...prev.readiness, outputs, completed: true }
+    }));
+  };
+
+  const handleReadinessNext = () => {
+    setState(prev => ({ ...prev, currentStep: 5 }));
+  };
+
+  const handleRestart = () => {
+    setState({
+      currentStep: 1,
+      roi: {
+        inputs: {
+          tasksPerMonth: 1000,
+          minutesPerTask: 15,
+          laborCostPerHour: 25,
+          errorRate: 5,
+          errorCostPerIncident: 100,
+          aiSuccessRate: 85,
+          aiCostPerTask: 0.05,
+          humanReviewPercent: 20,
+          implementationCost: 50000
+        },
+        outputs: null,
+        completed: false
+      },
+      risk: {
+        inputs: {
+          biometricIdentification: false,
+          socialScoring: false,
+          manipulativeTechniques: false,
+          exploitVulnerabilities: false,
+          criticalInfrastructure: false,
+          educationAccess: false,
+          employmentDecisions: false,
+          essentialServicesAccess: false,
+          lawEnforcement: false,
+          migrationAsylumBorder: false,
+          justiceAdministration: false,
+          democraticProcesses: false,
+          decisionsPerYear: 0,
+          affectedIndividuals: 0
+        },
+        outputs: null,
+        completed: false
+      },
+      architecture: {
+        inputs: {
+          useCase: '',
+          volumeQueriesPerMonth: 0,
+          latencyRequirementMs: 0,
+          dataResidency: 'any',
+          budgetPerMonth: 0,
+          teamSkills: []
+        },
+        recommendations: [],
+        selected: null,
+        completed: false
+      },
+      readiness: {
+        inputs: {
+          hasDataStrategy: false,
+          hasLabeledData: false,
+          dataQuality: 'medium',
+          hasMLExperience: false,
+          hasInfrastructure: false,
+          teamSize: 0,
+          hasExecutiveSupport: false,
+          hasChangeManagement: false,
+          hasBudgetAllocated: false,
+          hasComplianceFramework: false,
+          hasSecurityMeasures: false,
+          timelineWeeks: 12
+        },
+        outputs: null,
+        completed: false
+      },
+      projectId: null,
+      createdAt: new Date().toISOString()
+    });
   };
 
   return (
@@ -251,16 +347,31 @@ export default function WizardPage() {
             />
           )}
 
-          {/* Placeholder for remaining steps */}
-          {state.currentStep > 3 && (
-            <Box textAlign="center" py={spacing.xl}>
-              <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
-                Step {state.currentStep} (Coming Soon)
-              </Text>
-              <Text fontSize={typography.fontSize.base} color={colors.text.secondary}>
-                Readiness Assessment and Deployment Planning steps will be implemented in future phases.
-              </Text>
-            </Box>
+          {/* Step 4: Readiness Assessment */}
+          {state.currentStep === 4 && !state.readiness.completed && (
+            <WizardReadinessForm
+              inputs={state.readiness.inputs}
+              onChange={(inputs: ReadinessInputs) => setState(prev => ({
+                ...prev,
+                readiness: { ...prev.readiness, inputs }
+              }))}
+              onSubmit={handleReadinessSubmit}
+            />
+          )}
+
+          {state.currentStep === 4 && state.readiness.completed && state.readiness.outputs && (
+            <WizardReadinessResults
+              outputs={state.readiness.outputs}
+              onNext={handleReadinessNext}
+            />
+          )}
+
+          {/* Step 5: Deployment Planning */}
+          {state.currentStep === 5 && (
+            <WizardDeploymentPlan
+              wizardState={state}
+              onRestart={handleRestart}
+            />
           )}
         </Box>
 
