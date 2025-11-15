@@ -119,27 +119,28 @@ export default function CostsPage() {
         </Box>
 
         {costData && (
-          <Box
-            as="select"
-            value={timeRange}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              setTimeRange(e.target.value as any);
-              analyzeCosts(traces);
-            }}
-            w="150px"
-            px={spacing.sm}
-            py={spacing.xs}
-            borderRadius="md"
-            border="1px solid"
-            borderColor={colors.patience}
-            bg="white"
-            fontSize={typography.fontSize.sm}
-            cursor="pointer"
-            _hover={{ borderColor: colors.cobalt }}
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="all">All time</option>
+          <Box w="150px">
+            <select
+              value={timeRange}
+              onChange={(e) => {
+                setTimeRange(e.target.value as any);
+                analyzeCosts(traces);
+              }}
+              style={{
+                width: '100%',
+                padding: `${spacing.xs} ${spacing.sm}`,
+                borderRadius: '6px',
+                border: `1px solid ${colors.patience}`,
+                backgroundColor: 'white',
+                fontSize: typography.fontSize.sm,
+                cursor: 'pointer',
+                color: colors.navy,
+              }}
+            >
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="all">All time</option>
+            </select>
           </Box>
         )}
       </Flex>

@@ -23,6 +23,7 @@ export const colors = {
   olive: '#48bb78',         // Alias for success green
   gold: '#E48B59',          // Alias for warning/coral
   alert: '#fc8181',         // Alias for error red
+  gray: '#718096',          // Alias for muted gray
 
   // Text
   text: {

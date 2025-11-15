@@ -508,7 +508,7 @@ export default function AssessmentPage() {
         <Flex justify="space-between" mt={spacing.xl}>
           <Button
             onClick={handlePrevious}
-            isDisabled={currentQuestion === 0}
+            disabled={currentQuestion === 0}
             variant="outline"
           >
             <Flex align="center" gap={spacing.xs}>

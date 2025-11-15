@@ -127,7 +127,7 @@ export default function ConnectorsPage() {
         {mode === 'live' && (
           <Button
             onClick={fetchConnectorStatus}
-            isLoading={loading}
+            loading={loading}
             bg={colors.cobalt}
             color="white"
             _hover={{ bg: colors.navy }}

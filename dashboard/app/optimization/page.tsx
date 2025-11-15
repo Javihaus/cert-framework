@@ -193,23 +193,24 @@ export default function OptimizationPage() {
         </Box>
 
         {recommendations.length > 0 && (
-          <Box
-            as="select"
-            value={sortBy}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value as any)}
-            w="200px"
-            px={spacing.sm}
-            py={spacing.xs}
-            borderRadius="md"
-            border="1px solid"
-            borderColor={colors.patience}
-            bg="white"
-            fontSize={typography.fontSize.sm}
-            cursor="pointer"
-            _hover={{ borderColor: colors.cobalt }}
-          >
-            <option value="savings">Sort by Savings</option>
-            <option value="impact">Sort by Impact</option>
+          <Box w="200px">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              style={{
+                width: '100%',
+                padding: `${spacing.xs} ${spacing.sm}`,
+                borderRadius: '6px',
+                border: `1px solid ${colors.patience}`,
+                backgroundColor: 'white',
+                fontSize: typography.fontSize.sm,
+                cursor: 'pointer',
+                color: colors.navy,
+              }}
+            >
+              <option value="savings">Sort by Savings</option>
+              <option value="impact">Sort by Impact</option>
+            </select>
           </Box>
         )}
       </Flex>
