@@ -45,23 +45,6 @@ export default function OptimizationPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [sortBy, setSortBy] = useState<'savings' | 'impact'>('savings');
 
-  const loadFromFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const lines = content.split('\n').filter((line) => line.trim());
-        const parsed = lines.map((line) => JSON.parse(line)) as Trace[];
-        setTraces(parsed);
-        analyzeOptimizations(parsed);
-      } catch (error) {
-        console.error('Failed to parse file:', error);
-        alert('Invalid file format. Please upload a valid JSONL trace file.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
   const getCheaperModel = (model: string): string => {
     const downgrades: Record<string, string> = {
       'gpt-4': 'gpt-3.5-turbo',
@@ -234,9 +217,12 @@ export default function OptimizationPage() {
               Upload your cert_traces.jsonl file to discover ways to reduce costs
             </Text>
             <FileUpload
-              onUpload={loadFromFile}
-              acceptedFileTypes=".jsonl"
-              maxFileSizeMB={50}
+              onFileLoad={(data) => {
+                setTraces(data);
+                analyzeOptimizations(data);
+              }}
+              accept=".jsonl,.json"
+              label="Upload Trace File"
             />
           </Flex>
         </Card>

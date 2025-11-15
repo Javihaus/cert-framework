@@ -45,23 +45,6 @@ export default function CostsPage() {
   const [costData, setCostData] = useState<CostData | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
 
-  const loadFromFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const lines = content.split('\n').filter((line) => line.trim());
-        const parsed = lines.map((line) => JSON.parse(line)) as Trace[];
-        setTraces(parsed);
-        analyzeCosts(parsed);
-      } catch (error) {
-        console.error('Failed to parse file:', error);
-        alert('Invalid file format. Please upload a valid JSONL trace file.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
   const analyzeCosts = (allTraces: Trace[]) => {
     // Filter by time range
     const now = new Date();
@@ -175,9 +158,12 @@ export default function CostsPage() {
               Upload your cert_traces.jsonl file to see cost breakdowns, trends, and projections
             </Text>
             <FileUpload
-              onUpload={loadFromFile}
-              acceptedFileTypes=".jsonl"
-              maxFileSizeMB={50}
+              onFileLoad={(data) => {
+                setTraces(data);
+                analyzeCosts(data);
+              }}
+              accept=".jsonl,.json"
+              label="Upload Trace File"
             />
           </Flex>
         </Card>
