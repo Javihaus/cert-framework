@@ -435,6 +435,16 @@ except ImportError:
     # Health commands not available if dependencies missing
     pass
 
+# Register dashboard commands
+try:
+    from cert.cli.dashboard import dashboard, serve
+
+    cli.add_command(dashboard)
+    cli.add_command(serve)
+except ImportError:
+    # Dashboard commands not available if dependencies missing
+    pass
+
 
 if __name__ == "__main__":
     cli()
