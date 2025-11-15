@@ -1,19 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Grid,
-  Button,
-  Code,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from '@chakra-ui/react';
+import { Box, Flex, Text, Grid, Button, Code } from '@chakra-ui/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/tabs';
 import ConnectorCard from '@/components/ConnectorCard';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
@@ -137,14 +126,16 @@ export default function ConnectorsPage() {
 
         {mode === 'live' && (
           <Button
-            leftIcon={<RefreshCw size={16} />}
             onClick={fetchConnectorStatus}
-            isLoading={loading}
+            loading={loading}
             bg={colors.cobalt}
             color="white"
             _hover={{ bg: colors.navy }}
           >
-            Refresh
+            <Flex align="center" gap={spacing.xs}>
+              <RefreshCw size={16} />
+              <Text>Refresh</Text>
+            </Flex>
           </Button>
         )}
       </Flex>
