@@ -1,307 +1,328 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Flex, Text, Grid, Button, Code } from '@chakra-ui/react';
+import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/tabs';
-import ConnectorCard from '@/components/ConnectorCard';
 import Card from '@/components/Card';
 import { colors, spacing, typography } from '@/theme';
-import { RefreshCw, Package, Server } from 'lucide-react';
+import { CheckCircle2, XCircle, Package, Code as CodeIcon, Zap } from 'lucide-react';
 
 interface Connector {
   name: string;
-  status: 'active' | 'disabled' | 'error';
-  trace_count: number;
-  failure_count: number;
-  last_activity?: string;
-  description: string;
   platform: string;
-  install_command?: string;
+  status: 'available' | 'planned';
+  description: string;
+  features: string[];
+  installCommand: string;
+  usageExample: string;
+  releaseDate?: string;
 }
 
-export default function ConnectorsPage() {
-  const [connectors, setConnectors] = useState<Connector[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'demo' | 'live'>('demo');
+const CONNECTORS: Connector[] = [
+  {
+    name: 'OpenAI',
+    platform: 'openai',
+    status: 'available',
+    description: 'Automatic tracing for OpenAI SDK (chat, completions, embeddings)',
+    features: [
+      'Zero-code instrumentation',
+      'Automatic cost calculation',
+      'Token usage tracking',
+      'Latency measurement',
+      'Error logging',
+    ],
+    installCommand: 'pip install cert-framework[integrations]',
+    usageExample: `from cert.integrations.auto import *
 
-  // Check if running in live mode (self-hosted with API)
-  useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_CERT_API;
-    if (apiUrl) {
-      setMode('live');
-      fetchConnectorStatus();
-    } else {
-      // Demo mode - show available connectors
-      loadDemoData();
-    }
-  }, []);
-
-  const fetchConnectorStatus = async () => {
-    try {
-      setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_CERT_API || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/api/connectors/status`);
-      const data = await response.json();
-      setConnectors(data.connectors);
-    } catch (error) {
-      console.error('Failed to fetch connector status:', error);
-      loadDemoData();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadDemoData = () => {
-    // Demo data showing available connectors
-    setConnectors([
-      {
-        name: 'OpenAI',
-        status: 'disabled',
-        trace_count: 0,
-        failure_count: 0,
-        description: 'GPT-4, GPT-3.5, and all OpenAI models',
-        platform: 'openai',
-        install_command: 'pip install cert-framework[integrations]',
-      },
-      {
-        name: 'Anthropic',
-        status: 'disabled',
-        trace_count: 0,
-        failure_count: 0,
-        description: 'Claude 3 Opus, Sonnet, and Haiku',
-        platform: 'anthropic',
-        install_command: 'pip install cert-framework[integrations]',
-      },
-      {
-        name: 'AWS Bedrock',
-        status: 'disabled',
-        trace_count: 0,
-        failure_count: 0,
-        description: 'Claude, Llama, Titan, and more on AWS',
-        platform: 'bedrock',
-        install_command: 'pip install cert-framework[integrations]',
-      },
-      {
-        name: 'Azure OpenAI',
-        status: 'disabled',
-        trace_count: 0,
-        failure_count: 0,
-        description: 'OpenAI models via Azure',
-        platform: 'azure',
-        install_command: 'pip install cert-framework[integrations]',
-      },
-      {
-        name: 'LangChain',
-        status: 'disabled',
-        trace_count: 0,
-        failure_count: 0,
-        description: 'LangChain framework integration',
-        platform: 'langchain',
-        install_command: 'pip install cert-framework[integrations]',
-      },
-    ]);
-  };
-
-  const activeConnectors = connectors.filter((c) => c.status === 'active');
-  const totalTraces = connectors.reduce((sum, c) => sum + c.trace_count, 0);
-  const totalFailures = connectors.reduce((sum, c) => sum + c.failure_count, 0);
-
-  return (
-    <Box maxW="1400px" mx="auto" p={spacing.xl}>
-      {/* Header */}
-      <Flex justify="space-between" align="center" mb={spacing.xl}>
-        <Box>
-          <Text
-            fontSize={typography.fontSize['3xl']}
-            fontWeight={typography.fontWeight.bold}
-            color={colors.navy}
-            mb={spacing.xs}
-          >
-            Connector Status
-          </Text>
-          <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
-            Monitor and manage AI platform integrations
-          </Text>
-        </Box>
-
-        {mode === 'live' && (
-          <Button
-            onClick={fetchConnectorStatus}
-            loading={loading}
-            bg={colors.cobalt}
-            color="white"
-            _hover={{ bg: colors.navy }}
-          >
-            <Flex align="center" gap={spacing.xs}>
-              <RefreshCw size={16} />
-              <Text>Refresh</Text>
-            </Flex>
-          </Button>
-        )}
-      </Flex>
-
-      {/* Mode indicator */}
-      <Card mb={spacing.lg}>
-        <Flex align="center" gap={spacing.md}>
-          {mode === 'demo' ? (
-            <>
-              <Package size={24} color={colors.cobalt} />
-              <Box flex={1}>
-                <Text fontWeight={typography.fontWeight.semibold} color={colors.navy}>
-                  Demo Mode
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                  Showing available connectors. Install CERT locally to see live status.
-                </Text>
-              </Box>
-              <Code
-                px={spacing.sm}
-                py={spacing.xs}
-                borderRadius="md"
-                fontSize={typography.fontSize.sm}
-              >
-                pip install cert-framework[integrations]
-              </Code>
-            </>
-          ) : (
-            <>
-              <Server size={24} color={colors.olive} />
-              <Box flex={1}>
-                <Text fontWeight={typography.fontWeight.semibold} color={colors.navy}>
-                  Live Mode
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                  Connected to local CERT API - showing real-time status
-                </Text>
-              </Box>
-            </>
-          )}
-        </Flex>
-      </Card>
-
-      {/* Summary metrics */}
-      {mode === 'live' && (
-        <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={spacing.md} mb={spacing.lg}>
-          <Card>
-            <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.cobalt}>
-              {activeConnectors.length}
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-              Active Connectors
-            </Text>
-          </Card>
-          <Card>
-            <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-              {totalTraces.toLocaleString()}
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-              Total Traces
-            </Text>
-          </Card>
-          <Card>
-            <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={totalFailures > 0 ? colors.alert : colors.olive}>
-              {totalFailures}
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-              Failures
-            </Text>
-          </Card>
-        </Grid>
-      )}
-
-      {/* Connectors grid */}
-      <Grid templateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={spacing.md}>
-        {connectors.map((connector) => (
-          <ConnectorCard
-            key={connector.name}
-            name={connector.name}
-            status={connector.status}
-            tracesLogged={connector.trace_count}
-            failureCount={connector.failure_count}
-            lastActivity={connector.last_activity}
-            description={connector.description}
-          />
-        ))}
-      </Grid>
-
-      {/* Installation instructions (demo mode only) */}
-      {mode === 'demo' && (
-        <Card mt={spacing.xl}>
-          <Text
-            fontSize={typography.fontSize.xl}
-            fontWeight={typography.fontWeight.semibold}
-            color={colors.navy}
-            mb={spacing.md}
-          >
-            Getting Started
-          </Text>
-
-          <Tabs variant="soft-rounded" colorScheme="blue">
-            <TabList>
-              <Tab>Quick Start</Tab>
-              <Tab>Manual Activation</Tab>
-              <Tab>Self-Hosted Dashboard</Tab>
-            </TabList>
-
-            <TabPanels>
-              <TabPanel>
-                <Box as="pre" bg={colors.background} p={spacing.md} borderRadius="md" overflow="auto">
-                  <Code>
-                    {`# Install with integrations support
-pip install cert-framework[integrations]
-
-# Automatic activation (zero-config)
-import cert.integrations.auto
-
-# Your LLM calls are now automatically traced!
-from openai import OpenAI
-client = OpenAI()
+# That's it! All OpenAI calls are now traced
+client = openai.OpenAI()
 response = client.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4-turbo",
     messages=[{"role": "user", "content": "Hello!"}]
 )
 
-# Traces are automatically logged to cert_traces.jsonl`}
-                  </Code>
-                </Box>
-              </TabPanel>
+# Traces automatically logged to cert_traces.jsonl`,
+  },
+  {
+    name: 'Anthropic',
+    platform: 'anthropic',
+    status: 'available',
+    description: 'Automatic tracing for Anthropic SDK (messages, tool use)',
+    features: [
+      'Zero-code instrumentation',
+      'Automatic cost calculation',
+      'Token usage tracking',
+      'Tool use logging',
+      'Streaming support',
+    ],
+    installCommand: 'pip install cert-framework[integrations]',
+    usageExample: `from cert.integrations.auto import *
 
-              <TabPanel>
-                <Box as="pre" bg={colors.background} p={spacing.md} borderRadius="md" overflow="auto">
-                  <Code>
-                    {`# Manual connector activation
-from cert.integrations.registry import activate_all
-from cert.core.tracer import CertTracer
+# All Anthropic calls are now traced
+client = anthropic.Anthropic()
+message = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello!"}]
+)
 
-tracer = CertTracer()
-activate_all(tracer)
+# Traces automatically logged to cert_traces.jsonl`,
+  },
+  {
+    name: 'LangChain',
+    platform: 'langchain',
+    status: 'available',
+    description: 'Callback-based tracing for chains, agents, and tools',
+    features: [
+      'Full chain visibility',
+      'Agent action tracking',
+      'Tool invocation logs',
+      'Retrieval logging',
+      'Custom callback support',
+    ],
+    installCommand: 'pip install cert-framework[integrations]',
+    usageExample: `from cert.integrations.langchain import CertCallbackHandler
+from langchain.chains import LLMChain
 
-# Or activate specific connectors
-from cert.integrations.openai_connector import OpenAIConnector
-connector = OpenAIConnector(tracer)
-connector.activate()`}
-                  </Code>
-                </Box>
-              </TabPanel>
+callback = CertCallbackHandler()
 
-              <TabPanel>
-                <Box as="pre" bg={colors.background} p={spacing.md} borderRadius="md" overflow="auto">
-                  <Code>
-                    {`# Start the CERT API server
-cert serve
+chain = LLMChain(llm=llm, callbacks=[callback])
+result = chain.run("Your prompt")
 
-# In another terminal, set the API URL and start dashboard
-export NEXT_PUBLIC_CERT_API=http://localhost:8000
-cd dashboard && npm run dev
+# All chain steps logged to cert_traces.jsonl`,
+  },
+  {
+    name: 'AWS Bedrock',
+    platform: 'bedrock',
+    status: 'available',
+    description: 'boto3 client wrapper for Bedrock models',
+    features: [
+      'Claude via Bedrock',
+      'Cost estimation',
+      'Token tracking',
+      'Model version logging',
+      'Region tracking',
+    ],
+    installCommand: 'pip install cert-framework[integrations]',
+    usageExample: `from cert.integrations.auto import *
 
-# Dashboard will now show live connector status`}
-                  </Code>
-                </Box>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </Card>
-      )}
+# Use boto3 as normal - tracing is automatic
+bedrock = boto3.client('bedrock-runtime')
+response = bedrock.invoke_model(
+    modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+    body=json.dumps({"messages": [...]})
+)
+
+# Traces automatically logged`,
+  },
+  {
+    name: 'Google Vertex AI',
+    platform: 'vertex',
+    status: 'planned',
+    description: 'Support for Google Vertex AI models',
+    features: [
+      'Gemini models',
+      'PaLM models',
+      'Cost tracking',
+      'Token usage',
+      'Streaming support',
+    ],
+    installCommand: 'Coming Q2 2026',
+    usageExample: '# Implementation planned for Q2 2026',
+    releaseDate: 'Q2 2026',
+  },
+];
+
+export default function ConnectorsPage() {
+  const availableConnectors = CONNECTORS.filter((c) => c.status === 'available');
+  const plannedConnectors = CONNECTORS.filter((c) => c.status === 'planned');
+
+  return (
+    <Box p={spacing.xl}>
+      {/* Header */}
+      <Flex direction="column" mb={spacing.xl}>
+        <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+          Connectors
+        </Text>
+        <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+          Automatic tracing for all major AI platforms with zero code changes
+        </Text>
+      </Flex>
+
+      {/* Quick Start */}
+      <Card mb={spacing.xl}>
+        <Flex align="center" gap={spacing.md} mb={spacing.md}>
+          <Zap size={24} color={colors.cobalt} />
+          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+            Quick Start
+          </Text>
+        </Flex>
+        <Box bg={colors.background} p={spacing.md} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm} mb={spacing.md}>
+          pip install cert-framework[integrations]
+        </Box>
+        <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+          Then add this single line to your code:
+        </Text>
+        <Box bg={colors.background} p={spacing.md} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm} mt={spacing.sm}>
+          from cert.integrations.auto import *
+        </Box>
+        <Text fontSize={typography.fontSize.sm} color={colors.olive} mt={spacing.md} fontWeight={typography.fontWeight.medium}>
+          ✓ All AI API calls are now automatically traced to cert_traces.jsonl
+        </Text>
+      </Card>
+
+      {/* Tabs */}
+      <Tabs variant="enclosed" colorScheme="blue">
+        <TabList borderBottom="2px solid" borderColor={colors.patience}>
+          <Tab
+            _selected={{ bg: colors.cobalt, color: 'white' }}
+            color={colors.text.secondary}
+            fontWeight={typography.fontWeight.medium}
+          >
+            Available ({availableConnectors.length})
+          </Tab>
+          <Tab
+            _selected={{ bg: colors.cobalt, color: 'white' }}
+            color={colors.text.secondary}
+            fontWeight={typography.fontWeight.medium}
+          >
+            Planned ({plannedConnectors.length})
+          </Tab>
+        </TabList>
+
+        <TabPanels>
+          {/* Available Connectors */}
+          <TabPanel p={0} pt={spacing.lg}>
+            <Flex direction="column" gap={spacing.lg}>
+              {availableConnectors.map((connector) => (
+                <Card key={connector.platform}>
+                  <Flex justify="space-between" align="start" mb={spacing.md}>
+                    <Box>
+                      <Flex align="center" gap={spacing.sm} mb={spacing.xs}>
+                        <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+                          {connector.name}
+                        </Text>
+                        <Flex
+                          align="center"
+                          gap={spacing.xs}
+                          px={spacing.sm}
+                          py={spacing.xs}
+                          bg={colors.olive + '20'}
+                          borderRadius="full"
+                        >
+                          <CheckCircle2 size={14} color={colors.olive} />
+                          <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.olive}>
+                            Available
+                          </Text>
+                        </Flex>
+                      </Flex>
+                      <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                        {connector.description}
+                      </Text>
+                    </Box>
+                  </Flex>
+
+                  {/* Features */}
+                  <Box mb={spacing.md}>
+                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
+                      Features:
+                    </Text>
+                    <Grid templateColumns="repeat(2, 1fr)" gap={spacing.xs}>
+                      {connector.features.map((feature, idx) => (
+                        <Flex key={idx} align="center" gap={spacing.xs}>
+                          <CheckCircle2 size={14} color={colors.cobalt} />
+                          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                            {feature}
+                          </Text>
+                        </Flex>
+                      ))}
+                    </Grid>
+                  </Box>
+
+                  {/* Installation */}
+                  <Box mb={spacing.md}>
+                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
+                      Installation:
+                    </Text>
+                    <Box bg={colors.background} p={spacing.sm} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm}>
+                      {connector.installCommand}
+                    </Box>
+                  </Box>
+
+                  {/* Usage Example */}
+                  <Box>
+                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
+                      Usage Example:
+                    </Text>
+                    <Box
+                      as="pre"
+                      bg={colors.navy}
+                      color="white"
+                      p={spacing.md}
+                      borderRadius="md"
+                      fontSize={typography.fontSize.xs}
+                      overflowX="auto"
+                      fontFamily="mono"
+                      lineHeight="1.5"
+                    >
+                      {connector.usageExample}
+                    </Box>
+                  </Box>
+                </Card>
+              ))}
+            </Flex>
+          </TabPanel>
+
+          {/* Planned Connectors */}
+          <TabPanel p={0} pt={spacing.lg}>
+            <Flex direction="column" gap={spacing.lg}>
+              {plannedConnectors.map((connector) => (
+                <Card key={connector.platform}>
+                  <Flex justify="space-between" align="start">
+                    <Box>
+                      <Flex align="center" gap={spacing.sm} mb={spacing.xs}>
+                        <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+                          {connector.name}
+                        </Text>
+                        <Flex
+                          align="center"
+                          gap={spacing.xs}
+                          px={spacing.sm}
+                          py={spacing.xs}
+                          bg={colors.patience}
+                          borderRadius="full"
+                        >
+                          <Package size={14} color={colors.text.secondary} />
+                          <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.text.secondary}>
+                            {connector.releaseDate}
+                          </Text>
+                        </Flex>
+                      </Flex>
+                      <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} mb={spacing.md}>
+                        {connector.description}
+                      </Text>
+
+                      <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
+                        Planned Features:
+                      </Text>
+                      <Grid templateColumns="repeat(2, 1fr)" gap={spacing.xs}>
+                        {connector.features.map((feature, idx) => (
+                          <Flex key={idx} align="center" gap={spacing.xs}>
+                            <CheckCircle2 size={14} color={colors.mist} />
+                            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                              {feature}
+                            </Text>
+                          </Flex>
+                        ))}
+                      </Grid>
+                    </Box>
+                  </Flex>
+                </Card>
+              ))}
+            </Flex>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 }
