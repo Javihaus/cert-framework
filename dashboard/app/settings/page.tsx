@@ -2,16 +2,27 @@
 
 import { useState } from 'react';
 import {
-  CogIcon,
-  UserCircleIcon,
-  BellIcon,
-  ShieldCheckIcon,
-  KeyIcon,
-  GlobeAltIcon,
-  PaintBrushIcon,
-  ServerStackIcon,
-  CheckIcon,
-} from '@heroicons/react/24/outline';
+  Settings,
+  User,
+  Bell,
+  Shield,
+  Key,
+  Globe,
+  Palette,
+  Server,
+  Check,
+} from 'lucide-react';
+
+// Icon mapping for compatibility
+const CogIcon = Settings;
+const UserCircleIcon = User;
+const BellIcon = Bell;
+const ShieldCheckIcon = Shield;
+const KeyIcon = Key;
+const GlobeAltIcon = Globe;
+const PaintBrushIcon = Palette;
+const ServerStackIcon = Server;
+const CheckIcon = Check;
 
 const settingsSections = [
   { id: 'profile', name: 'Profile', icon: UserCircleIcon },

@@ -2,15 +2,25 @@
 
 import { useState } from 'react';
 import {
-  ShieldCheckIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  DocumentTextIcon,
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from '@heroicons/react/24/outline';
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  FileText,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
+
+// Icon mapping for compatibility
+const ShieldCheckIcon = Shield;
+const ExclamationTriangleIcon = AlertTriangle;
+const CheckCircleIcon = CheckCircle;
+const XCircleIcon = XCircle;
+const DocumentTextIcon = FileText;
+const ArrowRightIcon = ArrowRight;
+const ChevronDownIcon = ChevronDown;
+const ChevronUpIcon = ChevronUp;
 
 // EU AI Act Articles with compliance status
 const complianceArticles = [

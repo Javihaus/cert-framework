@@ -2,17 +2,29 @@
 
 import { useState } from 'react';
 import {
-  DocumentTextIcon,
-  DocumentArrowDownIcon,
-  CalendarIcon,
-  FunnelIcon,
-  MagnifyingGlassIcon,
-  EyeIcon,
-  ArrowDownTrayIcon,
-  ChartBarIcon,
-  ShieldCheckIcon,
-  ClockIcon,
-} from '@heroicons/react/24/outline';
+  FileText,
+  Download,
+  Calendar,
+  Filter,
+  Search,
+  Eye,
+  ArrowDownToLine,
+  BarChart3,
+  Shield,
+  Clock,
+} from 'lucide-react';
+
+// Icon mapping for compatibility
+const DocumentTextIcon = FileText;
+const DocumentArrowDownIcon = Download;
+const CalendarIcon = Calendar;
+const FunnelIcon = Filter;
+const MagnifyingGlassIcon = Search;
+const EyeIcon = Eye;
+const ArrowDownTrayIcon = ArrowDownToLine;
+const ChartBarIcon = BarChart3;
+const ShieldCheckIcon = Shield;
+const ClockIcon = Clock;
 
 // Mock reports data
 const reports = [
