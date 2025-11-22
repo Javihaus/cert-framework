@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
+import Link from 'next/link';
+import { Box, Flex, Text, Grid, Link as ChakraLink } from '@chakra-ui/react';
 import {
   Monitor,
   Activity,
@@ -219,24 +220,25 @@ export default function MonitoringDashboard() {
               CERT Framework v2.0 - Professional AI Compliance Monitoring
             </Text>
             <Flex gap={spacing.lg}>
-              <Text
-                as="a"
-                href="/privacy"
-                fontSize="12px"
-                color={colors.text.muted}
-                _hover={{ color: colors.primary[500] }}
-              >
-                Privacy Policy
-              </Text>
-              <Text
-                as="a"
+              <Link href="/privacy">
+                <Text
+                  fontSize="12px"
+                  color={colors.text.muted}
+                  cursor="pointer"
+                  _hover={{ color: colors.primary[500] }}
+                >
+                  Privacy Policy
+                </Text>
+              </Link>
+              <ChakraLink
                 href="https://github.com/cert-framework"
+                isExternal
                 fontSize="12px"
                 color={colors.text.muted}
-                _hover={{ color: colors.primary[500] }}
+                _hover={{ color: colors.primary[500], textDecoration: 'none' }}
               >
                 Documentation
-              </Text>
+              </ChakraLink>
             </Flex>
           </Flex>
         </Box>
