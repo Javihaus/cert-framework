@@ -1,16 +1,24 @@
 /**
  * CERT Dashboard Theme
+ * Professional SaaS Dashboard Design System
  *
  * Centralized export for all design system tokens.
  * Import from '@/theme' to access colors, spacing, typography, and component tokens.
  *
  * @example
- * import { colors, spacing, typography } from '@/theme';
+ * import { colors, spacing, typography, shadows, breakpoints } from '@/theme';
  *
- * <Box padding={spacing.xl} fontSize={typography.fontSize['2xl']} color={colors.navy}>
+ * <Box
+ *   padding={spacing.lg}
+ *   fontSize={typography.fontSize.lg}
+ *   color={colors.text.primary}
+ *   boxShadow={shadows.card}
+ * />
  */
 
 export { colors } from './colors';
+export type { Colors, ColorKey } from './colors';
+
 export {
   spacing,
   typography,
@@ -20,5 +28,18 @@ export {
   shadows,
   containers,
   transitions,
+  breakpoints,
+  media,
+  zIndex,
+  componentTokens,
 } from './tokens';
+
+export type {
+  Spacing,
+  Typography,
+  Shadows,
+  BorderRadius,
+  Breakpoints,
+} from './tokens';
+
 export { icons, iconSizes } from './icons';
