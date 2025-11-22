@@ -14,7 +14,7 @@ import {
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps {
+interface ButtonProps extends Record<string, unknown> {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -25,7 +25,6 @@ interface ButtonProps {
   loading?: boolean;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
-  [key: string]: unknown;
 }
 
 /**
@@ -50,7 +49,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const sizeStyles = componentTokens.button[size];
+    const buttonSize = size as ButtonSize;
+    const sizeStyles = componentTokens.button[buttonSize];
 
     const variantStyles = {
       primary: {
