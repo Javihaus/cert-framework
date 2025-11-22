@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Badge } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography, borderRadius } from '@/theme';
+import Badge from './Badge';
+import { cn } from '@/lib/utils';
 import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 
 interface ConnectorCardProps {
@@ -24,22 +24,22 @@ export default function ConnectorCard({
 }: ConnectorCardProps) {
   const statusConfig = {
     active: {
-      color: 'green',
+      iconClass: 'text-green-600 dark:text-green-500',
       icon: CheckCircle2,
       label: 'Active',
-      bg: colors.olive,
+      variant: 'success' as const,
     },
     disabled: {
-      color: 'gray',
+      iconClass: 'text-zinc-400',
       icon: XCircle,
       label: 'Disabled',
-      bg: colors.gray,
+      variant: 'default' as const,
     },
     error: {
-      color: 'red',
+      iconClass: 'text-red-500',
       icon: AlertTriangle,
       label: 'Error',
-      bg: colors.alert,
+      variant: 'error' as const,
     },
   };
 
@@ -48,97 +48,70 @@ export default function ConnectorCard({
 
   return (
     <Card>
-      <Flex direction="column" gap={spacing.md}>
+      <div className="flex flex-col gap-4">
         {/* Header with name and status */}
-        <Flex justify="space-between" align="center">
-          <Flex direction="column" gap={spacing.xs}>
-            <Text
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-            >
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
               {name}
-            </Text>
+            </h3>
             {description && (
-              <Text
-                fontSize={typography.fontSize.sm}
-                color={colors.text.secondary}
-              >
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 {description}
-              </Text>
+              </p>
             )}
-          </Flex>
+          </div>
 
-          <Flex align="center" gap={spacing.xs}>
-            <StatusIcon size={20} color={config.color} />
-            <Badge
-              colorScheme={config.color}
-              px={spacing.sm}
-              py={spacing.xs}
-              borderRadius="full"
-              fontSize={typography.fontSize.sm}
-            >
+          <div className="flex items-center gap-1">
+            <StatusIcon size={20} className={config.iconClass} />
+            <Badge variant={config.variant} size="sm">
               {config.label}
             </Badge>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
 
         {/* Metrics */}
-        <Flex gap={spacing.lg}>
-          <Flex direction="column" flex={1}>
-            <Text
-              fontSize={typography.fontSize['2xl']}
-              fontWeight={typography.fontWeight.bold}
-              color={colors.cobalt}
-            >
+        <div className="flex gap-6">
+          <div className="flex flex-col flex-1">
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-500">
               {tracesLogged.toLocaleString()}
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+            </span>
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
               traces logged
-            </Text>
-          </Flex>
+            </span>
+          </div>
 
           {failureCount > 0 && (
-            <Flex direction="column" flex={1}>
-              <Text
-                fontSize={typography.fontSize['2xl']}
-                fontWeight={typography.fontWeight.bold}
-                color={colors.alert}
-              >
+            <div className="flex flex-col flex-1">
+              <span className="text-2xl font-bold text-red-500">
                 {failureCount}
-              </Text>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+              </span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 failures
-              </Text>
-            </Flex>
+              </span>
+            </div>
           )}
-        </Flex>
+        </div>
 
         {/* Last activity */}
         {lastActivity && (
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Last activity: {lastActivity}
-          </Text>
+          </p>
         )}
 
         {/* Warning for failures */}
         {failureCount > 0 && (
-          <Box
-            bg={colors.alert + '20'}
-            border="1px solid"
-            borderColor={colors.alert}
-            borderRadius={borderRadius.md}
-            p={spacing.sm}
-          >
-            <Flex align="center" gap={spacing.xs}>
-              <AlertTriangle size={16} color={colors.alert} />
-              <Text fontSize={typography.fontSize.sm} color={colors.alert}>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-500 rounded-md p-2">
+            <div className="flex items-center gap-1">
+              <AlertTriangle size={16} className="text-red-500" />
+              <span className="text-sm text-red-500">
                 {failureCount} recent {failureCount === 1 ? 'failure' : 'failures'} detected
-              </Text>
-            </Flex>
-          </Box>
+              </span>
+            </div>
+          </div>
         )}
-      </Flex>
+      </div>
     </Card>
   );
 }

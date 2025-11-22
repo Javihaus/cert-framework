@@ -1,10 +1,9 @@
 'use client';
 
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
-import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import Card from './Card';
-import { colors, spacing, typography, shadows, transitions } from '@/theme';
 import { TrendBadge, StatusBadge } from './Badge';
+import { cn } from '@/lib/utils';
 
 type MetricVariant = 'default' | 'success' | 'warning' | 'error' | 'primary';
 
@@ -21,37 +20,32 @@ interface MetricCardProps {
   onClick?: () => void;
 }
 
-const variantStyles = {
+const variantStyles: Record<MetricVariant, { iconBg: string; iconColor: string }> = {
   default: {
-    iconBg: colors.neutral[100],
-    iconColor: colors.neutral[600],
-    valueColor: colors.text.primary,
+    iconBg: 'bg-zinc-100 dark:bg-zinc-800',
+    iconColor: 'text-zinc-600 dark:text-zinc-400',
   },
   success: {
-    iconBg: colors.semantic.successLight,
-    iconColor: colors.semantic.success,
-    valueColor: colors.text.primary,
+    iconBg: 'bg-emerald-100 dark:bg-emerald-500/20',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
   warning: {
-    iconBg: colors.semantic.warningLight,
-    iconColor: colors.semantic.warning,
-    valueColor: colors.text.primary,
+    iconBg: 'bg-amber-100 dark:bg-amber-500/20',
+    iconColor: 'text-amber-600 dark:text-amber-400',
   },
   error: {
-    iconBg: colors.semantic.errorLight,
-    iconColor: colors.semantic.error,
-    valueColor: colors.text.primary,
+    iconBg: 'bg-red-100 dark:bg-red-500/20',
+    iconColor: 'text-red-600 dark:text-red-400',
   },
   primary: {
-    iconBg: colors.primary[100],
-    iconColor: colors.primary[700],
-    valueColor: colors.text.primary,
+    iconBg: 'bg-blue-100 dark:bg-blue-500/20',
+    iconColor: 'text-blue-600 dark:text-blue-400',
   },
 };
 
 /**
  * Professional Metric Card Component
- * Displays key metrics with trends, sparklines, and targets
+ * Tailwind-only implementation based on DASHBOARD_DESIGN_SPEC.md
  */
 export default function MetricCard({
   label,
@@ -68,54 +62,33 @@ export default function MetricCard({
   const style = variantStyles[variant];
 
   return (
-    <Card
-      variant="elevated"
-      onClick={onClick}
-      hoverEffect={!!onClick}
-    >
-      <Flex direction="column" gap={spacing.md}>
+    <Card onClick={onClick} hoverEffect={!!onClick}>
+      <div className="flex flex-col gap-4">
         {/* Header Row - Label + Icon */}
-        <Flex align="center" justify="space-between">
-          <Text
-            fontSize="14px"
-            fontWeight={500}
-            color={colors.text.muted}
-          >
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
             {label}
-          </Text>
+          </span>
           {Icon && (
-            <Flex
-              align="center"
-              justify="center"
-              w="36px"
-              h="36px"
-              borderRadius="8px"
-              bg={style.iconBg}
-            >
-              <Icon size={18} color={style.iconColor} strokeWidth={2} />
-            </Flex>
+            <div className={cn('flex items-center justify-center w-9 h-9 rounded-lg', style.iconBg)}>
+              <Icon size={18} className={style.iconColor} strokeWidth={2} />
+            </div>
           )}
-        </Flex>
+        </div>
 
         {/* Value Row */}
-        <Flex align="flex-end" gap={spacing.sm}>
-          <Text
-            fontSize="32px"
-            fontWeight={700}
-            color={style.valueColor}
-            lineHeight={1.2}
-            letterSpacing="-0.02em"
-          >
+        <div className="flex items-end gap-3">
+          <span className="text-3xl font-semibold text-zinc-900 dark:text-white leading-none tracking-tight">
             {value}
-          </Text>
+          </span>
 
           {/* Trend Badge */}
           {trend !== undefined && (
-            <Box mb="4px">
+            <div className="mb-1">
               <TrendBadge value={trend} suffix={trendSuffix} />
-            </Box>
+            </div>
           )}
-        </Flex>
+        </div>
 
         {/* Sparkline */}
         {sparkline && sparkline.length > 0 && (
@@ -124,11 +97,11 @@ export default function MetricCard({
 
         {/* Footer - Target or Subtitle */}
         {(target || subtitle) && (
-          <Text fontSize="12px" color={colors.text.muted}>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
             {target ? `Target: ${target}` : subtitle}
-          </Text>
+          </span>
         )}
-      </Flex>
+      </div>
     </Card>
   );
 }
@@ -149,12 +122,12 @@ function Sparkline({ data, variant = 'default', height = 32 }: SparklineProps) {
   const min = Math.min(...data);
   const range = max - min || 1;
 
-  const colorMap = {
-    default: colors.neutral[400],
-    success: colors.semantic.success,
-    warning: colors.semantic.warning,
-    error: colors.semantic.error,
-    primary: colors.primary[500],
+  const colorMap: Record<MetricVariant, string> = {
+    default: '#A1A1AA',
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    primary: '#2563EB',
   };
 
   const points = data.map((value, index) => {
@@ -164,7 +137,7 @@ function Sparkline({ data, variant = 'default', height = 32 }: SparklineProps) {
   });
 
   return (
-    <Box h={`${height}px`} w="100%" overflow="hidden">
+    <div className="w-full overflow-hidden" style={{ height: `${height}px` }}>
       <svg width="100%" height={height} preserveAspectRatio="none">
         <polyline
           points={points.join(' ')}
@@ -175,7 +148,7 @@ function Sparkline({ data, variant = 'default', height = 32 }: SparklineProps) {
           strokeLinejoin="round"
         />
       </svg>
-    </Box>
+    </div>
   );
 }
 
@@ -196,45 +169,38 @@ export function BigNumberCard({
   value,
   unit = '',
   trend,
-  color = colors.primary[500],
   subtitle,
 }: BigNumberCardProps) {
   return (
-    <Card variant="elevated">
-      <Flex direction="column" gap={spacing.sm}>
-        <Text fontSize="14px" fontWeight={500} color={colors.text.muted}>
+    <Card>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {title}
-        </Text>
+        </span>
 
-        <Flex align="baseline" gap={spacing.xs}>
-          <Text
-            fontSize="48px"
-            fontWeight={700}
-            color={color}
-            lineHeight={1}
-            letterSpacing="-0.02em"
-          >
+        <div className="flex items-baseline gap-1">
+          <span className="text-5xl font-bold text-blue-600 dark:text-blue-400 leading-none tracking-tight">
             {value}
-          </Text>
+          </span>
           {unit && (
-            <Text fontSize="24px" fontWeight={500} color={colors.text.muted}>
+            <span className="text-2xl font-medium text-zinc-500">
               {unit}
-            </Text>
+            </span>
           )}
-        </Flex>
+        </div>
 
         {trend && (
-          <Text fontSize="14px" color={colors.semantic.success}>
+          <span className="text-sm text-emerald-600 dark:text-emerald-400">
             {trend}
-          </Text>
+          </span>
         )}
 
         {subtitle && (
-          <Text fontSize="12px" color={colors.text.muted}>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
             {subtitle}
-          </Text>
+          </span>
         )}
-      </Flex>
+      </div>
     </Card>
   );
 }
@@ -248,16 +214,9 @@ interface MetricsBarProps {
 
 export function MetricsBar({ children }: MetricsBarProps) {
   return (
-    <Grid
-      templateColumns={{
-        base: '1fr',
-        sm: 'repeat(2, 1fr)',
-        lg: 'repeat(4, 1fr)',
-      }}
-      gap={spacing.lg}
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {children}
-    </Grid>
+    </div>
   );
 }
 
@@ -275,25 +234,22 @@ export function CompactMetric({
   value,
   variant = 'default',
 }: CompactMetricProps) {
-  const style = variantStyles[variant];
+  const dotColors: Record<MetricVariant, string> = {
+    default: 'bg-zinc-400',
+    success: 'bg-emerald-500',
+    warning: 'bg-amber-500',
+    error: 'bg-red-500',
+    primary: 'bg-blue-500',
+  };
 
   return (
-    <Flex align="center" gap={spacing.sm}>
-      <Box
-        w="8px"
-        h="8px"
-        borderRadius="full"
-        bg={style.iconColor}
-      />
-      <Flex direction="column">
-        <Text fontSize="12px" color={colors.text.muted}>
-          {label}
-        </Text>
-        <Text fontSize="16px" fontWeight={600} color={style.valueColor}>
-          {value}
-        </Text>
-      </Flex>
-    </Flex>
+    <div className="flex items-center gap-3">
+      <span className={cn('w-2 h-2 rounded-full', dotColors[variant])} />
+      <div className="flex flex-col">
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">{label}</span>
+        <span className="text-base font-semibold text-zinc-900 dark:text-white">{value}</span>
+      </div>
+    </div>
   );
 }
 
@@ -314,27 +270,27 @@ export function StatusMetricCard({
   details,
 }: StatusMetricCardProps) {
   return (
-    <Card variant="bordered">
-      <Flex direction="column" gap={spacing.sm}>
-        <Flex justify="space-between" align="center">
-          <Text fontSize="14px" fontWeight={500} color={colors.text.primary}>
+    <Card>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium text-zinc-900 dark:text-white">
             {title}
-          </Text>
+          </span>
           <StatusBadge status={status} />
-        </Flex>
+        </div>
 
         {details && (
-          <Text fontSize="12px" color={colors.text.muted}>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
             {details}
-          </Text>
+          </span>
         )}
 
         {lastCheck && (
-          <Text fontSize="11px" color={colors.text.disabled}>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
             Last check: {lastCheck}
-          </Text>
+          </span>
         )}
-      </Flex>
+      </div>
     </Card>
   );
 }

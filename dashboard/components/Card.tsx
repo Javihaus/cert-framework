@@ -1,15 +1,14 @@
 'use client';
 
-import { Box, Flex, Text, BoxProps } from '@chakra-ui/react';
-import { ReactNode } from 'react';
-import { colors, borderRadius, spacing, shadows, transitions } from '@/theme';
+import { ReactNode, HTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
 
 type CardVariant = 'default' | 'bordered' | 'elevated' | 'interactive';
 
-interface CardProps extends Omit<BoxProps, 'variant'> {
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   variant?: CardVariant;
-  padding?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
   hoverEffect?: boolean;
 }
 
@@ -20,69 +19,45 @@ interface CardHeaderProps {
 
 interface CardContentProps {
   children: ReactNode;
+  className?: string;
 }
 
-const variantStyles = {
-  default: {
-    bg: colors.surface,
-    border: 'none',
-    boxShadow: 'none',
-  },
-  bordered: {
-    bg: colors.background,
-    border: `1px solid ${colors.border.default}`,
-    boxShadow: 'none',
-  },
-  elevated: {
-    bg: colors.background,
-    border: 'none',
-    boxShadow: shadows.card,
-  },
-  interactive: {
-    bg: colors.background,
-    border: `1px solid ${colors.border.default}`,
-    boxShadow: shadows.card,
-  },
+const paddingClasses = {
+  none: '',
+  sm: 'p-4',
+  md: 'p-5',
+  lg: 'p-6',
 };
 
 /**
  * Professional Card Component
- * Consistent styling across the dashboard with hover effects
+ * Tailwind-only implementation based on DASHBOARD_DESIGN_SPEC.md
  */
 export default function Card({
   children,
   variant = 'default',
-  padding = spacing.cardPadding,
+  padding = 'md',
   hoverEffect = false,
   onClick,
-  ...rest
+  className,
+  ...props
 }: CardProps) {
-  const style = variantStyles[variant];
   const isInteractive = hoverEffect || onClick || variant === 'interactive';
 
   return (
-    <Box
-      bg={style.bg}
-      border={style.border}
-      borderRadius={borderRadius.lg}
-      p={padding}
-      boxShadow={style.boxShadow}
-      transition={transitions.all}
-      cursor={onClick ? 'pointer' : 'default'}
+    <div
       onClick={onClick}
-      _hover={
-        isInteractive
-          ? {
-              transform: 'translateY(-2px)',
-              boxShadow: shadows.cardHover,
-              borderColor: colors.primary[500],
-            }
-          : undefined
-      }
-      {...rest}
+      className={cn(
+        'card',
+        paddingClasses[padding],
+        onClick && 'cursor-pointer',
+        isInteractive && 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated hover:border-blue-500',
+        className
+      )}
+      {...props}
     >
       {children}
-    </Box>
+    </div>
   );
 }
 
@@ -91,24 +66,18 @@ export default function Card({
  */
 export function CardHeader({ children, action }: CardHeaderProps) {
   return (
-    <Flex
-      justify="space-between"
-      align="center"
-      mb={spacing.md}
-      pb={spacing.md}
-      borderBottom={`1px solid ${colors.border.light}`}
-    >
-      <Box>{children}</Box>
-      {action && <Box>{action}</Box>}
-    </Flex>
+    <div className="flex justify-between items-center mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+      <div>{children}</div>
+      {action && <div>{action}</div>}
+    </div>
   );
 }
 
 /**
  * Card Content wrapper
  */
-export function CardContent({ children }: CardContentProps) {
-  return <Box>{children}</Box>;
+export function CardContent({ children, className }: CardContentProps) {
+  return <div className={cn(className)}>{children}</div>;
 }
 
 /**
@@ -116,14 +85,9 @@ export function CardContent({ children }: CardContentProps) {
  */
 export function CardTitle({ children }: { children: ReactNode }) {
   return (
-    <Text
-      fontSize="20px"
-      fontWeight={600}
-      color={colors.text.primary}
-      lineHeight={1.4}
-    >
+    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white leading-snug">
       {children}
-    </Text>
+    </h3>
   );
 }
 
@@ -132,8 +96,8 @@ export function CardTitle({ children }: { children: ReactNode }) {
  */
 export function CardDescription({ children }: { children: ReactNode }) {
   return (
-    <Text fontSize="14px" color={colors.text.muted} mt={spacing.xs}>
+    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
       {children}
-    </Text>
+    </p>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import {
   Play,
@@ -13,7 +12,7 @@ import {
 } from 'lucide-react';
 import Card from './Card';
 import Button from './Button';
-import { colors, spacing, borderRadius, transitions } from '@/theme';
+import { cn } from '@/lib/utils';
 
 interface QuickActionCardProps {
   icon: ReactNode;
@@ -23,9 +22,6 @@ interface QuickActionCardProps {
   variant?: 'default' | 'primary';
 }
 
-/**
- * Quick Action Card Component
- */
 export function QuickActionCard({
   icon,
   title,
@@ -36,84 +32,58 @@ export function QuickActionCard({
   const isPrimary = variant === 'primary';
 
   return (
-    <Flex
-      as="button"
-      direction="column"
-      align="flex-start"
-      gap={spacing.sm}
-      p={spacing.lg}
-      borderRadius={borderRadius.lg}
-      bg={isPrimary ? colors.primary[700] : colors.background}
-      border={isPrimary ? 'none' : `1px solid ${colors.border.default}`}
-      cursor="pointer"
-      transition={transitions.all}
-      textAlign="left"
+    <button
       onClick={onClick}
-      _hover={{
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        borderColor: isPrimary ? undefined : colors.primary[500],
-        bg: isPrimary ? colors.primary[500] : colors.background,
-      }}
+      className={cn(
+        'flex flex-col items-start gap-2 p-6 rounded-lg cursor-pointer transition-all text-left hover:-translate-y-0.5 hover:shadow-md',
+        isPrimary
+          ? 'bg-blue-700 hover:bg-blue-600 border-none'
+          : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-blue-500'
+      )}
     >
-      <Flex
-        align="center"
-        justify="center"
-        w="40px"
-        h="40px"
-        borderRadius={borderRadius.md}
-        bg={isPrimary ? 'rgba(255,255,255,0.2)' : colors.primary[100]}
-        color={isPrimary ? colors.text.inverse : colors.primary[700]}
+      <div
+        className={cn(
+          'flex items-center justify-center w-10 h-10 rounded-md',
+          isPrimary
+            ? 'bg-white/20 text-white'
+            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+        )}
       >
         {icon}
-      </Flex>
+      </div>
 
-      <Box>
-        <Text
-          fontSize="16px"
-          fontWeight={600}
-          color={isPrimary ? colors.text.inverse : colors.text.primary}
-          mb={spacing.xs}
+      <div>
+        <h3
+          className={cn(
+            'text-base font-semibold mb-1',
+            isPrimary ? 'text-white' : 'text-zinc-900 dark:text-white'
+          )}
         >
           {title}
-        </Text>
-        <Text
-          fontSize="13px"
-          color={isPrimary ? 'rgba(255,255,255,0.8)' : colors.text.muted}
+        </h3>
+        <p
+          className={cn(
+            'text-[13px]',
+            isPrimary ? 'text-white/80' : 'text-zinc-400'
+          )}
         >
           {description}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </button>
   );
 }
 
-/**
- * Legacy Quick Actions Props - for backward compatibility
- */
-interface LegacyQuickActionsProps {
-  onViewFailed: () => void;
-  onViewDistribution: () => void;
-  onExport: () => void;
-}
-
-/**
- * New Quick Actions Props
- */
 interface QuickActionsProps {
   onRunCheck?: () => void;
   onExportReport?: () => void;
   onConfigure?: () => void;
   onAddMonitor?: () => void;
-  // Legacy props
   onViewFailed?: () => void;
   onViewDistribution?: () => void;
   onExport?: () => void;
 }
 
-/**
- * Quick Actions Grid Component
- */
 export default function QuickActions({
   onRunCheck,
   onExportReport,
@@ -123,22 +93,16 @@ export default function QuickActions({
   onViewDistribution,
   onExport,
 }: QuickActionsProps) {
-  // Check if using legacy props
   const isLegacy = onViewFailed || onViewDistribution || onExport;
 
   if (isLegacy) {
     return (
-      <Card variant="elevated" padding={spacing.lg}>
-        <Text
-          fontSize="18px"
-          fontWeight={600}
-          color={colors.text.primary}
-          mb={spacing.md}
-        >
+      <Card variant="elevated" className="p-6">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
           Quick Actions
-        </Text>
+        </h2>
 
-        <Flex gap={spacing.sm} flexWrap="wrap">
+        <div className="flex gap-2 flex-wrap">
           {onViewFailed && (
             <Button
               variant="primary"
@@ -166,26 +130,18 @@ export default function QuickActions({
               View Distribution
             </Button>
           )}
-        </Flex>
+        </div>
       </Card>
     );
   }
 
   return (
-    <Card variant="elevated" padding={spacing.lg}>
-      <Text
-        fontSize="14px"
-        fontWeight={500}
-        color={colors.text.muted}
-        mb={spacing.md}
-      >
+    <Card variant="elevated" className="p-6">
+      <span className="text-sm font-medium text-zinc-400 mb-4 block">
         Quick Actions
-      </Text>
+      </span>
 
-      <Grid
-        templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }}
-        gap={spacing.md}
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <QuickActionCard
           icon={<Play size={20} />}
           title="Run Compliance Check"
@@ -214,14 +170,11 @@ export default function QuickActions({
           description="Manage alert rules"
           onClick={onConfigure || (() => {})}
         />
-      </Grid>
+      </div>
     </Card>
   );
 }
 
-/**
- * Inline Quick Actions - Horizontal button bar
- */
 interface InlineActionsProps {
   actions: Array<{
     icon: ReactNode;
@@ -233,7 +186,7 @@ interface InlineActionsProps {
 
 export function InlineActions({ actions }: InlineActionsProps) {
   return (
-    <Flex gap={spacing.sm} flexWrap="wrap">
+    <div className="flex gap-2 flex-wrap">
       {actions.map((action, index) => (
         <Button
           key={index}
@@ -244,13 +197,10 @@ export function InlineActions({ actions }: InlineActionsProps) {
           {action.label}
         </Button>
       ))}
-    </Flex>
+    </div>
   );
 }
 
-/**
- * Action Link - Text link with arrow
- */
 interface ActionLinkProps {
   children: ReactNode;
   onClick: () => void;
@@ -258,22 +208,12 @@ interface ActionLinkProps {
 
 export function ActionLink({ children, onClick }: ActionLinkProps) {
   return (
-    <Flex
-      as="button"
-      align="center"
-      gap={spacing.xs}
-      color={colors.primary[500]}
-      fontSize="14px"
-      fontWeight={500}
-      cursor="pointer"
-      transition={transitions.colors}
+    <button
       onClick={onClick}
-      _hover={{
-        color: colors.primary[700],
-      }}
+      className="flex items-center gap-1 text-blue-600 dark:text-blue-500 text-sm font-medium cursor-pointer transition-colors hover:text-blue-700 dark:hover:text-blue-400"
     >
       {children}
       <ArrowRight size={14} />
-    </Flex>
+    </button>
   );
 }

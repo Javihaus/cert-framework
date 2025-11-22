@@ -1,9 +1,19 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
 import { useMemo } from 'react';
-import { colors, spacing, typography } from '@/theme';
+import { cn } from '@/lib/utils';
 import { EvaluationResult } from '@/types/cert';
+
+// Chart colors - using direct hex values
+const chartColors = {
+  error: '#EF4444', // red-500
+  warning: '#F59E0B', // amber-500
+  success: '#22C55E', // green-500
+  navy: '#18181B', // zinc-900
+  border: '#E4E4E7', // zinc-200
+  text: '#71717A', // zinc-500
+  muted: '#A1A1AA', // zinc-400
+};
 
 interface DistributionChartProps {
   results: EvaluationResult[];
@@ -68,190 +78,124 @@ export default function DistributionChart({ results, threshold }: DistributionCh
   }, [results, threshold]);
 
   const getBarColor = (status: string) => {
-    // Use colors from the palette
-    if (status === 'fail') return colors.error;     // Red from palette
-    if (status === 'warn') return colors.warning;   // Coral from palette
-    return colors.success;                          // Green from palette
+    if (status === 'fail') return chartColors.error;
+    if (status === 'warn') return chartColors.warning;
+    return chartColors.success;
   };
 
   const maxCount = Math.max(...buckets.map(b => b.count), 1);
 
   return (
-    <Box>
-      {/* Professional Legend - not prose explanation */}
-      <Flex gap={spacing.lg} mb={spacing.xl} align="center">
-        <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg={colors.error} borderRadius="2px" />
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
+    <div>
+      {/* Legend */}
+      <div className="flex gap-6 mb-8 items-center">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: chartColors.error }} />
+          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
             Failed (&lt; 0.5)
-          </Text>
-        </Flex>
-        <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg={colors.warning} borderRadius="2px" />
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
-            Near threshold (0.5–{threshold.toFixed(1)})
-          </Text>
-        </Flex>
-        <Flex align="center" gap={spacing.xs}>
-          <Box w="12px" h="12px" bg={colors.success} borderRadius="2px" />
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} fontWeight={typography.fontWeight.medium}>
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: chartColors.warning }} />
+          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+            Near threshold (0.5-{threshold.toFixed(1)})
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: chartColors.success }} />
+          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
             Passed (&gt; {threshold.toFixed(1)})
-          </Text>
-        </Flex>
-      </Flex>
+          </span>
+        </div>
+      </div>
 
-      <Box position="relative" h="380px">
-        {/* Grid lines for reference */}
-        <Box position="absolute" left="0" right="0" top="0" bottom="60px">
+      <div className="relative h-[380px]">
+        {/* Grid lines */}
+        <div className="absolute left-0 right-0 top-0 bottom-[60px]">
           {[0, 25, 50, 75, 100].map((percent) => (
-            <Box
+            <div
               key={percent}
-              position="absolute"
-              left="0"
-              right="0"
-              bottom={`${(percent / 100) * 300}px`}
-              borderTop="1px solid"
-              borderColor={percent === 0 ? colors.navy : colors.patience}
-              opacity={percent === 0 ? 1 : 0.4}
+              className="absolute left-0 right-0 border-t"
+              style={{
+                bottom: `${(percent / 100) * 300}px`,
+                borderColor: percent === 0 ? chartColors.navy : chartColors.border,
+                opacity: percent === 0 ? 1 : 0.4,
+              }}
             >
-              <Text
-                position="absolute"
-                left="-40px"
-                top="-8px"
-                fontSize={typography.fontSize.xs}
-                color={colors.text.muted}
-                fontWeight={typography.fontWeight.medium}
+              <span
+                className="absolute left-[-40px] top-[-8px] text-xs font-medium"
+                style={{ color: chartColors.muted }}
               >
                 {Math.round((percent / 100) * maxCount)}
-              </Text>
-            </Box>
+              </span>
+            </div>
           ))}
-        </Box>
+        </div>
 
         {/* Bar Chart */}
-        <Flex
-          align="flex-end"
-          h="300px"
-          gap={spacing.xs}
-          position="relative"
-          ml="40px"
-        >
+        <div className="flex items-end h-[300px] gap-1 relative ml-10">
           {buckets.map((bucket, idx) => (
-            <Flex
+            <div
               key={idx}
-              flex="1"
-              direction="column"
-              align="center"
-              position="relative"
-              h="100%"
-              justify="flex-end"
-              role="group"
+              className="flex-1 flex flex-col items-center relative h-full justify-end group"
             >
               {/* Bar */}
-              <Box
-                bg={getBarColor(bucket.status)}
-                w="100%"
-                h={bucket.count > 0 ? `${bucket.percentage}%` : '0%'}
-                minH={bucket.count > 0 ? '8px' : '0px'}
-                borderRadius="3px 3px 0 0"
-                transition="all 0.2s"
-                opacity={0.9}
-                _groupHover={{ opacity: 1 }}
-                cursor="pointer"
-                position="relative"
+              <div
+                className="w-full rounded-t transition-all cursor-pointer opacity-90 group-hover:opacity-100 relative"
+                style={{
+                  backgroundColor: getBarColor(bucket.status),
+                  height: bucket.count > 0 ? `${bucket.percentage}%` : '0%',
+                  minHeight: bucket.count > 0 ? '8px' : '0px',
+                }}
               >
-                {/* Tooltip-style value on hover */}
+                {/* Tooltip */}
                 {bucket.count > 0 && (
-                  <Box
-                    position="absolute"
-                    top="-32px"
-                    left="50%"
-                    transform="translateX(-50%)"
-                    bg={colors.navy}
-                    color="white"
-                    px={spacing.xs}
-                    py="4px"
-                    borderRadius="4px"
-                    fontSize={typography.fontSize.xs}
-                    fontWeight={typography.fontWeight.semibold}
-                    whiteSpace="nowrap"
-                    opacity="0"
-                    transition="opacity 0.2s"
-                    _groupHover={{ opacity: 1 }}
-                    pointerEvents="none"
-                    zIndex="10"
+                  <div
+                    className="absolute top-[-32px] left-1/2 -translate-x-1/2 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-white"
+                    style={{ backgroundColor: chartColors.navy }}
                   >
                     {bucket.count} traces
-                  </Box>
+                  </div>
                 )}
-              </Box>
+              </div>
 
-              {/* Threshold marker - elegant vertical line */}
+              {/* Threshold marker */}
               {idx === 6 && (
-                <Box
-                  position="absolute"
-                  right="-4px"
-                  bottom="0"
-                  w="2px"
-                  h="300px"
-                  bg={colors.navy}
-                  opacity="0.3"
-                  pointerEvents="none"
+                <div
+                  className="absolute right-[-4px] bottom-0 w-0.5 h-[300px] opacity-30 pointer-events-none"
+                  style={{ backgroundColor: chartColors.navy }}
                 >
-                  <Box
-                    position="absolute"
-                    top="-28px"
-                    right="-2px"
-                    bg={colors.navy}
-                    color="white"
-                    px={spacing.xs}
-                    py="4px"
-                    borderRadius="4px"
-                    fontSize={typography.fontSize.xs}
-                    fontWeight={typography.fontWeight.semibold}
-                    whiteSpace="nowrap"
+                  <div
+                    className="absolute top-[-28px] right-[-2px] px-2 py-1 rounded text-xs font-semibold whitespace-nowrap text-white"
+                    style={{ backgroundColor: chartColors.navy }}
                   >
                     Threshold
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               )}
-            </Flex>
+            </div>
           ))}
-        </Flex>
+        </div>
 
-        {/* X-axis labels - clean, not rotated */}
-        <Flex mt={spacing.md} gap={spacing.xs} ml="40px">
+        {/* X-axis labels */}
+        <div className="flex mt-4 gap-1 ml-10">
           {buckets.map((bucket, idx) => (
-            <Box
-              key={idx}
-              flex="1"
-              textAlign="center"
-            >
-              <Text
-                fontSize={typography.fontSize.xs}
-                color={colors.text.muted}
-                fontWeight={typography.fontWeight.medium}
-              >
+            <div key={idx} className="flex-1 text-center">
+              <span className="text-xs font-medium" style={{ color: chartColors.muted }}>
                 {bucket.label}
-              </Text>
-            </Box>
+              </span>
+            </div>
           ))}
-        </Flex>
+        </div>
 
         {/* Axis label */}
-        <Text
-          position="absolute"
-          bottom="0"
-          left="50%"
-          transform="translateX(-50%)"
-          fontSize={typography.fontSize.xs}
-          color={colors.text.secondary}
-          fontWeight={typography.fontWeight.semibold}
-          mt={spacing.xs}
+        <span
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs font-semibold"
+          style={{ color: chartColors.text }}
         >
           Confidence Score
-        </Text>
-      </Box>
-    </Box>
+        </span>
+      </div>
+    </div>
   );
 }

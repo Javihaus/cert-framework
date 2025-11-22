@@ -1,8 +1,7 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button, Input } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
 import { ROIInputs } from '@/types/wizard';
 
 interface WizardROIFormProps {
@@ -17,189 +16,72 @@ export default function WizardROIForm({ inputs, onChange, onSubmit }: WizardROIF
   };
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
-        ROI Calculator
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">ROI Calculator</h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         Calculate the business case for AI automation. We'll compare your current manual process costs against estimated AI costs.
-      </Text>
+      </p>
 
       {/* Current Manual Process */}
-      <Card mb={spacing.lg} bg={colors.coral + '10'} borderColor={colors.coral}>
-        <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
-          Current Manual Process
-        </Text>
-
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md}>
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Tasks per Month
-            </Text>
-            <Input
-              type="number"
-              value={inputs.tasksPerMonth}
-              onChange={(e) => updateField('tasksPerMonth', Number(e.target.value))}
-              placeholder="1000"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              How many tasks done manually today?
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Minutes per Task
-            </Text>
-            <Input
-              type="number"
-              value={inputs.minutesPerTask}
-              onChange={(e) => updateField('minutesPerTask', Number(e.target.value))}
-              placeholder="15"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Average time to complete one task
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Labor Cost per Hour ($)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.laborCostPerHour}
-              onChange={(e) => updateField('laborCostPerHour', Number(e.target.value))}
-              placeholder="25"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Fully-loaded cost (salary + benefits)
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Error Rate (%)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.errorRate}
-              onChange={(e) => updateField('errorRate', Number(e.target.value))}
-              placeholder="5"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Percentage of tasks with errors
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Cost per Error ($)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.errorCostPerIncident}
-              onChange={(e) => updateField('errorCostPerIncident', Number(e.target.value))}
-              placeholder="100"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Average cost when error occurs
-            </Text>
-          </Box>
-        </Grid>
+      <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
+        <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">Current Manual Process</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Tasks per Month</label>
+            <input type="number" value={inputs.tasksPerMonth} onChange={(e) => updateField('tasksPerMonth', Number(e.target.value))} placeholder="1000" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">How many tasks done manually today?</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Minutes per Task</label>
+            <input type="number" value={inputs.minutesPerTask} onChange={(e) => updateField('minutesPerTask', Number(e.target.value))} placeholder="15" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Average time to complete one task</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Labor Cost per Hour ($)</label>
+            <input type="number" value={inputs.laborCostPerHour} onChange={(e) => updateField('laborCostPerHour', Number(e.target.value))} placeholder="25" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Fully-loaded cost (salary + benefits)</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Error Rate (%)</label>
+            <input type="number" value={inputs.errorRate} onChange={(e) => updateField('errorRate', Number(e.target.value))} placeholder="5" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Percentage of tasks with errors</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Cost per Error ($)</label>
+            <input type="number" value={inputs.errorCostPerIncident} onChange={(e) => updateField('errorCostPerIncident', Number(e.target.value))} placeholder="100" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Average cost when error occurs</p>
+          </div>
+        </div>
       </Card>
 
       {/* AI System Estimates */}
-      <Card mb={spacing.xl} bg={colors.olive + '10'} borderColor={colors.olive}>
-        <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
-          AI System Estimates
-        </Text>
-
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md}>
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              AI Success Rate (%)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.aiSuccessRate}
-              onChange={(e) => updateField('aiSuccessRate', Number(e.target.value))}
-              placeholder="85"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Expected accuracy of AI system
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              AI Cost per Task ($)
-            </Text>
-            <Input
-              type="number"
-              step="0.01"
-              value={inputs.aiCostPerTask}
-              onChange={(e) => updateField('aiCostPerTask', Number(e.target.value))}
-              placeholder="0.05"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              Model inference + infrastructure
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Human Review (%)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.humanReviewPercent}
-              onChange={(e) => updateField('humanReviewPercent', Number(e.target.value))}
-              placeholder="20"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              What % of AI outputs need human review?
-            </Text>
-          </Box>
-
-          <Box>
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium} color={colors.navy} mb={spacing.xs}>
-              Implementation Cost ($)
-            </Text>
-            <Input
-              type="number"
-              value={inputs.implementationCost}
-              onChange={(e) => updateField('implementationCost', Number(e.target.value))}
-              placeholder="50000"
-              bg="white"
-            />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
-              One-time setup cost
-            </Text>
-          </Box>
-        </Grid>
+      <Card className="mb-8 bg-green-50 dark:bg-green-900/20 border-green-600">
+        <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">AI System Estimates</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">AI Success Rate (%)</label>
+            <input type="number" value={inputs.aiSuccessRate} onChange={(e) => updateField('aiSuccessRate', Number(e.target.value))} placeholder="85" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Expected accuracy of AI system</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">AI Cost per Task ($)</label>
+            <input type="number" step="0.01" value={inputs.aiCostPerTask} onChange={(e) => updateField('aiCostPerTask', Number(e.target.value))} placeholder="0.05" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">Model inference + infrastructure</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Human Review (%)</label>
+            <input type="number" value={inputs.humanReviewPercent} onChange={(e) => updateField('humanReviewPercent', Number(e.target.value))} placeholder="20" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">What % of AI outputs need human review?</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-zinc-900 dark:text-white mb-1 block">Implementation Cost ($)</label>
+            <input type="number" value={inputs.implementationCost} onChange={(e) => updateField('implementationCost', Number(e.target.value))} placeholder="50000" className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white" />
+            <p className="text-xs text-zinc-500 mt-1">One-time setup cost</p>
+          </div>
+        </div>
       </Card>
 
-      <Button
-        onClick={onSubmit}
-        bg={colors.cobalt}
-        color="white"
-        w="100%"
-        py={spacing.lg}
-        fontSize={typography.fontSize.lg}
-        fontWeight={typography.fontWeight.semibold}
-        _hover={{ bg: colors.navy }}
-      >
-        Calculate ROI
-      </Button>
-    </Box>
+      <Button onClick={onSubmit} variant="primary" fullWidth size="lg">Calculate ROI</Button>
+    </div>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
+import { cn } from '@/lib/utils';
 import { ReadinessOutputs } from '@/types/wizard';
 import { CheckCircle2, AlertTriangle, XCircle, TrendingUp, Clock, AlertCircle, Database, Code, Users, Shield } from 'lucide-react';
 
@@ -20,32 +20,36 @@ export default function WizardReadinessResults({
       case 'ready':
         return {
           icon: CheckCircle2,
-          color: colors.olive,
-          bg: colors.olive + '10',
+          colorClass: 'text-green-600',
+          bgClass: 'bg-green-50 dark:bg-green-900/20',
+          borderClass: 'border-green-600',
           label: 'Ready to Implement',
           message: 'Your organization demonstrates strong readiness across all dimensions. You can proceed with confidence.'
         };
       case 'needs-preparation':
         return {
           icon: AlertTriangle,
-          color: colors.gold,
-          bg: colors.gold + '10',
+          colorClass: 'text-amber-500',
+          bgClass: 'bg-amber-50 dark:bg-amber-900/20',
+          borderClass: 'border-amber-500',
           label: 'Needs Preparation',
           message: 'Some gaps need to be addressed before implementation. Review recommendations and create a preparation plan.'
         };
       case 'not-ready':
         return {
           icon: XCircle,
-          color: colors.alert,
-          bg: colors.alert + '10',
+          colorClass: 'text-red-500',
+          bgClass: 'bg-red-50 dark:bg-red-900/20',
+          borderClass: 'border-red-500',
           label: 'Not Ready',
           message: 'Significant preparation required. Focus on building foundational capabilities before implementation.'
         };
       default:
         return {
           icon: AlertCircle,
-          color: colors.mist,
-          bg: colors.background,
+          colorClass: 'text-zinc-500',
+          bgClass: 'bg-zinc-100 dark:bg-zinc-800',
+          borderClass: 'border-zinc-300',
           label: 'Unknown',
           message: ''
         };
@@ -62,177 +66,169 @@ export default function WizardReadinessResults({
     compliance: Shield
   };
 
-  const getCategoryColor = (score: number) => {
-    if (score >= 70) return colors.olive;
-    if (score >= 40) return colors.gold;
-    return colors.alert;
+  const getCategoryConfig = (score: number) => {
+    if (score >= 70) return { colorClass: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-900/20', borderClass: 'border-green-600' };
+    if (score >= 40) return { colorClass: 'text-amber-500', bgClass: 'bg-amber-50 dark:bg-amber-900/20', borderClass: 'border-amber-500' };
+    return { colorClass: 'text-red-500', bgClass: 'bg-red-50 dark:bg-red-900/20', borderClass: 'border-red-500' };
   };
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
         Readiness Assessment Results
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+      </h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         Based on your organizational capabilities and preparedness
-      </Text>
+      </p>
 
       {/* Overall Readiness Badge */}
-      <Card
-        mb={spacing.lg}
-        bg={config.bg}
-        borderColor={config.color}
-        borderWidth="2px"
-        textAlign="center"
-        py={spacing.xl}
-      >
-        <Flex direction="column" align="center" gap={spacing.md}>
-          <ReadinessIcon size={64} color={config.color} />
-          <Box>
-            <Text fontSize={typography.fontSize['4xl']} fontWeight={typography.fontWeight.bold} color={config.color}>
+      <Card className={cn('mb-6 border-2 text-center py-8', config.bgClass, config.borderClass)}>
+        <div className="flex flex-col items-center gap-4">
+          <ReadinessIcon size={64} className={config.colorClass} />
+          <div>
+            <p className={cn('text-4xl font-bold', config.colorClass)}>
               {config.label}
-            </Text>
-            <Text fontSize={typography.fontSize['5xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mt={spacing.sm}>
+            </p>
+            <p className="text-5xl font-bold text-zinc-900 dark:text-white mt-2">
               {outputs.overallScore}/100
-            </Text>
-          </Box>
-          <Text fontSize={typography.fontSize.base} color={colors.text.secondary} maxW="600px">
+            </p>
+          </div>
+          <p className="text-base text-zinc-500 dark:text-zinc-400 max-w-xl">
             {config.message}
-          </Text>
-        </Flex>
+          </p>
+        </div>
       </Card>
 
       {/* Category Scores */}
-      <Card mb={spacing.lg}>
-        <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
+      <Card className="mb-6">
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
           Category Breakdown
-        </Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md}>
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
           {Object.entries(outputs.categoryScores).map(([category, score]) => {
             const CategoryIcon = categoryIcons[category as keyof typeof categoryIcons];
-            const categoryColor = getCategoryColor(score);
+            const categoryConfig = getCategoryConfig(score);
 
             return (
               <Card
                 key={category}
-                bg={categoryColor + '10'}
-                borderColor={categoryColor}
+                className={cn('border-2', categoryConfig.bgClass, categoryConfig.borderClass)}
               >
-                <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-                  <CategoryIcon size={20} color={categoryColor} />
-                  <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+                <div className="flex items-center gap-2 mb-2">
+                  <CategoryIcon size={20} className={categoryConfig.colorClass} />
+                  <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                     {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </Text>
-                </Flex>
-                <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={categoryColor}>
+                  </span>
+                </div>
+                <p className={cn('text-3xl font-bold', categoryConfig.colorClass)}>
                   {score}/100
-                </Text>
+                </p>
               </Card>
             );
           })}
-        </Grid>
+        </div>
       </Card>
 
       {/* Timeline Estimate */}
-      <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md} mb={spacing.lg}>
-        <Card borderColor={colors.cobalt}>
-          <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-            <Clock size={20} color={colors.cobalt} />
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card className="border-2 border-blue-600">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock size={20} className="text-blue-600" />
+            <span className="text-sm font-semibold text-zinc-900 dark:text-white">
               Estimated Timeline
-            </Text>
-          </Flex>
-          <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+            </span>
+          </div>
+          <p className="text-2xl font-bold text-zinc-900 dark:text-white">
             {outputs.estimatedTimelineWeeks} weeks
-          </Text>
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
+          </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
             Including preparation and implementation
-          </Text>
+          </p>
         </Card>
 
-        <Card borderColor={colors.alert}>
-          <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-            <AlertCircle size={20} color={colors.alert} />
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+        <Card className="border-2 border-red-500">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle size={20} className="text-red-500" />
+            <span className="text-sm font-semibold text-zinc-900 dark:text-white">
               Gaps Identified
-            </Text>
-          </Flex>
-          <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+            </span>
+          </div>
+          <p className="text-2xl font-bold text-zinc-900 dark:text-white">
             {outputs.gaps.length}
-          </Text>
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
+          </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
             Areas needing attention
-          </Text>
+          </p>
         </Card>
-      </Grid>
+      </div>
 
       {/* Gaps */}
       {outputs.gaps.length > 0 && (
-        <Card mb={spacing.lg} bg={colors.alert + '10'} borderColor={colors.alert}>
-          <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-            <AlertCircle size={24} color={colors.alert} />
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+        <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertCircle size={24} className="text-red-500" />
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
               Gaps to Address
-            </Text>
-          </Flex>
-          <Flex direction="column" gap={spacing.sm}>
+            </h3>
+          </div>
+          <div className="flex flex-col gap-2">
             {outputs.gaps.map((gap, idx) => (
-              <Flex key={idx} align="start" gap={spacing.sm} p={spacing.sm} bg="white" borderRadius="md">
-                <XCircle size={16} color={colors.alert} style={{ marginTop: '2px', flexShrink: 0 }} />
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+              <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
+                <XCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
                   {gap}
-                </Text>
-              </Flex>
+                </span>
+              </div>
             ))}
-          </Flex>
+          </div>
         </Card>
       )}
 
       {/* Recommendations */}
-      <Card mb={spacing.lg} bg={colors.cobalt + '10'} borderColor={colors.cobalt}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <TrendingUp size={24} color={colors.cobalt} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+      <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp size={24} className="text-blue-600" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Recommendations
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={spacing.sm}>
+          </h3>
+        </div>
+        <div className="flex flex-col gap-2">
           {outputs.recommendations.map((rec, idx) => (
-            <Flex key={idx} align="start" gap={spacing.sm} p={spacing.sm} bg="white" borderRadius="md">
-              <CheckCircle2 size={16} color={colors.cobalt} style={{ marginTop: '2px', flexShrink: 0 }} />
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+            <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
+              <CheckCircle2 size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {rec}
-              </Text>
-            </Flex>
+              </span>
+            </div>
           ))}
-        </Flex>
+        </div>
       </Card>
 
       {/* Risk Factors */}
       {outputs.riskFactors.length > 0 && (
-        <Card mb={spacing.lg} bg={colors.gold + '10'} borderColor={colors.gold}>
-          <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-            <AlertTriangle size={24} color={colors.gold} />
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+        <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle size={24} className="text-amber-500" />
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
               Risk Factors
-            </Text>
-          </Flex>
-          <Flex direction="column" gap={spacing.sm}>
+            </h3>
+          </div>
+          <div className="flex flex-col gap-2">
             {outputs.riskFactors.map((risk, idx) => (
-              <Flex key={idx} align="start" gap={spacing.sm} p={spacing.sm} bg="white" borderRadius="md">
-                <AlertTriangle size={16} color={colors.gold} style={{ marginTop: '2px', flexShrink: 0 }} />
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+              <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
+                <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
                   {risk}
-                </Text>
-              </Flex>
+                </span>
+              </div>
             ))}
-          </Flex>
+          </div>
         </Card>
       )}
 
       {/* Summary Message */}
-      <Card mb={spacing.lg}>
-        <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.md}>
+      <Card className="mb-6">
+        <p className="text-base text-zinc-500 dark:text-zinc-400">
           {outputs.readinessLevel === 'ready' && (
             <>
               Your organization is well-positioned to proceed with AI implementation.
@@ -254,22 +250,13 @@ export default function WizardReadinessResults({
               place, which can serve as your preparation roadmap.
             </>
           )}
-        </Text>
+        </p>
       </Card>
 
       {/* Continue Button */}
-      <Button
-        onClick={onNext}
-        bg={colors.cobalt}
-        color="white"
-        w="100%"
-        py={spacing.lg}
-        fontSize={typography.fontSize.lg}
-        fontWeight={typography.fontWeight.semibold}
-        _hover={{ bg: colors.navy }}
-      >
+      <Button onClick={onNext} variant="primary" fullWidth size="lg">
         Continue to Deployment Planning
       </Button>
-    </Box>
+    </div>
   );
 }

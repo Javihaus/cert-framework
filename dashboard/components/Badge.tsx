@@ -1,8 +1,7 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
-import { colors, borderRadius, spacing, componentTokens } from '@/theme';
+import { cn } from '@/lib/utils';
 
 type BadgeVariant =
   | 'default'
@@ -10,8 +9,7 @@ type BadgeVariant =
   | 'success'
   | 'warning'
   | 'error'
-  | 'info'
-  | 'pro';
+  | 'info';
 type BadgeSize = 'sm' | 'md' | 'lg';
 
 interface BadgeProps {
@@ -20,11 +18,36 @@ interface BadgeProps {
   size?: BadgeSize;
   dot?: boolean;
   icon?: ReactNode;
+  className?: string;
 }
+
+const variantClasses: Record<BadgeVariant, string> = {
+  default: 'badge-neutral',
+  primary: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+  success: 'badge-success',
+  warning: 'badge-warning',
+  error: 'badge-error',
+  info: 'badge-info',
+};
+
+const dotColors: Record<BadgeVariant, string> = {
+  default: 'bg-zinc-400',
+  primary: 'bg-blue-500',
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+  error: 'bg-red-500',
+  info: 'bg-blue-500',
+};
+
+const sizeClasses: Record<BadgeSize, string> = {
+  sm: 'text-[11px] h-5',
+  md: 'text-xs h-6',
+  lg: 'text-[13px] h-7',
+};
 
 /**
  * Professional Badge Component
- * For status indicators, labels, and counts
+ * Tailwind-only implementation based on DASHBOARD_DESIGN_SPEC.md
  */
 export default function Badge({
   children,
@@ -32,80 +55,23 @@ export default function Badge({
   size = 'md',
   dot = false,
   icon,
+  className,
 }: BadgeProps) {
-  const sizeStyles = componentTokens.badge[size];
-
-  const variantStyles = {
-    default: {
-      bg: colors.neutral[100],
-      color: colors.text.secondary,
-      dotColor: colors.neutral[400],
-    },
-    primary: {
-      bg: colors.primary[100],
-      color: colors.primary[700],
-      dotColor: colors.primary[500],
-    },
-    success: {
-      bg: colors.semantic.successLight,
-      color: colors.semantic.successDark,
-      dotColor: colors.semantic.success,
-    },
-    warning: {
-      bg: colors.semantic.warningLight,
-      color: colors.semantic.warningDark,
-      dotColor: colors.semantic.warning,
-    },
-    error: {
-      bg: colors.semantic.errorLight,
-      color: colors.semantic.errorDark,
-      dotColor: colors.semantic.error,
-    },
-    info: {
-      bg: colors.semantic.infoLight,
-      color: colors.semantic.infoDark,
-      dotColor: colors.semantic.info,
-    },
-    pro: {
-      bg: colors.primary[700],
-      color: colors.text.inverse,
-      dotColor: colors.text.inverse,
-    },
-  };
-
-  const style = variantStyles[variant];
-
   return (
-    <Box
-      display="inline-flex"
-      alignItems="center"
-      justifyContent="center"
-      gap={spacing.xs}
-      h={sizeStyles.height}
-      px={sizeStyles.padding}
-      fontSize={sizeStyles.fontSize}
-      fontWeight={500}
-      borderRadius={sizeStyles.borderRadius}
-      bg={style.bg}
-      color={style.color}
-      whiteSpace="nowrap"
+    <span
+      className={cn(
+        'badge',
+        variantClasses[variant],
+        sizeClasses[size],
+        className
+      )}
     >
       {dot && (
-        <Box
-          w="6px"
-          h="6px"
-          borderRadius="full"
-          bg={style.dotColor}
-          flexShrink={0}
-        />
+        <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', dotColors[variant])} />
       )}
-      {icon && (
-        <Box as="span" display="flex" fontSize="12px">
-          {icon}
-        </Box>
-      )}
+      {icon && <span className="flex text-xs">{icon}</span>}
       {children}
-    </Box>
+    </span>
   );
 }
 
@@ -131,15 +97,15 @@ export function StatusBadge({
   size = 'md',
   showDot = true,
 }: StatusBadgeProps) {
-  const statusConfig = {
-    healthy: { variant: 'success' as const, label: 'Healthy' },
-    active: { variant: 'success' as const, label: 'Active' },
-    warning: { variant: 'warning' as const, label: 'Warning' },
-    error: { variant: 'error' as const, label: 'Error' },
-    inactive: { variant: 'default' as const, label: 'Inactive' },
-    pending: { variant: 'warning' as const, label: 'Pending' },
-    compliant: { variant: 'success' as const, label: 'Compliant' },
-    'non-compliant': { variant: 'error' as const, label: 'Non-Compliant' },
+  const statusConfig: Record<string, { variant: BadgeVariant; label: string }> = {
+    healthy: { variant: 'success', label: 'Healthy' },
+    active: { variant: 'success', label: 'Active' },
+    warning: { variant: 'warning', label: 'Warning' },
+    error: { variant: 'error', label: 'Error' },
+    inactive: { variant: 'default', label: 'Inactive' },
+    pending: { variant: 'warning', label: 'Pending' },
+    compliant: { variant: 'success', label: 'Compliant' },
+    'non-compliant': { variant: 'error', label: 'Non-Compliant' },
   };
 
   const config = statusConfig[status];
@@ -172,7 +138,7 @@ export function CountBadge({
   const displayCount = count > maxCount ? `${maxCount}+` : count;
 
   return (
-    <Badge variant={variant} size={size}>
+    <Badge variant={variant} size={size} className="badge-notification">
       {displayCount}
     </Badge>
   );
@@ -194,14 +160,12 @@ export function TrendBadge({ value, suffix = '%', size = 'sm' }: TrendBadgeProps
 
   return (
     <Badge variant={variant} size={size}>
-      <Flex align="center" gap="2px">
-        <Box as="span" fontSize="10px">
-          {isPositive ? '▲' : '▼'}
-        </Box>
+      <span className="flex items-center gap-0.5">
+        <span className="text-[10px]">{isPositive ? '▲' : '▼'}</span>
         {prefix}
         {Math.abs(value)}
         {suffix}
-      </Flex>
+      </span>
     </Badge>
   );
 }
@@ -215,11 +179,11 @@ interface RiskBadgeProps {
 }
 
 export function RiskBadge({ level, size = 'md' }: RiskBadgeProps) {
-  const riskConfig = {
-    minimal: { variant: 'success' as const, label: 'Minimal Risk' },
-    limited: { variant: 'info' as const, label: 'Limited Risk' },
-    high: { variant: 'warning' as const, label: 'High Risk' },
-    unacceptable: { variant: 'error' as const, label: 'Unacceptable' },
+  const riskConfig: Record<string, { variant: BadgeVariant; label: string }> = {
+    minimal: { variant: 'success', label: 'Minimal Risk' },
+    limited: { variant: 'info', label: 'Limited Risk' },
+    high: { variant: 'warning', label: 'High Risk' },
+    unacceptable: { variant: 'error', label: 'Unacceptable' },
   };
 
   const config = riskConfig[level];

@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, Text, Grid, Button } from '@chakra-ui/react';
 import FileUpload from '@/components/FileUpload';
 import RecommendationCard from '@/components/RecommendationCard';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
-import { colors, spacing, typography } from '@/theme';
 import { Zap, DollarSign, TrendingDown, Target, Package } from 'lucide-react';
 import { Trace, OptimizationOpportunity } from '@/types/trace';
 import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
@@ -42,63 +40,54 @@ export default function OptimizationPage() {
   const highImpactCount = recommendations.filter((r) => r.impact === 'high').length;
 
   return (
-    <Box p={spacing.xl}>
+    <div className="p-8">
       {/* Header */}
-      <Flex justify="space-between" align="start" mb={spacing.xl}>
-        <Box>
-          <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
             Optimization Opportunities
-          </Text>
-          <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+          </h1>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400">
             Discover opportunities to reduce AI costs
-          </Text>
-        </Box>
+          </p>
+        </div>
 
         {recommendations.length > 0 && (
-          <Box w="200px">
+          <div className="w-[200px]">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              style={{
-                width: '100%',
-                padding: `${spacing.xs} ${spacing.sm}`,
-                borderRadius: '6px',
-                border: `1px solid ${colors.patience}`,
-                backgroundColor: 'white',
-                fontSize: typography.fontSize.sm,
-                cursor: 'pointer',
-                color: colors.navy,
-              }}
+              onChange={(e) => setSortBy(e.target.value as 'savings' | 'impact')}
+              className="w-full px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-sm cursor-pointer text-zinc-900 dark:text-white"
             >
               <option value="savings">Sort by Savings</option>
               <option value="impact">Sort by Impact</option>
             </select>
-          </Box>
+          </div>
         )}
-      </Flex>
+      </div>
 
       {/* File upload */}
       {recommendations.length === 0 && (
         <Card>
-          <Flex direction="column" align="center" gap={spacing.md} py={spacing.xl}>
-            <Zap size={48} color={colors.gold} />
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+          <div className="flex flex-col items-center gap-4 py-8">
+            <Zap size={48} className="text-amber-500" />
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
               Upload trace file to find optimization opportunities
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} textAlign="center" maxW="500px">
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-[500px]">
               Upload your cert_traces.jsonl file to discover ways to reduce costs
-            </Text>
-            <Box w="100%" maxW="500px">
+            </p>
+            <div className="w-full max-w-[500px]">
               <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="Upload Trace File" />
-            </Box>
-          </Flex>
+            </div>
+          </div>
         </Card>
       )}
 
       {/* Summary Metrics */}
       {recommendations.length > 0 && (
         <>
-          <Grid templateColumns="repeat(3, 1fr)" gap={spacing.md} mb={spacing.lg}>
+          <div className="grid grid-cols-3 gap-4 mb-6">
             <MetricCard
               label="Potential Savings"
               value={`$${totalSavings.toFixed(2)}`}
@@ -117,20 +106,20 @@ export default function OptimizationPage() {
               icon={Package}
               variant="default"
             />
-          </Grid>
+          </div>
 
           {/* Recommendations List */}
-          <Box>
-            <Flex align="center" justify="space-between" mb={spacing.md}>
-              <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
                 Recommendations
-              </Text>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+              </h2>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {sortedRecommendations.length} optimization{sortedRecommendations.length !== 1 ? 's' : ''} available
-              </Text>
-            </Flex>
+              </span>
+            </div>
 
-            <Flex direction="column" gap={spacing.md}>
+            <div className="flex flex-col gap-4">
               {sortedRecommendations.map((rec, idx) => (
                 <RecommendationCard
                   key={idx}
@@ -145,51 +134,51 @@ export default function OptimizationPage() {
                   }}
                 />
               ))}
-            </Flex>
-          </Box>
+            </div>
+          </div>
 
           {/* Implementation Guide */}
-          <Card mt={spacing.xl}>
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+          <Card className="mt-8">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
               How to Implement These Optimizations
-            </Text>
-            <Flex direction="column" gap={spacing.sm}>
-              <Box>
-                <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+            </h2>
+            <div className="flex flex-col gap-2">
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Model Downgrades:
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Change your model parameter in API calls. Test with a sample of production prompts to verify quality remains acceptable.
-                </Text>
-              </Box>
-              <Box>
-                <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Caching:
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Implement semantic caching with Redis or use prompt caching features from Anthropic (Claude) or OpenAI.
-                </Text>
-              </Box>
-              <Box>
-                <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Prompt Optimization:
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Remove redundant context, use system messages effectively, and compress verbose instructions.
-                </Text>
-              </Box>
-              <Box>
-                <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Batch Processing:
-                </Text>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Group similar API calls together and process them in batches to reduce overhead.
-                </Text>
-              </Box>
-            </Flex>
+                </p>
+              </div>
+            </div>
           </Card>
         </>
       )}
-    </Box>
+    </div>
   );
 }

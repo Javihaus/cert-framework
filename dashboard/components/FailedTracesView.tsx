@@ -1,54 +1,62 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-  Badge,
-  VStack,
-  HStack,
-} from '@chakra-ui/react';
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-} from '@chakra-ui/table';
-import {
-  MdWarning,
-  MdInfo,
-  MdRemoveCircle,
-  MdHelp,
-  MdFileDownload,
-} from 'react-icons/md';
+import { AlertTriangle, Info, XCircle, HelpCircle, Download } from 'lucide-react';
 import Card from './Card';
+import Button from './Button';
+import Badge from './Badge';
+import { cn } from '@/lib/utils';
 import { EvaluationResult } from '@/types/cert';
 import { classifyFailure, PATTERNS } from '@/utils/patternClassifier';
-import { colors } from '@/theme/colors';
 
 interface FailedTracesViewProps {
   results: EvaluationResult[];
   threshold: number;
 }
 
-// Map icon names to actual icon components
-const ICON_MAP = {
-  MdWarning,
-  MdInfo,
-  MdRemoveCircle,
-  MdHelp,
+// Map icon names to Lucide icons
+const ICON_MAP: Record<string, React.ElementType> = {
+  MdWarning: AlertTriangle,
+  MdInfo: Info,
+  MdRemoveCircle: XCircle,
+  MdHelp: HelpCircle,
+};
+
+// Pattern color classes
+const PATTERN_COLORS: Record<string, { bg: string; border: string; text: string; iconBg: string; active: string }> = {
+  orange: {
+    bg: 'bg-orange-50 dark:bg-orange-900/20',
+    border: 'border-orange-300 hover:border-orange-400',
+    text: 'text-orange-500',
+    iconBg: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+    active: 'border-orange-300 bg-orange-50 dark:bg-orange-900/20',
+  },
+  blue: {
+    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    border: 'border-blue-300 hover:border-blue-400',
+    text: 'text-blue-500',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    active: 'border-blue-300 bg-blue-50 dark:bg-blue-900/20',
+  },
+  red: {
+    bg: 'bg-red-50 dark:bg-red-900/20',
+    border: 'border-red-300 hover:border-red-400',
+    text: 'text-red-500',
+    iconBg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+    active: 'border-red-300 bg-red-50 dark:bg-red-900/20',
+  },
+  gray: {
+    bg: 'bg-zinc-100 dark:bg-zinc-800',
+    border: 'border-zinc-300 hover:border-zinc-400',
+    text: 'text-zinc-500',
+    iconBg: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400',
+    active: 'border-zinc-300 bg-zinc-100 dark:bg-zinc-800',
+  },
 };
 
 export default function FailedTracesView({ results, threshold }: FailedTracesViewProps) {
-  // State: which pattern is currently filtered (null = show all)
   const [filterPattern, setFilterPattern] = useState<string | null>(null);
 
-  // Get failed results with pattern classification
-  // useMemo = only recalculate when results change (performance optimization)
   const failedResults = useMemo(() => {
     return results
       .filter(r => !r.passed)
@@ -62,13 +70,11 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
       }));
   }, [results]);
 
-  // Apply filter if one is selected
   const filteredResults = useMemo(() => {
     if (!filterPattern) return failedResults;
     return failedResults.filter(r => r.pattern.type === filterPattern);
   }, [failedResults, filterPattern]);
 
-  // Count how many of each pattern
   const patternCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     Object.keys(PATTERNS).forEach(key => {
@@ -80,7 +86,6 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
     return counts;
   }, [failedResults]);
 
-  // Export filtered results to CSV
   const handleExportCSV = () => {
     const headers = ['Timestamp', 'Score', 'Pattern', 'Query', 'Response'];
     const rows = filteredResults.map(r => [
@@ -101,7 +106,6 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
     URL.revokeObjectURL(url);
   };
 
-  // Export to JSON
   const handleExportJSON = () => {
     const exportData = filteredResults.map(r => ({
       timestamp: r.timestamp,
@@ -122,22 +126,21 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
     URL.revokeObjectURL(url);
   };
 
-  // Toggle filter when clicking a pattern box
   const handlePatternClick = (patternType: string) => {
     setFilterPattern(filterPattern === patternType ? null : patternType);
   };
 
   return (
-    <VStack gap="20px" align="stretch">
+    <div className="flex flex-col gap-5">
       {/* Pattern Cards */}
-      <Card style={{ borderColor: colors.patience }}>
-        <Text fontSize="24px" fontWeight="700" color={colors.navy} mb="12px">
+      <Card>
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">
           Failure Pattern Classification
-        </Text>
-        <Text fontSize="16px" color={colors.text.secondary} mb="20px" lineHeight="1.6">
+        </h2>
+        <p className="text-base text-zinc-500 dark:text-zinc-400 mb-5 leading-relaxed">
           {failedResults.length} failed traces grouped by failure type. Click a pattern to filter results.
-        </Text>
-        <Flex gap="12px" flexWrap="wrap">
+        </p>
+        <div className="flex gap-3 flex-wrap">
           {Object.entries(PATTERNS).map(([key, pattern]) => {
             const Icon = ICON_MAP[pattern.icon as keyof typeof ICON_MAP];
             const count = patternCounts[key];
@@ -145,170 +148,121 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
               ? ((count / failedResults.length) * 100).toFixed(1)
               : '0.0';
             const isActive = filterPattern === key;
+            const colorConfig = PATTERN_COLORS[pattern.color] || PATTERN_COLORS.gray;
 
             return (
-              <Box
+              <div
                 key={key}
-                p="20px"
-                border="2px solid"
-                borderColor={isActive ? `${pattern.color}.300` : 'gray.200'}
-                bg={isActive ? `${pattern.color}.50` : 'white'}
-                borderRadius="10px"
-                flex="1"
-                minW="200px"
-                cursor="pointer"
                 onClick={() => handlePatternClick(key)}
-                transition="all 0.2s"
-                _hover={{ borderColor: `${pattern.color}.400`, transform: 'translateY(-2px)' }}
+                className={cn(
+                  'p-5 border-2 rounded-lg flex-1 min-w-[200px] cursor-pointer transition-all hover:-translate-y-0.5',
+                  isActive ? colorConfig.active : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900',
+                  colorConfig.border
+                )}
               >
-                <HStack mb="12px">
-                  <Box
-                    w="40px"
-                    h="40px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    bg={`${pattern.color}.100`}
-                    color={`${pattern.color}.700`}
-                    borderRadius="8px"
-                  >
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={cn('w-10 h-10 flex items-center justify-center rounded-lg', colorConfig.iconBg)}>
                     <Icon size={20} />
-                  </Box>
-                  <Text fontSize="16px" fontWeight="600" color={colors.navy}>
+                  </div>
+                  <span className="text-base font-semibold text-zinc-900 dark:text-white">
                     {pattern.label}
-                  </Text>
-                </HStack>
-                <Text fontSize="32px" fontWeight="700" color={`${pattern.color}.500`} lineHeight="1">
+                  </span>
+                </div>
+                <p className={cn('text-3xl font-bold leading-none', colorConfig.text)}>
                   {count}
-                </Text>
-                <Text fontSize="14px" color={colors.text.muted} mt="4px">
+                </p>
+                <p className="text-sm text-zinc-400 mt-1">
                   {percentage}% of failures
-                </Text>
-              </Box>
+                </p>
+              </div>
             );
           })}
-        </Flex>
+        </div>
       </Card>
 
       {/* Export Buttons & Table */}
-      <Card style={{ borderColor: colors.patience }}>
-        <Flex justify="space-between" align="center" mb="20px">
-          <Text fontSize="24px" fontWeight="700" color={colors.navy}>
+      <Card>
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
             {filterPattern
               ? `${PATTERNS[filterPattern].label} Traces (${filteredResults.length})`
               : `Failed Traces (${failedResults.length})`
             }
-          </Text>
-          <HStack gap="12px">
-            <Button
-              onClick={handleExportCSV}
-              bg="white"
-              border="1px solid"
-              borderColor={colors.patience}
-              color={colors.navy}
-              fontSize="15px"
-              fontWeight="500"
-              px="18px"
-              py="10px"
-              h="auto"
-              _hover={{ bg: colors.background }}
-            >
-              <Flex align="center" gap="8px">
-                <MdFileDownload size={18} />
-                <span>Export CSV</span>
-              </Flex>
+          </h2>
+          <div className="flex gap-3">
+            <Button onClick={handleExportCSV} variant="secondary" size="sm" icon={<Download size={18} />}>
+              Export CSV
             </Button>
-            <Button
-              onClick={handleExportJSON}
-              bg="white"
-              border="1px solid"
-              borderColor={colors.patience}
-              color={colors.navy}
-              fontSize="15px"
-              fontWeight="500"
-              px="18px"
-              py="10px"
-              h="auto"
-              _hover={{ bg: colors.background }}
-            >
-              <Flex align="center" gap="8px">
-                <MdFileDownload size={18} />
-                <span>Export JSON</span>
-              </Flex>
+            <Button onClick={handleExportJSON} variant="secondary" size="sm" icon={<Download size={18} />}>
+              Export JSON
             </Button>
-          </HStack>
-        </Flex>
+          </div>
+        </div>
 
         {filteredResults.length === 0 ? (
-          <Text color={colors.text.muted} fontSize="16px" textAlign="center" py="60px">
+          <p className="text-zinc-400 text-base text-center py-16">
             No traces match the selected filter
-          </Text>
+          </p>
         ) : (
-          <Box overflowX="auto">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th fontSize="14px">Score</Th>
-                  <Th fontSize="14px">Pattern</Th>
-                  <Th fontSize="14px">Query</Th>
-                  <Th fontSize="14px">Response</Th>
-                  <Th fontSize="14px">Time</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-zinc-200 dark:border-zinc-700">
+                  <th className="text-left text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-3 px-2">Score</th>
+                  <th className="text-left text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-3 px-2">Pattern</th>
+                  <th className="text-left text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-3 px-2">Query</th>
+                  <th className="text-left text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-3 px-2">Response</th>
+                  <th className="text-left text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-3 px-2">Time</th>
+                </tr>
+              </thead>
+              <tbody>
                 {filteredResults.map((result, idx) => {
                   const Icon = ICON_MAP[result.pattern.icon as keyof typeof ICON_MAP];
+                  const colorConfig = PATTERN_COLORS[result.pattern.color] || PATTERN_COLORS.gray;
                   return (
-                    <Tr key={idx}>
-                      <Td>
-                        <Text fontSize="15px" fontWeight="700" color="red.500">
+                    <tr key={idx} className="border-b border-zinc-100 dark:border-zinc-800">
+                      <td className="py-3 px-2">
+                        <span className="text-sm font-bold text-red-500">
                           {result.measurement.confidence.toFixed(3)}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <HStack>
-                          <Icon size={18} color={`var(--chakra-colors-${result.pattern.color}-500)`} />
-                          <Badge colorScheme={result.pattern.color} fontSize="13px">
+                        </span>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="flex items-center gap-2">
+                          <Icon size={18} className={colorConfig.text} />
+                          <Badge variant={result.pattern.color === 'orange' ? 'warning' : result.pattern.color === 'red' ? 'error' : 'default'} size="sm">
                             {result.pattern.label}
                           </Badge>
-                        </HStack>
-                      </Td>
-                      <Td maxW="250px">
-                        <Text
-                          fontSize="14px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          whiteSpace="nowrap"
+                        </div>
+                      </td>
+                      <td className="py-3 px-2 max-w-[250px]">
+                        <span
+                          className="text-sm truncate block"
                           title={result.query}
                         >
                           {result.query}
-                        </Text>
-                      </Td>
-                      <Td maxW="350px">
-                        <Text
-                          fontSize="14px"
-                          color="gray.600"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          whiteSpace="nowrap"
+                        </span>
+                      </td>
+                      <td className="py-3 px-2 max-w-[350px]">
+                        <span
+                          className="text-sm text-zinc-500 truncate block"
                           title={result.response || ''}
                         >
                           {result.response || 'N/A'}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text fontSize="13px" color="gray.500">
+                        </span>
+                      </td>
+                      <td className="py-3 px-2">
+                        <span className="text-xs text-zinc-400">
                           {new Date(result.timestamp).toLocaleString()}
-                        </Text>
-                      </Td>
-                    </Tr>
+                        </span>
+                      </td>
+                    </tr>
                   );
                 })}
-              </Tbody>
-            </Table>
-          </Box>
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
-    </VStack>
+    </div>
   );
 }

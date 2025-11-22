@@ -1,14 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Text,
-  Flex,
-} from '@chakra-ui/react';
 import { Upload, CheckCircle2 } from 'lucide-react';
-import { colors } from '@/theme/colors';
+import Button from './Button';
 
 interface FileUploadProps {
   onFileLoad: (data: any) => void;
@@ -46,7 +40,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
   };
 
   return (
-    <Box>
+    <div>
       <input
         type="file"
         accept={accept}
@@ -58,54 +52,39 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         id="file-upload"
       />
 
-      <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+      <label htmlFor="file-upload" className="cursor-pointer">
         <Button
-          as="span"
-          size="md"
-          bg={colors.patience}
-          color={colors.text.primary}
-          _hover={{ bg: colors.mist }}
+          variant="secondary"
+          icon={<Upload size={20} />}
+          className="pointer-events-none"
         >
-          <Flex align="center" gap="8px">
-            <Upload size={20} strokeWidth={2} />
-            <span>{label}</span>
-          </Flex>
+          {label}
         </Button>
       </label>
 
       {fileName && (
-        <Box
-          mt="16px"
-          bg="#e8f5e9"
-          p="16px"
-          borderRadius="8px"
-        >
-          <Flex align="center" gap="12px">
-            <CheckCircle2 size={24} color={colors.success} strokeWidth={2} />
-            <Box>
-              <Text fontSize="15px" fontWeight="600" color={colors.success}>
+        <div className="mt-4 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 size={24} className="text-green-600 dark:text-green-500" />
+            <div>
+              <p className="text-sm font-semibold text-green-600 dark:text-green-500">
                 File uploaded successfully
-              </Text>
-              <Text fontSize="14px" color={colors.text.secondary}>
+              </p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 {fileName}
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       {error && (
-        <Box
-          mt="16px"
-          bg="#fee"
-          p="16px"
-          borderRadius="8px"
-        >
-          <Text fontSize="15px" color={colors.error} fontWeight="500">
+        <div className="mt-4 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+          <p className="text-sm font-medium text-red-600 dark:text-red-500">
             {error}
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
