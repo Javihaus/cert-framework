@@ -230,18 +230,19 @@ export default function MonitoringDashboard() {
                   Privacy Policy
                 </Text>
               </Link>
-              <Box
-                as="a"
+              <a
                 href="https://github.com/cert-framework"
                 target="_blank"
                 rel="noopener noreferrer"
-                fontSize="12px"
-                color={colors.text.muted}
-                cursor="pointer"
-                _hover={{ color: colors.primary[500] }}
+                style={{
+                  fontSize: '12px',
+                  color: colors.text.muted,
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                }}
               >
                 Documentation
-              </Box>
+              </a>
             </Flex>
           </Flex>
         </Box>
