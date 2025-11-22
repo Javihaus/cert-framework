@@ -13,6 +13,11 @@ Public API:
     - export_report(): Generate EU AI Act compliance reports (requires [compliance])
     - PRESETS: Industry preset configurations
 
+New Modules (v4.0.0):
+    - cert.monitoring: Production LLM monitoring (drift, latency, feedback)
+    - cert.compliance_2025: EU AI Act 2025 compliance (risk classification, GPAI, audit)
+    - cert.observability: Telemetry, visualization, and alerting
+
 Example Usage:
     >>> from cert import trace
     >>>
@@ -30,6 +35,16 @@ Example Usage:
     ...     text1="Revenue was $5M in Q4",
     ...     text2="Q4 revenue reached $5M"
     ... )
+    >>>
+    >>> # For EU AI Act 2025 compliance:
+    >>> from cert.compliance_2025 import AIActRiskClassifier
+    >>> classifier = AIActRiskClassifier()
+    >>> assessment = classifier.classify("HR Screening AI", domain="employment")
+    >>>
+    >>> # For production monitoring:
+    >>> from cert.monitoring import EmbeddingDriftMonitor, LatencyTracker
+    >>> drift_monitor = EmbeddingDriftMonitor()
+    >>> latency_tracker = LatencyTracker()
 
 Advanced Features (Experimental):
     For trajectory analysis and coordination monitoring, use:
