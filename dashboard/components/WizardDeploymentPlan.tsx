@@ -1,8 +1,7 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
 import { WizardState } from '@/types/wizard';
 import { CheckCircle2, Calendar, DollarSign, Shield, Code, Rocket, FileText, Users, AlertTriangle } from 'lucide-react';
 
@@ -15,217 +14,146 @@ export default function WizardDeploymentPlan({
   wizardState,
   onRestart
 }: WizardDeploymentPlanProps) {
-  // Generate phase-based roadmap
   const phases = generatePhases(wizardState);
   const summary = generateSummary(wizardState);
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
         Implementation Roadmap
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+      </h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         Your complete AI implementation plan based on business case, compliance requirements, and organizational readiness
-      </Text>
+      </p>
 
       {/* Executive Summary */}
-      <Card mb={spacing.lg} bg={colors.cobalt + '10'} borderColor={colors.cobalt}>
-        <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
-          Executive Summary
-        </Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md}>
-          <Flex align="center" gap={spacing.sm}>
-            <DollarSign size={20} color={colors.olive} />
-            <Box>
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Expected Annual Savings</Text>
-              <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                ${summary.annualSavings.toLocaleString()}
-              </Text>
-            </Box>
-          </Flex>
-
-          <Flex align="center" gap={spacing.sm}>
-            <Calendar size={20} color={colors.cobalt} />
-            <Box>
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Total Timeline</Text>
-              <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                {summary.totalWeeks} weeks
-              </Text>
-            </Box>
-          </Flex>
-
-          <Flex align="center" gap={spacing.sm}>
-            <Shield size={20} color={colors.gold} />
-            <Box>
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Compliance Level</Text>
-              <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                {summary.complianceLevel}
-              </Text>
-            </Box>
-          </Flex>
-
-          <Flex align="center" gap={spacing.sm}>
-            <Users size={20} color={colors.alert} />
-            <Box>
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Readiness Score</Text>
-              <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                {summary.readinessScore}/100
-              </Text>
-            </Box>
-          </Flex>
-        </Grid>
-
-        <Box mt={spacing.md} p={spacing.md} bg="white" borderRadius="md">
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-            <strong>Architecture:</strong> {summary.architecture}
-          </Text>
-        </Box>
+      <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">Executive Summary</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            <DollarSign size={20} className="text-green-600" />
+            <div>
+              <p className="text-xs text-zinc-500">Expected Annual Savings</p>
+              <p className="text-lg font-bold text-zinc-900 dark:text-white">${summary.annualSavings.toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar size={20} className="text-blue-600" />
+            <div>
+              <p className="text-xs text-zinc-500">Total Timeline</p>
+              <p className="text-lg font-bold text-zinc-900 dark:text-white">{summary.totalWeeks} weeks</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Shield size={20} className="text-amber-500" />
+            <div>
+              <p className="text-xs text-zinc-500">Compliance Level</p>
+              <p className="text-lg font-bold text-zinc-900 dark:text-white">{summary.complianceLevel}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users size={20} className="text-red-500" />
+            <div>
+              <p className="text-xs text-zinc-500">Readiness Score</p>
+              <p className="text-lg font-bold text-zinc-900 dark:text-white">{summary.readinessScore}/100</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 p-4 bg-white dark:bg-zinc-800 rounded-md">
+          <p className="text-sm text-zinc-500"><strong className="text-zinc-900 dark:text-white">Architecture:</strong> {summary.architecture}</p>
+        </div>
       </Card>
 
       {/* Implementation Phases */}
-      <Card mb={spacing.lg}>
-        <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.md}>
-          Implementation Phases
-        </Text>
-        <Flex direction="column" gap={spacing.md}>
+      <Card className="mb-6">
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">Implementation Phases</h3>
+        <div className="flex flex-col gap-4">
           {phases.map((phase, idx) => (
-            <Box
-              key={idx}
-              p={spacing.md}
-              borderRadius="md"
-              borderWidth="2px"
-              borderColor={phase.color}
-              bg={phase.color + '10'}
-            >
-              <Flex align="center" justify="space-between" mb={spacing.sm}>
-                <Flex align="center" gap={spacing.sm}>
-                  <phase.icon size={24} color={phase.color} />
-                  <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                    Phase {idx + 1}: {phase.name}
-                  </Text>
-                </Flex>
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                  {phase.duration} weeks
-                </Text>
-              </Flex>
-
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} mb={spacing.md}>
-                {phase.description}
-              </Text>
-
-              <Flex direction="column" gap={spacing.xs}>
+            <div key={idx} className={`p-4 rounded-md border-2 ${phase.borderClass} ${phase.bgClass}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <phase.icon size={24} className={phase.iconClass} />
+                  <span className="text-lg font-bold text-zinc-900 dark:text-white">Phase {idx + 1}: {phase.name}</span>
+                </div>
+                <span className="text-sm text-zinc-500">{phase.duration} weeks</span>
+              </div>
+              <p className="text-sm text-zinc-500 mb-4">{phase.description}</p>
+              <div className="flex flex-col gap-1">
                 {phase.tasks.map((task, taskIdx) => (
-                  <Flex key={taskIdx} align="start" gap={spacing.sm}>
-                    <CheckCircle2 size={16} color={phase.color} style={{ marginTop: '2px', flexShrink: 0 }} />
-                    <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                      {task}
-                    </Text>
-                  </Flex>
+                  <div key={taskIdx} className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className={`${phase.iconClass} mt-0.5 flex-shrink-0`} />
+                    <span className="text-sm text-zinc-500">{task}</span>
+                  </div>
                 ))}
-              </Flex>
-
+              </div>
               {phase.deliverables.length > 0 && (
-                <Box mt={spacing.sm} p={spacing.sm} bg="white" borderRadius="md">
-                  <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
-                    Key Deliverables:
-                  </Text>
-                  <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                    {phase.deliverables.join(' • ')}
-                  </Text>
-                </Box>
+                <div className="mt-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
+                  <span className="text-xs font-semibold text-zinc-900 dark:text-white">Key Deliverables: </span>
+                  <span className="text-xs text-zinc-500">{phase.deliverables.join(' + ')}</span>
+                </div>
               )}
-            </Box>
+            </div>
           ))}
-        </Flex>
+        </div>
       </Card>
 
       {/* Critical Success Factors */}
-      <Card mb={spacing.lg} bg={colors.gold + '10'} borderColor={colors.gold}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <AlertTriangle size={24} color={colors.gold} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-            Critical Success Factors
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={spacing.sm}>
+      <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertTriangle size={24} className="text-amber-500" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Critical Success Factors</h3>
+        </div>
+        <div className="flex flex-col gap-2">
           {summary.criticalFactors.map((factor, idx) => (
-            <Flex key={idx} align="start" gap={spacing.sm} p={spacing.sm} bg="white" borderRadius="md">
-              <AlertTriangle size={16} color={colors.gold} style={{ marginTop: '2px', flexShrink: 0 }} />
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                {factor}
-              </Text>
-            </Flex>
+            <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
+              <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-zinc-500">{factor}</span>
+            </div>
           ))}
-        </Flex>
+        </div>
       </Card>
 
       {/* Next Steps */}
-      <Card mb={spacing.lg}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <Rocket size={24} color={colors.cobalt} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-            Immediate Next Steps
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={spacing.sm}>
+      <Card className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Rocket size={24} className="text-blue-600" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Immediate Next Steps</h3>
+        </div>
+        <div className="flex flex-col gap-2">
           {summary.nextSteps.map((step, idx) => (
-            <Flex key={idx} align="start" gap={spacing.sm}>
-              <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.bold} color={colors.cobalt}>
-                {idx + 1}.
-              </Text>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                {step}
-              </Text>
-            </Flex>
+            <div key={idx} className="flex items-start gap-2">
+              <span className="text-lg font-bold text-blue-600">{idx + 1}.</span>
+              <span className="text-sm text-zinc-500">{step}</span>
+            </div>
           ))}
-        </Flex>
+        </div>
       </Card>
 
       {/* Actions */}
-      <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md}>
-        <Button
-          onClick={onRestart}
-          variant="outline"
-          borderColor={colors.patience}
-          color={colors.text.secondary}
-          py={spacing.lg}
-          fontSize={typography.fontSize.base}
-          _hover={{ borderColor: colors.cobalt, color: colors.cobalt }}
-        >
-          <Flex align="center" gap={spacing.sm}>
+      <div className="grid grid-cols-2 gap-4">
+        <Button onClick={onRestart} variant="secondary">
+          <div className="flex items-center gap-2">
             <FileText size={20} />
-            <Text>Start New Assessment</Text>
-          </Flex>
+            <span>Start New Assessment</span>
+          </div>
         </Button>
-
-        <Button
-          onClick={() => window.print()}
-          bg={colors.cobalt}
-          color="white"
-          py={spacing.lg}
-          fontSize={typography.fontSize.base}
-          _hover={{ bg: colors.navy }}
-        >
-          <Flex align="center" gap={spacing.sm}>
+        <Button onClick={() => window.print()} variant="primary">
+          <div className="flex items-center gap-2">
             <FileText size={20} />
-            <Text>Print / Export PDF</Text>
-          </Flex>
+            <span>Print / Export PDF</span>
+          </div>
         </Button>
-      </Grid>
+      </div>
 
-      {/* Disclaimer */}
-      <Box mt={spacing.lg} p={spacing.md} bg={colors.background} borderRadius="md">
-        <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} textAlign="center">
+      <div className="mt-6 p-4 bg-zinc-100 dark:bg-zinc-800 rounded-md">
+        <p className="text-xs text-zinc-500 text-center">
           This implementation plan is generated based on your inputs and industry best practices.
-          Actual timelines, costs, and requirements may vary. Consult with legal and technical experts
-          before making final implementation decisions.
-        </Text>
-      </Box>
-    </Box>
+          Actual timelines, costs, and requirements may vary.
+        </p>
+      </div>
+    </div>
   );
 }
-
-// Helper functions
 
 function generateSummary(state: WizardState) {
   return {
@@ -241,48 +169,25 @@ function generateSummary(state: WizardState) {
 
 function generateCriticalFactors(state: WizardState): string[] {
   const factors: string[] = [];
-
-  // From readiness assessment
   if (state.readiness.outputs) {
-    if (state.readiness.outputs.overallScore < 70) {
-      factors.push('Address organizational gaps before full implementation');
-    }
-    if (state.readiness.outputs.riskFactors.length > 0) {
-      factors.push('Mitigate identified risk factors to prevent project delays');
-    }
+    if (state.readiness.outputs.overallScore < 70) factors.push('Address organizational gaps before full implementation');
+    if (state.readiness.outputs.riskFactors.length > 0) factors.push('Mitigate identified risk factors to prevent project delays');
   }
-
-  // From risk assessment
   if (state.risk.outputs) {
-    if (state.risk.outputs.classification === 'high-risk') {
-      factors.push('EU AI Act compliance is mandatory - budget for audit and documentation');
-    }
-    if (state.risk.outputs.classification === 'prohibited') {
-      factors.push('Current use case is prohibited under EU AI Act - redesign required');
-    }
+    if (state.risk.outputs.classification === 'high-risk') factors.push('EU AI Act compliance is mandatory - budget for audit and documentation');
+    if (state.risk.outputs.classification === 'prohibited') factors.push('Current use case is prohibited under EU AI Act - redesign required');
   }
-
-  // From ROI
   if (state.roi.outputs) {
-    if (state.roi.outputs.breakEvenMonths > 12) {
-      factors.push('Long payback period - secure multi-year budget commitment');
-    }
-    if (state.roi.outputs.confidenceLevel === 'low') {
-      factors.push('Start with pilot to validate ROI assumptions before scaling');
-    }
+    if (state.roi.outputs.breakEvenMonths > 12) factors.push('Long payback period - secure multi-year budget commitment');
+    if (state.roi.outputs.confidenceLevel === 'low') factors.push('Start with pilot to validate ROI assumptions before scaling');
   }
-
-  // General best practices
   factors.push('Establish clear success metrics and monitoring from day one');
   factors.push('Plan for iterative improvement - initial deployment is just the beginning');
-
   return factors;
 }
 
 function generateNextSteps(state: WizardState): string[] {
   const steps: string[] = [];
-
-  // Prioritize based on readiness
   if (state.readiness.outputs && state.readiness.outputs.overallScore < 40) {
     steps.push('Secure executive sponsorship and formal budget allocation');
     steps.push('Develop data strategy and governance framework');
@@ -291,24 +196,17 @@ function generateNextSteps(state: WizardState): string[] {
     steps.push('Form project team with clear roles and responsibilities');
     steps.push('Set up development environment with chosen architecture');
   }
-
-  // Compliance requirements
   if (state.risk.outputs && state.risk.outputs.classification === 'high-risk') {
     steps.push('Engage legal counsel to establish EU AI Act compliance program');
     steps.push('Begin documentation of AI system design and risk management');
   }
-
-  // Technical setup
   if (state.architecture.selected) {
     steps.push(`Provision ${state.architecture.selected.name} infrastructure and accounts`);
     steps.push('Create proof-of-concept with sample data to validate approach');
   }
-
-  // General
   steps.push('Define success metrics and monitoring strategy');
   steps.push('Create user acceptance testing plan and criteria');
-
-  return steps.slice(0, 6); // Limit to 6 most important
+  return steps.slice(0, 6);
 }
 
 interface Phase {
@@ -318,13 +216,13 @@ interface Phase {
   tasks: string[];
   deliverables: string[];
   icon: any;
-  color: string;
+  iconClass: string;
+  borderClass: string;
+  bgClass: string;
 }
 
 function generatePhases(state: WizardState): Phase[] {
   const phases: Phase[] = [];
-
-  // Determine if preparation phase is needed
   const needsPreparation = state.readiness.outputs && state.readiness.outputs.gaps.length > 3;
 
   if (needsPreparation) {
@@ -332,58 +230,40 @@ function generatePhases(state: WizardState): Phase[] {
       name: 'Preparation & Foundation',
       description: 'Address organizational gaps and establish foundational capabilities',
       duration: Math.ceil((state.readiness.outputs?.estimatedTimelineWeeks || 12) * 0.3),
-      tasks: [
-        'Secure executive sponsorship and budget approval',
-        'Establish data governance framework and policies',
-        'Hire or contract required technical expertise',
-        'Set up compliance and audit framework',
-        'Implement security and privacy measures'
-      ],
-      deliverables: ['Data governance framework', 'Compliance program', 'Technical team in place'],
+      tasks: ['Secure executive sponsorship and budget approval', 'Establish data governance framework', 'Hire required technical expertise', 'Set up compliance framework', 'Implement security measures'],
+      deliverables: ['Data governance framework', 'Compliance program', 'Technical team'],
       icon: Users,
-      color: colors.alert
+      iconClass: 'text-red-500',
+      borderClass: 'border-red-500',
+      bgClass: 'bg-red-50 dark:bg-red-900/20'
     });
   }
 
-  // Planning & Design
   phases.push({
     name: 'Planning & Architecture',
     description: 'Detailed design and technical planning based on chosen architecture',
     duration: 3,
-    tasks: [
-      `Provision ${state.architecture.selected?.name || 'selected architecture'} infrastructure`,
-      'Design data pipelines and model architecture',
-      'Create detailed project timeline and milestones',
-      'Define success metrics and KPIs',
-      'Establish monitoring and observability strategy'
-    ],
+    tasks: [`Provision ${state.architecture.selected?.name || 'selected architecture'} infrastructure`, 'Design data pipelines and model architecture', 'Create detailed project timeline', 'Define success metrics and KPIs', 'Establish monitoring strategy'],
     deliverables: ['Technical architecture document', 'Project plan', 'Success criteria'],
     icon: Code,
-    color: colors.cobalt
+    iconClass: 'text-blue-600',
+    borderClass: 'border-blue-600',
+    bgClass: 'bg-blue-50 dark:bg-blue-900/20'
   });
 
-  // Development & Testing
-  const devDuration = state.readiness.outputs ?
-    Math.ceil((state.readiness.outputs.estimatedTimelineWeeks || 12) * 0.4) : 6;
-
+  const devDuration = state.readiness.outputs ? Math.ceil((state.readiness.outputs.estimatedTimelineWeeks || 12) * 0.4) : 6;
   phases.push({
     name: 'Development & Testing',
     description: 'Build, train, and validate the AI system',
     duration: devDuration,
-    tasks: [
-      'Prepare and label training data',
-      'Implement data processing pipelines',
-      'Develop and train AI models',
-      'Build integration with existing systems',
-      'Conduct thorough testing and validation',
-      'Perform security and compliance audits'
-    ],
+    tasks: ['Prepare and label training data', 'Implement data processing pipelines', 'Develop and train AI models', 'Build integration with existing systems', 'Conduct testing and validation', 'Perform security audits'],
     deliverables: ['Trained models', 'Integration code', 'Test reports', 'Security audit'],
     icon: Code,
-    color: colors.olive
+    iconClass: 'text-green-600',
+    borderClass: 'border-green-600',
+    bgClass: 'bg-green-50 dark:bg-green-900/20'
   });
 
-  // Compliance (if high-risk)
   if (state.risk.outputs && state.risk.outputs.classification === 'high-risk') {
     phases.push({
       name: 'Compliance & Documentation',
@@ -392,42 +272,34 @@ function generatePhases(state: WizardState): Phase[] {
       tasks: state.risk.outputs.complianceRequirements || [],
       deliverables: ['Technical documentation', 'Risk assessment report', 'Conformity assessment'],
       icon: Shield,
-      color: colors.gold
+      iconClass: 'text-amber-500',
+      borderClass: 'border-amber-500',
+      bgClass: 'bg-amber-50 dark:bg-amber-900/20'
     });
   }
 
-  // Deployment
   phases.push({
     name: 'Deployment & Launch',
     description: 'Production deployment and user rollout',
     duration: 2,
-    tasks: [
-      'Deploy to production environment',
-      'Conduct user training and onboarding',
-      'Implement monitoring and alerting',
-      'Gradual rollout to users (pilot → full)',
-      'Establish support and incident response procedures'
-    ],
+    tasks: ['Deploy to production environment', 'Conduct user training and onboarding', 'Implement monitoring and alerting', 'Gradual rollout to users', 'Establish support procedures'],
     deliverables: ['Production system', 'User documentation', 'Monitoring dashboards'],
     icon: Rocket,
-    color: colors.cobalt
+    iconClass: 'text-blue-600',
+    borderClass: 'border-blue-600',
+    bgClass: 'bg-blue-50 dark:bg-blue-900/20'
   });
 
-  // Optimization
   phases.push({
     name: 'Monitor & Optimize',
     description: 'Ongoing monitoring, improvement, and maintenance',
-    duration: 0, // Ongoing
-    tasks: [
-      'Monitor performance metrics and KPIs',
-      'Collect user feedback and iterate',
-      'Retrain models with new data',
-      'Optimize costs and performance',
-      'Maintain compliance documentation'
-    ],
+    duration: 0,
+    tasks: ['Monitor performance metrics and KPIs', 'Collect user feedback and iterate', 'Retrain models with new data', 'Optimize costs and performance', 'Maintain compliance documentation'],
     deliverables: ['Performance reports', 'Model updates', 'Cost optimization'],
     icon: FileText,
-    color: colors.olive
+    iconClass: 'text-green-600',
+    borderClass: 'border-green-600',
+    bgClass: 'bg-green-50 dark:bg-green-900/20'
   });
 
   return phases;

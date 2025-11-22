@@ -1,8 +1,6 @@
 'use client';
 
-import { Box, Flex } from '@chakra-ui/react';
-import { colors } from '@/theme/colors';
-import { spacing, containers } from '@/theme/tokens';
+import { cn } from '@/lib/utils';
 import Navigation, { NavigationSection } from './Navigation';
 import MonitoringSidebar from './MonitoringSidebar';
 import Footer from './Footer';
@@ -28,7 +26,7 @@ export default function AppLayout({
   const showSidebar = activeSection === 'monitoring';
 
   return (
-    <Box minH="100vh" display="flex" flexDirection="column" bg={colors.background}>
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950">
 
       {/* Top Navigation - ALWAYS VISIBLE */}
       <Navigation
@@ -37,7 +35,7 @@ export default function AppLayout({
       />
 
       {/* Main Content Area */}
-      <Flex flex="1" position="relative" justify="center">
+      <div className="flex flex-1 relative justify-center">
 
         {/* Conditional Sidebar - ONLY in Monitoring section */}
         {showSidebar && (
@@ -49,22 +47,19 @@ export default function AppLayout({
         )}
 
         {/* Main Content */}
-        <Box
-          as="main"
-          w="100%"
-          maxW={containers.content}
-          ml={{ base: '0', md: showSidebar ? '240px' : '0' }}
-          transition="margin-left 0.3s"
-          px={spacing.xl}
-          py={spacing['2xl']}
+        <main
+          className={cn(
+            'w-full max-w-6xl px-8 py-12 transition-[margin-left] duration-300',
+            showSidebar ? 'md:ml-60' : 'ml-0'
+          )}
         >
           {children}
-        </Box>
+        </main>
 
-      </Flex>
+      </div>
 
       {/* Footer */}
       <Footer />
-    </Box>
+    </div>
   );
 }

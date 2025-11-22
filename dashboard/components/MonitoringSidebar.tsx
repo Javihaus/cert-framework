@@ -1,15 +1,12 @@
 'use client';
 
-import React from 'react';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors } from '@/theme/colors';
-import { spacing, radius, typography } from '@/theme/tokens';
-import { icons, iconSizes } from '@/theme/icons';
+import { Upload, LayoutDashboard, AlertTriangle, BarChart3, FileText, Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SidebarItem {
   id: string;
   label: string;
-  icon: any;
+  icon: React.ElementType;
   enabled: boolean;
 }
 
@@ -26,113 +23,55 @@ export default function MonitoringSidebar({
 }: MonitoringSidebarProps) {
 
   const items: SidebarItem[] = [
-    { id: 'load', label: 'Load Data', icon: icons.upload, enabled: true },
-    { id: 'overview', label: 'Overview', icon: icons.dashboard, enabled: hasData },
-    { id: 'failed', label: 'Failed Traces', icon: icons.warning, enabled: hasData },
-    { id: 'distribution', label: 'Distribution', icon: icons.chart, enabled: hasData },
-    { id: 'documents', label: 'Documents', icon: icons.document, enabled: hasData },
+    { id: 'load', label: 'Load Data', icon: Upload, enabled: true },
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard, enabled: hasData },
+    { id: 'failed', label: 'Failed Traces', icon: AlertTriangle, enabled: hasData },
+    { id: 'distribution', label: 'Distribution', icon: BarChart3, enabled: hasData },
+    { id: 'documents', label: 'Documents', icon: FileText, enabled: hasData },
   ];
 
   return (
-    <Box
-      w="240px"
-      h="100%"
-      bg="white"
-      borderRight="1px solid"
-      borderColor={colors.patience}
-      position="fixed"
-      left="0"
-      top="80px"
-      bottom="0"
-      pt={spacing.xl}
-      overflowY="auto"
-      display={{ base: 'none', md: 'flex' }}
-      flexDirection="column"
-    >
+    <div className="w-60 h-full bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700 fixed left-0 top-20 bottom-0 pt-8 overflow-y-auto hidden md:flex flex-col">
       {/* Section Title */}
-      <Text
-        px={spacing.lg}
-        mb={spacing.md}
-        fontSize={typography.fontSize.xs}
-        fontWeight={typography.fontWeight.semibold}
-        color={colors.text.muted}
-        textTransform="uppercase"
-        letterSpacing="0.05em"
-      >
+      <span className="px-6 mb-4 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
         Monitoring
-      </Text>
+      </span>
 
       {/* Navigation Items */}
-      <Flex direction="column" gap={spacing.xs} px={spacing.sm}>
+      <div className="flex flex-col gap-1 px-2">
         {items.map((item) => {
           const isActive = activeTab === item.id;
           const Icon = item.icon;
 
           return (
-            <Box
+            <button
               key={item.id}
-              as="button"
               onClick={() => item.enabled && onTabChange(item.id)}
-              w="100%"
-              px={spacing.md}
-              py={spacing.sm}
-              borderRadius={radius.md}
-              display="flex"
-              alignItems="center"
-              gap={spacing.sm}
-              cursor={item.enabled ? 'pointer' : 'not-allowed'}
-              transition="all 0.2s"
-              bg={isActive ? colors.navy : 'transparent'}
-              color={
-                !item.enabled
-                  ? colors.text.muted
-                  : isActive
-                  ? 'white'
-                  : colors.text.primary
-              }
-              opacity={item.enabled ? 1 : 0.4}
-              pointerEvents={item.enabled ? 'auto' : 'none'}
-              _hover={
-                item.enabled
-                  ? {
-                      bg: isActive ? colors.navy : colors.background,
-                    }
-                  : {}
-              }
-              fontWeight={isActive ? typography.fontWeight.semibold : typography.fontWeight.medium}
-              fontSize={typography.fontSize.sm}
+              disabled={!item.enabled}
+              className={cn(
+                'w-full px-4 py-2 rounded-md flex items-center gap-2 transition-all text-sm text-left',
+                isActive
+                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold'
+                  : 'text-zinc-900 dark:text-zinc-100 font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800',
+                !item.enabled && 'opacity-40 cursor-not-allowed'
+              )}
             >
-              {/* Icon */}
-              <Icon size={iconSizes.sm} />
-
-              {/* Label */}
-              <Text flex="1" textAlign="left">
-                {item.label}
-              </Text>
-            </Box>
+              <Icon size={18} />
+              <span className="flex-1">{item.label}</span>
+            </button>
           );
         })}
-      </Flex>
+      </div>
 
       {/* Privacy Notice */}
-      <Box
-        mt="auto"
-        px={spacing.lg}
-        py={spacing.xl}
-        borderTop="1px solid"
-        borderColor={colors.patience}
-      >
-        <Flex align="flex-start" gap={spacing.xs}>
-          {React.createElement(icons.lock, { size: iconSizes.sm, color: colors.text.muted, style: { marginTop: '2px' } })}
-          <Text
-            fontSize={typography.fontSize.xs}
-            color={colors.text.muted}
-            lineHeight={typography.lineHeight.relaxed}
-          >
+      <div className="mt-auto px-6 py-8 border-t border-zinc-200 dark:border-zinc-700">
+        <div className="flex items-start gap-1">
+          <Lock size={14} className="text-zinc-400 mt-0.5 flex-shrink-0" />
+          <span className="text-xs text-zinc-400 leading-relaxed">
             Your data stays private. All processing happens locally in your browser.
-          </Text>
-        </Flex>
-      </Box>
-    </Box>
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

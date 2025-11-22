@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/tabs';
+import { useState } from 'react';
 import Card from '@/components/Card';
-import { colors, spacing, typography } from '@/theme';
+import { cn } from '@/lib/utils';
 import { CheckCircle2, XCircle, Package, Code as CodeIcon, Zap } from 'lucide-react';
 
 interface Connector {
@@ -134,195 +132,156 @@ response = bedrock.invoke_model(
 ];
 
 export default function ConnectorsPage() {
+  const [activeTab, setActiveTab] = useState<'available' | 'planned'>('available');
   const availableConnectors = CONNECTORS.filter((c) => c.status === 'available');
   const plannedConnectors = CONNECTORS.filter((c) => c.status === 'planned');
 
+  const displayedConnectors = activeTab === 'available' ? availableConnectors : plannedConnectors;
+
   return (
-    <Box p={spacing.xl}>
+    <div className="p-8">
       {/* Header */}
-      <Flex direction="column" mb={spacing.xl}>
-        <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+      <div className="flex flex-col mb-8">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
           Connectors
-        </Text>
-        <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+        </h1>
+        <p className="text-lg text-zinc-500 dark:text-zinc-400">
           Automatic tracing for all major AI platforms with zero code changes
-        </Text>
-      </Flex>
+        </p>
+      </div>
 
       {/* Quick Start */}
-      <Card mb={spacing.xl}>
-        <Flex align="center" gap={spacing.md} mb={spacing.md}>
-          <Zap size={24} color={colors.cobalt} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+      <Card className="mb-8">
+        <div className="flex items-center gap-4 mb-4">
+          <Zap size={24} className="text-blue-600" />
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Quick Start
-          </Text>
-        </Flex>
-        <Box bg={colors.background} p={spacing.md} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm} mb={spacing.md}>
+          </h2>
+        </div>
+        <div className="bg-zinc-100 dark:bg-zinc-800 p-4 rounded-md font-mono text-sm mb-4">
           pip install cert-framework[integrations]
-        </Box>
-        <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+        </div>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Then add this single line to your code:
-        </Text>
-        <Box bg={colors.background} p={spacing.md} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm} mt={spacing.sm}>
+        </p>
+        <div className="bg-zinc-100 dark:bg-zinc-800 p-4 rounded-md font-mono text-sm mt-2">
           from cert.integrations.auto import *
-        </Box>
-        <Text fontSize={typography.fontSize.sm} color={colors.olive} mt={spacing.md} fontWeight={typography.fontWeight.medium}>
-          ✓ All AI API calls are now automatically traced to cert_traces.jsonl
-        </Text>
+        </div>
+        <p className="text-sm text-green-600 dark:text-green-500 mt-4 font-medium">
+          All AI API calls are now automatically traced to cert_traces.jsonl
+        </p>
       </Card>
 
       {/* Tabs */}
-      <Tabs variant="enclosed" colorScheme="blue">
-        <TabList borderBottom="2px solid" borderColor={colors.patience}>
-          <Tab
-            _selected={{ bg: colors.cobalt, color: 'white' }}
-            color={colors.text.secondary}
-            fontWeight={typography.fontWeight.medium}
+      <div className="border-b-2 border-zinc-200 dark:border-zinc-700 mb-6">
+        <div className="flex gap-0">
+          <button
+            onClick={() => setActiveTab('available')}
+            className={cn(
+              'px-4 py-2 font-medium text-sm transition-colors',
+              activeTab === 'available'
+                ? 'bg-blue-600 text-white rounded-t-md'
+                : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+            )}
           >
             Available ({availableConnectors.length})
-          </Tab>
-          <Tab
-            _selected={{ bg: colors.cobalt, color: 'white' }}
-            color={colors.text.secondary}
-            fontWeight={typography.fontWeight.medium}
+          </button>
+          <button
+            onClick={() => setActiveTab('planned')}
+            className={cn(
+              'px-4 py-2 font-medium text-sm transition-colors',
+              activeTab === 'planned'
+                ? 'bg-blue-600 text-white rounded-t-md'
+                : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+            )}
           >
             Planned ({plannedConnectors.length})
-          </Tab>
-        </TabList>
+          </button>
+        </div>
+      </div>
 
-        <TabPanels>
-          {/* Available Connectors */}
-          <TabPanel p={0} pt={spacing.lg}>
-            <Flex direction="column" gap={spacing.lg}>
-              {availableConnectors.map((connector) => (
-                <Card key={connector.platform}>
-                  <Flex justify="space-between" align="start" mb={spacing.md}>
-                    <Box>
-                      <Flex align="center" gap={spacing.sm} mb={spacing.xs}>
-                        <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                          {connector.name}
-                        </Text>
-                        <Flex
-                          align="center"
-                          gap={spacing.xs}
-                          px={spacing.sm}
-                          py={spacing.xs}
-                          bg={colors.olive + '20'}
-                          borderRadius="full"
-                        >
-                          <CheckCircle2 size={14} color={colors.olive} />
-                          <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.olive}>
-                            Available
-                          </Text>
-                        </Flex>
-                      </Flex>
-                      <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                        {connector.description}
-                      </Text>
-                    </Box>
-                  </Flex>
+      {/* Connectors List */}
+      <div className="flex flex-col gap-6">
+        {displayedConnectors.map((connector) => (
+          <Card key={connector.platform}>
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                    {connector.name}
+                  </h3>
+                  {connector.status === 'available' ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                      <CheckCircle2 size={14} className="text-green-600 dark:text-green-500" />
+                      <span className="text-xs font-medium text-green-600 dark:text-green-500">
+                        Available
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-200 dark:bg-zinc-700 rounded-full">
+                      <Package size={14} className="text-zinc-500 dark:text-zinc-400" />
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                        {connector.releaseDate}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {connector.description}
+                </p>
+              </div>
+            </div>
 
-                  {/* Features */}
-                  <Box mb={spacing.md}>
-                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
-                      Features:
-                    </Text>
-                    <Grid templateColumns="repeat(2, 1fr)" gap={spacing.xs}>
-                      {connector.features.map((feature, idx) => (
-                        <Flex key={idx} align="center" gap={spacing.xs}>
-                          <CheckCircle2 size={14} color={colors.cobalt} />
-                          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                            {feature}
-                          </Text>
-                        </Flex>
-                      ))}
-                    </Grid>
-                  </Box>
+            {/* Features */}
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">
+                {connector.status === 'available' ? 'Features:' : 'Planned Features:'}
+              </h4>
+              <div className="grid grid-cols-2 gap-1">
+                {connector.features.map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-1">
+                    <CheckCircle2
+                      size={14}
+                      className={cn(
+                        connector.status === 'available'
+                          ? 'text-blue-600 dark:text-blue-500'
+                          : 'text-zinc-400 dark:text-zinc-500'
+                      )}
+                    />
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {feature}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Installation */}
-                  <Box mb={spacing.md}>
-                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
-                      Installation:
-                    </Text>
-                    <Box bg={colors.background} p={spacing.sm} borderRadius="md" fontFamily="mono" fontSize={typography.fontSize.sm}>
-                      {connector.installCommand}
-                    </Box>
-                  </Box>
+            {/* Installation - only for available connectors */}
+            {connector.status === 'available' && (
+              <>
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">
+                    Installation:
+                  </h4>
+                  <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-md font-mono text-sm">
+                    {connector.installCommand}
+                  </div>
+                </div>
 
-                  {/* Usage Example */}
-                  <Box>
-                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
-                      Usage Example:
-                    </Text>
-                    <Box
-                      as="pre"
-                      bg={colors.navy}
-                      color="white"
-                      p={spacing.md}
-                      borderRadius="md"
-                      fontSize={typography.fontSize.xs}
-                      overflowX="auto"
-                      fontFamily="mono"
-                      lineHeight="1.5"
-                    >
-                      {connector.usageExample}
-                    </Box>
-                  </Box>
-                </Card>
-              ))}
-            </Flex>
-          </TabPanel>
-
-          {/* Planned Connectors */}
-          <TabPanel p={0} pt={spacing.lg}>
-            <Flex direction="column" gap={spacing.lg}>
-              {plannedConnectors.map((connector) => (
-                <Card key={connector.platform}>
-                  <Flex justify="space-between" align="start">
-                    <Box>
-                      <Flex align="center" gap={spacing.sm} mb={spacing.xs}>
-                        <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
-                          {connector.name}
-                        </Text>
-                        <Flex
-                          align="center"
-                          gap={spacing.xs}
-                          px={spacing.sm}
-                          py={spacing.xs}
-                          bg={colors.patience}
-                          borderRadius="full"
-                        >
-                          <Package size={14} color={colors.text.secondary} />
-                          <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.text.secondary}>
-                            {connector.releaseDate}
-                          </Text>
-                        </Flex>
-                      </Flex>
-                      <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} mb={spacing.md}>
-                        {connector.description}
-                      </Text>
-
-                      <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
-                        Planned Features:
-                      </Text>
-                      <Grid templateColumns="repeat(2, 1fr)" gap={spacing.xs}>
-                        {connector.features.map((feature, idx) => (
-                          <Flex key={idx} align="center" gap={spacing.xs}>
-                            <CheckCircle2 size={14} color={colors.mist} />
-                            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-                              {feature}
-                            </Text>
-                          </Flex>
-                        ))}
-                      </Grid>
-                    </Box>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Box>
+                {/* Usage Example */}
+                <div>
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">
+                    Usage Example:
+                  </h4>
+                  <pre className="bg-zinc-900 text-white p-4 rounded-md text-xs overflow-x-auto font-mono leading-relaxed">
+                    {connector.usageExample}
+                  </pre>
+                </div>
+              </>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }

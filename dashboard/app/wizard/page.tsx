@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, spacing, typography } from '@/theme';
+import { cn } from '@/lib/utils';
 import { WizardState, ROIInputs, RiskInputs, ArchitectureInputs, ArchitectureRecommendation, ReadinessInputs } from '@/types/wizard';
 import { calculateROI } from '@/lib/roi-calculator';
 import { classifyRisk } from '@/lib/risk-classifier';
@@ -244,61 +243,65 @@ export default function WizardPage() {
   };
 
   return (
-    <Box minH="100vh" bg={colors.background} py={spacing.xl}>
-      <Box maxW="1200px" mx="auto" px={spacing.lg}>
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-8">
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <Box mb={spacing.xl} textAlign="center">
-          <Text fontSize={typography.fontSize['4xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-1">
             AI Implementation Wizard
-          </Text>
-          <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+          </h1>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400">
             Data-driven planning for production AI systems
-          </Text>
-        </Box>
+          </p>
+        </div>
 
         {/* Progress Indicator */}
-        <Box mb={spacing.xl}>
-          <Flex justify="space-between" mb={spacing.sm}>
+        <div className="mb-8">
+          <div className="flex justify-between mb-2">
             {STEPS.map((step, idx) => (
-              <Flex key={step.id} align="center" flex={1}>
-                <Flex align="center" gap={spacing.sm} flex={1}>
-                  <Flex
-                    align="center"
-                    justify="center"
-                    w="40px"
-                    h="40px"
-                    borderRadius="full"
-                    bg={step.id <= state.currentStep ? colors.cobalt : colors.patience}
-                    color={step.id <= state.currentStep ? 'white' : colors.text.secondary}
-                    fontWeight={typography.fontWeight.semibold}
-                    fontSize={typography.fontSize.sm}
+              <div key={step.id} className="flex items-center flex-1">
+                <div className="flex items-center gap-2 flex-1">
+                  <div
+                    className={cn(
+                      'flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm',
+                      step.id <= state.currentStep
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400'
+                    )}
                   >
                     {step.id}
-                  </Flex>
-                  <Box flex={1}>
-                    <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={step.id <= state.currentStep ? colors.navy : colors.text.secondary}>
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn(
+                      'text-sm font-semibold',
+                      step.id <= state.currentStep
+                        ? 'text-zinc-900 dark:text-white'
+                        : 'text-zinc-500 dark:text-zinc-400'
+                    )}>
                       {step.name}
-                    </Text>
-                    <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {step.description}
-                    </Text>
-                  </Box>
-                </Flex>
+                    </p>
+                  </div>
+                </div>
                 {idx < STEPS.length - 1 && (
-                  <Box
-                    h="2px"
-                    flex="0 0 40px"
-                    bg={step.id < state.currentStep ? colors.cobalt : colors.patience}
-                    mx={spacing.xs}
+                  <div
+                    className={cn(
+                      'h-0.5 flex-[0_0_40px] mx-1',
+                      step.id < state.currentStep
+                        ? 'bg-blue-600'
+                        : 'bg-zinc-200 dark:bg-zinc-700'
+                    )}
                   />
                 )}
-              </Flex>
+              </div>
             ))}
-          </Flex>
-        </Box>
+          </div>
+        </div>
 
         {/* Step Content */}
-        <Box bg="white" borderRadius="lg" boxShadow="0 2px 8px rgba(0,0,0,0.1)" p={spacing.xl}>
+        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-md p-8">
           {/* Step 1: ROI Calculator */}
           {state.currentStep === 1 && !state.roi.completed && (
             <WizardROIForm
@@ -373,15 +376,15 @@ export default function WizardPage() {
               onRestart={handleRestart}
             />
           )}
-        </Box>
+        </div>
 
         {/* Footer */}
-        <Box mt={spacing.lg} textAlign="center">
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             All calculations are performed client-side. Your data never leaves your browser.
-          </Text>
-        </Box>
-      </Box>
-    </Box>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

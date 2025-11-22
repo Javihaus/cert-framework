@@ -1,395 +1,213 @@
 'use client';
 
-import { Box, Text, Grid, Flex } from '@chakra-ui/react';
-import { MdCheckCircle, MdInsertDriveFile, MdBarChart, MdSecurity, MdSpeed, MdVerifiedUser } from 'react-icons/md';
-import { colors, spacing, typography, borderRadius } from '@/theme';
+import { BarChart3, FileText, ShieldCheck, Clock, CheckCircle2 } from 'lucide-react';
 import Card from '@/components/Card';
 
 export default function HomePage() {
   return (
-    <Box>
+    <div>
       {/* Hero Section */}
-      <Box mb={spacing['3xl']} textAlign="center">
-        <Text
-          fontSize={typography.fontSize['5xl']}
-          fontWeight={typography.fontWeight.bold}
-          color={colors.navy}
-          mb={spacing.lg}
-          letterSpacing={typography.letterSpacing.tight}
-          lineHeight={typography.lineHeight.tight}
-        >
+      <div className="mb-16 text-center">
+        <h1 className="text-5xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight leading-tight">
           AI systems you can deploy with confidence
-        </Text>
-        <Text
-          fontSize={typography.fontSize['2xl']}
-          color={colors.text.secondary}
-          lineHeight={typography.lineHeight.relaxed}
-          maxW="800px"
-          mx="auto"
-        >
+        </h1>
+        <p className="text-2xl text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[800px] mx-auto">
           Built for the August 2025 EU AI Act deadline. Trace analysis that proves 90%+ accuracy. Documentation ready for conformity assessment.
-        </Text>
-      </Box>
+        </p>
+      </div>
 
       {/* Overview Card */}
-      <Card style={{ borderColor: colors.patience, marginBottom: spacing['2xl'] }}>
-        <Text
-          fontSize={typography.fontSize['3xl']}
-          fontWeight={typography.fontWeight.bold}
-          color={colors.navy}
-          mb={spacing.lg}
-        >
+      <Card className="mb-12">
+        <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-6">
           What CERT Does
-        </Text>
-        <Text
-          fontSize={typography.fontSize.lg}
-          lineHeight={typography.lineHeight.loose}
-          color={colors.text.primary}
-          mb={spacing.lg}
-        >
+        </h2>
+        <p className="text-lg leading-loose text-zinc-900 dark:text-zinc-100 mb-6">
           CERT combines production LLM monitoring with EU AI Act compliance automation.
           Track accuracy, analyze failures, and generate audit-ready documentation automatically.
-        </Text>
-        <Box
-          bg={colors.patience}
-          p={spacing.lg}
-          borderRadius={borderRadius.lg}
-        >
-          <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-            <MdVerifiedUser size={28} color={colors.cobalt} />
-            <Text
-              fontSize={typography.fontSize.lg}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-            >
+        </p>
+        <div className="bg-zinc-100 dark:bg-zinc-800 p-6 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 size={28} className="text-blue-600" />
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Built for Compliance Consultants
-            </Text>
-          </Flex>
-          <Text
-            fontSize={typography.fontSize.base}
-            lineHeight={typography.lineHeight.relaxed}
-            color={colors.text.primary}
-          >
+            </h3>
+          </div>
+          <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
             Turn weeks of manual documentation into hours. CERT analyzes your traces,
             classifies risk, and generates professional Word documents ready for expert review.
-          </Text>
-        </Box>
+          </p>
+        </div>
       </Card>
 
       {/* Features Grid */}
-      <Grid templateColumns="repeat(2, 1fr)" gap={spacing.xl} mb={spacing['2xl']}>
+      <div className="grid grid-cols-2 gap-8 mb-12">
         {/* Monitoring */}
-        <Card style={{ borderColor: colors.patience, padding: spacing.xl }}>
-          <Flex align="start" gap={spacing.md} mb={spacing.md}>
-            <Box
-              w="56px"
-              h="56px"
-              bg={colors.cobalt}
-              borderRadius={borderRadius.lg}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              color="white"
-            >
-              <MdBarChart size={32} />
-            </Box>
-            <Box flex="1">
-              <Text
-                fontSize={typography.fontSize['2xl']}
-                fontWeight={typography.fontWeight.bold}
-                color={colors.navy}
-                mb={spacing.sm}
-              >
+        <Card className="p-8">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+              <BarChart3 size={32} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Production Monitoring
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Upload LLM traces to analyze accuracy, identify failures, and track
                 performance metrics required by Article 15 (accuracy, robustness).
-              </Text>
-            </Box>
-          </Flex>
-          <Box mt={spacing.lg} pt={spacing.lg} borderTop="1px solid" borderColor={colors.patience}>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-              → Use <strong>Monitoring</strong> tab to load trace data
-            </Text>
-          </Box>
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Use <strong>Monitoring</strong> tab to load trace data
+            </p>
+          </div>
         </Card>
 
         {/* Document Generation */}
-        <Card style={{ borderColor: colors.patience, padding: spacing.xl }}>
-          <Flex align="start" gap={spacing.md} mb={spacing.md}>
-            <Box
-              w="56px"
-              h="56px"
-              bg={colors.coral}
-              borderRadius={borderRadius.lg}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              color="white"
-            >
-              <MdInsertDriveFile size={32} />
-            </Box>
-            <Box flex="1">
-              <Text
-                fontSize={typography.fontSize['2xl']}
-                fontWeight={typography.fontWeight.bold}
-                color={colors.navy}
-                mb={spacing.sm}
-              >
+        <Card className="p-8">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-14 h-14 bg-amber-500 rounded-lg flex items-center justify-center text-white">
+              <FileText size={32} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Compliance Documents
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Generate 5 professional Word documents for EU AI Act compliance:
                 Risk Classification, Annex IV Technical Documentation, and more.
-              </Text>
-            </Box>
-          </Flex>
-          <Box mt={spacing.lg} pt={spacing.lg} borderTop="1px solid" borderColor={colors.patience}>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
-              → Use <strong>Document Generation</strong> tab to create package
-            </Text>
-          </Box>
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Use <strong>Document Generation</strong> tab to create package
+            </p>
+          </div>
         </Card>
-      </Grid>
+      </div>
 
       {/* Workflow Card */}
-      <Card style={{ borderColor: colors.cobalt, backgroundColor: '#f8fafc', padding: spacing['2xl'] }}>
-        <Text
-          fontSize={typography.fontSize['3xl']}
-          fontWeight={typography.fontWeight.bold}
-          color={colors.navy}
-          mb={spacing.xl}
-        >
+      <Card className="p-12 bg-zinc-50 dark:bg-zinc-900/50">
+        <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-8">
           Typical Workflow
-        </Text>
+        </h2>
 
-        <Flex direction="column" gap={spacing.lg}>
+        <div className="flex flex-col gap-6">
           {/* Step 1 */}
-          <Flex align="start" gap={spacing.lg}>
-            <Box
-              minW="44px"
-              h="44px"
-              bg={colors.cobalt}
-              color="white"
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.bold}
-            >
+          <div className="flex items-start gap-6">
+            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
               1
-            </Box>
-            <Box>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.xs}
-              >
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
                 Load Production Traces
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Upload JSON file with LLM traces from your production system (via OpenTelemetry,
                 LangSmith, or custom logging). CERT analyzes accuracy and failure patterns.
-              </Text>
-            </Box>
-          </Flex>
+              </p>
+            </div>
+          </div>
 
           {/* Step 2 */}
-          <Flex align="start" gap={spacing.lg}>
-            <Box
-              minW="44px"
-              h="44px"
-              bg={colors.cobalt}
-              color="white"
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.bold}
-            >
+          <div className="flex items-start gap-6">
+            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
               2
-            </Box>
-            <Box>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.xs}
-              >
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
                 Review Monitoring Dashboards
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Explore overview metrics, failed traces, and distribution charts. Identify
                 issues to address before generating compliance documentation.
-              </Text>
-            </Box>
-          </Flex>
+              </p>
+            </div>
+          </div>
 
           {/* Step 3 */}
-          <Flex align="start" gap={spacing.lg}>
-            <Box
-              minW="44px"
-              h="44px"
-              bg={colors.cobalt}
-              color="white"
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.bold}
-            >
+          <div className="flex items-start gap-6">
+            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
               3
-            </Box>
-            <Box>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.xs}
-              >
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
                 Download Reports
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Generate a professional PDF report directly in your browser. For Word documents,
                 use the CERT CLI to generate the full compliance package locally.
-              </Text>
-            </Box>
-          </Flex>
+              </p>
+            </div>
+          </div>
 
           {/* Step 4 */}
-          <Flex align="start" gap={spacing.lg}>
-            <Box
-              minW="44px"
-              h="44px"
-              bg={colors.cobalt}
-              color="white"
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.bold}
-            >
+          <div className="flex items-start gap-6">
+            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
               4
-            </Box>
-            <Box>
-              <Text
-                fontSize={typography.fontSize.xl}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-                mb={spacing.xs}
-              >
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
                 Expert Review & Delivery
-              </Text>
-              <Text
-                fontSize={typography.fontSize.base}
-                lineHeight={typography.lineHeight.relaxed}
-                color={colors.text.primary}
-              >
+              </h3>
+              <p className="text-base leading-relaxed text-zinc-900 dark:text-zinc-100">
                 Documents include [EXPERT INPUT REQUIRED] markers for manual sections.
                 Add professional commentary (8-10 hours), convert to PDF, deliver to client.
-              </Text>
-            </Box>
-          </Flex>
-        </Flex>
+              </p>
+            </div>
+          </div>
+        </div>
       </Card>
 
       {/* Footer Info */}
-      <Box mt={spacing['3xl']} pt={spacing.xl} borderTop="1px solid" borderColor={colors.patience}>
-        <Flex gap={spacing['3xl']}>
-          <Box flex="1">
-            <Flex align="center" gap={spacing.xs} mb={spacing.sm}>
-              <MdSecurity size={20} color={colors.cobalt} />
-              <Text
-                fontSize={typography.fontSize.base}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.text.secondary}
-              >
+      <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+        <div className="flex gap-16">
+          <div className="flex-1">
+            <div className="flex items-center gap-1 mb-2">
+              <ShieldCheck size={20} className="text-blue-600" />
+              <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 EU AI Act Focus
-              </Text>
-            </Flex>
-            <Text
-              fontSize={typography.fontSize.sm}
-              color={colors.text.muted}
-              lineHeight={typography.lineHeight.loose}
-            >
+              </span>
+            </div>
+            <p className="text-sm text-zinc-400 leading-loose">
               Risk classification (Annex III)<br/>
               Technical documentation (Annex IV)<br/>
               Accuracy & robustness (Article 15)<br/>
               Logging requirements (Article 19)
-            </Text>
-          </Box>
-          <Box flex="1">
-            <Flex align="center" gap={spacing.xs} mb={spacing.sm}>
-              <MdInsertDriveFile size={20} color={colors.cobalt} />
-              <Text
-                fontSize={typography.fontSize.base}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.text.secondary}
-              >
+            </p>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-1 mb-2">
+              <FileText size={20} className="text-blue-600" />
+              <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 Document Outputs
-              </Text>
-            </Flex>
-            <Text
-              fontSize={typography.fontSize.sm}
-              color={colors.text.muted}
-              lineHeight={typography.lineHeight.loose}
-            >
+              </span>
+            </div>
+            <p className="text-sm text-zinc-400 leading-loose">
               5 Microsoft Word documents<br/>
               32 pages total<br/>
               Auto-populated with trace data<br/>
               Expert sections marked for review
-            </Text>
-          </Box>
-          <Box flex="1">
-            <Flex align="center" gap={spacing.xs} mb={spacing.sm}>
-              <MdSpeed size={20} color={colors.cobalt} />
-              <Text
-                fontSize={typography.fontSize.base}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.text.secondary}
-              >
+            </p>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-1 mb-2">
+              <Clock size={20} className="text-blue-600" />
+              <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 Time Savings
-              </Text>
-            </Flex>
-            <Text
-              fontSize={typography.fontSize.sm}
-              color={colors.text.muted}
-              lineHeight={typography.lineHeight.loose}
-            >
+              </span>
+            </div>
+            <p className="text-sm text-zinc-400 leading-loose">
               Traditional: 40-60 hours manual work<br/>
               With CERT: 8-10 hours expert review<br/>
               Automation: 80% time reduction<br/>
               Quality: Consistent, audit-ready output
-            </Text>
-          </Box>
-        </Flex>
-      </Box>
-    </Box>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

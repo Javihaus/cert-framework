@@ -1,11 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-  Activity,
   Clock,
-  Coins,
   AlertCircle,
   CheckCircle,
   Pause,
@@ -14,14 +11,13 @@ import {
   ChevronDown,
   Zap,
 } from 'lucide-react';
-import Card, { CardHeader, CardTitle } from './Card';
-import Button, { IconButton } from './Button';
-import Badge, { StatusBadge } from './Badge';
-import { colors, spacing, borderRadius, transitions } from '@/theme';
+import Card, { CardTitle } from './Card';
+import { IconButton } from './Button';
+import Badge from './Badge';
+import { cn } from '@/lib/utils';
 
 /**
  * Mock trace data for demonstration
- * In production, this would come from a WebSocket or polling API
  */
 interface Trace {
   id: string;
@@ -92,10 +88,6 @@ interface LiveTraceMonitorProps {
   onTraceClick?: (trace: Trace) => void;
 }
 
-/**
- * Live Trace Monitor Component
- * Shows real-time LLM API calls with status, latency, tokens, and cost
- */
 export default function LiveTraceMonitor({
   maxTraces = 10,
   onTraceClick,
@@ -104,7 +96,6 @@ export default function LiveTraceMonitor({
   const [filter, setFilter] = useState<'all' | 'errors' | 'warnings'>('all');
   const [traces, setTraces] = useState<Trace[]>(mockTraces);
 
-  // Filter traces based on selected filter
   const filteredTraces = traces.filter((trace) => {
     if (filter === 'all') return true;
     if (filter === 'errors') return trace.status === 'error';
@@ -113,32 +104,29 @@ export default function LiveTraceMonitor({
   });
 
   return (
-    <Card variant="elevated" padding={spacing.lg}>
+    <Card variant="elevated" className="p-6">
       {/* Header */}
-      <Flex justify="space-between" align="center" mb={spacing.lg}>
-        <Flex align="center" gap={spacing.sm}>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
           <CardTitle>Live Traces</CardTitle>
           <Badge variant="success" dot>
             {traces.length} active
           </Badge>
-        </Flex>
+        </div>
 
-        <Flex gap={spacing.sm}>
-          {/* Filter Dropdown */}
+        <div className="flex gap-2">
           <FilterDropdown value={filter} onChange={setFilter} />
-
-          {/* Pause/Play Button */}
           <IconButton
             icon={isPaused ? <Play size={16} /> : <Pause size={16} />}
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Resume' : 'Pause'}
             variant="secondary"
           />
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
       {/* Trace List */}
-      <Flex direction="column" gap={spacing.xs}>
+      <div className="flex flex-col gap-1">
         {filteredTraces.slice(0, maxTraces).map((trace) => (
           <TraceRow
             key={trace.id}
@@ -148,23 +136,15 @@ export default function LiveTraceMonitor({
         ))}
 
         {filteredTraces.length === 0 && (
-          <Flex
-            justify="center"
-            align="center"
-            py={spacing.xl}
-            color={colors.text.muted}
-          >
-            <Text fontSize="14px">No traces match the current filter</Text>
-          </Flex>
+          <div className="flex justify-center items-center py-8 text-zinc-400">
+            <span className="text-sm">No traces match the current filter</span>
+          </div>
         )}
-      </Flex>
+      </div>
     </Card>
   );
 }
 
-/**
- * Individual Trace Row
- */
 interface TraceRowProps {
   trace: Trace;
   onClick?: () => void;
@@ -174,115 +154,77 @@ function TraceRow({ trace, onClick }: TraceRowProps) {
   const statusConfig = {
     success: {
       icon: CheckCircle,
-      color: colors.semantic.success,
-      bg: colors.semantic.successLight,
+      colorClass: 'text-green-600 dark:text-green-500',
+      bgClass: 'bg-green-50 dark:bg-green-900/20',
     },
     error: {
       icon: AlertCircle,
-      color: colors.semantic.error,
-      bg: colors.semantic.errorLight,
+      colorClass: 'text-red-500',
+      bgClass: 'bg-red-50 dark:bg-red-900/20',
     },
     warning: {
       icon: AlertCircle,
-      color: colors.semantic.warning,
-      bg: colors.semantic.warningLight,
+      colorClass: 'text-amber-500',
+      bgClass: 'bg-amber-50 dark:bg-amber-900/20',
     },
   };
 
   const config = statusConfig[trace.status];
   const StatusIcon = config.icon;
-
   const timeAgo = getTimeAgo(trace.timestamp);
 
   return (
-    <Flex
-      align="center"
-      gap={spacing.md}
-      p={spacing.sm}
-      borderRadius={borderRadius.md}
-      bg={colors.neutral[50]}
-      cursor={onClick ? 'pointer' : 'default'}
-      transition={transitions.all}
-      _hover={{
-        bg: colors.neutral[100],
-      }}
+    <div
+      className={cn(
+        'flex items-center gap-4 p-2 rounded-md bg-zinc-50 dark:bg-zinc-800/50 transition-all',
+        onClick && 'cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800'
+      )}
       onClick={onClick}
     >
       {/* Status Indicator */}
-      <Flex
-        align="center"
-        justify="center"
-        w="32px"
-        h="32px"
-        borderRadius={borderRadius.md}
-        bg={config.bg}
-      >
-        <StatusIcon size={16} color={config.color} />
-      </Flex>
+      <div className={cn('flex items-center justify-center w-8 h-8 rounded-md', config.bgClass)}>
+        <StatusIcon size={16} className={config.colorClass} />
+      </div>
 
       {/* Model & Endpoint */}
-      <Flex direction="column" flex={1} minW="0">
-        <Text
-          fontSize="14px"
-          fontWeight={500}
-          color={colors.text.primary}
-          overflow="hidden"
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
-        >
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="text-sm font-medium text-zinc-900 dark:text-white truncate">
           {trace.model}
-        </Text>
-        <Text fontSize="12px" color={colors.text.muted} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+        </span>
+        <span className="text-xs text-zinc-400 truncate">
           {trace.endpoint}
-        </Text>
-      </Flex>
+        </span>
+      </div>
 
       {/* Metrics */}
-      <Flex align="center" gap={spacing.lg} display={{ base: 'none', md: 'flex' }}>
-        {/* Latency */}
-        <Flex align="center" gap={spacing.xs} minW="80px">
-          <Clock size={14} color={colors.text.muted} />
-          <Text fontSize="13px" color={colors.text.secondary}>
+      <div className="hidden md:flex items-center gap-6">
+        <div className="flex items-center gap-1 min-w-[80px]">
+          <Clock size={14} className="text-zinc-400" />
+          <span className="text-[13px] text-zinc-500">
             {trace.latency}ms
-          </Text>
-        </Flex>
+          </span>
+        </div>
 
-        {/* Tokens */}
-        <Flex align="center" gap={spacing.xs} minW="80px">
-          <Zap size={14} color={colors.text.muted} />
-          <Text fontSize="13px" color={colors.text.secondary}>
+        <div className="flex items-center gap-1 min-w-[80px]">
+          <Zap size={14} className="text-zinc-400" />
+          <span className="text-[13px] text-zinc-500">
             {trace.tokens.toLocaleString()}
-          </Text>
-        </Flex>
+          </span>
+        </div>
 
-        {/* Cost */}
-        <Text
-          fontSize="13px"
-          fontWeight={500}
-          color={colors.text.primary}
-          minW="60px"
-          textAlign="right"
-        >
-          €{trace.cost.toFixed(3)}
-        </Text>
-      </Flex>
+        <span className="text-[13px] font-medium text-zinc-900 dark:text-white min-w-[60px] text-right">
+          ${trace.cost.toFixed(3)}
+        </span>
+      </div>
 
       {/* Timestamp */}
-      <Text
-        fontSize="12px"
-        color={colors.text.disabled}
-        minW="60px"
-        textAlign="right"
-      >
+      <span className="text-xs text-zinc-300 dark:text-zinc-600 min-w-[60px] text-right">
         {timeAgo}
-      </Text>
-    </Flex>
+      </span>
+    </div>
   );
 }
 
-/**
- * Filter Dropdown Component
- */
 interface FilterDropdownProps {
   value: 'all' | 'errors' | 'warnings';
   onChange: (value: 'all' | 'errors' | 'warnings') => void;
@@ -300,90 +242,47 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
   const selectedLabel = options.find((o) => o.value === value)?.label || 'All';
 
   return (
-    <Box position="relative">
-      <Flex
-        as="button"
-        align="center"
-        gap={spacing.xs}
-        px={spacing.sm}
-        py={spacing.xs}
-        borderRadius={borderRadius.md}
-        border={`1px solid ${colors.border.default}`}
-        bg={colors.background}
-        fontSize="13px"
-        color={colors.text.secondary}
-        cursor="pointer"
-        transition={transitions.all}
+    <div className="relative">
+      <button
+        className="flex items-center gap-1 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[13px] text-zinc-500 cursor-pointer transition-all hover:border-blue-500"
         onClick={() => setIsOpen(!isOpen)}
-        _hover={{
-          borderColor: colors.primary[500],
-        }}
       >
         <Filter size={14} />
-        <Text>{selectedLabel}</Text>
+        <span>{selectedLabel}</span>
         <ChevronDown size={14} />
-      </Flex>
+      </button>
 
       {isOpen && (
         <>
-          <Box
-            position="fixed"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
+          <div
+            className="fixed inset-0"
             onClick={() => setIsOpen(false)}
           />
-          <Flex
-            position="absolute"
-            top="100%"
-            right="0"
-            mt={spacing.xs}
-            direction="column"
-            bg={colors.background}
-            border={`1px solid ${colors.border.default}`}
-            borderRadius={borderRadius.md}
-            boxShadow="0 4px 12px rgba(0,0,0,0.1)"
-            overflow="hidden"
-            zIndex={100}
-          >
+          <div className="absolute top-full right-0 mt-1 flex flex-col bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg overflow-hidden z-[100]">
             {options.map((option) => (
-              <Box
+              <button
                 key={option.value}
-                as="button"
-                px={spacing.md}
-                py={spacing.sm}
-                fontSize="13px"
-                color={
+                className={cn(
+                  'px-4 py-2 text-[13px] text-left cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-700',
                   value === option.value
-                    ? colors.primary[700]
-                    : colors.text.secondary
-                }
-                bg={value === option.value ? colors.primary[100] : 'transparent'}
-                textAlign="left"
-                cursor="pointer"
-                transition={transitions.colors}
+                    ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-zinc-500'
+                )}
                 onClick={() => {
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                _hover={{
-                  bg: colors.neutral[100],
-                }}
               >
                 {option.label}
-              </Box>
+              </button>
             ))}
-          </Flex>
+          </div>
         </>
       )}
-    </Box>
+    </div>
   );
 }
 
-/**
- * Helper function to format time ago
- */
 function getTimeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
 

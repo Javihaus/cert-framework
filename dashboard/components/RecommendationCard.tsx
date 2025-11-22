@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Button } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
+import { cn } from '@/lib/utils';
 import { TrendingDown, Database, Scissors, Zap } from 'lucide-react';
 
 interface RecommendationCardProps {
@@ -14,6 +14,50 @@ interface RecommendationCardProps {
   onApply?: () => void;
 }
 
+const typeConfig = {
+  model_downgrade: {
+    icon: TrendingDown,
+    label: 'Model Downgrade',
+    colorClass: 'text-blue-600 dark:text-blue-500',
+  },
+  caching: {
+    icon: Database,
+    label: 'Response Caching',
+    colorClass: 'text-green-600 dark:text-green-500',
+  },
+  prompt_optimization: {
+    icon: Scissors,
+    label: 'Prompt Optimization',
+    colorClass: 'text-zinc-900 dark:text-white',
+  },
+  batching: {
+    icon: Zap,
+    label: 'Request Batching',
+    colorClass: 'text-amber-500',
+  },
+};
+
+const impactConfig = {
+  high: {
+    bgClass: 'bg-green-100 dark:bg-green-900/30',
+    borderClass: 'border-green-600 dark:border-green-500',
+    textClass: 'text-green-600 dark:text-green-500',
+    label: 'High Impact',
+  },
+  medium: {
+    bgClass: 'bg-amber-100 dark:bg-amber-900/30',
+    borderClass: 'border-amber-500',
+    textClass: 'text-amber-600 dark:text-amber-500',
+    label: 'Medium Impact',
+  },
+  low: {
+    bgClass: 'bg-zinc-100 dark:bg-zinc-800',
+    borderClass: 'border-zinc-400 dark:border-zinc-600',
+    textClass: 'text-zinc-500 dark:text-zinc-400',
+    label: 'Low Impact',
+  },
+};
+
 export default function RecommendationCard({
   type,
   description,
@@ -22,126 +66,69 @@ export default function RecommendationCard({
   details,
   onApply,
 }: RecommendationCardProps) {
-  const typeConfig = {
-    model_downgrade: {
-      icon: TrendingDown,
-      label: 'Model Downgrade',
-      color: colors.cobalt,
-      emoji: '⬇️',
-    },
-    caching: {
-      icon: Database,
-      label: 'Response Caching',
-      color: colors.olive,
-      emoji: '💾',
-    },
-    prompt_optimization: {
-      icon: Scissors,
-      label: 'Prompt Optimization',
-      color: colors.navy,
-      emoji: '✂️',
-    },
-    batching: {
-      icon: Zap,
-      label: 'Request Batching',
-      color: colors.gold,
-      emoji: '⚡',
-    },
-  };
-
-  const impactConfig = {
-    high: { color: colors.olive, label: 'High Impact' },
-    medium: { color: colors.gold, label: 'Medium Impact' },
-    low: { color: colors.patience, label: 'Low Impact' },
-  };
-
   const config = typeConfig[type];
   const impactInfo = impactConfig[impact];
   const Icon = config.icon;
 
   return (
     <Card>
-      <Flex gap={spacing.md} align="start">
+      <div className="flex gap-4 items-start">
         {/* Icon */}
-        <Box
-          fontSize="3xl"
-          lineHeight="1"
-          flexShrink={0}
-          color={config.color}
-        >
+        <div className={cn('flex-shrink-0', config.colorClass)}>
           <Icon size={32} />
-        </Box>
+        </div>
 
         {/* Content */}
-        <Flex direction="column" flex={1} gap={spacing.sm}>
+        <div className="flex flex-col flex-1 gap-2">
           {/* Header */}
-          <Flex justify="space-between" align="start">
-            <Flex direction="column" gap={spacing.xs}>
-              <Text
-                fontSize={typography.fontSize.lg}
-                fontWeight={typography.fontWeight.semibold}
-                color={colors.navy}
-              >
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                 {config.label}
-              </Text>
-              <Text
-                fontSize={typography.fontSize.sm}
-                color={colors.text.secondary}
-              >
+              </h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 {description}
-              </Text>
-            </Flex>
+              </p>
+            </div>
 
             {/* Impact badge */}
-            <Box
-              px={spacing.sm}
-              py={spacing.xs}
-              borderRadius="full"
-              bg={impactInfo.color + '20'}
-              border="1px solid"
-              borderColor={impactInfo.color}
+            <span
+              className={cn(
+                'px-2 py-1 rounded-full border text-xs font-medium',
+                impactInfo.bgClass,
+                impactInfo.borderClass,
+                impactInfo.textClass
+              )}
             >
-              <Text
-                fontSize={typography.fontSize.xs}
-                fontWeight={typography.fontWeight.medium}
-                color={impactInfo.color}
-              >
-                {impactInfo.label}
-              </Text>
-            </Box>
-          </Flex>
+              {impactInfo.label}
+            </span>
+          </div>
 
           {/* Details */}
           {details && (
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
               {details}
-            </Text>
+            </p>
           )}
 
           {/* Savings and action */}
-          <Flex justify="space-between" align="center" mt={spacing.xs}>
-            <Text
-              fontSize={typography.fontSize.xl}
-              fontWeight={typography.fontWeight.bold}
-              color={colors.olive}
-            >
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-xl font-bold text-green-600 dark:text-green-500">
               {savings}
-            </Text>
+            </span>
 
             {onApply && (
               <Button
                 onClick={onApply}
                 size="sm"
-                bg={colors.cobalt}
-                color="white"
-                _hover={{ bg: colors.navy }}
+                variant="primary"
               >
                 View Details
               </Button>
             )}
-          </Flex>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }

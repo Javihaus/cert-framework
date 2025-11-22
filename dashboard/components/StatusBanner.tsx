@@ -1,6 +1,5 @@
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, spacing, borderRadius, typography } from '@/theme';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StatusBannerProps {
   isCompliant: boolean;
@@ -11,18 +10,16 @@ interface StatusBannerProps {
 export default function StatusBanner({ isCompliant, accuracy, failedCount }: StatusBannerProps) {
   const variant = isCompliant
     ? {
-        border: colors.success,
-        bg: 'white',
+        borderClass: 'border-green-600',
         icon: CheckCircle2,
-        iconColor: colors.success,
+        iconClass: 'text-green-600',
         title: 'Meets Compliance Threshold',
         message: `Accuracy at ${(accuracy * 100).toFixed(1)}% (target: 90%). System ready for deployment.`,
       }
     : {
-        border: colors.coral,
-        bg: 'white',
+        borderClass: 'border-amber-500',
         icon: AlertTriangle,
-        iconColor: colors.coral,
+        iconClass: 'text-amber-500',
         title: 'Below Compliance Threshold',
         message: `Accuracy at ${(accuracy * 100).toFixed(1)}% (target: 90%). Review ${failedCount} failed traces to identify systematic issues.`,
       };
@@ -30,38 +27,27 @@ export default function StatusBanner({ isCompliant, accuracy, failedCount }: Sta
   const Icon = variant.icon;
 
   return (
-    <Box
-      bg={variant.bg}
-      border="2px solid"
-      borderColor={variant.border}
-      borderRadius={borderRadius.lg}
-      p={spacing.lg}
-      mb={spacing['2xl']}
+    <div
+      className={cn(
+        'bg-white dark:bg-zinc-900 border-2 rounded-lg p-6 mb-12',
+        variant.borderClass
+      )}
     >
-      <Flex gap={spacing.md} align="flex-start">
+      <div className="flex gap-4 items-start">
         <Icon
           size={24}
-          color={variant.iconColor}
+          className={variant.iconClass}
           strokeWidth={2}
         />
-        <Box flex="1">
-          <Text
-            fontSize={typography.fontSize.lg}
-            fontWeight={typography.fontWeight.semibold}
-            color={colors.navy}
-            mb={spacing.xs}
-          >
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">
             {variant.title}
-          </Text>
-          <Text
-            fontSize={typography.fontSize.base}
-            color={colors.text.secondary}
-            lineHeight={typography.lineHeight.relaxed}
-          >
+          </h3>
+          <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
             {variant.message}
-          </Text>
-        </Box>
-      </Flex>
-    </Box>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import {
   Monitor,
@@ -11,7 +10,7 @@ import {
   BarChart3,
   Settings,
 } from 'lucide-react';
-import { colors, spacing, shadows } from '@/theme';
+import { cn } from '@/lib/utils';
 import Button from './Button';
 
 /**
@@ -19,21 +18,23 @@ import Button from './Button';
  */
 interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: string;
+  className?: string;
 }
 
-export function Spinner({ size = 'md', color = colors.primary[500] }: SpinnerProps) {
-  const sizeMap = { sm: '16px', md: '24px', lg: '40px' };
-  const borderMap = { sm: '2px', md: '3px', lg: '4px' };
+export function Spinner({ size = 'md', className }: SpinnerProps) {
+  const sizeClasses = {
+    sm: 'w-4 h-4 border-2',
+    md: 'w-6 h-6 border-[3px]',
+    lg: 'w-10 h-10 border-4',
+  };
 
   return (
-    <Box
-      w={sizeMap[size]}
-      h={sizeMap[size]}
-      border={`${borderMap[size]} solid ${colors.neutral[200]}`}
-      borderTopColor={color}
-      borderRadius="50%"
-      animation="states-spin 0.8s linear infinite"
+    <div
+      className={cn(
+        'rounded-full border-zinc-200 border-t-blue-500 animate-spin',
+        sizeClasses[size],
+        className
+      )}
     />
   );
 }
@@ -51,18 +52,12 @@ export function LoadingState({
   size = 'md',
 }: LoadingStateProps) {
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      py={spacing['2xl']}
-      gap={spacing.md}
-    >
+    <div className="flex flex-col items-center justify-center py-12 gap-4">
       <Spinner size={size} />
-      <Text fontSize="14px" color={colors.text.muted}>
+      <span className="text-sm text-zinc-400 dark:text-zinc-500">
         {message}
-      </Text>
-    </Flex>
+      </span>
+    </div>
   );
 }
 
@@ -87,93 +82,71 @@ interface EmptyStateProps {
   };
 }
 
+const typeConfig = {
+  monitors: {
+    Icon: Monitor,
+    defaultTitle: 'No monitors yet',
+    defaultDescription: 'Start monitoring your LLM endpoints to track performance and compliance.',
+  },
+  traces: {
+    Icon: BarChart3,
+    defaultTitle: 'No traces recorded',
+    defaultDescription: 'Traces will appear here once you start making API calls.',
+  },
+  documents: {
+    Icon: FileText,
+    defaultTitle: 'No documents generated',
+    defaultDescription: 'Generate your first compliance report to get started.',
+  },
+  alerts: {
+    Icon: AlertCircle,
+    defaultTitle: 'No alerts',
+    defaultDescription: 'You have no active alerts. Everything is running smoothly.',
+  },
+  data: {
+    Icon: Inbox,
+    defaultTitle: 'No data available',
+    defaultDescription: 'There is no data to display at this time.',
+  },
+  settings: {
+    Icon: Settings,
+    defaultTitle: 'No configuration',
+    defaultDescription: 'Configure your settings to get started.',
+  },
+};
+
 export function EmptyState({
   type = 'data',
   title,
   description,
   action,
 }: EmptyStateProps) {
-  const typeConfig = {
-    monitors: {
-      Icon: Monitor,
-      defaultTitle: 'No monitors yet',
-      defaultDescription: 'Start monitoring your LLM endpoints to track performance and compliance.',
-    },
-    traces: {
-      Icon: BarChart3,
-      defaultTitle: 'No traces recorded',
-      defaultDescription: 'Traces will appear here once you start making API calls.',
-    },
-    documents: {
-      Icon: FileText,
-      defaultTitle: 'No documents generated',
-      defaultDescription: 'Generate your first compliance report to get started.',
-    },
-    alerts: {
-      Icon: AlertCircle,
-      defaultTitle: 'No alerts',
-      defaultDescription: 'You have no active alerts. Everything is running smoothly.',
-    },
-    data: {
-      Icon: Inbox,
-      defaultTitle: 'No data available',
-      defaultDescription: 'There is no data to display at this time.',
-    },
-    settings: {
-      Icon: Settings,
-      defaultTitle: 'No configuration',
-      defaultDescription: 'Configure your settings to get started.',
-    },
-  };
-
   const config = typeConfig[type];
   const IconComponent = config.Icon;
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      py={spacing['3xl']}
-      px={spacing.xl}
-      textAlign="center"
-    >
-      <Flex
-        align="center"
-        justify="center"
-        w="80px"
-        h="80px"
-        borderRadius="full"
-        bg={colors.neutral[100]}
-        mb={spacing.lg}
-      >
-        <IconComponent size={32} color={colors.neutral[400]} />
-      </Flex>
+    <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-6">
+        <IconComponent size={32} className="text-zinc-400 dark:text-zinc-500" />
+      </div>
 
-      <Text
-        fontSize="20px"
-        fontWeight={600}
-        color={colors.text.primary}
-        mb={spacing.xs}
-      >
+      <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
         {title || config.defaultTitle}
-      </Text>
+      </h3>
 
-      <Text
-        fontSize="14px"
-        color={colors.text.muted}
-        maxW="400px"
-        mb={action ? spacing.lg : 0}
-      >
+      <p className={cn(
+        'text-sm text-zinc-400 dark:text-zinc-500 max-w-md',
+        action ? 'mb-6' : ''
+      )}>
         {description || config.defaultDescription}
-      </Text>
+      </p>
 
       {action && (
         <Button variant="primary" onClick={action.onClick}>
           {action.label}
         </Button>
       )}
-    </Flex>
+    </div>
   );
 }
 
@@ -192,43 +165,21 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      py={spacing['3xl']}
-      px={spacing.xl}
-      textAlign="center"
-    >
-      <Flex
-        align="center"
-        justify="center"
-        w="80px"
-        h="80px"
-        borderRadius="full"
-        bg={colors.accent[100]}
-        mb={spacing.lg}
-      >
-        <AlertCircle size={32} color={colors.accent[500]} />
-      </Flex>
+    <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 mb-6">
+        <AlertCircle size={32} className="text-red-500" />
+      </div>
 
-      <Text
-        fontSize="20px"
-        fontWeight={600}
-        color={colors.text.primary}
-        mb={spacing.xs}
-      >
+      <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
         {title}
-      </Text>
+      </h3>
 
-      <Text
-        fontSize="14px"
-        color={colors.text.muted}
-        maxW="400px"
-        mb={onRetry ? spacing.lg : 0}
-      >
+      <p className={cn(
+        'text-sm text-zinc-400 dark:text-zinc-500 max-w-md',
+        onRetry ? 'mb-6' : ''
+      )}>
         {message}
-      </Text>
+      </p>
 
       {onRetry && (
         <Button
@@ -239,7 +190,7 @@ export function ErrorState({
           Try Again
         </Button>
       )}
-    </Flex>
+    </div>
   );
 }
 
@@ -249,43 +200,23 @@ export function ErrorState({
 interface SkeletonProps {
   width?: string;
   height?: string;
-  borderRadius?: string;
+  className?: string;
 }
 
 export function Skeleton({
   width = '100%',
   height = '20px',
-  borderRadius = '4px',
+  className,
 }: SkeletonProps) {
   return (
-    <Box
-      w={width}
-      h={height}
-      borderRadius={borderRadius}
-      bg={colors.neutral[200]}
-      animation="states-pulse 1.5s ease-in-out infinite"
+    <div
+      className={cn(
+        'rounded bg-zinc-200 dark:bg-zinc-700 animate-pulse',
+        className
+      )}
+      style={{ width, height }}
     />
   );
-}
-
-// Add keyframes via style tag injection
-if (typeof document !== 'undefined') {
-  const styleId = 'states-keyframes';
-  if (!document.getElementById(styleId)) {
-    const styleTag = document.createElement('style');
-    styleTag.id = styleId;
-    styleTag.textContent = `
-      @keyframes states-spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      @keyframes states-pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
-    `;
-    document.head.appendChild(styleTag);
-  }
 }
 
 /**
@@ -293,20 +224,15 @@ if (typeof document !== 'undefined') {
  */
 export function CardSkeleton() {
   return (
-    <Box
-      bg={colors.background}
-      borderRadius="12px"
-      p={spacing.lg}
-      boxShadow={shadows.card}
-    >
+    <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm">
       <Skeleton height="24px" width="60%" />
-      <Box h={spacing.md} />
+      <div className="h-4" />
       <Skeleton height="14px" width="100%" />
-      <Box h={spacing.xs} />
+      <div className="h-1" />
       <Skeleton height="14px" width="80%" />
-      <Box h={spacing.lg} />
-      <Skeleton height="40px" width="120px" borderRadius="8px" />
-    </Box>
+      <div className="h-6" />
+      <Skeleton height="40px" width="120px" className="rounded-lg" />
+    </div>
   );
 }
 
@@ -315,18 +241,13 @@ export function CardSkeleton() {
  */
 export function MetricSkeleton() {
   return (
-    <Box
-      bg={colors.background}
-      borderRadius="12px"
-      p={spacing.lg}
-      boxShadow={shadows.card}
-    >
+    <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm">
       <Skeleton height="14px" width="80px" />
-      <Box h={spacing.md} />
+      <div className="h-4" />
       <Skeleton height="40px" width="120px" />
-      <Box h={spacing.sm} />
+      <div className="h-2" />
       <Skeleton height="16px" width="60px" />
-    </Box>
+    </div>
   );
 }
 
@@ -335,7 +256,7 @@ export function MetricSkeleton() {
  */
 export function TableRowSkeleton({ columns = 4 }: { columns?: number }) {
   return (
-    <Flex gap={spacing.md} py={spacing.sm}>
+    <div className="flex gap-4 py-2">
       {Array.from({ length: columns }).map((_, i) => (
         <Skeleton
           key={i}
@@ -343,6 +264,6 @@ export function TableRowSkeleton({ columns = 4 }: { columns?: number }) {
           width={i === 0 ? '30%' : `${70 / (columns - 1)}%`}
         />
       ))}
-    </Flex>
+    </div>
   );
 }

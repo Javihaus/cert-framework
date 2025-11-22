@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import CostTrendChart from '@/components/CostTrendChart';
 import Card from '@/components/Card';
-import { colors, spacing, typography } from '@/theme';
 import { DollarSign, TrendingUp, TrendingDown, Calendar, Package } from 'lucide-react';
 import { Trace, CostSummary } from '@/types/trace';
 import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
@@ -61,67 +59,58 @@ export default function CostsPage() {
     : undefined;
 
   return (
-    <Box p={spacing.xl}>
+    <div className="p-8">
       {/* Header */}
-      <Flex justify="space-between" align="start" mb={spacing.xl}>
-        <Box>
-          <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
             Cost Analysis
-          </Text>
-          <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+          </h1>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400">
             Track and analyze AI API costs across platforms
-          </Text>
-        </Box>
+          </p>
+        </div>
 
         {costData && (
-          <Box w="150px">
+          <div className="w-[150px]">
             <select
               value={timeRange}
               onChange={(e) => {
-                setTimeRange(e.target.value as any);
+                setTimeRange(e.target.value as '7d' | '30d' | 'all');
                 analyzeCosts(traces);
               }}
-              style={{
-                width: '100%',
-                padding: `${spacing.xs} ${spacing.sm}`,
-                borderRadius: '6px',
-                border: `1px solid ${colors.patience}`,
-                backgroundColor: 'white',
-                fontSize: typography.fontSize.sm,
-                cursor: 'pointer',
-                color: colors.navy,
-              }}
+              className="w-full px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-sm cursor-pointer text-zinc-900 dark:text-white"
             >
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
               <option value="all">All time</option>
             </select>
-          </Box>
+          </div>
         )}
-      </Flex>
+      </div>
 
       {/* File upload */}
       {!costData && (
         <Card>
-          <Flex direction="column" align="center" gap={spacing.md} py={spacing.xl}>
-            <DollarSign size={48} color={colors.cobalt} />
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+          <div className="flex flex-col items-center gap-4 py-8">
+            <DollarSign size={48} className="text-blue-600" />
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
               Upload trace file to analyze costs
-            </Text>
-            <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} textAlign="center" maxW="500px">
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-[500px]">
               Upload your cert_traces.jsonl file to see detailed cost breakdowns, trends, and projections
-            </Text>
-            <Box w="100%" maxW="500px">
+            </p>
+            <div className="w-full max-w-[500px]">
               <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="Upload Trace File" />
-            </Box>
-          </Flex>
+            </div>
+          </div>
         </Card>
       )}
 
       {/* Metrics */}
       {costData && (
         <>
-          <Grid templateColumns="repeat(4, 1fr)" gap={spacing.md} mb={spacing.lg}>
+          <div className="grid grid-cols-4 gap-4 mb-6">
             <MetricCard
               label="Total Cost"
               value={`$${costData.totalCost.toFixed(2)}`}
@@ -146,99 +135,85 @@ export default function CostsPage() {
               icon={Package}
               variant="default"
             />
-          </Grid>
+          </div>
 
           {/* Cost trend chart */}
-          <Card mb={spacing.lg}>
-            <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+          <Card className="mb-6">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
               Cost Trend
-            </Text>
-            <Box h="300px">
+            </h2>
+            <div className="h-[300px]">
               <CostTrendChart data={chartData} height={300} showCount={true} />
-            </Box>
+            </div>
           </Card>
 
           {/* Cost by Model */}
-          <Grid templateColumns="repeat(2, 1fr)" gap={spacing.lg}>
+          <div className="grid grid-cols-2 gap-6">
             <Card>
-              <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
                 Cost by Model
-              </Text>
-              <Box overflowX="auto">
-                <Flex bg={colors.background} p={spacing.sm} borderBottom="1px solid" borderColor={colors.patience} fontWeight={typography.fontWeight.medium}>
-                  <Box flex={2}>Model</Box>
-                  <Box flex={1} textAlign="right">
-                    Cost
-                  </Box>
-                  <Box flex={1} textAlign="right">
-                    %
-                  </Box>
-                </Flex>
+              </h2>
+              <div className="overflow-x-auto">
+                <div className="flex bg-zinc-100 dark:bg-zinc-800 p-2 border-b border-zinc-300 dark:border-zinc-600 font-medium">
+                  <div className="flex-[2]">Model</div>
+                  <div className="flex-1 text-right">Cost</div>
+                  <div className="flex-1 text-right">%</div>
+                </div>
                 {Object.entries(costData.byModel)
                   .sort((a, b) => b[1] - a[1])
                   .map(([model, cost], idx) => (
-                    <Flex
+                    <div
                       key={model}
-                      p={spacing.sm}
-                      bg={idx % 2 === 0 ? 'white' : colors.background}
-                      borderBottom="1px solid"
-                      borderColor={colors.patience}
+                      className={`flex p-2 border-b border-zinc-200 dark:border-zinc-700 ${
+                        idx % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-zinc-50 dark:bg-zinc-800'
+                      }`}
                     >
-                      <Box flex={2} fontSize={typography.fontSize.sm}>
-                        {model}
-                      </Box>
-                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium}>
+                      <div className="flex-[2] text-sm">{model}</div>
+                      <div className="flex-1 text-right text-sm font-medium">
                         ${cost.toFixed(2)}
-                      </Box>
-                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                      </div>
+                      <div className="flex-1 text-right text-sm text-zinc-500 dark:text-zinc-400">
                         {((cost / costData.totalCost) * 100).toFixed(1)}%
-                      </Box>
-                    </Flex>
+                      </div>
+                    </div>
                   ))}
-              </Box>
+              </div>
             </Card>
 
             {/* Cost by Platform */}
             <Card>
-              <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
                 Cost by Platform
-              </Text>
-              <Box overflowX="auto">
-                <Flex bg={colors.background} p={spacing.sm} borderBottom="1px solid" borderColor={colors.patience} fontWeight={typography.fontWeight.medium}>
-                  <Box flex={2}>Platform</Box>
-                  <Box flex={1} textAlign="right">
-                    Cost
-                  </Box>
-                  <Box flex={1} textAlign="right">
-                    %
-                  </Box>
-                </Flex>
+              </h2>
+              <div className="overflow-x-auto">
+                <div className="flex bg-zinc-100 dark:bg-zinc-800 p-2 border-b border-zinc-300 dark:border-zinc-600 font-medium">
+                  <div className="flex-[2]">Platform</div>
+                  <div className="flex-1 text-right">Cost</div>
+                  <div className="flex-1 text-right">%</div>
+                </div>
                 {Object.entries(costData.byPlatform)
                   .sort((a, b) => b[1] - a[1])
                   .map(([platform, cost], idx) => (
-                    <Flex
+                    <div
                       key={platform}
-                      p={spacing.sm}
-                      bg={idx % 2 === 0 ? 'white' : colors.background}
-                      borderBottom="1px solid"
-                      borderColor={colors.patience}
+                      className={`flex p-2 border-b border-zinc-200 dark:border-zinc-700 ${
+                        idx % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-zinc-50 dark:bg-zinc-800'
+                      }`}
                     >
-                      <Box flex={2} fontSize={typography.fontSize.sm}>
-                        {platform}
-                      </Box>
-                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.medium}>
+                      <div className="flex-[2] text-sm">{platform}</div>
+                      <div className="flex-1 text-right text-sm font-medium">
                         ${cost.toFixed(2)}
-                      </Box>
-                      <Box flex={1} textAlign="right" fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+                      </div>
+                      <div className="flex-1 text-right text-sm text-zinc-500 dark:text-zinc-400">
                         {((cost / costData.totalCost) * 100).toFixed(1)}%
-                      </Box>
-                    </Flex>
+                      </div>
+                    </div>
                   ))}
-              </Box>
+              </div>
             </Card>
-          </Grid>
+          </div>
         </>
       )}
-    </Box>
+    </div>
   );
 }

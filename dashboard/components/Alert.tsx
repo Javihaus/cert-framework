@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import {
   AlertCircle,
@@ -9,7 +8,7 @@ import {
   Info,
   X,
 } from 'lucide-react';
-import { colors, borderRadius, spacing, transitions } from '@/theme';
+import { cn } from '@/lib/utils';
 import Button from './Button';
 
 type AlertSeverity = 'info' | 'success' | 'warning' | 'error' | 'high';
@@ -23,6 +22,39 @@ interface AlertProps {
   onDismiss?: () => void;
 }
 
+const severityConfig = {
+  info: {
+    bgClass: 'bg-blue-50 dark:bg-blue-900/20',
+    borderClass: 'border-blue-500',
+    iconClass: 'text-blue-500',
+    Icon: Info,
+  },
+  success: {
+    bgClass: 'bg-green-50 dark:bg-green-900/20',
+    borderClass: 'border-green-500',
+    iconClass: 'text-green-500',
+    Icon: CheckCircle,
+  },
+  warning: {
+    bgClass: 'bg-amber-50 dark:bg-amber-900/20',
+    borderClass: 'border-amber-500',
+    iconClass: 'text-amber-500',
+    Icon: AlertTriangle,
+  },
+  error: {
+    bgClass: 'bg-red-50 dark:bg-red-900/20',
+    borderClass: 'border-red-500',
+    iconClass: 'text-red-500',
+    Icon: AlertCircle,
+  },
+  high: {
+    bgClass: 'bg-red-100 dark:bg-red-900/30',
+    borderClass: 'border-red-600',
+    iconClass: 'text-red-600',
+    Icon: AlertCircle,
+  },
+};
+
 /**
  * Professional Alert Component
  * For system alerts, warnings, and notifications
@@ -35,96 +67,52 @@ export default function Alert({
   action,
   onDismiss,
 }: AlertProps) {
-  const severityStyles = {
-    info: {
-      bg: colors.semantic.infoLight,
-      borderColor: colors.semantic.info,
-      iconColor: colors.semantic.info,
-      Icon: Info,
-    },
-    success: {
-      bg: colors.semantic.successLight,
-      borderColor: colors.semantic.success,
-      iconColor: colors.semantic.success,
-      Icon: CheckCircle,
-    },
-    warning: {
-      bg: colors.semantic.warningLight,
-      borderColor: colors.semantic.warning,
-      iconColor: colors.semantic.warning,
-      Icon: AlertTriangle,
-    },
-    error: {
-      bg: colors.semantic.errorLight,
-      borderColor: colors.semantic.error,
-      iconColor: colors.semantic.error,
-      Icon: AlertCircle,
-    },
-    high: {
-      bg: colors.accent[100],
-      borderColor: colors.accent[500],
-      iconColor: colors.accent[500],
-      Icon: AlertCircle,
-    },
-  };
-
-  const style = severityStyles[severity];
-  const IconComponent = style.Icon;
+  const config = severityConfig[severity];
+  const IconComponent = config.Icon;
 
   return (
-    <Box
-      bg={style.bg}
-      borderLeft={`4px solid ${style.borderColor}`}
-      borderRadius={borderRadius.md}
-      p={spacing.md}
-      transition={transitions.all}
+    <div
+      className={cn(
+        'border-l-4 rounded-md p-4 transition-all',
+        config.bgClass,
+        config.borderClass
+      )}
     >
-      <Flex gap={spacing.sm} align="flex-start">
-        <Box color={style.iconColor} flexShrink={0} mt="2px">
+      <div className="flex gap-2 items-start">
+        <div className={cn('flex-shrink-0 mt-0.5', config.iconClass)}>
           <IconComponent size={20} />
-        </Box>
+        </div>
 
-        <Box flex={1}>
+        <div className="flex-1">
           {title && (
-            <Text
-              fontWeight={600}
-              fontSize="14px"
-              color={colors.text.primary}
-              mb={spacing.xs}
-            >
+            <p className="font-semibold text-sm text-zinc-900 dark:text-white mb-1">
               {title}
-            </Text>
+            </p>
           )}
-          <Text fontSize="14px" color={colors.text.secondary}>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {children}
-          </Text>
+          </p>
 
-          {action && <Box mt={spacing.sm}>{action}</Box>}
-        </Box>
+          {action && <div className="mt-2">{action}</div>}
+        </div>
 
-        <Flex align="center" gap={spacing.sm} flexShrink={0}>
+        <div className="flex items-center gap-2 flex-shrink-0">
           {timestamp && (
-            <Text fontSize="12px" color={colors.text.muted}>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">
               {timestamp}
-            </Text>
+            </span>
           )}
           {onDismiss && (
-            <Box
-              as="button"
-              p="4px"
-              borderRadius={borderRadius.sm}
-              color={colors.text.muted}
-              cursor="pointer"
-              transition={transitions.colors}
+            <button
               onClick={onDismiss}
-              _hover={{ bg: colors.surfaceHover, color: colors.text.primary }}
+              className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
             >
               <X size={16} />
-            </Box>
+            </button>
           )}
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -138,9 +126,9 @@ interface AlertListProps {
 
 export function AlertList({ children, maxVisible }: AlertListProps) {
   return (
-    <Flex direction="column" gap={spacing.sm}>
+    <div className="flex flex-col gap-2">
       {children}
-    </Flex>
+    </div>
   );
 }
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button, Input } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
+import { cn } from '@/lib/utils';
 import { ReadinessInputs } from '@/types/wizard';
 import { CheckCircle2, Circle, Database, Code, Users, Shield } from 'lucide-react';
 
@@ -37,56 +37,53 @@ export default function WizardReadinessForm({
     const isChecked = inputs[field] as boolean;
 
     return (
-      <Flex
-        p={spacing.md}
-        borderRadius="md"
-        borderWidth="2px"
-        borderColor={isChecked ? colors.cobalt : colors.patience}
-        bg={isChecked ? colors.cobalt + '10' : 'white'}
-        cursor="pointer"
-        transition="all 0.2s"
+      <div
+        className={cn(
+          'p-4 rounded-md border-2 cursor-pointer transition-all flex gap-2 hover:border-blue-600',
+          isChecked
+            ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+            : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800'
+        )}
         onClick={() => updateCheckbox(field, !isChecked)}
-        _hover={{ borderColor: colors.cobalt }}
-        gap={spacing.sm}
       >
-        <Box flexShrink={0} mt="2px">
+        <div className="flex-shrink-0 mt-0.5">
           {isChecked ? (
-            <CheckCircle2 size={20} color={colors.cobalt} />
+            <CheckCircle2 size={20} className="text-blue-600" />
           ) : (
-            <Circle size={20} color={colors.patience} />
+            <Circle size={20} className="text-zinc-400" />
           )}
-        </Box>
-        <Box flex={1}>
-          <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.xs}>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">
             {label}
-          </Text>
-          <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
+          </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {description}
-          </Text>
-        </Box>
-      </Flex>
+          </p>
+        </div>
+      </div>
     );
   };
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
         Readiness Assessment
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+      </h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         Evaluate your organization's preparedness for AI implementation across data, technical, organizational, and compliance dimensions.
-      </Text>
+      </p>
 
       {/* Data Readiness */}
-      <Card mb={spacing.lg} bg={colors.cobalt + '10'} borderColor={colors.cobalt}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <Database size={24} color={colors.cobalt} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+      <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
+        <div className="flex items-center gap-2 mb-4">
+          <Database size={24} className="text-blue-600" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Data Readiness
-          </Text>
-        </Flex>
+          </h3>
+        </div>
 
-        <Flex direction="column" gap={spacing.sm}>
+        <div className="flex flex-col gap-2">
           <CheckboxField
             field="hasDataStrategy"
             label="Data Strategy & Governance"
@@ -99,43 +96,33 @@ export default function WizardReadinessForm({
             description="Sufficient labeled or annotated data available for training/fine-tuning"
           />
 
-          <Box p={spacing.md} borderRadius="md" borderWidth="2px" borderColor={colors.patience} bg="white">
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
+          <div className="p-4 rounded-md border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white mb-2">
               Data Quality Level
-            </Text>
-            <Box>
-              <select
-                value={inputs.dataQuality}
-                onChange={(e) => updateField('dataQuality', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: `2px solid ${colors.patience}`,
-                  fontSize: '14px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="high">High - Clean, consistent, well-documented</option>
-                <option value="medium">Medium - Mostly clean with some gaps</option>
-                <option value="low">Low - Significant quality issues</option>
-              </select>
-            </Box>
-          </Box>
-        </Flex>
+            </p>
+            <select
+              value={inputs.dataQuality}
+              onChange={(e) => updateField('dataQuality', e.target.value)}
+              className="w-full px-3 py-2 rounded-md border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm cursor-pointer"
+            >
+              <option value="high">High - Clean, consistent, well-documented</option>
+              <option value="medium">Medium - Mostly clean with some gaps</option>
+              <option value="low">Low - Significant quality issues</option>
+            </select>
+          </div>
+        </div>
       </Card>
 
       {/* Technical Readiness */}
-      <Card mb={spacing.lg} bg={colors.olive + '10'} borderColor={colors.olive}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <Code size={24} color={colors.olive} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+      <Card className="mb-6 bg-green-50 dark:bg-green-900/20 border-green-600">
+        <div className="flex items-center gap-2 mb-4">
+          <Code size={24} className="text-green-600" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Technical Readiness
-          </Text>
-        </Flex>
+          </h3>
+        </div>
 
-        <Flex direction="column" gap={spacing.sm}>
+        <div className="flex flex-col gap-2">
           <CheckboxField
             field="hasMLExperience"
             label="ML/AI Experience"
@@ -148,34 +135,35 @@ export default function WizardReadinessForm({
             description="Cloud infrastructure (AWS/Azure/GCP) set up for AI workloads"
           />
 
-          <Box p={spacing.md} borderRadius="md" borderWidth="2px" borderColor={colors.patience} bg="white">
-            <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
+          <div className="p-4 rounded-md border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white mb-2">
               Team Size (technical staff)
-            </Text>
-            <Input
+            </p>
+            <input
               type="number"
               value={inputs.teamSize}
               onChange={(e) => updateField('teamSize', Number(e.target.value))}
               placeholder="Number of engineers/data scientists"
               min={0}
+              className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
             />
-            <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
               Include engineers, data scientists, ML specialists working on this project
-            </Text>
-          </Box>
-        </Flex>
+            </p>
+          </div>
+        </div>
       </Card>
 
       {/* Organizational Readiness */}
-      <Card mb={spacing.lg} bg={colors.gold + '10'} borderColor={colors.gold}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <Users size={24} color={colors.gold} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+      <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
+        <div className="flex items-center gap-2 mb-4">
+          <Users size={24} className="text-amber-500" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Organizational Readiness
-          </Text>
-        </Flex>
+          </h3>
+        </div>
 
-        <Flex direction="column" gap={spacing.sm}>
+        <div className="flex flex-col gap-2">
           <CheckboxField
             field="hasExecutiveSupport"
             label="Executive Sponsorship"
@@ -193,19 +181,19 @@ export default function WizardReadinessForm({
             label="Budget Allocated"
             description="Formal budget approved and allocated for implementation and operations"
           />
-        </Flex>
+        </div>
       </Card>
 
       {/* Compliance Readiness */}
-      <Card mb={spacing.lg} bg={colors.alert + '10'} borderColor={colors.alert}>
-        <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-          <Shield size={24} color={colors.alert} />
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+      <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
+        <div className="flex items-center gap-2 mb-4">
+          <Shield size={24} className="text-red-500" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Compliance & Security Readiness
-          </Text>
-        </Flex>
+          </h3>
+        </div>
 
-        <Flex direction="column" gap={spacing.sm}>
+        <div className="flex flex-col gap-2">
           <CheckboxField
             field="hasComplianceFramework"
             label="Compliance Framework"
@@ -217,42 +205,34 @@ export default function WizardReadinessForm({
             label="Security & Privacy Measures"
             description="Data security, access controls, and privacy protection implemented"
           />
-        </Flex>
+        </div>
       </Card>
 
       {/* Timeline Estimate */}
-      <Card mb={spacing.lg}>
-        <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
+      <Card className="mb-6">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
           Expected Timeline
-        </Text>
-        <Text fontSize={typography.fontSize.sm} color={colors.text.secondary} mb={spacing.md}>
+        </h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
           How many weeks do you estimate for implementation?
-        </Text>
-        <Input
+        </p>
+        <input
           type="number"
           value={inputs.timelineWeeks}
           onChange={(e) => updateField('timelineWeeks', Number(e.target.value))}
           placeholder="Weeks"
           min={1}
+          className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
         />
-        <Text fontSize={typography.fontSize.xs} color={colors.text.secondary} mt={spacing.xs}>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
           Include planning, development, testing, and deployment phases
-        </Text>
+        </p>
       </Card>
 
       {/* Submit Button */}
-      <Button
-        onClick={onSubmit}
-        bg={colors.cobalt}
-        color="white"
-        w="100%"
-        py={spacing.lg}
-        fontSize={typography.fontSize.lg}
-        fontWeight={typography.fontWeight.semibold}
-        _hover={{ bg: colors.navy }}
-      >
+      <Button onClick={onSubmit} variant="primary" fullWidth size="lg">
         Assess Readiness
       </Button>
-    </Box>
+    </div>
   );
 }

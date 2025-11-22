@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   LayoutDashboard,
   Monitor,
@@ -8,21 +7,12 @@ import {
   TrendingUp,
   Settings,
   Bell,
-  User,
   Menu,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import {
-  colors,
-  spacing,
-  borderRadius,
-  typography,
-  shadows,
-  transitions,
-  zIndex,
-} from '@/theme';
 import Badge, { CountBadge } from './Badge';
+import { cn } from '@/lib/utils';
 
 // Navigation sections
 type NavigationSection =
@@ -48,10 +38,6 @@ interface NavigationProps {
   userAvatar?: string;
 }
 
-/**
- * Professional Navigation Bar
- * 80px height, clear active states, notification bell, user section
- */
 export default function Navigation({
   activeSection,
   onSectionChange,
@@ -68,25 +54,14 @@ export default function Navigation({
   ];
 
   return (
-    <Box
-      as="nav"
-      position="sticky"
-      top="0"
-      zIndex={zIndex.sticky}
-      bg={colors.primary[900]}
-      boxShadow={shadows.sm}
-    >
-      <Box maxW="1400px" mx="auto" px={spacing.lg}>
-        <Flex h={spacing.navHeight} align="center" justify="space-between">
+    <nav className="sticky top-0 z-50 bg-zinc-900 dark:bg-zinc-950 shadow-sm">
+      <div className="max-w-[1400px] mx-auto px-6">
+        <div className="h-20 flex items-center justify-between">
           {/* Logo Section */}
           <LogoSection />
 
           {/* Desktop Navigation */}
-          <Flex
-            gap={spacing.xs}
-            display={{ base: 'none', md: 'flex' }}
-            align="center"
-          >
+          <div className="hidden md:flex items-center gap-1">
             {tabs.map((tab) => (
               <NavTab
                 key={tab.id}
@@ -95,10 +70,10 @@ export default function Navigation({
                 onClick={() => onSectionChange(tab.id)}
               />
             ))}
-          </Flex>
+          </div>
 
           {/* Right Section - User & Notifications */}
-          <Flex align="center" gap={spacing.md}>
+          <div className="flex items-center gap-4">
             {/* Notification Bell */}
             <NotificationBell count={notificationCount} />
 
@@ -114,16 +89,16 @@ export default function Navigation({
             <UserAvatar name={userName} />
 
             {/* Mobile Menu Toggle */}
-            <Box display={{ base: 'flex', md: 'none' }}>
+            <div className="flex md:hidden">
               <NavIconButton
                 icon={mobileMenuOpen ? X : Menu}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Menu"
               />
-            </Box>
-          </Flex>
-        </Flex>
-      </Box>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Mobile Navigation Drawer */}
       <MobileDrawer
@@ -135,48 +110,28 @@ export default function Navigation({
           setMobileMenuOpen(false);
         }}
       />
-    </Box>
+    </nav>
   );
 }
 
-/**
- * Logo Section
- */
 function LogoSection() {
   return (
-    <Flex align="center" gap={spacing.sm}>
-      <Flex
-        w="40px"
-        h="40px"
-        borderRadius={borderRadius.md}
-        bg={colors.primary[500]}
-        align="center"
-        justify="center"
-      >
-        <Text color="white" fontWeight="bold" fontSize="18px">
-          C
-        </Text>
-      </Flex>
-      <Flex align="center" gap={spacing.xs}>
-        <Text
-          fontSize="24px"
-          fontWeight={700}
-          color={colors.text.inverse}
-          letterSpacing="-0.02em"
-        >
+    <div className="flex items-center gap-2">
+      <div className="w-10 h-10 rounded-md bg-blue-600 flex items-center justify-center">
+        <span className="text-white font-bold text-lg">C</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <span className="text-2xl font-bold text-white tracking-tight">
           CERT
-        </Text>
-        <Badge variant="pro" size="sm">
+        </span>
+        <Badge variant="primary" size="sm">
           PRO
         </Badge>
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   );
 }
 
-/**
- * Navigation Tab Component
- */
 interface NavTabProps {
   tab: Tab;
   isActive: boolean;
@@ -187,39 +142,24 @@ function NavTab({ tab, isActive, onClick }: NavTabProps) {
   const IconComponent = tab.icon;
 
   return (
-    <Box
-      as="button"
+    <button
       onClick={onClick}
-      display="flex"
-      alignItems="center"
-      gap={spacing.xs}
-      px={spacing.md}
-      py={spacing.sm}
-      borderRadius={borderRadius.md}
-      fontSize="14px"
-      fontWeight={500}
-      color={isActive ? colors.text.inverse : colors.neutral[400]}
-      bg={isActive ? colors.primary[700] : 'transparent'}
-      transition={transitions.all}
-      cursor="pointer"
-      position="relative"
-      _hover={{
-        bg: isActive ? colors.primary[700] : 'rgba(255, 255, 255, 0.1)',
-        color: colors.text.inverse,
-      }}
+      className={cn(
+        'flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-all relative',
+        isActive
+          ? 'text-white bg-zinc-700'
+          : 'text-zinc-400 hover:text-white hover:bg-white/10'
+      )}
     >
       <IconComponent size={18} />
-      <Text>{tab.label}</Text>
+      <span>{tab.label}</span>
       {tab.badge && tab.badge > 0 && (
         <CountBadge count={tab.badge} variant="warning" size="sm" />
       )}
-    </Box>
+    </button>
   );
 }
 
-/**
- * Navigation Icon Button
- */
 interface NavIconButtonProps {
   icon: typeof Settings;
   isActive?: boolean;
@@ -234,69 +174,38 @@ function NavIconButton({
   'aria-label': ariaLabel,
 }: NavIconButtonProps) {
   return (
-    <Box
-      as="button"
+    <button
       onClick={onClick}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      w="40px"
-      h="40px"
-      borderRadius={borderRadius.md}
-      color={isActive ? colors.text.inverse : colors.neutral[400]}
-      bg={isActive ? colors.primary[700] : 'transparent'}
-      transition={transitions.all}
-      cursor="pointer"
       aria-label={ariaLabel}
-      _hover={{
-        bg: 'rgba(255, 255, 255, 0.1)',
-        color: colors.text.inverse,
-      }}
+      className={cn(
+        'flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all',
+        isActive
+          ? 'text-white bg-zinc-700'
+          : 'text-zinc-400 hover:text-white hover:bg-white/10'
+      )}
     >
       <Icon size={20} />
-    </Box>
+    </button>
   );
 }
 
-/**
- * Notification Bell with Count
- */
 function NotificationBell({ count }: { count: number }) {
   return (
-    <Box position="relative">
+    <div className="relative">
       <NavIconButton
         icon={Bell}
         onClick={() => {}}
         aria-label={`Notifications${count > 0 ? ` (${count})` : ''}`}
       />
       {count > 0 && (
-        <Box
-          position="absolute"
-          top="-2px"
-          right="-2px"
-          minW="18px"
-          h="18px"
-          borderRadius="full"
-          bg={colors.accent[500]}
-          color={colors.text.inverse}
-          fontSize="10px"
-          fontWeight={600}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          px="4px"
-          border={`2px solid ${colors.primary[900]}`}
-        >
+        <div className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-amber-500 text-white text-[10px] font-semibold flex items-center justify-center px-1 border-2 border-zinc-900">
           {count > 9 ? '9+' : count}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
-/**
- * User Avatar
- */
 function UserAvatar({ name }: { name: string }) {
   const initials = name
     .split(' ')
@@ -306,31 +215,12 @@ function UserAvatar({ name }: { name: string }) {
     .slice(0, 2);
 
   return (
-    <Flex
-      as="button"
-      align="center"
-      justify="center"
-      w="40px"
-      h="40px"
-      borderRadius="full"
-      bg={colors.primary[500]}
-      color={colors.text.inverse}
-      fontSize="14px"
-      fontWeight={600}
-      cursor="pointer"
-      transition={transitions.all}
-      _hover={{
-        bg: colors.primary[400],
-      }}
-    >
+    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-blue-500">
       {initials}
-    </Flex>
+    </button>
   );
 }
 
-/**
- * Mobile Navigation Drawer
- */
 interface MobileDrawerProps {
   isOpen: boolean;
   tabs: Tab[];
@@ -347,56 +237,34 @@ function MobileDrawer({
   if (!isOpen) return null;
 
   return (
-    <Box
-      position="absolute"
-      top={spacing.navHeight}
-      left="0"
-      right="0"
-      bg={colors.primary[900]}
-      borderTop={`1px solid ${colors.primary[700]}`}
-      p={spacing.md}
-      display={{ base: 'block', md: 'none' }}
-      boxShadow={shadows.elevated}
-    >
-      <Flex direction="column" gap={spacing.xs}>
+    <div className="absolute top-20 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-4 block md:hidden shadow-lg">
+      <div className="flex flex-col gap-1">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeSection === tab.id;
 
           return (
-            <Box
+            <button
               key={tab.id}
-              as="button"
               onClick={() => onSectionChange(tab.id)}
-              display="flex"
-              alignItems="center"
-              gap={spacing.sm}
-              p={spacing.md}
-              borderRadius={borderRadius.md}
-              fontSize="16px"
-              fontWeight={500}
-              color={isActive ? colors.text.inverse : colors.neutral[400]}
-              bg={isActive ? colors.primary[700] : 'transparent'}
-              transition={transitions.all}
-              cursor="pointer"
-              w="100%"
-              textAlign="left"
-              _hover={{
-                bg: isActive ? colors.primary[700] : 'rgba(255, 255, 255, 0.1)',
-              }}
+              className={cn(
+                'flex items-center gap-2 p-4 rounded-md text-base font-medium cursor-pointer transition-all w-full text-left',
+                isActive
+                  ? 'text-white bg-zinc-700'
+                  : 'text-zinc-400 hover:bg-white/10'
+              )}
             >
               <IconComponent size={20} />
-              <Text flex={1}>{tab.label}</Text>
+              <span className="flex-1">{tab.label}</span>
               {tab.badge && tab.badge > 0 && (
                 <CountBadge count={tab.badge} variant="warning" size="sm" />
               )}
-            </Box>
+            </button>
           );
         })}
-      </Flex>
-    </Box>
+      </div>
+    </div>
   );
 }
 
-// Export navigation section type for external use
 export type { NavigationSection };

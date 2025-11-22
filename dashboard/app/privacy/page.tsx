@@ -1,128 +1,126 @@
 'use client';
 
-import { Box, Text, Heading, VStack, Link } from '@chakra-ui/react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Card from '@/components/Card';
-import { colors } from '@/theme/colors';
 
 export default function PrivacyPolicy() {
   return (
-    <Box minH="100vh" bg={colors.background} display="flex" flexDirection="column">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
       <Navigation activeSection="documentation" onSectionChange={() => {}} />
 
-      <Box maxW="900px" mx="auto" px="32px" py="48px" flex="1">
-        <Card style={{ borderColor: colors.patience }}>
-          <VStack align="stretch" gap="32px">
+      <div className="max-w-[900px] mx-auto px-8 py-12 flex-1">
+        <Card>
+          <div className="flex flex-col gap-8">
             {/* Header */}
-            <Box>
-              <Heading as="h1" fontSize="42px" fontWeight="700" color={colors.navy} mb="12px">
+            <div>
+              <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-3">
                 Privacy Policy
-              </Heading>
-              <Text fontSize="16px" color={colors.text.muted}>
+              </h1>
+              <p className="text-base text-zinc-500 dark:text-zinc-400">
                 Effective Date: November 7, 2025
-              </Text>
-            </Box>
+              </p>
+            </div>
 
             {/* Data Processing */}
-            <Box>
-              <Heading as="h2" fontSize="28px" fontWeight="700" color={colors.navy} mb="16px">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
                 Data Processing
-              </Heading>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="16px">
+              </h2>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-4">
                 When you use the CERT Framework dashboard, all file processing occurs locally in your web browser. We do not receive, store, or have access to your uploaded files or the data they contain.
-              </Text>
-              <Box as="ul" pl="24px" fontSize="16px" lineHeight="1.8" color={colors.text.primary}>
-                <Box as="li" mb="8px">Your trace files never leave your computer</Box>
-                <Box as="li" mb="8px">PDF reports are generated in your browser</Box>
-                <Box as="li" mb="8px">No data is sent to our servers</Box>
-                <Box as="li" mb="8px">No data is stored in databases or logs</Box>
-              </Box>
-            </Box>
+              </p>
+              <ul className="pl-6 text-base leading-relaxed text-zinc-700 dark:text-zinc-300 list-disc">
+                <li className="mb-2">Your trace files never leave your computer</li>
+                <li className="mb-2">PDF reports are generated in your browser</li>
+                <li className="mb-2">No data is sent to our servers</li>
+                <li className="mb-2">No data is stored in databases or logs</li>
+              </ul>
+            </div>
 
             {/* Information We Collect */}
-            <Box>
-              <Heading as="h2" fontSize="28px" fontWeight="700" color={colors.navy} mb="16px">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
                 Information We Collect
-              </Heading>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="16px">
+              </h2>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-4">
                 The CERT Framework dashboard collects minimal operational data:
-              </Text>
-              <Box as="ul" pl="24px" fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="16px">
-                <Box as="li" mb="8px">Basic usage analytics (page views, feature usage)</Box>
-                <Box as="li" mb="8px">Technical error logs (for debugging purposes only)</Box>
-              </Box>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} fontWeight="600" mb="8px">
+              </p>
+              <ul className="pl-6 text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-4 list-disc">
+                <li className="mb-2">Basic usage analytics (page views, feature usage)</li>
+                <li className="mb-2">Technical error logs (for debugging purposes only)</li>
+              </ul>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 font-semibold mb-2">
                 We do NOT collect:
-              </Text>
-              <Box as="ul" pl="24px" fontSize="16px" lineHeight="1.8" color={colors.text.primary}>
-                <Box as="li" mb="8px">Uploaded file contents</Box>
-                <Box as="li" mb="8px">Evaluation results</Box>
-                <Box as="li" mb="8px">Any data from your AI systems</Box>
-              </Box>
-            </Box>
+              </p>
+              <ul className="pl-6 text-base leading-relaxed text-zinc-700 dark:text-zinc-300 list-disc">
+                <li className="mb-2">Uploaded file contents</li>
+                <li className="mb-2">Evaluation results</li>
+                <li className="mb-2">Any data from your AI systems</li>
+              </ul>
+            </div>
 
             {/* Third-Party Services */}
-            <Box>
-              <Heading as="h2" fontSize="28px" fontWeight="700" color={colors.navy} mb="16px">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
                 Third-Party Services
-              </Heading>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary}>
+              </h2>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
                 Our dashboard is hosted on Vercel. While we don't send your evaluation data to servers, Vercel may collect standard web hosting analytics (IP addresses, page load times) as part of their infrastructure.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
             {/* GDPR Rights */}
-            <Box>
-              <Heading as="h2" fontSize="28px" fontWeight="700" color={colors.navy} mb="16px">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
                 Your Rights (GDPR)
-              </Heading>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="16px">
+              </h2>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-4">
                 Under the General Data Protection Regulation, you have rights to:
-              </Text>
-              <Box as="ul" pl="24px" fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="16px">
-                <Box as="li" mb="8px">Access any personal data we hold</Box>
-                <Box as="li" mb="8px">Request deletion of your data</Box>
-                <Box as="li" mb="8px">Object to processing</Box>
-                <Box as="li" mb="8px">Lodge a complaint with your supervisory authority</Box>
-              </Box>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary}>
+              </p>
+              <ul className="pl-6 text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-4 list-disc">
+                <li className="mb-2">Access any personal data we hold</li>
+                <li className="mb-2">Request deletion of your data</li>
+                <li className="mb-2">Object to processing</li>
+                <li className="mb-2">Lodge a complaint with your supervisory authority</li>
+              </ul>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
                 Since we don't store your evaluation data, these rights are automatically fulfilled - we cannot access what we never collected.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
             {/* Contact */}
-            <Box>
-              <Heading as="h2" fontSize="28px" fontWeight="700" color={colors.navy} mb="16px">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
                 Contact
-              </Heading>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary} mb="12px">
+              </h2>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-3">
                 For privacy questions:{' '}
-                <Link href="mailto:javier@jmarin.info" color={colors.cobalt} textDecoration="underline">
+                <a href="mailto:javier@jmarin.info" className="text-blue-600 dark:text-blue-500 underline hover:text-blue-700 dark:hover:text-blue-400">
                   javier@jmarin.info
-                </Link>
-              </Text>
-              <Text fontSize="16px" lineHeight="1.8" color={colors.text.primary}>
+                </a>
+              </p>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
                 Data Controller:<br />
                 CERT Framework<br />
                 Madrid, Spain
-              </Text>
-            </Box>
+              </p>
+            </div>
 
             {/* Updates */}
-            <Box bg={colors.patience} p="24px" borderRadius="12px">
-              <Heading as="h3" fontSize="18px" fontWeight="700" color={colors.navy} mb="12px">
+            <div className="bg-zinc-100 dark:bg-zinc-800 p-6 rounded-xl">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-3">
                 Policy Updates
-              </Heading>
-              <Text fontSize="15px" lineHeight="1.7" color={colors.text.primary}>
+              </h3>
+              <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
                 We may update this privacy policy from time to time. Any changes will be posted on this page with an updated effective date. Your continued use of the dashboard after such changes constitutes acceptance of the updated policy.
-              </Text>
-            </Box>
-          </VStack>
+              </p>
+            </div>
+          </div>
         </Card>
-      </Box>
+      </div>
 
       <Footer />
-    </Box>
+    </div>
   );
 }

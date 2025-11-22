@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Button, Flex, Text, Grid, Input, Textarea, Code } from '@chakra-ui/react';
+import { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
-import { colors, spacing, typography, borderRadius } from '@/theme';
 import { InfoBox } from '@/components/ui';
 import Card from '@/components/Card';
+import Button from '@/components/Button';
 import { EvaluationSummary, EvaluationResult } from '@/types/cert';
 import { Article15Report } from '@/types/report-schema';
 import { CERTReportPDF } from './CERTReportPDF';
@@ -24,7 +23,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
   const [notes, setNotes] = useState('');
 
   // Load organization from sessionStorage if available
-  useState(() => {
+  useEffect(() => {
     const complianceDataStr = sessionStorage.getItem('compliance_data');
     if (complianceDataStr) {
       try {
@@ -34,7 +33,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
         // Ignore errors
       }
     }
-  });
+  }, []);
 
   const handleDownloadReport = async () => {
     setLoading(true);
@@ -106,190 +105,122 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
   const isCompliant = summary.accuracy >= 0.9;
 
   return (
-    <Box maxW="900px" mx="auto">
+    <div className="max-w-[900px] mx-auto">
       {/* PDF Report Section */}
-      <Card style={{ borderColor: colors.patience, padding: spacing.xl, marginBottom: spacing.lg }}>
-        <Text
-          fontSize={typography.fontSize['2xl']}
-          fontWeight={typography.fontWeight.bold}
-          color={colors.navy}
-          mb={spacing.md}
-        >
+      <Card className="p-8 mb-6">
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
           Download PDF Compliance Report
-        </Text>
-        <Text
-          fontSize={typography.fontSize.base}
-          color={colors.text.secondary}
-          mb={spacing.lg}
-          lineHeight={typography.lineHeight.loose}
-        >
+        </h2>
+        <p className="text-base text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
           Generate a professional PDF report with comprehensive evaluation metrics, failure analysis, and compliance recommendations. Generated entirely in your browser - no data sent to servers.
-        </Text>
+        </p>
 
-        <Grid templateColumns="1fr" gap={spacing.lg} mb={spacing.lg}>
-          <Box>
-            <Text
-              fontSize={typography.fontSize.sm}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-              mb={spacing.xs}
-            >
+        <div className="grid grid-cols-1 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-white mb-1">
               Report Title
-            </Text>
-            <Input
+            </label>
+            <input
+              type="text"
               value={reportTitle}
               onChange={(e) => setReportTitle(e.target.value)}
               placeholder="Enter report title"
-              bg={colors.background}
-              fontSize={typography.fontSize.sm}
-              height="44px"
+              className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white h-11"
             />
-          </Box>
+          </div>
 
-          <Box>
-            <Text
-              fontSize={typography.fontSize.sm}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-              mb={spacing.xs}
-            >
+          <div>
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-white mb-1">
               Organization
-            </Text>
-            <Input
+            </label>
+            <input
+              type="text"
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
               placeholder="Your organization name"
-              bg={colors.background}
-              fontSize={typography.fontSize.sm}
-              height="44px"
+              className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white h-11"
             />
-          </Box>
+          </div>
 
-          <Box>
-            <Text
-              fontSize={typography.fontSize.sm}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-              mb={spacing.xs}
-            >
+          <div>
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-white mb-1">
               Evaluator
-            </Text>
-            <Input
+            </label>
+            <input
+              type="text"
               value={evaluator}
               onChange={(e) => setEvaluator(e.target.value)}
               placeholder="Name of person conducting evaluation"
-              bg={colors.background}
-              fontSize={typography.fontSize.sm}
-              height="44px"
+              className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white h-11"
             />
-          </Box>
+          </div>
 
-          <Box>
-            <Text
-              fontSize={typography.fontSize.sm}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.navy}
-              mb={spacing.xs}
-            >
+          <div>
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-white mb-1">
               Additional Notes
-            </Text>
-            <Textarea
+            </label>
+            <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any additional context or notes for this report"
-              bg={colors.background}
-              fontSize={typography.fontSize.sm}
               rows={4}
+              className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white"
             />
-          </Box>
-        </Grid>
+          </div>
+        </div>
 
         {/* Report Preview */}
-        <Box
-          bg={colors.background}
-          p={spacing.lg}
-          borderRadius={borderRadius.md}
-          border="1px solid"
-          borderColor={colors.patience}
-          mb={spacing.lg}
-        >
-          <Text
-            fontSize={typography.fontSize.base}
-            fontWeight={typography.fontWeight.bold}
-            color={colors.navy}
-            mb={spacing.sm}
-          >
+        <div className="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-md border border-zinc-200 dark:border-zinc-700 mb-6">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-2">
             Report Preview
-          </Text>
-          <Grid templateColumns="1fr 1fr" gap={spacing.sm}>
-            <Box>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Total Traces:</Text>
-              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <span className="text-sm text-zinc-400">Total Traces:</span>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                 {summary.total_traces.toLocaleString()}
-              </Text>
-            </Box>
-            <Box>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Accuracy:</Text>
-              <Text
-                fontSize={typography.fontSize.sm}
-                fontWeight={typography.fontWeight.semibold}
-                color={isCompliant ? colors.success : colors.warning}
-              >
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-zinc-400">Accuracy:</span>
+              <p className={`text-sm font-semibold ${isCompliant ? 'text-green-600' : 'text-amber-500'}`}>
                 {(summary.accuracy * 100).toFixed(1)}%
-              </Text>
-            </Box>
-            <Box>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Passed:</Text>
-              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.success}>
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-zinc-400">Passed:</span>
+              <p className="text-sm font-semibold text-green-600">
                 {summary.passed_traces.toLocaleString()}
-              </Text>
-            </Box>
-            <Box>
-              <Text fontSize={typography.fontSize.sm} color={colors.text.muted}>Failed:</Text>
-              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.error}>
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-zinc-400">Failed:</span>
+              <p className="text-sm font-semibold text-red-500">
                 {summary.failed_traces.toLocaleString()}
-              </Text>
-            </Box>
-          </Grid>
-        </Box>
+              </p>
+            </div>
+          </div>
+        </div>
 
         <Button
-          w="100%"
-          h="48px"
-          bg={colors.cobalt}
-          color="white"
-          fontSize={typography.fontSize.lg}
-          fontWeight={typography.fontWeight.semibold}
-          borderRadius={borderRadius.md}
-          _hover={{ bg: colors.navy }}
           onClick={handleDownloadReport}
+          variant="primary"
+          fullWidth
+          size="lg"
+          icon={<Download size={20} />}
           disabled={loading}
         >
-          {loading ? 'Generating Report...' : (
-            <Flex align="center" gap={spacing.sm}>
-              <Download size={20} strokeWidth={2} />
-              <Text>Download PDF Report</Text>
-            </Flex>
-          )}
+          {loading ? 'Generating Report...' : 'Download PDF Report'}
         </Button>
       </Card>
 
       {/* CLI Instructions for Word Documents */}
       <InfoBox type="info" title="Need Word Documents?">
-        <Box>
-          <Text mb={spacing.md}>
+        <div>
+          <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
             For the full EU AI Act compliance package (5 Word documents, 32 pages), use the CERT CLI. All processing happens locally on your machine - your traces never leave your computer.
-          </Text>
-          <Code
-            display="block"
-            whiteSpace="pre"
-            p={spacing.md}
-            borderRadius={borderRadius.md}
-            fontSize={typography.fontSize.sm}
-            bg="white"
-            color={colors.navy}
-            lineHeight={typography.lineHeight.relaxed}
-          >
+          </p>
+          <pre className="block whitespace-pre p-4 rounded-md text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 leading-relaxed overflow-x-auto">
 {`# Install CERT CLI
 pip install cert-framework
 
@@ -303,12 +234,12 @@ reporter = ComplianceReporter(
     provider_name="My Company"
 )
 reporter.save_report("traces.jsonl", "package.docx")`}
-          </Code>
-          <Text mt={spacing.sm} fontSize={typography.fontSize.xs} color={colors.text.muted}>
+          </pre>
+          <p className="mt-2 text-xs text-zinc-400">
             The CLI generates: Risk Classification Report (2p), Annex IV Technical Documentation (20-25p), Audit Trail Guide (3p), Monitoring Framework (5p), and Conformity Checklist (2p).
-          </Text>
-        </Box>
+          </p>
+        </div>
       </InfoBox>
-    </Box>
+    </div>
   );
 }

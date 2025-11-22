@@ -1,6 +1,6 @@
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, spacing, borderRadius, typography, icons, iconSizes } from '@/theme';
+import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
+import { Info, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 interface InfoBoxProps {
   type: 'info' | 'success' | 'warning' | 'error';
@@ -9,31 +9,30 @@ interface InfoBoxProps {
 }
 
 export function InfoBox({ type, title, children }: InfoBoxProps) {
-  // ONLY use colors from the palette
   const styles = {
     info: {
-      bg: colors.patience,      // #E6DDD6 - From palette
-      border: colors.cobalt,     // #3C6098 - From palette
-      icon: icons.info,
-      iconColor: colors.cobalt,
+      bg: 'bg-blue-50 dark:bg-blue-900/20',
+      border: 'border-blue-600',
+      icon: Info,
+      iconColor: 'text-blue-600',
     },
     success: {
-      bg: colors.patience,       // Same background for consistency
-      border: colors.success,    // From palette
-      icon: icons.success,
-      iconColor: colors.success,
+      bg: 'bg-green-50 dark:bg-green-900/20',
+      border: 'border-green-600',
+      icon: CheckCircle2,
+      iconColor: 'text-green-600',
     },
     warning: {
-      bg: colors.patience,       // Same background
-      border: colors.coral,      // #E48B59 - From palette (Aegean Sky)
-      icon: icons.warning,
-      iconColor: colors.coral,
+      bg: 'bg-amber-50 dark:bg-amber-900/20',
+      border: 'border-amber-500',
+      icon: AlertTriangle,
+      iconColor: 'text-amber-500',
     },
     error: {
-      bg: colors.patience,       // Same background
-      border: colors.error,      // From palette
-      icon: icons.error,
-      iconColor: colors.error,
+      bg: 'bg-red-50 dark:bg-red-900/20',
+      border: 'border-red-500',
+      icon: XCircle,
+      iconColor: 'text-red-500',
     },
   };
 
@@ -41,40 +40,31 @@ export function InfoBox({ type, title, children }: InfoBoxProps) {
   const IconComponent = style.icon;
 
   return (
-    <Box
-      bg={style.bg}
-      border="1px solid"
-      borderColor={style.border}
-      borderRadius={borderRadius.md}
-      p={spacing.md}
+    <div
+      className={cn(
+        'border rounded-md p-4',
+        style.bg,
+        style.border
+      )}
     >
-      <Flex gap={spacing.sm}>
+      <div className="flex gap-2">
         {/* Icon */}
-        <Box flexShrink={0} mt="2px">
-          <IconComponent size={iconSizes.md} color={style.iconColor} />
-        </Box>
+        <div className="flex-shrink-0 mt-0.5">
+          <IconComponent size={20} className={style.iconColor} />
+        </div>
 
         {/* Content */}
-        <Box flex="1">
+        <div className="flex-1">
           {title && (
-            <Text
-              fontSize={typography.fontSize.base}
-              fontWeight={typography.fontWeight.semibold}
-              color={colors.text.primary}
-              mb={spacing.xs}
-            >
+            <p className="text-base font-semibold text-zinc-900 dark:text-white mb-1">
               {title}
-            </Text>
+            </p>
           )}
-          <Text
-            fontSize={typography.fontSize.sm}
-            color={colors.text.secondary}
-            lineHeight={typography.lineHeight.relaxed}
-          >
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
             {children}
-          </Text>
-        </Box>
-      </Flex>
-    </Box>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

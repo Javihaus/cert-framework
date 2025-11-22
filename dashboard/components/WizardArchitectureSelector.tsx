@@ -1,11 +1,11 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
+import { cn } from '@/lib/utils';
 import { ArchitectureInputs, ArchitectureRecommendation } from '@/types/wizard';
 import { selectArchitecture, getAllArchitectures, calculateMonthlyCost } from '@/lib/architecture-selector';
-import { Check, DollarSign, Clock, Code, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
+import { Check, DollarSign, Code, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 interface WizardArchitectureSelectorProps {
@@ -30,13 +30,13 @@ export default function WizardArchitectureSelector({
   const getComplexityConfig = (complexity: string) => {
     switch (complexity) {
       case 'low':
-        return { color: colors.olive, label: 'Easy Setup', icon: CheckCircle2 };
+        return { colorClass: 'text-green-600', bgClass: 'bg-green-100 dark:bg-green-900/30', label: 'Easy Setup', icon: CheckCircle2 };
       case 'medium':
-        return { color: colors.cobalt, label: 'Moderate Setup', icon: AlertCircle };
+        return { colorClass: 'text-blue-600', bgClass: 'bg-blue-100 dark:bg-blue-900/30', label: 'Moderate Setup', icon: AlertCircle };
       case 'high':
-        return { color: colors.gold, label: 'Complex Setup', icon: Zap };
+        return { colorClass: 'text-amber-500', bgClass: 'bg-amber-100 dark:bg-amber-900/30', label: 'Complex Setup', icon: Zap };
       default:
-        return { color: colors.mist, label: 'Unknown', icon: AlertCircle };
+        return { colorClass: 'text-zinc-500', bgClass: 'bg-zinc-100 dark:bg-zinc-800', label: 'Unknown', icon: AlertCircle };
     }
   };
 
@@ -47,205 +47,163 @@ export default function WizardArchitectureSelector({
 
     return (
       <Card
-        borderWidth="2px"
-        borderColor={isSelected ? colors.cobalt : colors.patience}
-        bg={isSelected ? colors.cobalt + '10' : 'white'}
-        cursor="pointer"
+        className={cn(
+          'cursor-pointer transition-all relative',
+          isSelected
+            ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+            : 'border-2 border-zinc-200 dark:border-zinc-700 hover:border-blue-500'
+        )}
         onClick={() => onSelect(arch)}
-        transition="all 0.2s"
-        _hover={{ borderColor: colors.cobalt }}
-        position="relative"
       >
-        {/* Selection indicator */}
         {isSelected && (
-          <Box position="absolute" top={spacing.md} right={spacing.md}>
-            <Flex
-              w="32px"
-              h="32px"
-              bg={colors.cobalt}
-              borderRadius="full"
-              align="center"
-              justify="center"
-            >
+          <div className="absolute top-4 right-4">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
               <Check size={20} color="white" />
-            </Flex>
-          </Box>
+            </div>
+          </div>
         )}
 
-        {/* Header */}
-        <Flex direction="column" mb={spacing.md}>
-          <Text fontSize={typography.fontSize.xl} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+        <div className="flex flex-col mb-4">
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">
             {arch.name}
-          </Text>
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+          </h3>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {arch.description}
-          </Text>
-        </Flex>
+          </p>
+        </div>
 
-        {/* Complexity & Cost */}
-        <Flex gap={spacing.sm} mb={spacing.md}>
-          <Flex align="center" gap={spacing.xs} px={spacing.sm} py={spacing.xs} bg={complexityConfig.color + '20'} borderRadius="md">
-            <ComplexityIcon size={16} color={complexityConfig.color} />
-            <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={complexityConfig.color}>
+        <div className="flex gap-2 mb-4">
+          <div className={cn('flex items-center gap-1 px-2 py-1 rounded-md', complexityConfig.bgClass)}>
+            <ComplexityIcon size={16} className={complexityConfig.colorClass} />
+            <span className={cn('text-xs font-medium', complexityConfig.colorClass)}>
               {complexityConfig.label}
-            </Text>
-          </Flex>
-          <Flex align="center" gap={spacing.xs} px={spacing.sm} py={spacing.xs} bg={colors.cobalt + '10'} borderRadius="md">
-            <DollarSign size={16} color={colors.cobalt} />
-            <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.cobalt}>
+            </span>
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/30">
+            <DollarSign size={16} className="text-blue-600" />
+            <span className="text-xs font-medium text-blue-600">
               ${estimatedCost.toFixed(0)}/mo
-            </Text>
-          </Flex>
-        </Flex>
+            </span>
+          </div>
+        </div>
 
-        {/* Components Breakdown */}
-        <Box mb={spacing.md} p={spacing.md} bg={colors.background} borderRadius="md">
-          <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
+        <div className="mb-4 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-md">
+          <span className="text-xs font-semibold text-zinc-900 dark:text-white mb-2 block">
             Tech Stack
-          </Text>
-          <Flex direction="column" gap={spacing.xs}>
-            <Flex justify="space-between">
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>LLM:</Text>
-              <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.navy}>
+          </span>
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between">
+              <span className="text-xs text-zinc-500">LLM:</span>
+              <span className="text-xs font-medium text-zinc-900 dark:text-white">
                 {arch.components.llm.provider} {arch.components.llm.model}
-              </Text>
-            </Flex>
-            <Flex justify="space-between">
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Vector DB:</Text>
-              <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.navy}>
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-xs text-zinc-500">Vector DB:</span>
+              <span className="text-xs font-medium text-zinc-900 dark:text-white">
                 {arch.components.vectorDb.name}
-              </Text>
-            </Flex>
-            <Flex justify="space-between">
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>Framework:</Text>
-              <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.medium} color={colors.navy}>
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-xs text-zinc-500">Framework:</span>
+              <span className="text-xs font-medium text-zinc-900 dark:text-white">
                 {arch.components.orchestration.framework}
-              </Text>
-            </Flex>
-          </Flex>
-        </Box>
+              </span>
+            </div>
+          </div>
+        </div>
 
-        {/* Pros & Cons */}
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md} mb={spacing.md}>
-          <Box>
-            <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.semibold} color={colors.olive} mb={spacing.xs}>
-              Pros
-            </Text>
-            <Flex direction="column" gap={spacing.xs}>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <span className="text-xs font-semibold text-green-600 mb-1 block">Pros</span>
+            <div className="flex flex-col gap-1">
               {arch.pros.slice(0, 2).map((pro, idx) => (
-                <Flex key={idx} align="start" gap={spacing.xs}>
-                  <CheckCircle2 size={12} color={colors.olive} style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                    {pro}
-                  </Text>
-                </Flex>
+                <div key={idx} className="flex items-start gap-1">
+                  <CheckCircle2 size={12} className="text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-zinc-500">{pro}</span>
+                </div>
               ))}
-            </Flex>
-          </Box>
-          <Box>
-            <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.semibold} color={colors.alert} mb={spacing.xs}>
-              Cons
-            </Text>
-            <Flex direction="column" gap={spacing.xs}>
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-red-500 mb-1 block">Cons</span>
+            <div className="flex flex-col gap-1">
               {arch.cons.slice(0, 2).map((con, idx) => (
-                <Flex key={idx} align="start" gap={spacing.xs}>
-                  <AlertCircle size={12} color={colors.alert} style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                    {con}
-                  </Text>
-                </Flex>
+                <div key={idx} className="flex items-start gap-1">
+                  <AlertCircle size={12} className="text-red-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-zinc-500">{con}</span>
+                </div>
               ))}
-            </Flex>
-          </Box>
-        </Grid>
+            </div>
+          </div>
+        </div>
 
-        {/* Code Example Toggle */}
         {isSelected && (
-          <Box p={spacing.md} bg={colors.navy} borderRadius="md">
-            <Flex align="center" gap={spacing.xs} mb={spacing.sm}>
-              <Code size={14} color="white" />
-              <Text fontSize={typography.fontSize.xs} fontWeight={typography.fontWeight.semibold} color="white">
-                Quick Start Example
-              </Text>
-            </Flex>
-            <Box
-              as="pre"
-              fontSize={typography.fontSize.xs}
-              color="white"
-              overflow="auto"
-              whiteSpace="pre-wrap"
-              fontFamily="monospace"
-            >
+          <div className="p-4 bg-zinc-900 rounded-md">
+            <div className="flex items-center gap-1 mb-2">
+              <Code size={14} className="text-white" />
+              <span className="text-xs font-semibold text-white">Quick Start Example</span>
+            </div>
+            <pre className="text-xs text-white overflow-auto whitespace-pre-wrap font-mono">
               {arch.codeExample}
-            </Box>
-          </Box>
+            </pre>
+          </div>
         )}
       </Card>
     );
   };
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
         Architecture Selection
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+      </h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         {showAll
           ? 'All available reference architectures. Click any to see details and select.'
           : `Based on your requirements, we recommend these ${recommendations.length} production-proven architectures.`
         }
-      </Text>
+      </p>
 
-      {/* Recommendation context */}
       {!showAll && recommendations.length > 0 && (
-        <Card mb={spacing.lg} bg={colors.cobalt + '10'} borderColor={colors.cobalt}>
-          <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.sm}>
+        <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
+          <span className="text-sm font-semibold text-zinc-900 dark:text-white mb-2 block">
             Recommendations Based On:
-          </Text>
-          <Flex direction="column" gap={spacing.xs}>
-            <Flex align="center" gap={spacing.xs}>
-              <DollarSign size={14} color={colors.cobalt} />
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                Budget: ${inputs.budgetPerMonth}/month
-              </Text>
-            </Flex>
-            <Flex align="center" gap={spacing.xs}>
-              <Zap size={14} color={colors.cobalt} />
-              <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                Volume: {inputs.volumeQueriesPerMonth.toLocaleString()} queries/month
-              </Text>
-            </Flex>
+          </span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1">
+              <DollarSign size={14} className="text-blue-600" />
+              <span className="text-xs text-zinc-500">Budget: ${inputs.budgetPerMonth}/month</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Zap size={14} className="text-blue-600" />
+              <span className="text-xs text-zinc-500">Volume: {inputs.volumeQueriesPerMonth.toLocaleString()} queries/month</span>
+            </div>
             {inputs.dataResidency !== 'any' && (
-              <Flex align="center" gap={spacing.xs}>
-                <AlertCircle size={14} color={colors.cobalt} />
-                <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                  Data Residency: {inputs.dataResidency.toUpperCase()}
-                </Text>
-              </Flex>
+              <div className="flex items-center gap-1">
+                <AlertCircle size={14} className="text-blue-600" />
+                <span className="text-xs text-zinc-500">Data Residency: {inputs.dataResidency.toUpperCase()}</span>
+              </div>
             )}
             {inputs.teamSkills.length > 0 && (
-              <Flex align="center" gap={spacing.xs}>
-                <CheckCircle2 size={14} color={colors.cobalt} />
-                <Text fontSize={typography.fontSize.xs} color={colors.text.secondary}>
-                  Team Skills: {inputs.teamSkills.join(', ')}
-                </Text>
-              </Flex>
+              <div className="flex items-center gap-1">
+                <CheckCircle2 size={14} className="text-blue-600" />
+                <span className="text-xs text-zinc-500">Team Skills: {inputs.teamSkills.join(', ')}</span>
+              </div>
             )}
-          </Flex>
+          </div>
         </Card>
       )}
 
-      {/* No recommendations warning */}
       {!showAll && recommendations.length === 0 && (
-        <Card mb={spacing.lg} bg={colors.alert + '10'} borderColor={colors.alert}>
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+        <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
+          <p className="text-sm text-zinc-500">
             No architectures match your exact requirements. We've relaxed some constraints below to show available options.
-          </Text>
+          </p>
         </Card>
       )}
 
-      {/* Architecture Cards */}
-      <Flex direction="column" gap={spacing.md} mb={spacing.lg}>
+      <div className="flex flex-col gap-4 mb-6">
         {displayedArchitectures.map((arch, idx) => (
           <ArchitectureCard
             key={idx}
@@ -253,18 +211,14 @@ export default function WizardArchitectureSelector({
             isSelected={selectedArchitecture?.name === arch.name}
           />
         ))}
-      </Flex>
+      </div>
 
-      {/* Show All / Show Recommended Toggle */}
       {!showAll && recommendations.length < allArchitectures.length && (
         <Button
           onClick={() => setShowAll(true)}
-          variant="outline"
-          w="100%"
-          mb={spacing.md}
-          borderColor={colors.patience}
-          color={colors.text.secondary}
-          _hover={{ borderColor: colors.cobalt, color: colors.cobalt }}
+          variant="secondary"
+          fullWidth
+          className="mb-4"
         >
           Browse All {allArchitectures.length} Architectures
         </Button>
@@ -273,31 +227,23 @@ export default function WizardArchitectureSelector({
       {showAll && (
         <Button
           onClick={() => setShowAll(false)}
-          variant="outline"
-          w="100%"
-          mb={spacing.md}
-          borderColor={colors.patience}
-          color={colors.text.secondary}
-          _hover={{ borderColor: colors.cobalt, color: colors.cobalt }}
+          variant="secondary"
+          fullWidth
+          className="mb-4"
         >
           Show Only Recommended
         </Button>
       )}
 
-      {/* Continue Button */}
       <Button
         onClick={onNext}
-        bg={colors.cobalt}
-        color="white"
-        w="100%"
-        py={spacing.lg}
-        fontSize={typography.fontSize.lg}
-        fontWeight={typography.fontWeight.semibold}
-        _hover={{ bg: colors.navy }}
+        variant="primary"
+        fullWidth
+        size="lg"
         disabled={!selectedArchitecture}
       >
         {selectedArchitecture ? 'Continue to Readiness Assessment' : 'Select an Architecture to Continue'}
       </Button>
-    </Box>
+    </div>
   );
 }

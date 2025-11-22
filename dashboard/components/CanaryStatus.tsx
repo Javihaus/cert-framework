@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import {
   Bird,
   CheckCircle,
@@ -11,8 +10,8 @@ import {
   TrendingDown,
 } from 'lucide-react';
 import Card, { CardTitle } from './Card';
-import Badge, { StatusBadge } from './Badge';
-import { colors, spacing, borderRadius, transitions } from '@/theme';
+import Badge from './Badge';
+import { cn } from '@/lib/utils';
 
 /**
  * Canary Prompt Interface
@@ -92,25 +91,18 @@ export default function CanaryStatus({
   const errorCount = canaries.filter((c) => c.status === 'error').length;
 
   return (
-    <Card variant="elevated" padding={spacing.lg}>
+    <Card variant="elevated" className="p-6">
       {/* Header */}
-      <Flex justify="space-between" align="center" mb={spacing.lg}>
-        <Flex align="center" gap={spacing.sm}>
-          <Flex
-            align="center"
-            justify="center"
-            w="32px"
-            h="32px"
-            borderRadius={borderRadius.md}
-            bg={colors.primary[100]}
-          >
-            <Bird size={16} color={colors.primary[700]} />
-          </Flex>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900/30">
+            <Bird size={16} className="text-blue-700 dark:text-blue-400" />
+          </div>
           <CardTitle>Canary Status</CardTitle>
-        </Flex>
+        </div>
 
         {/* Summary Badges */}
-        <Flex gap={spacing.xs}>
+        <div className="flex gap-1">
           <Badge variant="success" size="sm">
             {healthyCount} OK
           </Badge>
@@ -124,18 +116,18 @@ export default function CanaryStatus({
               {errorCount}
             </Badge>
           )}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
       {/* Canary Grid */}
-      <Grid
-        templateColumns={compact ? '1fr' : { base: '1fr', md: 'repeat(2, 1fr)' }}
-        gap={spacing.sm}
-      >
+      <div className={cn(
+        'grid gap-2',
+        compact ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
+      )}>
         {canaries.map((canary) => (
           <CanaryCard key={canary.id} canary={canary} />
         ))}
-      </Grid>
+      </div>
     </Card>
   );
 }
@@ -151,18 +143,18 @@ function CanaryCard({ canary }: CanaryCardProps) {
   const statusConfig = {
     healthy: {
       icon: CheckCircle,
-      color: colors.semantic.success,
-      bg: colors.semantic.successLight,
+      colorClass: 'text-green-600 dark:text-green-500',
+      bgClass: 'bg-green-50 dark:bg-green-900/20',
     },
     warning: {
       icon: AlertTriangle,
-      color: colors.semantic.warning,
-      bg: colors.semantic.warningLight,
+      colorClass: 'text-amber-500',
+      bgClass: 'bg-amber-50 dark:bg-amber-900/20',
     },
     error: {
       icon: XCircle,
-      color: colors.semantic.error,
-      bg: colors.semantic.errorLight,
+      colorClass: 'text-red-500',
+      bgClass: 'bg-red-50 dark:bg-red-900/20',
     },
   };
 
@@ -176,66 +168,42 @@ function CanaryCard({ canary }: CanaryCardProps) {
         ? TrendingDown
         : null;
 
-  const trendColor =
+  const trendColorClass =
     canary.trend === 'up'
-      ? colors.semantic.success
+      ? 'text-green-600 dark:text-green-500'
       : canary.trend === 'down'
-        ? colors.semantic.error
-        : colors.text.muted;
+        ? 'text-red-500'
+        : 'text-zinc-400';
 
   return (
-    <Flex
-      align="center"
-      gap={spacing.sm}
-      p={spacing.sm}
-      borderRadius={borderRadius.md}
-      border={`1px solid ${colors.border.light}`}
-      bg={colors.neutral[50]}
-      transition={transitions.all}
-      _hover={{
-        borderColor: colors.border.dark,
-        bg: colors.neutral[100],
-      }}
-    >
+    <div className="flex items-center gap-2 p-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 transition-all hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800">
       {/* Status Icon */}
-      <Flex
-        align="center"
-        justify="center"
-        w="28px"
-        h="28px"
-        borderRadius={borderRadius.sm}
-        bg={config.bg}
-        flexShrink={0}
-      >
-        <StatusIcon size={14} color={config.color} />
-      </Flex>
+      <div className={cn(
+        'flex items-center justify-center w-7 h-7 rounded flex-shrink-0',
+        config.bgClass
+      )}>
+        <StatusIcon size={14} className={config.colorClass} />
+      </div>
 
       {/* Info */}
-      <Flex direction="column" flex={1} minW="0">
-        <Text
-          fontSize="13px"
-          fontWeight={500}
-          color={colors.text.primary}
-          overflow="hidden"
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
-        >
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">
           {canary.name}
-        </Text>
-        <Flex align="center" gap={spacing.xs}>
-          <Text fontSize="11px" color={colors.text.muted}>
+        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
             {canary.consistency.toFixed(1)}% consistent
-          </Text>
-          {TrendIcon && <TrendIcon size={10} color={trendColor} />}
-        </Flex>
-      </Flex>
+          </span>
+          {TrendIcon && <TrendIcon size={10} className={trendColorClass} />}
+        </div>
+      </div>
 
       {/* Response Time */}
-      <Flex align="center" gap={spacing.xs} color={colors.text.muted}>
+      <div className="flex items-center gap-1 text-zinc-400 dark:text-zinc-500">
         <Clock size={12} />
-        <Text fontSize="11px">{canary.responseTime}ms</Text>
-      </Flex>
-    </Flex>
+        <span className="text-[11px]">{canary.responseTime}ms</span>
+      </div>
+    </div>
   );
 }
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Text, Grid, Button } from '@chakra-ui/react';
 import Card from './Card';
-import { colors, spacing, typography } from '@/theme';
+import Button from './Button';
+import { cn } from '@/lib/utils';
 import { RiskOutputs } from '@/types/wizard';
 import { XCircle, AlertTriangle, Shield, CheckCircle2, Clock, DollarSign } from 'lucide-react';
 
@@ -17,40 +17,45 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
       case 'prohibited':
         return {
           icon: XCircle,
-          color: colors.alert,
-          bg: colors.alert + '10',
+          colorClass: 'text-red-500',
+          bgClass: 'bg-red-50 dark:bg-red-900/20',
+          borderClass: 'border-red-500',
           label: 'PROHIBITED',
           description: 'This AI system cannot be deployed under EU AI Act'
         };
       case 'high-risk':
         return {
           icon: AlertTriangle,
-          color: colors.gold,
-          bg: colors.gold + '10',
+          colorClass: 'text-amber-500',
+          bgClass: 'bg-amber-50 dark:bg-amber-900/20',
+          borderClass: 'border-amber-500',
           label: 'HIGH-RISK',
           description: 'Significant compliance requirements apply'
         };
       case 'limited-risk':
         return {
           icon: Shield,
-          color: colors.cobalt,
-          bg: colors.cobalt + '10',
+          colorClass: 'text-blue-600',
+          bgClass: 'bg-blue-50 dark:bg-blue-900/20',
+          borderClass: 'border-blue-600',
           label: 'LIMITED-RISK',
           description: 'Transparency obligations required'
         };
       case 'minimal-risk':
         return {
           icon: CheckCircle2,
-          color: colors.olive,
-          bg: colors.olive + '10',
+          colorClass: 'text-green-600',
+          bgClass: 'bg-green-50 dark:bg-green-900/20',
+          borderClass: 'border-green-600',
           label: 'MINIMAL-RISK',
           description: 'No mandatory requirements'
         };
       default:
         return {
           icon: Shield,
-          color: colors.mist,
-          bg: colors.background,
+          colorClass: 'text-zinc-500',
+          bgClass: 'bg-zinc-100 dark:bg-zinc-800',
+          borderClass: 'border-zinc-300',
           label: 'UNKNOWN',
           description: ''
         };
@@ -62,113 +67,113 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
   const isProhibited = outputs.classification === 'prohibited';
 
   return (
-    <Box>
-      <Text fontSize={typography.fontSize['3xl']} fontWeight={typography.fontWeight.bold} color={colors.navy} mb={spacing.xs}>
+    <div>
+      <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
         Risk Classification Results
-      </Text>
-      <Text fontSize={typography.fontSize.base} color={colors.text.secondary} mb={spacing.xl}>
+      </h2>
+      <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">
         Your AI system has been classified according to EU AI Act requirements
-      </Text>
+      </p>
 
       {/* Classification Badge */}
-      <Card mb={spacing.lg} bg={config.bg} borderColor={config.color} borderWidth="3px">
-        <Flex direction="column" align="center" textAlign="center" py={spacing.lg}>
-          <Icon size={64} color={config.color} />
-          <Text fontSize={typography.fontSize['4xl']} fontWeight={typography.fontWeight.bold} color={config.color} mt={spacing.md} mb={spacing.xs}>
+      <Card className={cn('mb-6 border-[3px]', config.bgClass, config.borderClass)}>
+        <div className="flex flex-col items-center text-center py-6">
+          <Icon size={64} className={config.colorClass} />
+          <p className={cn('text-4xl font-bold mt-4 mb-1', config.colorClass)}>
             {config.label}
-          </Text>
-          <Text fontSize={typography.fontSize.lg} color={colors.text.secondary}>
+          </p>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400">
             {config.description}
-          </Text>
-        </Flex>
+          </p>
+        </div>
       </Card>
 
       {/* Prohibition Reason */}
       {isProhibited && outputs.prohibitionReason && (
-        <Card mb={spacing.lg} bg={colors.alert + '10'} borderColor={colors.alert}>
-          <Flex align="center" gap={spacing.sm} mb={spacing.md}>
-            <XCircle size={24} color={colors.alert} />
-            <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+        <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
+          <div className="flex items-center gap-2 mb-4">
+            <XCircle size={24} className="text-red-500" />
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Why This System is Prohibited
-            </Text>
-          </Flex>
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+            </h3>
+          </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {outputs.prohibitionReason}
-          </Text>
+          </p>
         </Card>
       )}
 
       {/* Triggered Criteria */}
       {outputs.triggeredCriteria.length > 0 && (
-        <Card mb={spacing.lg}>
-          <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+        <Card className="mb-6">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
             Triggered Criteria
-          </Text>
-          <Flex direction="column" gap={spacing.sm}>
+          </h3>
+          <div className="flex flex-col gap-2">
             {outputs.triggeredCriteria.map((criterion, idx) => (
-              <Flex key={idx} align="start" gap={spacing.sm}>
-                <Box w="4px" h="4px" bg={config.color} borderRadius="full" mt="8px" flexShrink={0} />
-                <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+              <div key={idx} className="flex items-start gap-2">
+                <div className={cn('w-1 h-1 rounded-full mt-2 flex-shrink-0', config.colorClass.replace('text-', 'bg-'))} />
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
                   {criterion}
-                </Text>
-              </Flex>
+                </span>
+              </div>
             ))}
-          </Flex>
+          </div>
         </Card>
       )}
 
       {/* Cost and Timeline Estimates */}
       {!isProhibited && (
-        <Grid templateColumns="repeat(2, 1fr)" gap={spacing.md} mb={spacing.lg}>
-          <Card borderColor={colors.cobalt} borderWidth="2px">
-            <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-              <DollarSign size={20} color={colors.cobalt} />
-              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <Card className="border-2 border-blue-600">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign size={20} className="text-blue-600" />
+              <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                 Estimated Compliance Cost
-              </Text>
-            </Flex>
-            <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-zinc-900 dark:text-white">
               ${outputs.estimatedComplianceCost.low.toLocaleString()} - ${outputs.estimatedComplianceCost.high.toLocaleString()}
-            </Text>
+            </p>
           </Card>
 
-          <Card borderColor={colors.cobalt} borderWidth="2px">
-            <Flex align="center" gap={spacing.sm} mb={spacing.sm}>
-              <Clock size={20} color={colors.cobalt} />
-              <Text fontSize={typography.fontSize.sm} fontWeight={typography.fontWeight.semibold} color={colors.navy}>
+          <Card className="border-2 border-blue-600">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock size={20} className="text-blue-600" />
+              <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                 Estimated Timeline
-              </Text>
-            </Flex>
-            <Text fontSize={typography.fontSize['2xl']} fontWeight={typography.fontWeight.bold} color={colors.navy}>
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-zinc-900 dark:text-white">
               {outputs.estimatedTimeMonths.low} - {outputs.estimatedTimeMonths.high} months
-            </Text>
+            </p>
           </Card>
-        </Grid>
+        </div>
       )}
 
       {/* Compliance Requirements */}
-      <Card mb={spacing.xl}>
-        <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+      <Card className="mb-8">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
           {isProhibited ? 'Legal Status' : 'Compliance Requirements'}
-        </Text>
-        <Flex direction="column" gap={spacing.sm}>
+        </h3>
+        <div className="flex flex-col gap-2">
           {outputs.complianceRequirements.map((requirement, idx) => (
-            <Flex key={idx} align="start" gap={spacing.sm}>
-              <CheckCircle2 size={16} color={colors.cobalt} style={{ marginTop: '2px', flexShrink: 0 }} />
-              <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+            <div key={idx} className="flex items-start gap-2">
+              <CheckCircle2 size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {requirement}
-              </Text>
-            </Flex>
+              </span>
+            </div>
           ))}
-        </Flex>
+        </div>
       </Card>
 
       {/* Summary and Next Steps */}
-      <Card mb={spacing.xl} bg={colors.background}>
-        <Text fontSize={typography.fontSize.lg} fontWeight={typography.fontWeight.semibold} color={colors.navy} mb={spacing.md}>
+      <Card className="mb-8 bg-zinc-100 dark:bg-zinc-800">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
           What This Means
-        </Text>
-        <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+        </h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {isProhibited && (
             <>
               Your AI system falls under prohibited uses of the EU AI Act. It cannot be deployed in the EU.
@@ -177,53 +182,44 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
           )}
           {outputs.classification === 'high-risk' && (
             <>
-              Your AI system is classified as <strong>high-risk</strong> under Annex III of the EU AI Act.
+              Your AI system is classified as <strong className="text-zinc-900 dark:text-white">high-risk</strong> under Annex III of the EU AI Act.
               You'll need to implement comprehensive compliance measures including risk management systems,
               technical documentation, human oversight, and undergo conformity assessment before deployment.
-              Estimated compliance costs range from <strong>${outputs.estimatedComplianceCost.low.toLocaleString()}</strong> to{' '}
-              <strong>${outputs.estimatedComplianceCost.high.toLocaleString()}</strong> over{' '}
-              <strong>{outputs.estimatedTimeMonths.low}-{outputs.estimatedTimeMonths.high} months</strong>.
+              Estimated compliance costs range from <strong className="text-zinc-900 dark:text-white">${outputs.estimatedComplianceCost.low.toLocaleString()}</strong> to{' '}
+              <strong className="text-zinc-900 dark:text-white">${outputs.estimatedComplianceCost.high.toLocaleString()}</strong> over{' '}
+              <strong className="text-zinc-900 dark:text-white">{outputs.estimatedTimeMonths.low}-{outputs.estimatedTimeMonths.high} months</strong>.
             </>
           )}
           {outputs.classification === 'limited-risk' && (
             <>
-              Your AI system has <strong>limited-risk</strong> classification. You must comply with transparency requirements,
+              Your AI system has <strong className="text-zinc-900 dark:text-white">limited-risk</strong> classification. You must comply with transparency requirements,
               ensuring users know they're interacting with AI and understand the system's capabilities and limitations.
-              This is relatively straightforward with costs around <strong>${outputs.estimatedComplianceCost.low.toLocaleString()}</strong> to{' '}
-              <strong>${outputs.estimatedComplianceCost.high.toLocaleString()}</strong>.
+              This is relatively straightforward with costs around <strong className="text-zinc-900 dark:text-white">${outputs.estimatedComplianceCost.low.toLocaleString()}</strong> to{' '}
+              <strong className="text-zinc-900 dark:text-white">${outputs.estimatedComplianceCost.high.toLocaleString()}</strong>.
             </>
           )}
           {outputs.classification === 'minimal-risk' && (
             <>
-              Good news! Your AI system is <strong>minimal-risk</strong> with no mandatory compliance requirements under the EU AI Act.
+              Good news! Your AI system is <strong className="text-zinc-900 dark:text-white">minimal-risk</strong> with no mandatory compliance requirements under the EU AI Act.
               You're encouraged to follow voluntary codes of conduct, but standard product safety laws apply.
             </>
           )}
-        </Text>
+        </p>
       </Card>
 
       {!isProhibited && (
-        <Button
-          onClick={onNext}
-          bg={colors.cobalt}
-          color="white"
-          w="100%"
-          py={spacing.lg}
-          fontSize={typography.fontSize.lg}
-          fontWeight={typography.fontWeight.semibold}
-          _hover={{ bg: colors.navy }}
-        >
+        <Button onClick={onNext} variant="primary" fullWidth size="lg">
           Continue to Architecture Selection
         </Button>
       )}
 
       {isProhibited && (
-        <Box textAlign="center">
-          <Text fontSize={typography.fontSize.sm} color={colors.text.secondary}>
+        <div className="text-center">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             This wizard cannot proceed with prohibited AI systems. Please consult legal counsel for alternative approaches.
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

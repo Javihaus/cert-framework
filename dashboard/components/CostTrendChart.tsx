@@ -1,6 +1,5 @@
 'use client';
 
-import { Box } from '@chakra-ui/react';
 import {
   LineChart,
   Line,
@@ -11,7 +10,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { colors } from '@/theme/colors';
+
+// Chart colors - using direct hex values for Recharts
+const chartColors = {
+  primary: '#2563EB', // blue-600
+  secondary: '#16A34A', // green-600
+  grid: '#E4E4E7', // zinc-200
+  text: '#71717A', // zinc-500
+  border: '#D4D4D8', // zinc-300
+};
 
 interface CostTrendData {
   date: string;
@@ -31,21 +38,21 @@ export default function CostTrendChart({
   showCount = false,
 }: CostTrendChartProps) {
   return (
-    <Box width="100%" height={height}>
+    <div className="w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke={colors.patience} />
+          <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
           <XAxis
             dataKey="date"
-            stroke={colors.text.secondary}
+            stroke={chartColors.text}
             style={{ fontSize: 12 }}
           />
           <YAxis
             yAxisId="left"
-            stroke={colors.text.secondary}
+            stroke={chartColors.text}
             style={{ fontSize: 12 }}
             tickFormatter={(value) => `$${value.toFixed(2)}`}
           />
@@ -53,7 +60,7 @@ export default function CostTrendChart({
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke={colors.text.secondary}
+              stroke={chartColors.text}
               style={{ fontSize: 12 }}
             />
           )}
@@ -65,7 +72,7 @@ export default function CostTrendChart({
             }}
             contentStyle={{
               backgroundColor: 'white',
-              border: `1px solid ${colors.patience}`,
+              border: `1px solid ${chartColors.border}`,
               borderRadius: '8px',
               padding: '12px',
             }}
@@ -75,9 +82,9 @@ export default function CostTrendChart({
             yAxisId="left"
             type="monotone"
             dataKey="cost"
-            stroke={colors.cobalt}
+            stroke={chartColors.primary}
             strokeWidth={2}
-            dot={{ fill: colors.cobalt, r: 4 }}
+            dot={{ fill: chartColors.primary, r: 4 }}
             activeDot={{ r: 6 }}
             name="Cost"
           />
@@ -86,14 +93,14 @@ export default function CostTrendChart({
               yAxisId="right"
               type="monotone"
               dataKey="count"
-              stroke={colors.olive}
+              stroke={chartColors.secondary}
               strokeWidth={2}
-              dot={{ fill: colors.olive, r: 4 }}
+              dot={{ fill: chartColors.secondary, r: 4 }}
               name="Requests"
             />
           )}
         </LineChart>
       </ResponsiveContainer>
-    </Box>
+    </div>
   );
 }

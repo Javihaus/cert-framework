@@ -10,45 +10,123 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary palette - Professional Blues
-        primary: {
-          900: '#0C121B',
-          800: '#112358',
-          700: '#004683',
-          600: '#005A9E',
-          500: '#1C70AD',
-          400: '#3C6098',
-          300: '#5B8BC9',
-          200: '#8BB4DC',
-          100: '#E8F0F8',
-          50: '#F0F7FC',
+        // Brand color
+        brand: {
+          DEFAULT: '#2563EB',
+          hover: '#1D4ED8',
+          active: '#1E40AF',
+          light: 'rgba(37, 99, 235, 0.1)',
         },
-        // Accent - Coral for alerts
-        accent: {
-          600: '#D55A4F',
-          500: '#E5756A',
-          400: '#E48B59',
-          300: '#EEA090',
-          100: '#FEE8E6',
-          50: '#FFF5F4',
+
+        // Light mode backgrounds
+        background: {
+          page: '#FAFAFA',
+          surface: '#FFFFFF',
+          subtle: '#F4F4F5',
+        },
+
+        // Dark mode backgrounds
+        'background-dark': {
+          page: '#09090B',
+          surface: '#18181B',
+          elevated: '#27272A',
+        },
+
+        // Text hierarchy
+        text: {
+          primary: '#09090B',
+          secondary: '#71717A',
+          tertiary: '#A1A1AA',
+        },
+
+        // Status colors
+        status: {
+          success: '#10B981',
+          'success-light': '#D1FAE5',
+          'success-dark': '#059669',
+          warning: '#F59E0B',
+          'warning-light': '#FEF3C7',
+          'warning-dark': '#D97706',
+          error: '#EF4444',
+          'error-light': '#FEE2E2',
+          'error-dark': '#DC2626',
+          info: '#3B82F6',
+          'info-light': '#DBEAFE',
+          'info-dark': '#2563EB',
+        },
+
+        // Border colors
+        border: {
+          DEFAULT: '#E4E4E7',
+          light: '#F4F4F5',
+          dark: '#D4D4D8',
+        },
+
+        // Chart colors
+        chart: {
+          stroke: '#2563EB',
+          grid: '#F4F4F5',
         },
       },
+
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
       },
+
+      fontSize: {
+        xs: ['12px', { lineHeight: '16px' }],
+        sm: ['13px', { lineHeight: '20px' }],
+        base: ['14px', { lineHeight: '20px' }],
+        lg: ['16px', { lineHeight: '24px' }],
+        xl: ['18px', { lineHeight: '28px' }],
+        '2xl': ['24px', { lineHeight: '32px' }],
+        '3xl': ['30px', { lineHeight: '36px' }],
+      },
+
+      spacing: {
+        'sidebar': '240px',
+        'header': '56px',
+      },
+
+      borderRadius: {
+        sm: '4px',
+        DEFAULT: '6px',
+        md: '6px',
+        lg: '8px',
+        xl: '12px',
+      },
+
+      boxShadow: {
+        card: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        elevated: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB',
+        'focus-error': '0 0 0 2px #FFFFFF, 0 0 0 4px #EF4444',
+      },
+
+      transitionDuration: {
+        DEFAULT: '150ms',
+      },
+
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-in': 'slideIn 0.3s ease-out',
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'slide-in': 'slideIn 0.2s ease-out',
+        'scale-in': 'scaleIn 0.15s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
+
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '0%': { opacity: '0', transform: 'translateY(-4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideIn: {
           '0%': { transform: 'translateX(-10px)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
     },
