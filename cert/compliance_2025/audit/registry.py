@@ -27,21 +27,23 @@ class RegistrationStatus(Enum):
 class RegistrationEntry:
     """EU database registration entry for high-risk AI system."""
 
-    # Provider Information
+    # Provider Information (required)
     provider_name: str
     provider_address: str
     provider_country: str
     provider_contact_email: str
-    provider_registration_number: str = ""
 
-    # System Information
+    # System Information (required)
     system_name: str
     system_version: str
     system_description: str
     intended_purpose: str
     risk_category: str  # Annex III category
 
-    # Technical Details
+    # Provider Information (optional)
+    provider_registration_number: str = ""
+
+    # Technical Details (optional)
     ai_techniques: list[str] = field(default_factory=list)
     data_types: list[str] = field(default_factory=list)
     hardware_requirements: str = ""
