@@ -2,15 +2,25 @@
 
 import { useState } from 'react';
 import {
-  ChartBarIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  CurrencyEuroIcon,
-  CpuChipIcon,
-  BoltIcon,
-  ClockIcon,
-  CalendarIcon,
-} from '@heroicons/react/24/outline';
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Euro,
+  Cpu,
+  Zap,
+  Clock,
+  Calendar,
+} from 'lucide-react';
+
+// Icon mapping for compatibility
+const ChartBarIcon = BarChart3;
+const ArrowTrendingUpIcon = TrendingUp;
+const ArrowTrendingDownIcon = TrendingDown;
+const CurrencyEuroIcon = Euro;
+const CpuChipIcon = Cpu;
+const BoltIcon = Zap;
+const ClockIcon = Clock;
+const CalendarIcon = Calendar;
 import {
   AreaChart,
   Area,
