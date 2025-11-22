@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Flex, Text, Image } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   LayoutDashboard,
   Monitor,
@@ -30,7 +30,8 @@ type NavigationSection =
   | 'monitoring'
   | 'compliance'
   | 'analytics'
-  | 'settings';
+  | 'settings'
+  | 'documentation'; // Legacy support
 
 interface Tab {
   id: NavigationSection;
@@ -144,28 +145,18 @@ export default function Navigation({
 function LogoSection() {
   return (
     <Flex align="center" gap={spacing.sm}>
-      <Box h="40px" w="40px" display="flex" alignItems="center">
-        <Image
-          src="/cert-logo.png"
-          alt="CERT Logo"
-          h="40px"
-          w="auto"
-          fallback={
-            <Flex
-              w="40px"
-              h="40px"
-              borderRadius={borderRadius.md}
-              bg={colors.primary[500]}
-              align="center"
-              justify="center"
-            >
-              <Text color="white" fontWeight="bold" fontSize="18px">
-                C
-              </Text>
-            </Flex>
-          }
-        />
-      </Box>
+      <Flex
+        w="40px"
+        h="40px"
+        borderRadius={borderRadius.md}
+        bg={colors.primary[500]}
+        align="center"
+        justify="center"
+      >
+        <Text color="white" fontWeight="bold" fontSize="18px">
+          C
+        </Text>
+      </Flex>
       <Flex align="center" gap={spacing.xs}>
         <Text
           fontSize="24px"

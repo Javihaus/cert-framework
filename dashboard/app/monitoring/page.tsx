@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Box, Flex, Text, Grid, Link as ChakraLink } from '@chakra-ui/react';
+import { Box, Flex, Text, Grid } from '@chakra-ui/react';
 import {
   Monitor,
   Activity,
@@ -230,15 +230,19 @@ export default function MonitoringDashboard() {
                   Privacy Policy
                 </Text>
               </Link>
-              <ChakraLink
+              <a
                 href="https://github.com/cert-framework"
-                isExternal
-                fontSize="12px"
-                color={colors.text.muted}
-                _hover={{ color: colors.primary[500], textDecoration: 'none' }}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: '12px',
+                  color: colors.text.muted,
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                }}
               >
                 Documentation
-              </ChakraLink>
+              </a>
             </Flex>
           </Flex>
         </Box>

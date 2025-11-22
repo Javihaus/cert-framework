@@ -216,7 +216,9 @@ function CanaryCard({ canary }: CanaryCardProps) {
           fontSize="13px"
           fontWeight={500}
           color={colors.text.primary}
-          noOfLines={1}
+          overflow="hidden"
+          textOverflow="ellipsis"
+          whiteSpace="nowrap"
         >
           {canary.name}
         </Text>

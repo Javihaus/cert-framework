@@ -226,11 +226,13 @@ function TraceRow({ trace, onClick }: TraceRowProps) {
           fontSize="14px"
           fontWeight={500}
           color={colors.text.primary}
-          noOfLines={1}
+          overflow="hidden"
+          textOverflow="ellipsis"
+          whiteSpace="nowrap"
         >
           {trace.model}
         </Text>
-        <Text fontSize="12px" color={colors.text.muted} noOfLines={1}>
+        <Text fontSize="12px" color={colors.text.muted} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
           {trace.endpoint}
         </Text>
       </Flex>

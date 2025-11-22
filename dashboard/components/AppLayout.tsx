@@ -3,15 +3,15 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { colors } from '@/theme/colors';
 import { spacing, containers } from '@/theme/tokens';
-import Navigation from './Navigation';
+import Navigation, { NavigationSection } from './Navigation';
 import MonitoringSidebar from './MonitoringSidebar';
 import Footer from './Footer';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  activeSection: 'home' | 'monitoring' | 'documentation';
+  activeSection: NavigationSection;
   activeMonitoringTab?: string;
-  onSectionChange: (section: 'home' | 'monitoring' | 'documentation') => void;
+  onSectionChange: (section: NavigationSection) => void;
   onMonitoringTabChange?: (tab: string) => void;
   hasData: boolean;
 }
