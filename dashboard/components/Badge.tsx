@@ -20,7 +20,6 @@ interface BadgeProps {
   size?: BadgeSize;
   dot?: boolean;
   icon?: ReactNode;
-  [key: string]: unknown;
 }
 
 /**
@@ -33,7 +32,6 @@ export default function Badge({
   size = 'md',
   dot = false,
   icon,
-  ...rest
 }: BadgeProps) {
   const sizeStyles = componentTokens.badge[size];
 
@@ -91,7 +89,6 @@ export default function Badge({
       bg={style.bg}
       color={style.color}
       whiteSpace="nowrap"
-      {...rest}
     >
       {dot && (
         <Box

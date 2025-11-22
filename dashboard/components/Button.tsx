@@ -1,7 +1,7 @@
 'use client';
 
-import { Box, Flex } from '@chakra-ui/react';
-import { ReactNode, forwardRef } from 'react';
+import { Flex } from '@chakra-ui/react';
+import { ReactNode, forwardRef, CSSProperties } from 'react';
 import {
   colors,
   borderRadius,
@@ -14,7 +14,7 @@ import {
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends Record<string, unknown> {
+interface ButtonProps {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -26,6 +26,33 @@ interface ButtonProps extends Record<string, unknown> {
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
 }
+
+const variantStyles: Record<ButtonVariant, { bg: string; color: string; border: string; hoverBg: string }> = {
+  primary: {
+    bg: colors.primary[700],
+    color: colors.text.inverse,
+    border: 'none',
+    hoverBg: colors.primary[500],
+  },
+  secondary: {
+    bg: colors.background,
+    color: colors.primary[700],
+    border: `2px solid ${colors.primary[700]}`,
+    hoverBg: colors.neutral[100],
+  },
+  ghost: {
+    bg: 'transparent',
+    color: colors.primary[500],
+    border: 'none',
+    hoverBg: colors.neutral[100],
+  },
+  danger: {
+    bg: colors.accent[500],
+    color: colors.text.inverse,
+    border: 'none',
+    hoverBg: colors.accent[600],
+  },
+};
 
 /**
  * Professional Button Component
@@ -45,112 +72,71 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       onClick,
       type = 'button',
-      ...rest
     },
     ref
   ) => {
-    const buttonSize = size as ButtonSize;
-    const sizeStyles = componentTokens.button[buttonSize];
-
-    const variantStyles = {
-      primary: {
-        bg: colors.primary[700],
-        color: colors.text.inverse,
-        border: 'none',
-        _hover: {
-          bg: colors.primary[500],
-        },
-        _active: {
-          bg: colors.primary[800],
-        },
-      },
-      secondary: {
-        bg: colors.background,
-        color: colors.primary[700],
-        border: `2px solid ${colors.primary[700]}`,
-        _hover: {
-          bg: colors.neutral[100],
-          borderColor: colors.primary[500],
-        },
-        _active: {
-          bg: colors.neutral[200],
-        },
-      },
-      ghost: {
-        bg: 'transparent',
-        color: colors.primary[500],
-        border: 'none',
-        _hover: {
-          bg: colors.neutral[100],
-        },
-        _active: {
-          bg: colors.neutral[200],
-        },
-      },
-      danger: {
-        bg: colors.accent[500],
-        color: colors.text.inverse,
-        border: 'none',
-        _hover: {
-          bg: colors.accent[600],
-        },
-        _active: {
-          bg: colors.accent[600],
-        },
-      },
-    };
-
+    const sizeStyles = componentTokens.button[size];
     const style = variantStyles[variant];
 
+    const buttonStyle: CSSProperties = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
+      height: sizeStyles.height,
+      padding: `0 ${size === 'sm' ? spacing.sm : spacing.lg}`,
+      fontSize: sizeStyles.fontSize,
+      fontWeight: 500,
+      fontFamily: 'inherit',
+      borderRadius: sizeStyles.borderRadius,
+      backgroundColor: style.bg,
+      color: style.color,
+      border: style.border,
+      cursor: disabled || loading ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.5 : 1,
+      transition: transitions.all,
+      width: fullWidth ? '100%' : 'auto',
+      outline: 'none',
+    };
+
     return (
-      <Box
-        as="button"
+      <button
         ref={ref}
         type={type}
-        display="inline-flex"
-        alignItems="center"
-        justifyContent="center"
-        gap={spacing.xs}
-        h={sizeStyles.height}
-        px={size === 'sm' ? spacing.sm : spacing.lg}
-        fontSize={sizeStyles.fontSize}
-        fontWeight={500}
-        fontFamily="inherit"
-        borderRadius={sizeStyles.borderRadius}
-        bg={style.bg}
-        color={style.color}
-        border={style.border}
-        cursor={disabled || loading ? 'not-allowed' : 'pointer'}
-        opacity={disabled ? 0.5 : 1}
-        transition={transitions.all}
-        width={fullWidth ? '100%' : 'auto'}
+        style={buttonStyle}
         onClick={disabled || loading ? undefined : onClick}
-        _hover={disabled || loading ? undefined : style._hover}
-        _active={disabled || loading ? undefined : style._active}
-        _focus={{
-          outline: 'none',
-          boxShadow: shadows.focus,
+        disabled={disabled || loading}
+        onMouseOver={(e) => {
+          if (!disabled && !loading) {
+            e.currentTarget.style.backgroundColor = style.hoverBg;
+          }
         }}
-        {...rest}
+        onMouseOut={(e) => {
+          if (!disabled && !loading) {
+            e.currentTarget.style.backgroundColor = style.bg;
+          }
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.boxShadow = shadows.focus;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       >
         {loading ? (
           <LoadingSpinner />
         ) : (
           <>
             {icon && iconPosition === 'left' && (
-              <Box as="span" display="flex">
-                {icon}
-              </Box>
+              <span style={{ display: 'flex' }}>{icon}</span>
             )}
             {children}
             {icon && iconPosition === 'right' && (
-              <Box as="span" display="flex">
-                {icon}
-              </Box>
+              <span style={{ display: 'flex' }}>{icon}</span>
             )}
           </>
         )}
-      </Box>
+      </button>
     );
   }
 );
@@ -169,8 +155,42 @@ interface IconButtonProps {
   disabled?: boolean;
   onClick?: () => void;
   'aria-label': string;
-  [key: string]: unknown;
 }
+
+const iconButtonVariantStyles: Record<ButtonVariant, { bg: string; color: string; border: string; hoverBg: string; hoverColor?: string }> = {
+  primary: {
+    bg: colors.primary[700],
+    color: colors.text.inverse,
+    border: 'none',
+    hoverBg: colors.primary[500],
+  },
+  secondary: {
+    bg: colors.background,
+    color: colors.primary[700],
+    border: `1px solid ${colors.border.default}`,
+    hoverBg: colors.neutral[100],
+  },
+  ghost: {
+    bg: 'transparent',
+    color: colors.text.secondary,
+    border: 'none',
+    hoverBg: colors.neutral[100],
+    hoverColor: colors.primary[500],
+  },
+  danger: {
+    bg: colors.accent[100],
+    color: colors.accent[500],
+    border: 'none',
+    hoverBg: colors.accent[500],
+    hoverColor: colors.text.inverse,
+  },
+};
+
+const iconButtonSizeMap = {
+  sm: '32px',
+  md: '40px',
+  lg: '48px',
+};
 
 export function IconButton({
   icon,
@@ -179,66 +199,55 @@ export function IconButton({
   disabled = false,
   onClick,
   'aria-label': ariaLabel,
-  ...rest
 }: IconButtonProps) {
-  const sizeMap = {
-    sm: '32px',
-    md: '40px',
-    lg: '48px',
-  };
+  const style = iconButtonVariantStyles[variant];
 
-  const variantStyles = {
-    primary: {
-      bg: colors.primary[700],
-      color: colors.text.inverse,
-      _hover: { bg: colors.primary[500] },
-    },
-    secondary: {
-      bg: colors.background,
-      color: colors.primary[700],
-      border: `1px solid ${colors.border.default}`,
-      _hover: { bg: colors.neutral[100], borderColor: colors.primary[500] },
-    },
-    ghost: {
-      bg: 'transparent',
-      color: colors.text.secondary,
-      _hover: { bg: colors.neutral[100], color: colors.primary[500] },
-    },
-    danger: {
-      bg: colors.accent[100],
-      color: colors.accent[500],
-      _hover: { bg: colors.accent[500], color: colors.text.inverse },
-    },
+  const buttonStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: iconButtonSizeMap[size],
+    height: iconButtonSizeMap[size],
+    borderRadius: borderRadius.md,
+    backgroundColor: style.bg,
+    color: style.color,
+    border: style.border,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.5 : 1,
+    transition: transitions.all,
+    outline: 'none',
   };
-
-  const style = variantStyles[variant];
 
   return (
-    <Box
-      as="button"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      w={sizeMap[size]}
-      h={sizeMap[size]}
-      borderRadius={borderRadius.md}
-      bg={style.bg}
-      color={style.color}
-      border={style.border || 'none'}
-      cursor={disabled ? 'not-allowed' : 'pointer'}
-      opacity={disabled ? 0.5 : 1}
-      transition={transitions.all}
+    <button
+      type="button"
+      style={buttonStyle}
       onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       aria-label={ariaLabel}
-      _hover={disabled ? undefined : style._hover}
-      _focus={{
-        outline: 'none',
-        boxShadow: shadows.focus,
+      onMouseOver={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = style.hoverBg;
+          if (style.hoverColor) {
+            e.currentTarget.style.color = style.hoverColor;
+          }
+        }
       }}
-      {...rest}
+      onMouseOut={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = style.bg;
+          e.currentTarget.style.color = style.color;
+        }
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.boxShadow = shadows.focus;
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.boxShadow = 'none';
+      }}
     >
       {icon}
-    </Box>
+    </button>
   );
 }
 
@@ -247,17 +256,17 @@ export function IconButton({
  */
 interface ButtonGroupProps {
   children: ReactNode;
-  spacing?: string;
+  gap?: string;
   direction?: 'row' | 'column';
 }
 
 export function ButtonGroup({
   children,
-  spacing: gap = spacing.sm,
+  gap: gapSize = spacing.sm,
   direction = 'row',
 }: ButtonGroupProps) {
   return (
-    <Flex direction={direction} gap={gap}>
+    <Flex direction={direction} gap={gapSize}>
       {children}
     </Flex>
   );
@@ -268,21 +277,32 @@ export function ButtonGroup({
  */
 function LoadingSpinner() {
   return (
-    <Box
-      as="span"
-      display="inline-block"
-      w="16px"
-      h="16px"
-      border="2px solid currentColor"
-      borderRightColor="transparent"
-      borderRadius="50%"
-      animation="spin 0.6s linear infinite"
-      sx={{
-        '@keyframes spin': {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg)' },
-        },
+    <span
+      style={{
+        display: 'inline-block',
+        width: '16px',
+        height: '16px',
+        border: '2px solid currentColor',
+        borderRightColor: 'transparent',
+        borderRadius: '50%',
+        animation: 'button-spin 0.6s linear infinite',
       }}
     />
   );
+}
+
+// Add keyframes via style tag injection
+if (typeof document !== 'undefined') {
+  const styleId = 'button-spinner-keyframes';
+  if (!document.getElementById(styleId)) {
+    const styleTag = document.createElement('style');
+    styleTag.id = styleId;
+    styleTag.textContent = `
+      @keyframes button-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(styleTag);
+  }
 }

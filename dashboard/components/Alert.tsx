@@ -21,7 +21,6 @@ interface AlertProps {
   timestamp?: string;
   action?: ReactNode;
   onDismiss?: () => void;
-  [key: string]: unknown;
 }
 
 /**
@@ -35,7 +34,6 @@ export default function Alert({
   timestamp,
   action,
   onDismiss,
-  ...rest
 }: AlertProps) {
   const severityStyles = {
     info: {
@@ -80,7 +78,6 @@ export default function Alert({
       borderRadius={borderRadius.md}
       p={spacing.md}
       transition={transitions.all}
-      {...rest}
     >
       <Flex gap={spacing.sm} align="flex-start">
         <Box color={style.iconColor} flexShrink={0} mt="2px">

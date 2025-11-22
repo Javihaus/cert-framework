@@ -1,16 +1,16 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text, BoxProps } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import { colors, borderRadius, spacing, shadows, transitions } from '@/theme';
 
-interface CardProps {
+type CardVariant = 'default' | 'bordered' | 'elevated' | 'interactive';
+
+interface CardProps extends Omit<BoxProps, 'variant'> {
   children: ReactNode;
-  variant?: 'default' | 'bordered' | 'elevated' | 'interactive';
+  variant?: CardVariant;
   padding?: string;
   hoverEffect?: boolean;
-  onClick?: () => void;
-  [key: string]: unknown;
 }
 
 interface CardHeaderProps {
@@ -21,6 +21,29 @@ interface CardHeaderProps {
 interface CardContentProps {
   children: ReactNode;
 }
+
+const variantStyles = {
+  default: {
+    bg: colors.surface,
+    border: 'none',
+    boxShadow: 'none',
+  },
+  bordered: {
+    bg: colors.background,
+    border: `1px solid ${colors.border.default}`,
+    boxShadow: 'none',
+  },
+  elevated: {
+    bg: colors.background,
+    border: 'none',
+    boxShadow: shadows.card,
+  },
+  interactive: {
+    bg: colors.background,
+    border: `1px solid ${colors.border.default}`,
+    boxShadow: shadows.card,
+  },
+};
 
 /**
  * Professional Card Component
@@ -34,30 +57,7 @@ export default function Card({
   onClick,
   ...rest
 }: CardProps) {
-  const variants = {
-    default: {
-      bg: colors.surface,
-      border: 'none',
-      boxShadow: 'none',
-    },
-    bordered: {
-      bg: colors.background,
-      border: `1px solid ${colors.border.default}`,
-      boxShadow: 'none',
-    },
-    elevated: {
-      bg: colors.background,
-      border: 'none',
-      boxShadow: shadows.card,
-    },
-    interactive: {
-      bg: colors.background,
-      border: `1px solid ${colors.border.default}`,
-      boxShadow: shadows.card,
-    },
-  };
-
-  const style = variants[variant];
+  const style = variantStyles[variant];
   const isInteractive = hoverEffect || onClick || variant === 'interactive';
 
   return (

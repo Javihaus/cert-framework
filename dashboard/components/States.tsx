@@ -33,13 +33,7 @@ export function Spinner({ size = 'md', color = colors.primary[500] }: SpinnerPro
       border={`${borderMap[size]} solid ${colors.neutral[200]}`}
       borderTopColor={color}
       borderRadius="50%"
-      animation="spin 0.8s linear infinite"
-      sx={{
-        '@keyframes spin': {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg)' },
-        },
-      }}
+      animation="states-spin 0.8s linear infinite"
     />
   );
 }
@@ -269,15 +263,29 @@ export function Skeleton({
       h={height}
       borderRadius={borderRadius}
       bg={colors.neutral[200]}
-      animation="pulse 1.5s ease-in-out infinite"
-      sx={{
-        '@keyframes pulse': {
-          '0%, 100%': { opacity: 1 },
-          '50%': { opacity: 0.5 },
-        },
-      }}
+      animation="states-pulse 1.5s ease-in-out infinite"
     />
   );
+}
+
+// Add keyframes via style tag injection
+if (typeof document !== 'undefined') {
+  const styleId = 'states-keyframes';
+  if (!document.getElementById(styleId)) {
+    const styleTag = document.createElement('style');
+    styleTag.id = styleId;
+    styleTag.textContent = `
+      @keyframes states-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes states-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+    `;
+    document.head.appendChild(styleTag);
+  }
 }
 
 /**
