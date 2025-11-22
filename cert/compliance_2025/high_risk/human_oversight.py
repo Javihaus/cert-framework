@@ -5,15 +5,16 @@ Implements EU AI Act Article 14 requirements for human oversight
 of high-risk AI systems.
 """
 
+import functools
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable
 from enum import Enum
-import functools
+from typing import Any, Callable
 
 
 class OversightLevel(Enum):
     """Levels of human oversight required."""
+
     MINIMAL = "minimal"  # Periodic review
     STANDARD = "standard"  # Regular monitoring
     ENHANCED = "enhanced"  # Real-time monitoring
@@ -22,6 +23,7 @@ class OversightLevel(Enum):
 
 class EscalationPolicy(Enum):
     """Escalation policies for human oversight."""
+
     IMMEDIATE = "immediate"  # Escalate immediately
     THRESHOLD = "threshold"  # Escalate when threshold exceeded
     PERIODIC = "periodic"  # Periodic review
@@ -155,6 +157,7 @@ class HumanOversight:
         # Periodic sampling for standard level
         if self.config.level == OversightLevel.STANDARD:
             import random
+
             if random.random() < self.config.review_sample_rate:
                 return True
 
@@ -253,9 +256,7 @@ class HumanOversight:
             return approved, human_decision
         else:
             # No callback - raise for manual handling
-            raise RuntimeError(
-                "Human approval required but no approval_callback configured"
-            )
+            raise RuntimeError("Human approval required but no approval_callback configured")
 
     def override(
         self,
@@ -321,6 +322,7 @@ class HumanOversight:
     ) -> bool:
         """Export oversight audit trail to file."""
         import json
+
         try:
             data = [e.to_dict() for e in self._events]
             with open(filepath, "w") as f:
@@ -346,6 +348,7 @@ def requires_human_oversight(
         def make_decision(data):
             return {"decision": "approve", "confidence": 0.75}
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -354,17 +357,18 @@ def requires_human_oversight(
             # Check if result has confidence score
             if isinstance(result, dict):
                 confidence = result.get("confidence")
-                decision = result.get("decision", str(result))
 
                 if confidence is not None and confidence < confidence_threshold:
                     result["requires_human_review"] = True
-                    result["review_reason"] = f"Confidence {confidence} below threshold {confidence_threshold}"
+                    result["review_reason"] = (
+                        f"Confidence {confidence} below threshold {confidence_threshold}"
+                    )
 
                 if require_explanation and "explanation" not in result:
                     result["requires_human_review"] = True
-                    result["review_reason"] = result.get(
-                        "review_reason", ""
-                    ) + " No explanation provided."
+                    result["review_reason"] = (
+                        result.get("review_reason", "") + " No explanation provided."
+                    )
 
             return result
 
@@ -376,4 +380,5 @@ def requires_human_oversight(
         }
 
         return wrapper
+
     return decorator

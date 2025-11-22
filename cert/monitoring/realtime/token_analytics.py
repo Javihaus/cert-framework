@@ -9,17 +9,18 @@ This module provides comprehensive token usage tracking and analysis:
 - Pattern analysis
 """
 
+import json
+import statistics
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any
-from collections import deque
 from enum import Enum
-import statistics
-import json
+from typing import Any
 
 
 class UsageTrend(Enum):
     """Token usage trends."""
+
     DECREASING = "decreasing"
     STABLE = "stable"
     INCREASING = "increasing"
@@ -411,7 +412,7 @@ class TokenAnalytics:
             cutoff = datetime.utcnow() - timedelta(hours=window_hours)
             records = [r for r in records if r.timestamp >= cutoff]
 
-        models = set(r.model for r in records)
+        models = {r.model for r in records}
         breakdown = {}
 
         for model in models:
@@ -432,7 +433,7 @@ class TokenAnalytics:
             cutoff = datetime.utcnow() - timedelta(hours=window_hours)
             records = [r for r in records if r.timestamp >= cutoff]
 
-        endpoints = set(r.endpoint for r in records)
+        endpoints = {r.endpoint for r in records}
         breakdown = {}
 
         for endpoint in endpoints:
@@ -480,13 +481,15 @@ class TokenAnalytics:
             total_tokens = sum(r.total_tokens for r in bucket_records)
             total_cost = sum(r.cost_usd for r in bucket_records)
 
-            trend.append({
-                "timestamp": bucket_time.isoformat(),
-                "requests": len(bucket_records),
-                "total_tokens": total_tokens,
-                "total_cost_usd": total_cost,
-                "avg_tokens_per_request": total_tokens / len(bucket_records),
-            })
+            trend.append(
+                {
+                    "timestamp": bucket_time.isoformat(),
+                    "requests": len(bucket_records),
+                    "total_tokens": total_tokens,
+                    "total_cost_usd": total_cost,
+                    "avg_tokens_per_request": total_tokens / len(bucket_records),
+                }
+            )
 
         return trend
 
@@ -505,8 +508,8 @@ class TokenAnalytics:
 
         # Calculate moving average
         if len(tokens) >= 6:
-            first_half = statistics.mean(tokens[:len(tokens)//2])
-            second_half = statistics.mean(tokens[len(tokens)//2:])
+            first_half = statistics.mean(tokens[: len(tokens) // 2])
+            second_half = statistics.mean(tokens[len(tokens) // 2 :])
 
             # Check for spike (sudden large increase)
             max_token = max(tokens)
@@ -545,40 +548,46 @@ class TokenAnalytics:
         for model, summary in model_breakdown.items():
             for expensive in expensive_models:
                 if expensive in model.lower() and summary.total_cost_usd > 10:
-                    recommendations.append({
-                        "type": "model_downgrade",
-                        "priority": "high",
-                        "model": model,
-                        "current_cost": summary.total_cost_usd,
-                        "potential_savings_percent": 60,
-                        "recommendation": f"Consider using a smaller model for simple tasks. "
-                                        f"Current {model} usage costs ${summary.total_cost_usd:.2f}. "
-                                        f"Switching to GPT-4o-mini or Claude-3-Haiku for suitable "
-                                        f"tasks could save up to 60%.",
-                    })
+                    recommendations.append(
+                        {
+                            "type": "model_downgrade",
+                            "priority": "high",
+                            "model": model,
+                            "current_cost": summary.total_cost_usd,
+                            "potential_savings_percent": 60,
+                            "recommendation": f"Consider using a smaller model for simple tasks. "
+                            f"Current {model} usage costs ${summary.total_cost_usd:.2f}. "
+                            f"Switching to GPT-4o-mini or Claude-3-Haiku for suitable "
+                            f"tasks could save up to 60%.",
+                        }
+                    )
 
         # Check for high output token usage
         summary = self.get_summary(window_hours=window_hours)
         if summary and summary.avg_output_tokens > summary.avg_input_tokens * 3:
-            recommendations.append({
-                "type": "output_optimization",
-                "priority": "medium",
-                "avg_output_tokens": summary.avg_output_tokens,
-                "avg_input_tokens": summary.avg_input_tokens,
-                "recommendation": "High output token usage detected. Consider adding instructions "
-                                "to produce more concise responses, or implement response length limits.",
-            })
+            recommendations.append(
+                {
+                    "type": "output_optimization",
+                    "priority": "medium",
+                    "avg_output_tokens": summary.avg_output_tokens,
+                    "avg_input_tokens": summary.avg_input_tokens,
+                    "recommendation": "High output token usage detected. Consider adding instructions "
+                    "to produce more concise responses, or implement response length limits.",
+                }
+            )
 
         # Check trend for cost increase
         trend = self.analyze_trend(window_hours=window_hours)
         if trend == UsageTrend.INCREASING:
-            recommendations.append({
-                "type": "usage_monitoring",
-                "priority": "medium",
-                "trend": trend.value,
-                "recommendation": "Token usage is trending upward. Review recent changes "
-                                "and consider implementing caching for repeated queries.",
-            })
+            recommendations.append(
+                {
+                    "type": "usage_monitoring",
+                    "priority": "medium",
+                    "trend": trend.value,
+                    "recommendation": "Token usage is trending upward. Review recent changes "
+                    "and consider implementing caching for repeated queries.",
+                }
+            )
 
         return recommendations
 

@@ -12,17 +12,10 @@ Key Components:
 - Audit Module: Conformity assessment, EU database registration
 """
 
-from cert.compliance_2025.risk_classifier import (
-    AIActRiskClassifier,
-    RiskLevel,
-    RiskAssessment,
-    UseCase,
-)
-from cert.compliance_2025.high_risk import (
-    HighRiskRequirements,
-    HighRiskDocumentation,
-    HumanOversight,
-    requires_human_oversight,
+from cert.compliance_2025.audit import (
+    AuditReport,
+    ConformityAssessment,
+    EUDatabaseRegistration,
 )
 from cert.compliance_2025.gpai import (
     ModelCard,
@@ -30,10 +23,17 @@ from cert.compliance_2025.gpai import (
     SystemicRiskAssessment,
     TransparencyRequirements,
 )
-from cert.compliance_2025.audit import (
-    ConformityAssessment,
-    EUDatabaseRegistration,
-    AuditReport,
+from cert.compliance_2025.high_risk import (
+    HighRiskDocumentation,
+    HighRiskRequirements,
+    HumanOversight,
+    requires_human_oversight,
+)
+from cert.compliance_2025.risk_classifier import (
+    AIActRiskClassifier,
+    RiskAssessment,
+    RiskLevel,
+    UseCase,
 )
 
 __all__ = [

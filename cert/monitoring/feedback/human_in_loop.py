@@ -12,17 +12,18 @@ Key Features:
 - Integration with golden dataset management
 """
 
+import json
+import statistics
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Callable
-from collections import deque
 from enum import Enum
-import statistics
-import json
+from typing import Any, Callable
 
 
 class FeedbackType(Enum):
     """Types of human feedback."""
+
     THUMBS = "thumbs"  # Binary good/bad
     RATING = "rating"  # 1-5 star rating
     CORRECTION = "correction"  # Text correction
@@ -32,6 +33,7 @@ class FeedbackType(Enum):
 
 class FeedbackSignal(Enum):
     """Implicit feedback signals."""
+
     REGENERATION = "regeneration"  # User requested regeneration
     COPY = "copy"  # User copied response
     EDIT = "edit"  # User edited response
@@ -358,12 +360,14 @@ class HumanFeedbackCollector:
             signal: The implicit signal type
             metadata: Additional context
         """
-        self._signals.append({
-            "request_id": request_id,
-            "signal": signal.value,
-            "timestamp": datetime.utcnow().isoformat(),
-            "metadata": metadata or {},
-        })
+        self._signals.append(
+            {
+                "request_id": request_id,
+                "signal": signal.value,
+                "timestamp": datetime.utcnow().isoformat(),
+                "metadata": metadata or {},
+            }
+        )
 
     def increment_request_count(self, count: int = 1) -> None:
         """Increment the total request count for feedback rate calculation."""
@@ -423,10 +427,7 @@ class HumanFeedbackCollector:
             rating_distribution[r.value] = rating_distribution.get(r.value, 0) + 1
 
         # Corrections count
-        corrections_count = sum(
-            1 for r in records
-            if r.feedback_type == FeedbackType.CORRECTION
-        )
+        corrections_count = sum(1 for r in records if r.feedback_type == FeedbackType.CORRECTION)
 
         # Positive rate (including ratings >= 4 as positive)
         total_sentiment = positive_count + negative_count
@@ -503,10 +504,7 @@ class HumanFeedbackCollector:
         Returns:
             List of correction records
         """
-        records = [
-            r for r in self._feedback
-            if r.feedback_type == FeedbackType.CORRECTION
-        ]
+        records = [r for r in self._feedback if r.feedback_type == FeedbackType.CORRECTION]
 
         if window_hours:
             cutoff = datetime.utcnow() - timedelta(hours=window_hours)
@@ -531,10 +529,7 @@ class HumanFeedbackCollector:
             Dictionary of signal type to count
         """
         cutoff = datetime.utcnow() - timedelta(hours=window_hours)
-        recent = [
-            s for s in self._signals
-            if datetime.fromisoformat(s["timestamp"]) >= cutoff
-        ]
+        recent = [s for s in self._signals if datetime.fromisoformat(s["timestamp"]) >= cutoff]
 
         summary = {}
         for s in recent:
@@ -600,29 +595,35 @@ class HumanFeedbackCollector:
         for r in self._feedback:
             # Include corrections
             if r.feedback_type == FeedbackType.CORRECTION and r.corrected_response:
-                examples.append({
-                    "prompt": r.prompt,
-                    "expected_response": r.corrected_response,
-                    "source": "human_correction",
-                })
+                examples.append(
+                    {
+                        "prompt": r.prompt,
+                        "expected_response": r.corrected_response,
+                        "source": "human_correction",
+                    }
+                )
 
             # Include high-rated thumbs
             elif r.feedback_type == FeedbackType.THUMBS and r.value is True:
                 if r.prompt and r.response:
-                    examples.append({
-                        "prompt": r.prompt,
-                        "expected_response": r.response,
-                        "source": "positive_feedback",
-                    })
+                    examples.append(
+                        {
+                            "prompt": r.prompt,
+                            "expected_response": r.response,
+                            "source": "positive_feedback",
+                        }
+                    )
 
             # Include high ratings
             elif r.feedback_type == FeedbackType.RATING and r.value >= min_rating:
                 if r.prompt and r.response:
-                    examples.append({
-                        "prompt": r.prompt,
-                        "expected_response": r.response,
-                        "source": f"rating_{r.value}",
-                    })
+                    examples.append(
+                        {
+                            "prompt": r.prompt,
+                            "expected_response": r.response,
+                            "source": f"rating_{r.value}",
+                        }
+                    )
 
         try:
             with open(filepath, "w") as f:

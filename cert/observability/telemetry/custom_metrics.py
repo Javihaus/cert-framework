@@ -5,17 +5,18 @@ Provides flexible custom metric collection for domain-specific
 LLM monitoring needs.
 """
 
+import json
+import statistics
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Callable
-from collections import deque
 from enum import Enum
-import statistics
-import json
+from typing import Any
 
 
 class MetricType(Enum):
     """Types of custom metrics."""
+
     COUNTER = "counter"
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
@@ -195,10 +196,7 @@ class CustomMetrics:
 
         # Filter by labels if provided
         if labels:
-            data = [
-                d for d in data
-                if all(d.labels.get(k) == v for k, v in labels.items())
-            ]
+            data = [d for d in data if all(d.labels.get(k) == v for k, v in labels.items())]
 
         if not data:
             return None
@@ -228,17 +226,11 @@ class CustomMetrics:
         window = window_minutes or self.default_window_minutes
         cutoff = datetime.utcnow() - timedelta(minutes=window)
 
-        data = [
-            d for d in self._data[name]
-            if d.timestamp >= cutoff
-        ]
+        data = [d for d in self._data[name] if d.timestamp >= cutoff]
 
         # Filter by labels
         if labels:
-            data = [
-                d for d in data
-                if all(d.labels.get(k) == v for k, v in labels.items())
-            ]
+            data = [d for d in data if all(d.labels.get(k) == v for k, v in labels.items())]
 
         if not data:
             return {"count": 0}
@@ -312,10 +304,7 @@ class CustomMetrics:
         data = [d for d in self._data[name] if d.timestamp >= cutoff]
 
         if labels:
-            data = [
-                d for d in data
-                if all(d.labels.get(k) == v for k, v in labels.items())
-            ]
+            data = [d for d in data if all(d.labels.get(k) == v for k, v in labels.items())]
 
         if not data:
             return []
@@ -332,12 +321,14 @@ class CustomMetrics:
         for bucket_key in sorted(buckets.keys()):
             values = buckets[bucket_key]
             bucket_time = datetime.fromtimestamp(bucket_key * bucket_minutes * 60)
-            trend.append({
-                "timestamp": bucket_time.isoformat(),
-                "count": len(values),
-                "mean": statistics.mean(values),
-                "sum": sum(values),
-            })
+            trend.append(
+                {
+                    "timestamp": bucket_time.isoformat(),
+                    "count": len(values),
+                    "mean": statistics.mean(values),
+                    "sum": sum(values),
+                }
+            )
 
         return trend
 

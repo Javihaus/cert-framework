@@ -5,10 +5,10 @@ Generates EU AI Act compliant model cards for General-Purpose AI models
 as required by Article 53.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-import json
 
 
 @dataclass
@@ -386,21 +386,21 @@ class ModelCardGenerator:
 ## Model Identification
 
 - **Provider Address:** {card.identification.provider_address}
-- **License:** {card.identification.license_type or 'Not specified'}
-- **Modalities:** {', '.join(card.identification.modalities) or 'Not specified'}
+- **License:** {card.identification.license_type or "Not specified"}
+- **Modalities:** {", ".join(card.identification.modalities) or "Not specified"}
 
 ## Training Information
 
-{card.training.training_data_description or 'Training data description not provided.'}
+{card.training.training_data_description or "Training data description not provided."}
 
 **Data Sources:**
 {self._list_to_md(card.training.data_sources)}
 
-**Compute Resources:** {card.training.compute_resources or 'Not specified'}
+**Compute Resources:** {card.training.compute_resources or "Not specified"}
 
 **Environmental Impact:**
-- Energy Consumption: {card.training.energy_consumption or 'Not specified'}
-- Carbon Footprint: {card.training.carbon_footprint or 'Not specified'}
+- Energy Consumption: {card.training.energy_consumption or "Not specified"}
+- Carbon Footprint: {card.training.carbon_footprint or "Not specified"}
 
 ## Capabilities
 
@@ -438,16 +438,16 @@ class ModelCardGenerator:
 
 ## Technical Specifications
 
-- **Architecture:** {card.technical.architecture or 'Not specified'}
-- **Parameters:** {card.technical.parameter_count or 'Not specified'}
-- **Context Length:** {card.technical.context_length or 'Not specified'}
-- **Supported Languages:** {', '.join(card.technical.supported_languages) or 'Not specified'}
+- **Architecture:** {card.technical.architecture or "Not specified"}
+- **Parameters:** {card.technical.parameter_count or "Not specified"}
+- **Context Length:** {card.technical.context_length or "Not specified"}
+- **Supported Languages:** {", ".join(card.technical.supported_languages) or "Not specified"}
 
 ## Copyright Compliance
 
-{card.copyright.training_data_copyright_policy or 'Copyright policy not specified.'}
+{card.copyright.training_data_copyright_policy or "Copyright policy not specified."}
 
-**Opt-out Mechanisms:** {card.copyright.opt_out_mechanisms or 'Not specified'}
+**Opt-out Mechanisms:** {card.copyright.opt_out_mechanisms or "Not specified"}
 
 ---
 

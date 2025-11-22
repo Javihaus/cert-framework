@@ -12,16 +12,17 @@ Key Features:
 - Disagreement analysis
 """
 
+import json
+import statistics
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable
 from enum import Enum
-import statistics
-import json
+from typing import Any, Callable
 
 
 class AgreementLevel(Enum):
     """Agreement levels between ensemble members."""
+
     FULL = "full"  # All responses agree
     HIGH = "high"  # >80% agreement
     MODERATE = "moderate"  # 60-80% agreement
@@ -142,6 +143,7 @@ class EnsembleAgreementMonitor:
         if self._embedding_engine is None and self.use_semantic_similarity:
             try:
                 from cert.measure.embeddings import get_embedding_engine
+
                 self._embedding_engine = get_embedding_engine()
             except ImportError:
                 pass
@@ -317,13 +319,15 @@ class EnsembleAgreementMonitor:
         for i in range(n):
             for j in range(i + 1, n):
                 if matrix[i][j] < 0.5:  # Significant disagreement
-                    disagreements.append({
-                        "model_1": responses[i].model_id,
-                        "model_2": responses[j].model_id,
-                        "similarity": matrix[i][j],
-                        "response_1_preview": responses[i].response[:200],
-                        "response_2_preview": responses[j].response[:200],
-                    })
+                    disagreements.append(
+                        {
+                            "model_1": responses[i].model_id,
+                            "model_2": responses[j].model_id,
+                            "similarity": matrix[i][j],
+                            "response_1_preview": responses[i].response[:200],
+                            "response_2_preview": responses[j].response[:200],
+                        }
+                    )
 
         return disagreements
 
@@ -377,7 +381,9 @@ class EnsembleAgreementMonitor:
 
         # Compute agreement
         weights = [
-            self._models.get(r.model_id.split("_sample_")[0], EnsembleMember("", lambda x: "", 1.0)).weight
+            self._models.get(
+                r.model_id.split("_sample_")[0], EnsembleMember("", lambda x: "", 1.0)
+            ).weight
             for r in valid_responses
         ]
 
@@ -444,9 +450,9 @@ class EnsembleAgreementMonitor:
             "max_agreement": max(scores),
             "std_agreement": statistics.stdev(scores) if len(scores) > 1 else 0,
             "low_agreement_rate": sum(
-                1 for r in history
-                if r.agreement_score < self.agreement_threshold
-            ) / len(history),
+                1 for r in history if r.agreement_score < self.agreement_threshold
+            )
+            / len(history),
         }
 
     def export_history(self, filepath: str) -> bool:
@@ -466,9 +472,7 @@ class EnsembleAgreementMonitor:
         Returns:
             Dictionary mapping model_id to reliability metrics
         """
-        model_scores: dict[str, list[float]] = {
-            model_id: [] for model_id in self._models
-        }
+        model_scores: dict[str, list[float]] = {model_id: [] for model_id in self._models}
 
         for result in self._history:
             for response in result.responses:

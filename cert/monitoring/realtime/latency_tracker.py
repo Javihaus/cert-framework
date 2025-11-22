@@ -9,18 +9,19 @@ This module provides comprehensive latency monitoring including:
 - Latency trend analysis
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Any, Callable
-from collections import deque
-from enum import Enum
+import json
 import statistics
 import time
-import json
+from collections import deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable
 
 
 class LatencyTier(Enum):
     """Performance tiers based on latency."""
+
     EXCELLENT = "excellent"  # < P25
     GOOD = "good"  # P25 - P50
     ACCEPTABLE = "acceptable"  # P50 - P75
@@ -326,10 +327,7 @@ class LatencyTracker:
         window_minutes: int | None = None,
     ) -> dict[str, float] | None:
         """Get time-to-first-token statistics."""
-        measurements = [
-            m for m in self._measurements
-            if m.time_to_first_token_ms is not None
-        ]
+        measurements = [m for m in self._measurements if m.time_to_first_token_ms is not None]
 
         if window_minutes:
             cutoff = datetime.utcnow() - timedelta(minutes=window_minutes)
@@ -399,12 +397,12 @@ class LatencyTracker:
 
         # Calculate compliance rate
         measurements = [
-            m for m in self._measurements
+            m
+            for m in self._measurements
             if m.timestamp >= datetime.utcnow() - timedelta(minutes=window_minutes)
         ]
         compliant_count = sum(
-            1 for m in measurements
-            if m.latency_ms <= self.sla_config.p99_threshold_ms
+            1 for m in measurements if m.latency_ms <= self.sla_config.p99_threshold_ms
         )
         compliance_rate = compliant_count / len(measurements) if measurements else 1.0
 
@@ -475,13 +473,15 @@ class LatencyTracker:
             latencies = [m.latency_ms for m in bucket_measurements]
 
             bucket_time = datetime.fromtimestamp(bucket_key * bucket_minutes * 60)
-            trend.append({
-                "timestamp": bucket_time.isoformat(),
-                "count": len(latencies),
-                "mean": statistics.mean(latencies),
-                "p50": self._percentile(latencies, 50),
-                "p90": self._percentile(latencies, 90),
-            })
+            trend.append(
+                {
+                    "timestamp": bucket_time.isoformat(),
+                    "count": len(latencies),
+                    "mean": statistics.mean(latencies),
+                    "p50": self._percentile(latencies, 50),
+                    "p90": self._percentile(latencies, 90),
+                }
+            )
 
         return trend
 
@@ -493,7 +493,7 @@ class LatencyTracker:
         if not self.enable_per_endpoint_stats:
             return {}
 
-        endpoints = set(m.endpoint for m in self._measurements)
+        endpoints = {m.endpoint for m in self._measurements}
         breakdown = {}
 
         for endpoint in endpoints:
@@ -514,7 +514,7 @@ class LatencyTracker:
         if not self.enable_per_model_stats:
             return {}
 
-        models = set(m.model for m in self._measurements if m.model)
+        models = {m.model for m in self._measurements if m.model}
         breakdown = {}
 
         for model in models:

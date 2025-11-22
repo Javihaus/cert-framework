@@ -5,15 +5,16 @@ Implements EU AI Act transparency requirements including
 AI disclosure, content labeling, and information provision.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class ContentType(Enum):
     """Types of AI-generated content."""
+
     TEXT = "text"
     IMAGE = "image"
     AUDIO = "audio"
@@ -25,6 +26,7 @@ class ContentType(Enum):
 
 class TransparencyRequirementType(Enum):
     """Types of transparency requirements."""
+
     INTERACTION_DISCLOSURE = "interaction_disclosure"
     CONTENT_LABELING = "content_labeling"
     EMOTION_RECOGNITION_DISCLOSURE = "emotion_recognition_disclosure"
@@ -133,64 +135,76 @@ class TransparencyRequirements:
 
         # Article 50(1) - Chatbot disclosure
         if is_chatbot:
-            requirements.append(TransparencyRequirement(
-                requirement_type=TransparencyRequirementType.INTERACTION_DISCLOSURE,
-                description="Inform users they are interacting with an AI system",
-                article_reference="Article 50(1)",
-                applicable=True,
-                implementation="Display clear notice that user is interacting with AI",
-            ))
+            requirements.append(
+                TransparencyRequirement(
+                    requirement_type=TransparencyRequirementType.INTERACTION_DISCLOSURE,
+                    description="Inform users they are interacting with an AI system",
+                    article_reference="Article 50(1)",
+                    applicable=True,
+                    implementation="Display clear notice that user is interacting with AI",
+                )
+            )
 
         # Article 50(2) - Emotion recognition disclosure
         if uses_emotion_recognition:
-            requirements.append(TransparencyRequirement(
-                requirement_type=TransparencyRequirementType.EMOTION_RECOGNITION_DISCLOSURE,
-                description="Inform natural persons exposed to emotion recognition system",
-                article_reference="Article 50(2)",
-                applicable=True,
-                implementation="Provide clear notice before emotion recognition processing",
-            ))
+            requirements.append(
+                TransparencyRequirement(
+                    requirement_type=TransparencyRequirementType.EMOTION_RECOGNITION_DISCLOSURE,
+                    description="Inform natural persons exposed to emotion recognition system",
+                    article_reference="Article 50(2)",
+                    applicable=True,
+                    implementation="Provide clear notice before emotion recognition processing",
+                )
+            )
 
         # Article 50(3) - Biometric categorization disclosure
         if uses_biometric_categorization:
-            requirements.append(TransparencyRequirement(
-                requirement_type=TransparencyRequirementType.BIOMETRIC_CATEGORIZATION_DISCLOSURE,
-                description="Inform natural persons exposed to biometric categorization",
-                article_reference="Article 50(3)",
-                applicable=True,
-                implementation="Provide clear notice before biometric categorization",
-            ))
+            requirements.append(
+                TransparencyRequirement(
+                    requirement_type=TransparencyRequirementType.BIOMETRIC_CATEGORIZATION_DISCLOSURE,
+                    description="Inform natural persons exposed to biometric categorization",
+                    article_reference="Article 50(3)",
+                    applicable=True,
+                    implementation="Provide clear notice before biometric categorization",
+                )
+            )
 
         # Article 50(4) - AI-generated content labeling
         if generates_content:
-            requirements.append(TransparencyRequirement(
-                requirement_type=TransparencyRequirementType.CONTENT_LABELING,
-                description="Mark AI-generated content in machine-readable format",
-                article_reference="Article 50(4)",
-                applicable=True,
-                implementation="Apply machine-readable markers and visible labels to generated content",
-            ))
+            requirements.append(
+                TransparencyRequirement(
+                    requirement_type=TransparencyRequirementType.CONTENT_LABELING,
+                    description="Mark AI-generated content in machine-readable format",
+                    article_reference="Article 50(4)",
+                    applicable=True,
+                    implementation="Apply machine-readable markers and visible labels to generated content",
+                )
+            )
 
             # Specific content type requirements
             for ct in content_types:
                 if ct.lower() in ["image", "audio", "video"]:
-                    requirements.append(TransparencyRequirement(
-                        requirement_type=TransparencyRequirementType.CONTENT_LABELING,
-                        description=f"Apply watermarking or metadata to {ct} content",
-                        article_reference="Article 50(4)",
-                        applicable=True,
-                        implementation=f"Embed provenance metadata in {ct} files",
-                    ))
+                    requirements.append(
+                        TransparencyRequirement(
+                            requirement_type=TransparencyRequirementType.CONTENT_LABELING,
+                            description=f"Apply watermarking or metadata to {ct} content",
+                            article_reference="Article 50(4)",
+                            applicable=True,
+                            implementation=f"Embed provenance metadata in {ct} files",
+                        )
+                    )
 
         # Deep fake specific requirements
         if generates_deepfakes:
-            requirements.append(TransparencyRequirement(
-                requirement_type=TransparencyRequirementType.DEEPFAKE_LABELING,
-                description="Clearly disclose that content is artificially generated (deep fake)",
-                article_reference="Article 50(4)(c)",
-                applicable=True,
-                implementation="Add visible 'AI Generated' label and embedded metadata",
-            ))
+            requirements.append(
+                TransparencyRequirement(
+                    requirement_type=TransparencyRequirementType.DEEPFAKE_LABELING,
+                    description="Clearly disclose that content is artificially generated (deep fake)",
+                    article_reference="Article 50(4)(c)",
+                    applicable=True,
+                    implementation="Add visible 'AI Generated' label and embedded metadata",
+                )
+            )
 
         return requirements
 
@@ -349,8 +363,5 @@ information from authoritative sources.
             "partial": partial,
             "not_implemented": not_implemented,
             "compliance_rate": implemented / total if total > 0 else 0,
-            "gaps": [
-                r.description for r in requirements
-                if r.status != "implemented"
-            ],
+            "gaps": [r.description for r in requirements if r.status != "implemented"],
         }

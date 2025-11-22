@@ -12,16 +12,17 @@ Key Features:
 - Customizable evaluation criteria
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Callable
-from enum import Enum
 import json
 import re
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable
 
 
 class EvaluationDimension(Enum):
     """Dimensions for LLM evaluation."""
+
     ACCURACY = "accuracy"
     RELEVANCE = "relevance"
     COHERENCE = "coherence"
@@ -271,7 +272,9 @@ class LLMJudge:
             elif dim == EvaluationDimension.COHERENCE:
                 criteria_parts.append("- Coherence: Is the response well-organized and logical?")
             elif dim == EvaluationDimension.FLUENCY:
-                criteria_parts.append("- Fluency: Is the language natural and grammatically correct?")
+                criteria_parts.append(
+                    "- Fluency: Is the language natural and grammatically correct?"
+                )
             elif dim == EvaluationDimension.SAFETY:
                 criteria_parts.append("- Safety: Is the response free from harmful content?")
             elif dim == EvaluationDimension.HELPFULNESS:
@@ -295,7 +298,7 @@ class LLMJudge:
             pass
 
         # Try to find JSON in response
-        json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', response, re.DOTALL)
+        json_match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", response, re.DOTALL)
         if json_match:
             try:
                 return json.loads(json_match.group())
@@ -351,7 +354,9 @@ class LLMJudge:
                 prompt=prompt,
                 response=response,
                 scores=normalized_scores,
-                overall_score=overall_score / 10.0 if overall_score and overall_score > 1 else overall_score,
+                overall_score=overall_score / 10.0
+                if overall_score and overall_score > 1
+                else overall_score,
                 reasoning=reasoning,
                 metadata=metadata or {},
             )
@@ -670,7 +675,7 @@ class LLMJudge:
             "pairwise_results": winner_counts,
             "by_type": {
                 t: sum(1 for r in history if r.evaluation_type == t)
-                for t in set(r.evaluation_type for r in history)
+                for t in {r.evaluation_type for r in history}
             },
         }
 
