@@ -10,12 +10,17 @@ Implements EU AI Act requirements for high-risk AI systems:
 """
 
 from cert.compliance_2025.high_risk.documentation import HighRiskDocumentation
-from cert.compliance_2025.high_risk.human_oversight import HumanOversight, requires_human_oversight
+from cert.compliance_2025.high_risk.human_oversight import (
+    HumanOversight,
+    OversightConfig,
+    requires_human_oversight,
+)
 from cert.compliance_2025.high_risk.requirements import HighRiskRequirements
 
 __all__ = [
     "HighRiskRequirements",
     "HighRiskDocumentation",
     "HumanOversight",
+    "OversightConfig",
     "requires_human_oversight",
 ]

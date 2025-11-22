@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import './globals.css';
 import { Providers } from './providers';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,8 +11,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'CERT Dashboard',
-  description: 'EU AI Act Article 15 Compliance Monitoring',
+  title: 'CERT Dashboard - EU AI Act Compliance',
+  description: 'Professional EU AI Act Article 15 Compliance Monitoring Dashboard',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -19,9 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <DashboardLayout>{children}</DashboardLayout>
+        </Providers>
       </body>
     </html>
   );
