@@ -30,7 +30,8 @@ type NavigationSection =
   | 'monitoring'
   | 'compliance'
   | 'analytics'
-  | 'settings';
+  | 'settings'
+  | 'documentation'; // Legacy support
 
 interface Tab {
   id: NavigationSection;
