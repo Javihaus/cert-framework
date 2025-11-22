@@ -9,17 +9,17 @@ This module provides statistical anomaly detection for:
 - Behavior drift
 """
 
+import statistics
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Callable
-from collections import deque
 from enum import Enum
-import statistics
-import math
+from typing import Any, Callable
 
 
 class AnomalyType(Enum):
     """Types of anomalies that can be detected."""
+
     LATENCY_SPIKE = "latency_spike"
     ERROR_RATE_SPIKE = "error_rate_spike"
     TOKEN_USAGE_ANOMALY = "token_usage_anomaly"
@@ -30,6 +30,7 @@ class AnomalyType(Enum):
 
 class AnomalySeverity(Enum):
     """Severity levels for detected anomalies."""
+
     INFO = "info"
     WARNING = "warning"
     CRITICAL = "critical"
@@ -198,9 +199,7 @@ class AnomalyDetector:
         low = stats["mean"] - self.warning_threshold * stats["std"]
         high = stats["mean"] + self.warning_threshold * stats["std"]
 
-        description = self._generate_description(
-            name, value, stats, z_score, anomaly_type
-        )
+        description = self._generate_description(name, value, stats, z_score, anomaly_type)
 
         anomaly = Anomaly(
             anomaly_type=anomaly_type,
@@ -353,15 +352,11 @@ class AnomalyDetector:
             Anomaly rate (anomalies per hour)
         """
         cutoff = datetime.utcnow() - timedelta(hours=window_hours)
-        recent_anomalies = [
-            a for a in self._anomaly_history
-            if a.timestamp >= cutoff
-        ]
+        recent_anomalies = [a for a in self._anomaly_history if a.timestamp >= cutoff]
 
         if metric_name:
             recent_anomalies = [
-                a for a in recent_anomalies
-                if a.metadata.get("metric_name") == metric_name
+                a for a in recent_anomalies if a.metadata.get("metric_name") == metric_name
             ]
 
         return len(recent_anomalies) / window_hours
@@ -400,22 +395,15 @@ class AnomalyDetector:
         """Get summary of anomaly detection status."""
         total_anomalies = len(self._anomaly_history)
         recent_cutoff = datetime.utcnow() - timedelta(hours=1)
-        recent_anomalies = [
-            a for a in self._anomaly_history
-            if a.timestamp >= recent_cutoff
-        ]
+        recent_anomalies = [a for a in self._anomaly_history if a.timestamp >= recent_cutoff]
 
         severity_counts = {}
         for a in self._anomaly_history:
-            severity_counts[a.severity.value] = severity_counts.get(
-                a.severity.value, 0
-            ) + 1
+            severity_counts[a.severity.value] = severity_counts.get(a.severity.value, 0) + 1
 
         type_counts = {}
         for a in self._anomaly_history:
-            type_counts[a.anomaly_type.value] = type_counts.get(
-                a.anomaly_type.value, 0
-            ) + 1
+            type_counts[a.anomaly_type.value] = type_counts.get(a.anomaly_type.value, 0) + 1
 
         return {
             "total_anomalies": total_anomalies,
@@ -505,7 +493,8 @@ class MultiMetricAnomalyDetector:
 
         # Group recent anomalies by time window
         recent = [
-            (name, anomaly) for name, anomaly in self._recent_anomalies
+            (name, anomaly)
+            for name, anomaly in self._recent_anomalies
             if anomaly.timestamp >= cutoff
         ]
 
@@ -514,15 +503,17 @@ class MultiMetricAnomalyDetector:
 
         # Check for compound anomalies
         compound_events = []
-        affected_metrics = list(set(name for name, _ in recent))
+        affected_metrics = list({name for name, _ in recent})
 
         if len(affected_metrics) >= 2:
-            compound_events.append({
-                "type": "compound_anomaly",
-                "affected_metrics": affected_metrics,
-                "anomaly_count": len(recent),
-                "timestamp": current_time.isoformat(),
-                "description": f"Multiple anomalies detected in {', '.join(affected_metrics)}",
-            })
+            compound_events.append(
+                {
+                    "type": "compound_anomaly",
+                    "affected_metrics": affected_metrics,
+                    "anomaly_count": len(recent),
+                    "timestamp": current_time.isoformat(),
+                    "description": f"Multiple anomalies detected in {', '.join(affected_metrics)}",
+                }
+            )
 
         return compound_events

@@ -12,17 +12,18 @@ Key Features:
 - Configurable check intervals and thresholds
 """
 
+import hashlib
+import json
+import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Callable
 from enum import Enum
-import json
-import hashlib
-import statistics
+from typing import Any, Callable
 
 
 class CanaryType(Enum):
     """Types of canary prompts for different capability testing."""
+
     REASONING = "reasoning"
     FACTUALITY = "factuality"
     CONSISTENCY = "consistency"
@@ -117,15 +118,10 @@ class CanaryHistory:
             return 1.0
         return statistics.mean(r.consistency_score for r in recent)
 
-    def get_latency_stats(
-        self, window_hours: int = 24
-    ) -> dict[str, float]:
+    def get_latency_stats(self, window_hours: int = 24) -> dict[str, float]:
         """Get latency statistics within time window."""
         cutoff = datetime.utcnow() - timedelta(hours=window_hours)
-        latencies = [
-            r.latency_ms for r in self.results
-            if r.timestamp >= cutoff
-        ]
+        latencies = [r.latency_ms for r in self.results if r.timestamp >= cutoff]
         if not latencies:
             return {"mean": 0, "median": 0, "std": 0, "min": 0, "max": 0}
 
@@ -327,15 +323,11 @@ class CanaryPromptMonitor:
 
         # Check response length
         if canary.max_response_length and len(response) > canary.max_response_length:
-            issues.append(
-                f"Response too long: {len(response)} > {canary.max_response_length}"
-            )
+            issues.append(f"Response too long: {len(response)} > {canary.max_response_length}")
             score -= 0.2
 
         if canary.min_response_length and len(response) < canary.min_response_length:
-            issues.append(
-                f"Response too short: {len(response)} < {canary.min_response_length}"
-            )
+            issues.append(f"Response too short: {len(response)} < {canary.min_response_length}")
             score -= 0.2
 
         # Compare with baseline responses if available
@@ -344,9 +336,7 @@ class CanaryPromptMonitor:
                 response, self._baselines[canary_id]
             )
             if baseline_similarity < 0.5:
-                issues.append(
-                    f"Low similarity to baseline: {baseline_similarity:.2f}"
-                )
+                issues.append(f"Low similarity to baseline: {baseline_similarity:.2f}")
                 score -= 0.2 * (1 - baseline_similarity)
 
         return max(0.0, min(1.0, score)), issues
@@ -427,9 +417,7 @@ class CanaryPromptMonitor:
         latency_ms = (end_time - start_time).total_seconds() * 1000
 
         # Compute consistency score
-        consistency_score, issues = self._compute_consistency_score(
-            response, canary_id, canary
-        )
+        consistency_score, issues = self._compute_consistency_score(response, canary_id, canary)
 
         # Check latency
         if latency_ms > self.latency_threshold_ms:
@@ -544,10 +532,7 @@ class CanaryPromptMonitor:
         return {
             "consistency_threshold": self.consistency_threshold,
             "latency_threshold_ms": self.latency_threshold_ms,
-            "canaries": {
-                cid: canary.to_dict()
-                for cid, canary in self._canaries.items()
-            },
+            "canaries": {cid: canary.to_dict() for cid, canary in self._canaries.items()},
             "baselines": self._baselines,
         }
 
@@ -563,7 +548,7 @@ class CanaryPromptMonitor:
     def load_config(self, filepath: str) -> bool:
         """Load configuration from JSON file."""
         try:
-            with open(filepath, "r") as f:
+            with open(filepath) as f:
                 config = json.load(f)
 
             self.consistency_threshold = config.get(

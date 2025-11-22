@@ -11,15 +11,16 @@ Risk Levels:
 - Minimal: No specific obligations (spam filters, AI in games, etc.)
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class RiskLevel(Enum):
     """EU AI Act risk classification levels."""
+
     UNACCEPTABLE = "unacceptable"
     HIGH = "high"
     LIMITED = "limited"
@@ -28,6 +29,7 @@ class RiskLevel(Enum):
 
 class UseCase(Enum):
     """Annex III use case categories for high-risk classification."""
+
     # Biometrics
     BIOMETRIC_ID_REMOTE = "biometric_identification_remote"
     BIOMETRIC_CATEGORIZATION = "biometric_categorization"
@@ -131,8 +133,14 @@ ANNEX_III_CATEGORIES = {
             UseCase.EMOTION_RECOGNITION,
         ],
         "keywords": [
-            "biometric", "facial recognition", "face detection", "fingerprint",
-            "iris scan", "voice recognition", "emotion detection", "sentiment analysis",
+            "biometric",
+            "facial recognition",
+            "face detection",
+            "fingerprint",
+            "iris scan",
+            "voice recognition",
+            "emotion detection",
+            "sentiment analysis",
         ],
         "requirements": [
             "Biometric data protection measures",
@@ -148,8 +156,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.INFRASTRUCTURE_MANAGEMENT,
         ],
         "keywords": [
-            "power grid", "energy", "water supply", "traffic", "transport",
-            "digital infrastructure", "safety critical", "scada", "ics",
+            "power grid",
+            "energy",
+            "water supply",
+            "traffic",
+            "transport",
+            "digital infrastructure",
+            "safety critical",
+            "scada",
+            "ics",
         ],
         "requirements": [
             "Safety impact assessment",
@@ -166,8 +181,14 @@ ANNEX_III_CATEGORIES = {
             UseCase.EDUCATION_CHEATING,
         ],
         "keywords": [
-            "student assessment", "admission", "exam", "grading", "learning",
-            "educational evaluation", "proctoring", "cheating detection",
+            "student assessment",
+            "admission",
+            "exam",
+            "grading",
+            "learning",
+            "educational evaluation",
+            "proctoring",
+            "cheating detection",
         ],
         "requirements": [
             "Fairness validation across student groups",
@@ -184,8 +205,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.EMPLOYMENT_MONITORING,
         ],
         "keywords": [
-            "recruitment", "hiring", "cv screening", "resume", "interview",
-            "promotion", "termination", "performance evaluation", "employee monitoring",
+            "recruitment",
+            "hiring",
+            "cv screening",
+            "resume",
+            "interview",
+            "promotion",
+            "termination",
+            "performance evaluation",
+            "employee monitoring",
         ],
         "requirements": [
             "Non-discrimination validation",
@@ -202,8 +230,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.SOCIAL_SERVICES,
         ],
         "keywords": [
-            "credit score", "loan", "mortgage", "insurance", "benefits",
-            "social assistance", "welfare", "risk assessment", "financial",
+            "credit score",
+            "loan",
+            "mortgage",
+            "insurance",
+            "benefits",
+            "social assistance",
+            "welfare",
+            "risk assessment",
+            "financial",
         ],
         "requirements": [
             "Explainability of decisions",
@@ -220,8 +255,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.CRIME_PREDICTION,
         ],
         "keywords": [
-            "police", "law enforcement", "criminal", "profiling", "predictive policing",
-            "risk assessment", "recidivism", "lie detection", "evidence",
+            "police",
+            "law enforcement",
+            "criminal",
+            "profiling",
+            "predictive policing",
+            "risk assessment",
+            "recidivism",
+            "lie detection",
+            "evidence",
         ],
         "requirements": [
             "Strict logging requirements",
@@ -238,8 +280,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.VISA_PROCESSING,
         ],
         "keywords": [
-            "migration", "asylum", "visa", "border", "immigration",
-            "refugee", "travel document", "entry", "deportation",
+            "migration",
+            "asylum",
+            "visa",
+            "border",
+            "immigration",
+            "refugee",
+            "travel document",
+            "entry",
+            "deportation",
         ],
         "requirements": [
             "Human oversight mandatory",
@@ -255,8 +304,15 @@ ANNEX_III_CATEGORIES = {
             UseCase.SENTENCING,
         ],
         "keywords": [
-            "court", "judicial", "legal", "sentencing", "verdict",
-            "legal research", "case law", "judge", "prosecution",
+            "court",
+            "judicial",
+            "legal",
+            "sentencing",
+            "verdict",
+            "legal research",
+            "case law",
+            "judge",
+            "prosecution",
         ],
         "requirements": [
             "Human judicial authority",
@@ -276,7 +332,12 @@ PROHIBITED_PRACTICES = [
     },
     {
         "name": "Exploitation of vulnerabilities",
-        "keywords": ["exploit vulnerable", "target vulnerable", "manipulate children", "elderly manipulation"],
+        "keywords": [
+            "exploit vulnerable",
+            "target vulnerable",
+            "manipulate children",
+            "elderly manipulation",
+        ],
         "description": "AI systems that exploit vulnerabilities of specific groups",
     },
     {
@@ -381,12 +442,14 @@ class AIActRiskClassifier:
         # Check for prohibited practices first
         for practice in PROHIBITED_PRACTICES:
             practice_detected = any(kw in all_text for kw in practice["keywords"])
-            indicators.append(RiskIndicator(
-                indicator=f"Prohibited: {practice['name']}",
-                present=practice_detected,
-                weight=1.0 if practice_detected else 0.0,
-                description=practice["description"],
-            ))
+            indicators.append(
+                RiskIndicator(
+                    indicator=f"Prohibited: {practice['name']}",
+                    present=practice_detected,
+                    weight=1.0 if practice_detected else 0.0,
+                    description=practice["description"],
+                )
+            )
 
             if practice_detected:
                 return RiskAssessment(
@@ -404,19 +467,18 @@ class AIActRiskClassifier:
         requirements = []
         for category_name, category_data in ANNEX_III_CATEGORIES.items():
             category_match = domain.lower() == category_name
-            keyword_matches = sum(
-                1 for kw in category_data["keywords"]
-                if kw in all_text
-            )
+            keyword_matches = sum(1 for kw in category_data["keywords"] if kw in all_text)
 
             is_match = category_match or keyword_matches >= 2
 
-            indicators.append(RiskIndicator(
-                indicator=f"Annex III: {category_name}",
-                present=is_match,
-                weight=0.8 if is_match else 0.0,
-                description=f"Category match: {category_match}, Keywords: {keyword_matches}",
-            ))
+            indicators.append(
+                RiskIndicator(
+                    indicator=f"Annex III: {category_name}",
+                    present=is_match,
+                    weight=0.8 if is_match else 0.0,
+                    description=f"Category match: {category_match}, Keywords: {keyword_matches}",
+                )
+            )
 
             if is_match:
                 detected_use_cases.extend(category_data["use_cases"])
@@ -439,19 +501,23 @@ class AIActRiskClassifier:
 
             if systemic_risk:
                 detected_use_cases.append(UseCase.GPAI_SYSTEMIC)
-                requirements.extend([
-                    "Model evaluation and testing",
-                    "Systemic risk assessment",
-                    "Incident reporting",
-                    "Cybersecurity measures",
-                ])
+                requirements.extend(
+                    [
+                        "Model evaluation and testing",
+                        "Systemic risk assessment",
+                        "Incident reporting",
+                        "Cybersecurity measures",
+                    ]
+                )
 
-            indicators.append(RiskIndicator(
-                indicator="GPAI System",
-                present=True,
-                weight=0.5,
-                description=f"General-purpose AI, systemic risk: {systemic_risk}",
-            ))
+            indicators.append(
+                RiskIndicator(
+                    indicator="GPAI System",
+                    present=True,
+                    weight=0.5,
+                    description=f"General-purpose AI, systemic risk: {systemic_risk}",
+                )
+            )
 
         # Determine final risk level
         if detected_use_cases:

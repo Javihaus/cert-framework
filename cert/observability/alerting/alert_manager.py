@@ -5,15 +5,16 @@ Provides alert definition, triggering, and notification management
 for production LLM systems.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Any, Callable
-from enum import Enum
 import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable
 
 
 class AlertSeverity(Enum):
     """Alert severity levels."""
+
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
@@ -22,6 +23,7 @@ class AlertSeverity(Enum):
 
 class AlertStatus(Enum):
     """Alert status."""
+
     FIRING = "firing"
     RESOLVED = "resolved"
     ACKNOWLEDGED = "acknowledged"
@@ -283,9 +285,7 @@ class AlertManager:
 
         severity_counts = {}
         for alert in active:
-            severity_counts[alert.severity.value] = severity_counts.get(
-                alert.severity.value, 0
-            ) + 1
+            severity_counts[alert.severity.value] = severity_counts.get(alert.severity.value, 0) + 1
 
         return {
             "active_alerts": len(active),

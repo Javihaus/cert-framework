@@ -5,15 +5,16 @@ Provides incident tracking and response coordination
 for production LLM systems.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class IncidentSeverity(Enum):
     """Incident severity levels."""
+
     SEV1 = "sev1"  # Critical - immediate response
     SEV2 = "sev2"  # High - urgent response
     SEV3 = "sev3"  # Medium - normal response
@@ -22,6 +23,7 @@ class IncidentSeverity(Enum):
 
 class IncidentStatus(Enum):
     """Incident status."""
+
     OPEN = "open"
     INVESTIGATING = "investigating"
     IDENTIFIED = "identified"
@@ -268,10 +270,7 @@ class IncidentResponse:
             IncidentStatus.MITIGATING,
         ]
 
-        incidents = [
-            i for i in self._incidents.values()
-            if i.status in open_statuses
-        ]
+        incidents = [i for i in self._incidents.values() if i.status in open_statuses]
 
         if severity_filter:
             incidents = [i for i in incidents if i.severity == severity_filter]
@@ -286,9 +285,7 @@ class IncidentResponse:
             "total_incidents": len(self._incidents),
             "open_incidents": len(open_incidents),
             "by_severity": {
-                sev.value: len([
-                    i for i in open_incidents if i.severity == sev
-                ])
+                sev.value: len([i for i in open_incidents if i.severity == sev])
                 for sev in IncidentSeverity
             },
         }

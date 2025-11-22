@@ -13,17 +13,18 @@ Key Features:
 - Real-time alerting integration
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Callable
-from enum import Enum
 import json
 import math
 import warnings
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable
 
 
 class DriftSeverity(Enum):
     """Severity levels for detected drift."""
+
     NONE = "none"
     LOW = "low"
     MEDIUM = "medium"
@@ -192,11 +193,13 @@ class EmbeddingDriftMonitor:
         if self._embedding_engine is None:
             try:
                 from cert.measure.embeddings import get_embedding_engine
+
                 self._embedding_engine = get_embedding_engine()
             except ImportError:
                 warnings.warn(
                     "sentence-transformers not available. "
-                    "Install with: pip install cert-framework[evaluation]"
+                    "Install with: pip install cert-framework[evaluation]",
+                    stacklevel=2,
                 )
                 return None
         return self._embedding_engine
@@ -211,7 +214,7 @@ class EmbeddingDriftMonitor:
             embedding = engine.encode(text, convert_to_numpy=True)
             return embedding.tolist()
         except Exception as e:
-            warnings.warn(f"Failed to generate embedding: {e}")
+            warnings.warn(f"Failed to generate embedding: {e}", stacklevel=2)
             return None
 
     def add_to_baseline(
@@ -232,7 +235,7 @@ class EmbeddingDriftMonitor:
             True if successfully added, False otherwise
         """
         if self._baseline_finalized:
-            warnings.warn("Baseline already finalized. Call reset_baseline() first.")
+            warnings.warn("Baseline already finalized. Call reset_baseline() first.", stacklevel=2)
             return False
 
         if embedding is None and text is not None:
@@ -254,7 +257,8 @@ class EmbeddingDriftMonitor:
         if self._baseline_window.size < self.min_samples_for_detection:
             warnings.warn(
                 f"Insufficient baseline samples ({self._baseline_window.size}). "
-                f"Need at least {self.min_samples_for_detection}."
+                f"Need at least {self.min_samples_for_detection}.",
+                stacklevel=2,
             )
             return False
 
@@ -302,9 +306,7 @@ class EmbeddingDriftMonitor:
             return 0.0, 0.0, 0.0
 
         # Centroid distance (cosine)
-        centroid_distance = self._cosine_distance(
-            current_centroid, self._baseline_centroid
-        )
+        centroid_distance = self._cosine_distance(current_centroid, self._baseline_centroid)
 
         # Distribution divergence (simplified KL-like measure using variance ratio)
         distribution_divergence = 0.0
@@ -468,10 +470,7 @@ class EmbeddingDriftMonitor:
                 DriftSeverity.CRITICAL,
             ]
             min_index = severity_order.index(severity_filter)
-            history = [
-                r for r in history
-                if severity_order.index(r.severity) >= min_index
-            ]
+            history = [r for r in history if severity_order.index(r.severity) >= min_index]
 
         if limit:
             history = history[-limit:]
@@ -508,19 +507,15 @@ class EmbeddingDriftMonitor:
             self._baseline_finalized = data.get("finalized", True)
 
             if "thresholds" in data:
-                self.drift_threshold = data["thresholds"].get(
-                    "drift", self.drift_threshold
-                )
-                self.warning_threshold = data["thresholds"].get(
-                    "warning", self.warning_threshold
-                )
+                self.drift_threshold = data["thresholds"].get("drift", self.drift_threshold)
+                self.warning_threshold = data["thresholds"].get("warning", self.warning_threshold)
                 self.critical_threshold = data["thresholds"].get(
                     "critical", self.critical_threshold
                 )
 
             return True
         except (KeyError, TypeError) as e:
-            warnings.warn(f"Failed to import baseline: {e}")
+            warnings.warn(f"Failed to import baseline: {e}", stacklevel=2)
             return False
 
     def save_baseline(self, filepath: str) -> bool:
@@ -530,15 +525,15 @@ class EmbeddingDriftMonitor:
                 json.dump(self.export_baseline(), f, indent=2)
             return True
         except Exception as e:
-            warnings.warn(f"Failed to save baseline: {e}")
+            warnings.warn(f"Failed to save baseline: {e}", stacklevel=2)
             return False
 
     def load_baseline(self, filepath: str) -> bool:
         """Load baseline from JSON file."""
         try:
-            with open(filepath, "r") as f:
+            with open(filepath) as f:
                 data = json.load(f)
             return self.import_baseline(data)
         except Exception as e:
-            warnings.warn(f"Failed to load baseline: {e}")
+            warnings.warn(f"Failed to load baseline: {e}", stacklevel=2)
             return False

@@ -5,10 +5,10 @@ Generates EU AI Act Annex IV compliant technical documentation
 for high-risk AI systems.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-import json
 
 
 @dataclass

@@ -5,15 +5,16 @@ Implements conformity assessment procedures for high-risk AI systems
 as required by Article 43 of the EU AI Act.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class AssessmentProcedure(Enum):
     """Conformity assessment procedures per Annex VI/VII."""
+
     INTERNAL_CONTROL = "internal_control"  # Annex VI
     QUALITY_MANAGEMENT = "quality_management"  # Annex VII
     NOTIFIED_BODY = "notified_body"  # Third-party assessment
@@ -21,6 +22,7 @@ class AssessmentProcedure(Enum):
 
 class AssessmentStatus(Enum):
     """Assessment status."""
+
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     PASSED = "passed"
@@ -239,9 +241,7 @@ class ConformityAssessment:
             elif category_evidence or (score and score >= 0.5):
                 status = AssessmentStatus.CONDITIONAL_PASS
                 passed_count += 0.5
-                recommendations.append(
-                    f"Strengthen evidence for {criterion_def['description']}"
-                )
+                recommendations.append(f"Strengthen evidence for {criterion_def['description']}")
             else:
                 status = AssessmentStatus.FAILED
                 recommendations.append(
@@ -254,15 +254,17 @@ class ConformityAssessment:
             if score is not None and score < 0.7:
                 findings.append(f"Test score ({score:.1%}) below threshold")
 
-            criteria.append(AssessmentCriterion(
-                criterion_id=criterion_def["id"],
-                description=criterion_def["description"],
-                article_reference=criterion_def["article"],
-                status=status,
-                evidence=category_evidence,
-                findings=findings,
-                score=score,
-            ))
+            criteria.append(
+                AssessmentCriterion(
+                    criterion_id=criterion_def["id"],
+                    description=criterion_def["description"],
+                    article_reference=criterion_def["article"],
+                    status=status,
+                    evidence=category_evidence,
+                    findings=findings,
+                    score=score,
+                )
+            )
 
         # Determine overall status
         compliance_rate = passed_count / len(ASSESSMENT_CRITERIA)
@@ -332,14 +334,16 @@ EU DECLARATION OF CONFORMITY
 
         for criterion in report.criteria:
             status_symbol = "✓" if criterion.status == AssessmentStatus.PASSED else "○"
-            declaration += f"   {status_symbol} {criterion.article_reference}: {criterion.description}\n"
+            declaration += (
+                f"   {status_symbol} {criterion.article_reference}: {criterion.description}\n"
+            )
 
         declaration += f"""
 5. SIGNATORY
    This declaration is issued under the responsibility of the provider.
 
    Provider: {report.provider_name}
-   Date: {datetime.utcnow().strftime('%Y-%m-%d')}
+   Date: {datetime.utcnow().strftime("%Y-%m-%d")}
 
    [Signature Required]
 """

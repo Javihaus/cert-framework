@@ -5,15 +5,16 @@ Implements EU AI Act Article 51 requirements for assessing
 systemic risks of general-purpose AI models.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class SystemicRiskLevel(Enum):
     """Systemic risk classification levels."""
+
     NOT_APPLICABLE = "not_applicable"
     LOW = "low"
     MEDIUM = "medium"
@@ -23,6 +24,7 @@ class SystemicRiskLevel(Enum):
 
 class RiskCategory(Enum):
     """Categories of systemic risk."""
+
     CAPABILITY_RISK = "capability_risk"
     MISUSE_RISK = "misuse_risk"
     SOCIETAL_RISK = "societal_risk"
@@ -201,9 +203,7 @@ class SystemicRiskAssessment:
                 user_risk = 0.4
 
         # Assess capability risks
-        capability_risks = self._assess_capability_risks(
-            capabilities, has_agency_capabilities
-        )
+        capability_risks = self._assess_capability_risks(capabilities, has_agency_capabilities)
         risk_factors.extend(capability_risks)
 
         # Assess misuse risks
@@ -283,22 +283,26 @@ class SystemicRiskAssessment:
             cap_lower = cap.lower()
             for key, (name, severity, likelihood) in high_risk_capabilities.items():
                 if key in cap_lower:
-                    risks.append(RiskFactor(
-                        category=RiskCategory.CAPABILITY_RISK,
-                        name=name,
-                        description=f"Model has {cap} capability",
-                        severity=severity,
-                        likelihood=likelihood,
-                    ))
+                    risks.append(
+                        RiskFactor(
+                            category=RiskCategory.CAPABILITY_RISK,
+                            name=name,
+                            description=f"Model has {cap} capability",
+                            severity=severity,
+                            likelihood=likelihood,
+                        )
+                    )
 
         if has_agency:
-            risks.append(RiskFactor(
-                category=RiskCategory.CAPABILITY_RISK,
-                name="Agency capabilities",
-                description="Model can take autonomous actions in the world",
-                severity=0.8,
-                likelihood=0.7,
-            ))
+            risks.append(
+                RiskFactor(
+                    category=RiskCategory.CAPABILITY_RISK,
+                    name="Agency capabilities",
+                    description="Model can take autonomous actions in the world",
+                    severity=0.8,
+                    likelihood=0.7,
+                )
+            )
 
         return risks
 
@@ -311,24 +315,32 @@ class SystemicRiskAssessment:
         risks = []
 
         if can_generate_harmful:
-            risks.append(RiskFactor(
-                category=RiskCategory.MISUSE_RISK,
-                name="Harmful content generation",
-                description="Model can generate harmful content at scale",
-                severity=0.7,
-                likelihood=0.6,
-                mitigations=["Content filtering", "Output monitoring", "Use policies"],
-            ))
+            risks.append(
+                RiskFactor(
+                    category=RiskCategory.MISUSE_RISK,
+                    name="Harmful content generation",
+                    description="Model can generate harmful content at scale",
+                    severity=0.7,
+                    likelihood=0.6,
+                    mitigations=["Content filtering", "Output monitoring", "Use policies"],
+                )
+            )
 
         if can_influence_elections:
-            risks.append(RiskFactor(
-                category=RiskCategory.SOCIETAL_RISK,
-                name="Electoral influence",
-                description="Model could be used for electoral manipulation",
-                severity=0.9,
-                likelihood=0.4,
-                mitigations=["Political content policies", "Provenance marking", "Usage monitoring"],
-            ))
+            risks.append(
+                RiskFactor(
+                    category=RiskCategory.SOCIETAL_RISK,
+                    name="Electoral influence",
+                    description="Model could be used for electoral manipulation",
+                    severity=0.9,
+                    likelihood=0.4,
+                    mitigations=[
+                        "Political content policies",
+                        "Provenance marking",
+                        "Usage monitoring",
+                    ],
+                )
+            )
 
         return risks
 

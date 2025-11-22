@@ -5,11 +5,11 @@ Provides Prometheus-compatible metrics collection and export
 for LLM systems monitoring.
 """
 
+import time
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-from collections import defaultdict
-import time
 
 
 @dataclass
@@ -67,7 +67,22 @@ class PrometheusMetrics:
 
         # Histogram bucket definitions
         self._histogram_buckets = {
-            "default": [0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0],
+            "default": [
+                0.005,
+                0.01,
+                0.025,
+                0.05,
+                0.075,
+                0.1,
+                0.25,
+                0.5,
+                0.75,
+                1.0,
+                2.5,
+                5.0,
+                7.5,
+                10.0,
+            ],
             "latency": [0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0],
             "tokens": [10, 50, 100, 250, 500, 1000, 2000, 4000, 8000, 16000],
         }
@@ -185,7 +200,9 @@ class PrometheusMetrics:
         labels = {"model": model, "endpoint": endpoint}
 
         # Count request
-        self.inc_counter("llm_requests_total", labels={**labels, "status": "success" if success else "error"})
+        self.inc_counter(
+            "llm_requests_total", labels={**labels, "status": "success" if success else "error"}
+        )
 
         # Token metrics
         self.inc_counter("llm_input_tokens_total", value=input_tokens, labels=labels)
@@ -195,8 +212,12 @@ class PrometheusMetrics:
         self.observe_histogram("llm_request_duration_seconds", latency_seconds, labels=labels)
 
         # Token histograms
-        self.observe_histogram("llm_input_tokens", input_tokens, labels=labels, bucket_type="tokens")
-        self.observe_histogram("llm_output_tokens", output_tokens, labels=labels, bucket_type="tokens")
+        self.observe_histogram(
+            "llm_input_tokens", input_tokens, labels=labels, bucket_type="tokens"
+        )
+        self.observe_histogram(
+            "llm_output_tokens", output_tokens, labels=labels, bucket_type="tokens"
+        )
 
     def record_error(
         self,
@@ -218,7 +239,7 @@ class PrometheusMetrics:
             Prometheus-formatted metrics string
         """
         lines = []
-        lines.append(f"# CERT Framework LLM Metrics")
+        lines.append("# CERT Framework LLM Metrics")
         lines.append(f"# Generated at {datetime.utcnow().isoformat()}")
         lines.append("")
 
@@ -272,15 +293,15 @@ class PrometheusMetrics:
                 for bucket in buckets:
                     count = sum(1 for v in values if v <= bucket)
                     le_labels = labels_key + f',le="{bucket}"' if labels_key else f'le="{bucket}"'
-                    lines.append(f'{full_name}_bucket{{{le_labels}}} {count}')
+                    lines.append(f"{full_name}_bucket{{{le_labels}}} {count}")
 
                 # +Inf bucket
                 inf_labels = labels_key + ',le="+Inf"' if labels_key else 'le="+Inf"'
-                lines.append(f'{full_name}_bucket{{{inf_labels}}} {len(values)}')
+                lines.append(f"{full_name}_bucket{{{inf_labels}}} {len(values)}")
 
                 # Sum and count
-                lines.append(f'{full_name}_sum{labels_str} {sum(values)}')
-                lines.append(f'{full_name}_count{labels_str} {len(values)}')
+                lines.append(f"{full_name}_sum{labels_str} {sum(values)}")
+                lines.append(f"{full_name}_count{labels_str} {len(values)}")
             lines.append("")
 
         return "\n".join(lines)
@@ -289,15 +310,11 @@ class PrometheusMetrics:
         """Get metrics summary as dictionary."""
         return {
             "counters": {
-                key: values[-1].value if values else 0
-                for key, values in self._counters.items()
+                key: values[-1].value if values else 0 for key, values in self._counters.items()
             },
-            "gauges": {
-                key: mv.value for key, mv in self._gauges.items()
-            },
+            "gauges": {key: mv.value for key, mv in self._gauges.items()},
             "histogram_counts": {
-                name: len(observations)
-                for name, observations in self._histograms.items()
+                name: len(observations) for name, observations in self._histograms.items()
             },
         }
 

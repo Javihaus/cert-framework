@@ -5,15 +5,16 @@ Implements EU AI Act Article 71 requirements for registration
 of high-risk AI systems in the EU database.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
-import json
+from typing import Any
 
 
 class RegistrationStatus(Enum):
     """Registration status."""
+
     DRAFT = "draft"
     SUBMITTED = "submitted"
     UNDER_REVIEW = "under_review"
@@ -91,7 +92,9 @@ class RegistrationEntry:
             "registration_metadata": {
                 "registration_id": self.registration_id,
                 "status": self.status.value,
-                "submission_date": self.submission_date.isoformat() if self.submission_date else None,
+                "submission_date": self.submission_date.isoformat()
+                if self.submission_date
+                else None,
                 "approval_date": self.approval_date.isoformat() if self.approval_date else None,
                 "last_updated": self.last_updated.isoformat(),
             },
@@ -354,12 +357,12 @@ Description:
 COMPLIANCE STATUS
 -----------------
 Conformity Assessment: {entry.conformity_assessment_type}
-CE Marking Applied: {'Yes' if entry.ce_marking_applied else 'No'}
-Notified Body: {entry.notified_body_id or 'N/A'}
+CE Marking Applied: {"Yes" if entry.ce_marking_applied else "No"}
+Notified Body: {entry.notified_body_id or "N/A"}
 
 DATES
 -----
-Last Updated: {entry.last_updated.strftime('%Y-%m-%d %H:%M')}
+Last Updated: {entry.last_updated.strftime("%Y-%m-%d %H:%M")}
 """
 
         if entry.submission_date:

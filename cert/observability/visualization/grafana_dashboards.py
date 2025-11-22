@@ -5,9 +5,9 @@ Generates Grafana dashboard JSON configurations for monitoring
 LLM systems with production-ready panels and alerts.
 """
 
+import json
 from dataclasses import dataclass
 from typing import Any
-import json
 
 
 @dataclass
@@ -73,24 +73,24 @@ class GrafanaDashboardGenerator:
                     # Row 1: Key Metrics
                     self._stat_panel(
                         "Total Requests",
-                        f'sum({self.namespace}_llm_requests_total)',
+                        f"sum({self.namespace}_llm_requests_total)",
                         {"h": 4, "w": 6, "x": 0, "y": 0},
                     ),
                     self._stat_panel(
                         "Error Rate",
-                        f'sum(rate({self.namespace}_llm_errors_total[5m])) / sum(rate({self.namespace}_llm_requests_total[5m])) * 100',
+                        f"sum(rate({self.namespace}_llm_errors_total[5m])) / sum(rate({self.namespace}_llm_requests_total[5m])) * 100",
                         {"h": 4, "w": 6, "x": 6, "y": 0},
                         unit="percent",
                     ),
                     self._stat_panel(
                         "Avg Latency (p50)",
-                        f'histogram_quantile(0.5, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le))',
+                        f"histogram_quantile(0.5, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le))",
                         {"h": 4, "w": 6, "x": 12, "y": 0},
                         unit="s",
                     ),
                     self._stat_panel(
                         "Total Tokens",
-                        f'sum({self.namespace}_llm_input_tokens_total) + sum({self.namespace}_llm_output_tokens_total)',
+                        f"sum({self.namespace}_llm_input_tokens_total) + sum({self.namespace}_llm_output_tokens_total)",
                         {"h": 4, "w": 6, "x": 18, "y": 0},
                     ),
                     # Row 2: Request Latency
@@ -98,15 +98,15 @@ class GrafanaDashboardGenerator:
                         "Request Latency",
                         [
                             {
-                                "expr": f'histogram_quantile(0.5, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))',
+                                "expr": f"histogram_quantile(0.5, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))",
                                 "legendFormat": "p50 - {{{{model}}}}",
                             },
                             {
-                                "expr": f'histogram_quantile(0.9, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))',
+                                "expr": f"histogram_quantile(0.9, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))",
                                 "legendFormat": "p90 - {{{{model}}}}",
                             },
                             {
-                                "expr": f'histogram_quantile(0.99, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))',
+                                "expr": f"histogram_quantile(0.99, sum(rate({self.namespace}_llm_request_duration_seconds_bucket[5m])) by (le, model))",
                                 "legendFormat": "p99 - {{{{model}}}}",
                             },
                         ],
@@ -117,7 +117,7 @@ class GrafanaDashboardGenerator:
                         "Request Rate",
                         [
                             {
-                                "expr": f'sum(rate({self.namespace}_llm_requests_total[5m])) by (model)',
+                                "expr": f"sum(rate({self.namespace}_llm_requests_total[5m])) by (model)",
                                 "legendFormat": "{{{{model}}}}",
                             },
                         ],
@@ -128,11 +128,11 @@ class GrafanaDashboardGenerator:
                         "Token Usage",
                         [
                             {
-                                "expr": f'sum(rate({self.namespace}_llm_input_tokens_total[5m])) by (model)',
+                                "expr": f"sum(rate({self.namespace}_llm_input_tokens_total[5m])) by (model)",
                                 "legendFormat": "Input - {{{{model}}}}",
                             },
                             {
-                                "expr": f'sum(rate({self.namespace}_llm_output_tokens_total[5m])) by (model)',
+                                "expr": f"sum(rate({self.namespace}_llm_output_tokens_total[5m])) by (model)",
                                 "legendFormat": "Output - {{{{model}}}}",
                             },
                         ],
@@ -143,7 +143,7 @@ class GrafanaDashboardGenerator:
                         "Errors by Type",
                         [
                             {
-                                "expr": f'sum(rate({self.namespace}_llm_errors_total[5m])) by (error_type)',
+                                "expr": f"sum(rate({self.namespace}_llm_errors_total[5m])) by (error_type)",
                                 "legendFormat": "{{{{error_type}}}}",
                             },
                         ],
@@ -164,13 +164,13 @@ class GrafanaDashboardGenerator:
                 "panels": [
                     self._stat_panel(
                         "Total Cost (24h)",
-                        f'sum(increase({self.namespace}_llm_cost_usd_total[24h]))',
+                        f"sum(increase({self.namespace}_llm_cost_usd_total[24h]))",
                         {"h": 4, "w": 8, "x": 0, "y": 0},
                         unit="currencyUSD",
                     ),
                     self._stat_panel(
                         "Cost per Request",
-                        f'sum(rate({self.namespace}_llm_cost_usd_total[1h])) / sum(rate({self.namespace}_llm_requests_total[1h]))',
+                        f"sum(rate({self.namespace}_llm_cost_usd_total[1h])) / sum(rate({self.namespace}_llm_requests_total[1h]))",
                         {"h": 4, "w": 8, "x": 8, "y": 0},
                         unit="currencyUSD",
                     ),
@@ -178,7 +178,7 @@ class GrafanaDashboardGenerator:
                         "Cost by Model",
                         [
                             {
-                                "expr": f'sum(rate({self.namespace}_llm_cost_usd_total[1h])) by (model) * 3600',
+                                "expr": f"sum(rate({self.namespace}_llm_cost_usd_total[1h])) by (model) * 3600",
                                 "legendFormat": "{{{{model}}}}",
                             },
                         ],
@@ -199,23 +199,23 @@ class GrafanaDashboardGenerator:
                 "panels": [
                     self._stat_panel(
                         "Compliance Score",
-                        f'{self.namespace}_compliance_score',
+                        f"{self.namespace}_compliance_score",
                         {"h": 4, "w": 6, "x": 0, "y": 0},
                         unit="percent",
                     ),
                     self._stat_panel(
                         "Human Oversight Events",
-                        f'sum({self.namespace}_human_oversight_events_total)',
+                        f"sum({self.namespace}_human_oversight_events_total)",
                         {"h": 4, "w": 6, "x": 6, "y": 0},
                     ),
                     self._stat_panel(
                         "Drift Alerts",
-                        f'sum({self.namespace}_drift_alerts_total)',
+                        f"sum({self.namespace}_drift_alerts_total)",
                         {"h": 4, "w": 6, "x": 12, "y": 0},
                     ),
                     self._stat_panel(
                         "Accuracy Score",
-                        f'avg({self.namespace}_accuracy_score)',
+                        f"avg({self.namespace}_accuracy_score)",
                         {"h": 4, "w": 6, "x": 18, "y": 0},
                         unit="percent",
                     ),
@@ -259,10 +259,7 @@ class GrafanaDashboardGenerator:
             "title": title,
             "type": "timeseries",
             "gridPos": gridPos,
-            "targets": [
-                {**t, "datasource": self.datasource}
-                for t in targets
-            ],
+            "targets": [{**t, "datasource": self.datasource} for t in targets],
         }
 
     def export_dashboard(

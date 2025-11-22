@@ -6,13 +6,14 @@ for production LLM alert handling.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Any, Callable
+from datetime import datetime
 from enum import Enum
+from typing import Any, Callable
 
 
 class NotificationChannel(Enum):
     """Notification channels."""
+
     EMAIL = "email"
     SLACK = "slack"
     PAGERDUTY = "pagerduty"

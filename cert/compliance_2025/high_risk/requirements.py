@@ -7,12 +7,13 @@ for high-risk AI systems.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from enum import Enum
+from typing import Any
 
 
 class RequirementStatus(Enum):
     """Compliance status for a requirement."""
+
     COMPLIANT = "compliant"
     PARTIAL = "partial"
     NON_COMPLIANT = "non_compliant"
@@ -63,7 +64,9 @@ class ComplianceReport:
             "checks": [c.to_dict() for c in self.checks],
             "summary": self.summary,
             "assessment_date": self.assessment_date.isoformat(),
-            "next_review_date": self.next_review_date.isoformat() if self.next_review_date else None,
+            "next_review_date": self.next_review_date.isoformat()
+            if self.next_review_date
+            else None,
         }
 
 
@@ -290,18 +293,18 @@ class HighRiskRequirements:
                 recommendations = []
                 for gap in gaps:
                     check_name = gap.split(":")[0]
-                    recommendations.append(
-                        f"Implement and document {check_name.replace('_', ' ')}"
-                    )
+                    recommendations.append(f"Implement and document {check_name.replace('_', ' ')}")
 
-                checks.append(RequirementCheck(
-                    article=f"{article} ({article_data['title']})",
-                    requirement=f"{req['id']}: {req['description']}",
-                    status=status,
-                    evidence=evidence,
-                    gaps=gaps,
-                    recommendations=recommendations,
-                ))
+                checks.append(
+                    RequirementCheck(
+                        article=f"{article} ({article_data['title']})",
+                        requirement=f"{req['id']}: {req['description']}",
+                        status=status,
+                        evidence=evidence,
+                        gaps=gaps,
+                        recommendations=recommendations,
+                    )
+                )
 
         # Calculate overall compliance
         compliance_score = compliant_checks / total_checks if total_checks > 0 else 0
@@ -314,12 +317,8 @@ class HighRiskRequirements:
             overall_status = RequirementStatus.NON_COMPLIANT
 
         # Generate summary
-        non_compliant_count = sum(
-            1 for c in checks if c.status == RequirementStatus.NON_COMPLIANT
-        )
-        partial_count = sum(
-            1 for c in checks if c.status == RequirementStatus.PARTIAL
-        )
+        non_compliant_count = sum(1 for c in checks if c.status == RequirementStatus.NON_COMPLIANT)
+        partial_count = sum(1 for c in checks if c.status == RequirementStatus.PARTIAL)
 
         summary = (
             f"Compliance assessment for {system_name}: "
@@ -341,13 +340,15 @@ class HighRiskRequirements:
         all_reqs = []
         for article, article_data in self.requirements.items():
             for req in article_data["requirements"]:
-                all_reqs.append({
-                    "article": article,
-                    "title": article_data["title"],
-                    "id": req["id"],
-                    "description": req["description"],
-                    "checks": req["checks"],
-                })
+                all_reqs.append(
+                    {
+                        "article": article,
+                        "title": article_data["title"],
+                        "id": req["id"],
+                        "description": req["description"],
+                        "checks": req["checks"],
+                    }
+                )
         return all_reqs
 
     def get_compliance_checklist(self) -> list[str]:

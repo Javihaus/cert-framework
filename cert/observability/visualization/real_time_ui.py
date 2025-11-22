@@ -7,8 +7,7 @@ production LLM systems.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable
-import time
+from typing import Any
 
 
 @dataclass
@@ -84,11 +83,13 @@ class RealTimeUI:
         severity: str = "warning",
     ) -> None:
         """Add an alert."""
-        self._alerts.append({
-            "message": message,
-            "severity": severity,
-            "timestamp": datetime.utcnow().isoformat(),
-        })
+        self._alerts.append(
+            {
+                "message": message,
+                "severity": severity,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        )
         # Keep last 5 alerts
         self._alerts = self._alerts[-5:]
 
@@ -96,7 +97,7 @@ class RealTimeUI:
         """Add a log entry."""
         timestamp = datetime.utcnow().strftime("%H:%M:%S")
         self._logs.append(f"[{timestamp}] {message}")
-        self._logs = self._logs[-self._max_logs:]
+        self._logs = self._logs[-self._max_logs :]
 
     def render(self) -> str:
         """
@@ -132,7 +133,9 @@ class RealTimeUI:
             }.get(metric.trend, " ")
 
             value_str = f"{metric.value}{metric.unit}"
-            lines.append(f" [{status_indicator}] {metric.name:<20} {value_str:>15} {trend_indicator}")
+            lines.append(
+                f" [{status_indicator}] {metric.name:<20} {value_str:>15} {trend_indicator}"
+            )
 
         # Alerts
         if self._alerts:

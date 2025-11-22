@@ -5,12 +5,11 @@ Provides distributed tracing and metrics export using OpenTelemetry
 standard for production LLM systems.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Callable
-from contextlib import contextmanager
-import time
 import json
+import time
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+from typing import Any, Callable
 
 
 @dataclass
@@ -34,11 +33,13 @@ class Span:
 
     def add_event(self, name: str, attributes: dict[str, Any] | None = None) -> None:
         """Add an event to the span."""
-        self.events.append({
-            "name": name,
-            "timestamp": time.time(),
-            "attributes": attributes or {},
-        })
+        self.events.append(
+            {
+                "name": name,
+                "timestamp": time.time(),
+                "attributes": attributes or {},
+            }
+        )
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
@@ -108,16 +109,20 @@ class OpenTelemetryExporter:
         # Try to import OpenTelemetry
         self._otel_available = False
         try:
-            from opentelemetry import trace
-            from opentelemetry.sdk.trace import TracerProvider
-            self._otel_available = True
+            import importlib.util
+
+            self._otel_available = (
+                importlib.util.find_spec("opentelemetry") is not None
+                and importlib.util.find_spec("opentelemetry.sdk.trace") is not None
+            )
         except ImportError:
             pass
 
     def _generate_id(self, length: int = 16) -> str:
         """Generate a random ID."""
         import random
-        return ''.join(random.choices('0123456789abcdef', k=length))
+
+        return "".join(random.choices("0123456789abcdef", k=length))
 
     def start_trace(self) -> str:
         """Start a new trace and return trace ID."""
@@ -266,6 +271,7 @@ def trace_llm_call(
         def my_llm_function(prompt):
             return llm.complete(prompt)
     """
+
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             with exporter.start_span(span_name) as span:
@@ -279,8 +285,12 @@ def trace_llm_call(
                     if "usage" in result:
                         usage = result["usage"]
                         span.set_attribute("llm.prompt.tokens", usage.get("prompt_tokens", 0))
-                        span.set_attribute("llm.completion.tokens", usage.get("completion_tokens", 0))
+                        span.set_attribute(
+                            "llm.completion.tokens", usage.get("completion_tokens", 0)
+                        )
 
                 return result
+
         return wrapper
+
     return decorator
