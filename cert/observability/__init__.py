@@ -1,12 +1,47 @@
 """
-CERT Framework Observability
-=============================
+CERT Framework - Observability Module
 
-Observability modules for monitoring CERT Framework.
-
-Note: Prometheus integration was removed as premature complexity.
-For production monitoring, use the database layer with Supabase.
-See database/README.md for setup instructions.
+Production-grade observability for LLM systems including:
+- Telemetry: OpenTelemetry integration, Prometheus metrics, custom metrics
+- Visualization: Grafana dashboards, real-time UI
+- Alerting: Alert management, escalation rules, incident response
 """
 
-__all__ = []
+from cert.observability.telemetry import (
+    OpenTelemetryExporter,
+    PrometheusMetrics,
+    CustomMetrics,
+    MetricType,
+)
+from cert.observability.visualization import (
+    GrafanaDashboardGenerator,
+    RealTimeUI,
+)
+from cert.observability.alerting import (
+    AlertManager,
+    Alert,
+    AlertSeverity,
+    EscalationRule,
+    EscalationManager,
+    IncidentResponse,
+    Incident,
+)
+
+__all__ = [
+    # Telemetry
+    "OpenTelemetryExporter",
+    "PrometheusMetrics",
+    "CustomMetrics",
+    "MetricType",
+    # Visualization
+    "GrafanaDashboardGenerator",
+    "RealTimeUI",
+    # Alerting
+    "AlertManager",
+    "Alert",
+    "AlertSeverity",
+    "EscalationRule",
+    "EscalationManager",
+    "IncidentResponse",
+    "Incident",
+]
