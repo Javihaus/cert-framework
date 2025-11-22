@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -96,8 +97,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">C</span>
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                <Image
+                  src="/cert-logo.png"
+                  alt="CERT Framework"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  priority
+                />
               </div>
               {sidebarOpen && (
                 <motion.span
@@ -194,8 +202,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Bars3Icon className="h-6 w-6" />
           </button>
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold">C</span>
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+              <Image
+                src="/cert-logo.png"
+                alt="CERT Framework"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
             <span className="font-bold text-gray-900 dark:text-white">CERT</span>
           </Link>
