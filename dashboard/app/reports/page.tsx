@@ -154,7 +154,7 @@ export default function ReportsPage() {
               Generate and manage compliance reports for your AI systems
             </p>
           </div>
-          <button className="btn-primary flex items-center gap-2">
+          <button className="btn btn-primary flex items-center gap-2">
             <DocumentArrowDownIcon className="h-5 w-5" />
             Generate Report
           </button>

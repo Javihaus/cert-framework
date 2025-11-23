@@ -638,7 +638,7 @@ export default function SettingsPage() {
                         <span className="text-2xl font-bold text-white">JD</span>
                       </div>
                       <div>
-                        <button className="btn-secondary text-sm">Change Avatar</button>
+                        <button className="btn btn-secondary btn-sm">Change Avatar</button>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           JPG, GIF or PNG. Max 2MB.
                         </p>
@@ -774,7 +774,7 @@ export default function SettingsPage() {
                           </label>
                           <input type="password" className="input-field w-full" />
                         </div>
-                        <button className="btn-primary">Update Password</button>
+                        <button className="btn btn-primary">Update Password</button>
                       </div>
                     </div>
 
@@ -816,17 +816,17 @@ export default function SettingsPage() {
                             Use this key for production environments
                           </p>
                         </div>
-                        <button className="btn-secondary text-sm">Regenerate</button>
+                        <button className="btn btn-secondary btn-sm">Regenerate</button>
                       </div>
                       <div className="flex items-center gap-2">
                         <code className="flex-1 p-3 bg-gray-900 text-gray-100 rounded-lg text-sm font-mono">
                           cert_prod_••••••••••••••••••••••••
                         </code>
-                        <button className="btn-secondary text-sm">Copy</button>
+                        <button className="btn btn-secondary btn-sm">Copy</button>
                       </div>
                     </div>
 
-                    <button className="btn-primary">Create New API Key</button>
+                    <button className="btn btn-primary">Create New API Key</button>
                   </div>
                 </div>
               )}
@@ -873,7 +873,7 @@ export default function SettingsPage() {
                           >
                             {integration.status === 'connected' ? 'Connected' : 'Disconnected'}
                           </span>
-                          <button className="btn-secondary text-sm">
+                          <button className="btn btn-secondary btn-sm">
                             {integration.status === 'connected' ? 'Configure' : 'Connect'}
                           </button>
                         </div>
@@ -964,8 +964,8 @@ export default function SettingsPage() {
 
               {/* Save Button */}
               <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-4">
-                <button className="btn-secondary">Cancel</button>
-                <button onClick={handleSave} disabled={loading} className="btn-primary flex items-center gap-2">
+                <button className="btn btn-secondary">Cancel</button>
+                <button onClick={handleSave} disabled={loading} className="btn btn-primary flex items-center gap-2">
                   {saved && <CheckIcon className="h-4 w-4" />}
                   {saved ? 'Saved!' : loading ? 'Saving...' : 'Save Changes'}
                 </button>
