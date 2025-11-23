@@ -160,27 +160,21 @@ class MetricsEngine:
         Returns:
             CostMetric with value, trend, and breakdowns
         """
-        current_start, current_end, previous_start, previous_end = (
-            self._get_time_window_dates(time_window)
+        current_start, current_end, previous_start, previous_end = self._get_time_window_dates(
+            time_window
         )
 
-        current_traces = self._filter_traces_by_date(
-            self.traces, current_start, current_end
-        )
-        previous_traces = self._filter_traces_by_date(
-            self.traces, previous_start, previous_end
-        )
+        current_traces = self._filter_traces_by_date(self.traces, current_start, current_end)
+        previous_traces = self._filter_traces_by_date(self.traces, previous_start, previous_end)
 
         # Calculate current period cost
         current_cost = sum(
-            t.get("cost", 0) or t.get("metadata", {}).get("cost", 0) or 0
-            for t in current_traces
+            t.get("cost", 0) or t.get("metadata", {}).get("cost", 0) or 0 for t in current_traces
         )
 
         # Calculate previous period cost
         previous_cost = sum(
-            t.get("cost", 0) or t.get("metadata", {}).get("cost", 0) or 0
-            for t in previous_traces
+            t.get("cost", 0) or t.get("metadata", {}).get("cost", 0) or 0 for t in previous_traces
         )
 
         # Calculate trend
@@ -192,11 +186,7 @@ class MetricsEngine:
         # Breakdown by model
         by_model: Dict[str, float] = defaultdict(float)
         for trace in current_traces:
-            model = (
-                trace.get("model")
-                or trace.get("metadata", {}).get("model")
-                or "unknown"
-            )
+            model = trace.get("model") or trace.get("metadata", {}).get("model") or "unknown"
             cost = trace.get("cost", 0) or trace.get("metadata", {}).get("cost", 0) or 0
             by_model[model] += cost
 
@@ -204,9 +194,7 @@ class MetricsEngine:
         by_platform: Dict[str, float] = defaultdict(float)
         for trace in current_traces:
             platform = (
-                trace.get("platform")
-                or trace.get("metadata", {}).get("platform")
-                or "unknown"
+                trace.get("platform") or trace.get("metadata", {}).get("platform") or "unknown"
             )
             cost = trace.get("cost", 0) or trace.get("metadata", {}).get("cost", 0) or 0
             by_platform[platform] += cost
@@ -255,16 +243,12 @@ class MetricsEngine:
         Returns:
             HealthMetric with score, trend, and components
         """
-        current_start, current_end, previous_start, previous_end = (
-            self._get_time_window_dates(time_window)
+        current_start, current_end, previous_start, previous_end = self._get_time_window_dates(
+            time_window
         )
 
-        current_traces = self._filter_traces_by_date(
-            self.traces, current_start, current_end
-        )
-        previous_traces = self._filter_traces_by_date(
-            self.traces, previous_start, previous_end
-        )
+        current_traces = self._filter_traces_by_date(self.traces, current_start, current_end)
+        previous_traces = self._filter_traces_by_date(self.traces, previous_start, previous_end)
 
         if not current_traces:
             return HealthMetric(
@@ -276,11 +260,7 @@ class MetricsEngine:
             )
 
         # Calculate error rate
-        error_count = sum(
-            1
-            for t in current_traces
-            if t.get("error") or t.get("status") == "error"
-        )
+        error_count = sum(1 for t in current_traces if t.get("error") or t.get("status") == "error")
         error_rate = error_count / len(current_traces)
 
         # Calculate latencies
@@ -300,7 +280,9 @@ class MetricsEngine:
         # Calculate latency penalty (slow requests)
         threshold = self.config.health.p95_latency_threshold_ms
         slow_count = sum(1 for lat in latencies if lat > threshold)
-        latency_penalty = (slow_count / len(current_traces)) * self.config.health.latency_penalty_weight
+        latency_penalty = (
+            slow_count / len(current_traces)
+        ) * self.config.health.latency_penalty_weight
 
         # Calculate health score
         health_score = max(0.0, 100.0 * (1 - error_rate - latency_penalty))
@@ -315,9 +297,7 @@ class MetricsEngine:
         previous_health = 100.0
         if previous_traces:
             prev_error_count = sum(
-                1
-                for t in previous_traces
-                if t.get("error") or t.get("status") == "error"
+                1 for t in previous_traces if t.get("error") or t.get("status") == "error"
             )
             prev_error_rate = prev_error_count / len(previous_traces)
             prev_latencies = []
@@ -342,9 +322,9 @@ class MetricsEngine:
         # Identify issues
         issues = []
         if error_rate > self.config.health.critical_error_rate:
-            issues.append(f"Critical: Error rate ({error_rate*100:.1f}%) exceeds threshold")
+            issues.append(f"Critical: Error rate ({error_rate * 100:.1f}%) exceeds threshold")
         elif error_rate > self.config.health.warning_error_rate:
-            issues.append(f"Warning: Elevated error rate ({error_rate*100:.1f}%)")
+            issues.append(f"Warning: Elevated error rate ({error_rate * 100:.1f}%)")
 
         if p95_latency > self.config.health.p95_latency_threshold_ms:
             issues.append(f"Warning: P95 latency ({p95_latency:.0f}ms) exceeds threshold")
@@ -379,27 +359,19 @@ class MetricsEngine:
         Returns:
             QualityMetric with score, trend, and evaluation details
         """
-        current_start, current_end, previous_start, previous_end = (
-            self._get_time_window_dates(time_window)
+        current_start, current_end, previous_start, previous_end = self._get_time_window_dates(
+            time_window
         )
 
-        current_traces = self._filter_traces_by_date(
-            self.traces, current_start, current_end
-        )
-        previous_traces = self._filter_traces_by_date(
-            self.traces, previous_start, previous_end
-        )
+        current_traces = self._filter_traces_by_date(self.traces, current_start, current_end)
+        previous_traces = self._filter_traces_by_date(self.traces, previous_start, previous_end)
 
         method = self.config.quality.evaluation_method
 
         if method == "ground_truth" and self.config.quality.evaluation_dataset_path:
-            return self._quality_from_ground_truth(
-                current_traces, previous_traces, time_window
-            )
+            return self._quality_from_ground_truth(current_traces, previous_traces, time_window)
 
-        return self._quality_from_semantic_consistency(
-            current_traces, previous_traces, time_window
-        )
+        return self._quality_from_semantic_consistency(current_traces, previous_traces, time_window)
 
     def _quality_from_semantic_consistency(
         self,
@@ -421,20 +393,24 @@ class MetricsEngine:
             if "evaluation" in trace:
                 eval_result = trace["evaluation"]
                 score = eval_result.get("confidence", 0) * 100
-                evaluations.append({
-                    "passed": eval_result.get("matched", False),
-                    "score": score,
-                })
+                evaluations.append(
+                    {
+                        "passed": eval_result.get("matched", False),
+                        "score": score,
+                    }
+                )
                 model = trace.get("model", "unknown")
                 by_model[model].append(score)
 
             # Check for confidence in metadata
             elif trace.get("metadata", {}).get("confidence"):
                 conf = trace["metadata"]["confidence"]
-                evaluations.append({
-                    "passed": conf >= self.config.quality.semantic_threshold,
-                    "score": conf * 100,
-                })
+                evaluations.append(
+                    {
+                        "passed": conf >= self.config.quality.semantic_threshold,
+                        "score": conf * 100,
+                    }
+                )
                 model = trace.get("model", "unknown")
                 by_model[model].append(conf * 100)
 
@@ -445,11 +421,17 @@ class MetricsEngine:
                 answer_len = len(trace.get("answer", ""))
                 context_len = len(trace.get("context", ""))
                 # Simple heuristic score
-                score = min(100, (answer_len / max(context_len, 1)) * 50 + 50) if context_len > 0 else 50
-                evaluations.append({
-                    "passed": score >= self.config.quality.semantic_threshold * 100,
-                    "score": score,
-                })
+                score = (
+                    min(100, (answer_len / max(context_len, 1)) * 50 + 50)
+                    if context_len > 0
+                    else 50
+                )
+                evaluations.append(
+                    {
+                        "passed": score >= self.config.quality.semantic_threshold * 100,
+                        "score": score,
+                    }
+                )
                 model = trace.get("model", "unknown")
                 by_model[model].append(score)
 
@@ -469,8 +451,7 @@ class MetricsEngine:
 
         # Calculate by-model quality
         model_quality = {
-            model: statistics.mean(scores) if scores else 0
-            for model, scores in by_model.items()
+            model: statistics.mean(scores) if scores else 0 for model, scores in by_model.items()
         }
 
         # Calculate previous quality for trend
