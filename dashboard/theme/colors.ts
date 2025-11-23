@@ -112,6 +112,19 @@ export const colors = {
     fill: 'rgba(37, 99, 235, 0.1)',
     grid: '#F4F4F5',
   },
+
+  // Icon Colors - Consistent across all pages
+  // Rule: Same icon = Same color everywhere
+  icon: {
+    orange: '#E7640E',    // LayoutDashboard, FileText (Reports)
+    yellow: '#E6AA11',    // Euro, DollarSign, FileText (Assessment)
+    teal: '#4F8383',      // Activity, BarChart3, Settings, Clock
+    purple: '#883381',    // Shield, Zap, Sparkles
+    pink: '#E84C88',      // Heart
+    success: '#10B981',   // CheckCircle (success states)
+    error: '#EF4444',     // XCircle (error states)
+    warning: '#F59E0B',   // AlertTriangle (warning states)
+  },
 } as const;
 
 // Type exports for TypeScript

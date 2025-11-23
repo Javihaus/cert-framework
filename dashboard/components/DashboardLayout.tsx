@@ -26,6 +26,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { colors } from '@/theme/colors';
 
 interface NavItem {
   name: string;
@@ -41,13 +42,8 @@ interface NavSection {
   items: NavItem[];
 }
 
-// Icon color palette based on design spec
-const iconColors = {
-  orange: '#E7640E',
-  yellow: '#E6AA11',
-  teal: '#4F8383',
-  purple: '#883381',
-};
+// Icon colors from theme for consistency across all pages
+const iconColors = colors.icon;
 
 const navigation: NavSection[] = [
   {

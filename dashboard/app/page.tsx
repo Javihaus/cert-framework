@@ -30,6 +30,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { colors } from '@/theme/colors';
+
+// Icon colors for consistency across all pages
+const iconColors = colors.icon;
 
 // API base URL - configurable for different environments
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -114,6 +118,7 @@ function PrimaryMetricCard({
   trend,
   trendDirection,
   icon: Icon,
+  iconColor,
   subtitle,
   status,
   colorClass,
@@ -124,6 +129,7 @@ function PrimaryMetricCard({
   trend: string;
   trendDirection: 'up' | 'down' | 'stable';
   icon: React.ElementType;
+  iconColor: string;
   subtitle: string;
   status?: 'healthy' | 'degraded' | 'critical';
   colorClass: string;
@@ -147,7 +153,7 @@ function PrimaryMetricCard({
     >
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-xl ${colorClass}`}>
-          <Icon className="w-6 h-6" />
+          <Icon className="w-6 h-6" style={{ color: iconColor }} />
         </div>
         {status && (
           <span className={`badge ${
@@ -386,8 +392,9 @@ export default function Dashboard() {
             trend={metrics.cost.trend_display}
             trendDirection={metrics.cost.trend_direction}
             icon={Euro}
+            iconColor={iconColors.yellow}
             subtitle={`${timeWindowLabel} • ${metrics.cost.trace_count.toLocaleString()} requests`}
-            colorClass="bg-success-50 dark:bg-success-500/20 text-success-600"
+            colorClass="bg-amber-50 dark:bg-amber-500/20"
           />
 
           {/* Health Metric */}
@@ -397,9 +404,10 @@ export default function Dashboard() {
             trend={metrics.health.trend_display}
             trendDirection={metrics.health.trend_direction}
             icon={Heart}
+            iconColor={iconColors.pink}
             subtitle={`${metrics.health.error_rate.toFixed(2)}% errors • ${Math.round(metrics.health.p95_latency)}ms p95`}
             status={metrics.health.status}
-            colorClass="bg-error-50 dark:bg-error-500/20 text-error-600"
+            colorClass="bg-pink-50 dark:bg-pink-500/20"
           />
 
           {/* Quality Metric */}
@@ -409,8 +417,9 @@ export default function Dashboard() {
             trend={metrics.quality.trend_display}
             trendDirection={metrics.quality.trend_direction}
             icon={Sparkles}
+            iconColor={iconColors.purple}
             subtitle={metrics.quality.method_display}
-            colorClass="bg-purple-50 dark:bg-purple-500/20 text-purple-600"
+            colorClass="bg-purple-50 dark:bg-purple-500/20"
           />
         </div>
       )}
@@ -512,7 +521,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-porpoise" />
+                    <Clock className="w-4 h-4" style={{ color: iconColors.teal }} />
                     <span className="text-sm text-porpoise">P95 Latency</span>
                   </div>
                   <span className="text-sm font-medium text-midnight dark:text-white">
@@ -526,7 +535,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     {metrics.health.issues.map((issue, idx) => (
                       <div key={idx} className="flex items-start gap-2 text-sm">
-                        <AlertTriangle className="w-4 h-4 text-warning-500 flex-shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: iconColors.warning }} />
                         <span className="text-porpoise">{issue}</span>
                       </div>
                     ))}
@@ -562,7 +571,7 @@ export default function Dashboard() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-success-500" />
+                    <CheckCircle className="w-4 h-4" style={{ color: iconColors.success }} />
                     <span className="text-sm text-porpoise">Passed</span>
                   </div>
                   <span className="text-sm font-medium text-midnight dark:text-white">
@@ -571,7 +580,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <XCircle className="w-4 h-4 text-error-500" />
+                    <XCircle className="w-4 h-4" style={{ color: iconColors.error }} />
                     <span className="text-sm text-porpoise">Failed</span>
                   </div>
                   <span className="text-sm font-medium text-midnight dark:text-white">
@@ -593,8 +602,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/monitoring" className="card p-5 hover:shadow-md transition-shadow group">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-50 dark:bg-planetarium/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Activity className="w-5 h-5 text-planetarium" />
+            <div className="p-3 bg-teal-50 dark:bg-teal-500/20 rounded-xl group-hover:scale-105 transition-transform">
+              <Activity className="w-5 h-5" style={{ color: iconColors.teal }} />
             </div>
             <div>
               <h4 className="font-medium text-midnight dark:text-white">Live Monitoring</h4>
@@ -605,8 +614,8 @@ export default function Dashboard() {
 
         <Link href="/optimization" className="card p-5 hover:shadow-md transition-shadow group">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-success-50 dark:bg-success-500/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 text-success-600" />
+            <div className="p-3 bg-purple-50 dark:bg-purple-500/20 rounded-xl group-hover:scale-105 transition-transform">
+              <Zap className="w-5 h-5" style={{ color: iconColors.purple }} />
             </div>
             <div>
               <h4 className="font-medium text-midnight dark:text-white">Optimization</h4>
@@ -618,7 +627,7 @@ export default function Dashboard() {
         <Link href="/compliance" className="card p-5 hover:shadow-md transition-shadow group">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-purple-50 dark:bg-purple-500/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Shield className="w-5 h-5 text-purple-600" />
+              <Shield className="w-5 h-5" style={{ color: iconColors.purple }} />
             </div>
             <div>
               <h4 className="font-medium text-midnight dark:text-white">Compliance</h4>
