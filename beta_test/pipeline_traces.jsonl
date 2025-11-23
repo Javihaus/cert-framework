@@ -1,0 +1,6 @@
+{"timestamp": "2025-11-23T17:27:09.875481Z", "event": "pipeline_start", "document": "sample_financial_report.txt"}
+{"timestamp": "2025-11-23T17:27:10.932671Z", "event": "pipeline_complete", "document": "sample_financial_report.txt", "total_time_ms": 1057.07, "extraction_confidence": 0.92, "report_word_count": 0, "llm_calls": 2, "status": "success"}
+{"timestamp": "2025-11-23T17:27:09.875442Z", "function": "process_document", "duration_ms": 1057.5895309448242, "status": "success", "error": null, "metadata": {"component": "pipeline_orchestrator"}}
+{"timestamp": "2025-11-23T17:27:10.933490Z", "event": "pipeline_start", "document": "sample_research_paper.txt"}
+{"timestamp": "2025-11-23T17:27:12.106859Z", "event": "pipeline_complete", "document": "sample_research_paper.txt", "total_time_ms": 1173.3, "extraction_confidence": 0.92, "report_word_count": 0, "llm_calls": 4, "status": "success"}
+{"timestamp": "2025-11-23T17:27:10.933433Z", "function": "process_document", "duration_ms": 1173.793077468872, "status": "success", "error": null, "metadata": {"component": "pipeline_orchestrator"}}
