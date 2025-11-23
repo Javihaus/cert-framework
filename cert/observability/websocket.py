@@ -27,17 +27,18 @@ import asyncio
 import json
 import logging
 import threading
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Set
-from dataclasses import dataclass, asdict
+from typing import Any, Callable, Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 # Check for websockets library
 try:
     import websockets
-    from websockets.server import serve as websockets_serve
     from websockets.exceptions import ConnectionClosed
+    from websockets.server import serve as websockets_serve
+
     WEBSOCKETS_AVAILABLE = True
 except ImportError:
     WEBSOCKETS_AVAILABLE = False
@@ -47,6 +48,7 @@ except ImportError:
 @dataclass
 class TraceEvent:
     """Real-time trace event for WebSocket streaming."""
+
     event_type: str  # "trace", "metric", "alert", "heartbeat"
     timestamp: str
     data: Dict[str, Any]
@@ -74,12 +76,7 @@ class WebSocketTraceServer:
         server.stop()
     """
 
-    def __init__(
-        self,
-        host: str = "localhost",
-        port: int = 8765,
-        heartbeat_interval: int = 30
-    ):
+    def __init__(self, host: str = "localhost", port: int = 8765, heartbeat_interval: int = 30):
         """
         Initialize WebSocket trace server.
 
@@ -111,12 +108,19 @@ class WebSocketTraceServer:
 
         try:
             # Send welcome message
-            await websocket.send(json.dumps({
-                "event_type": "connected",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "data": {"message": "Connected to CERT trace stream", "client_id": client_id},
-                "source": "cert"
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "event_type": "connected",
+                        "timestamp": datetime.utcnow().isoformat() + "Z",
+                        "data": {
+                            "message": "Connected to CERT trace stream",
+                            "client_id": client_id,
+                        },
+                        "source": "cert",
+                    }
+                )
+            )
 
             # Keep connection alive and handle incoming messages
             async for message in websocket:
@@ -124,12 +128,16 @@ class WebSocketTraceServer:
                 try:
                     data = json.loads(message)
                     if data.get("type") == "ping":
-                        await websocket.send(json.dumps({
-                            "event_type": "pong",
-                            "timestamp": datetime.utcnow().isoformat() + "Z",
-                            "data": {},
-                            "source": "cert"
-                        }))
+                        await websocket.send(
+                            json.dumps(
+                                {
+                                    "event_type": "pong",
+                                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                                    "data": {},
+                                    "source": "cert",
+                                }
+                            )
+                        )
                 except json.JSONDecodeError:
                     pass
 
@@ -143,12 +151,14 @@ class WebSocketTraceServer:
         """Send periodic heartbeat to all clients."""
         while self._running:
             if self.clients:
-                message = json.dumps({
-                    "event_type": "heartbeat",
-                    "timestamp": datetime.utcnow().isoformat() + "Z",
-                    "data": {"clients": len(self.clients)},
-                    "source": "cert"
-                })
+                message = json.dumps(
+                    {
+                        "event_type": "heartbeat",
+                        "timestamp": datetime.utcnow().isoformat() + "Z",
+                        "data": {"clients": len(self.clients)},
+                        "source": "cert",
+                    }
+                )
                 await self._broadcast_async(message)
 
             await asyncio.sleep(self.heartbeat_interval)
@@ -187,16 +197,13 @@ class WebSocketTraceServer:
         event = TraceEvent(
             event_type="trace",
             timestamp=trace_data.get("timestamp", datetime.utcnow().isoformat() + "Z"),
-            data=trace_data
+            data=trace_data,
         )
 
         message = json.dumps(asdict(event), default=str)
 
         # Schedule broadcast in event loop
-        asyncio.run_coroutine_threadsafe(
-            self._broadcast_async(message),
-            self._loop
-        )
+        asyncio.run_coroutine_threadsafe(self._broadcast_async(message), self._loop)
 
     def broadcast_metric(self, metric_name: str, value: float, tags: Optional[Dict] = None) -> None:
         """
@@ -213,19 +220,12 @@ class WebSocketTraceServer:
         event = TraceEvent(
             event_type="metric",
             timestamp=datetime.utcnow().isoformat() + "Z",
-            data={
-                "metric": metric_name,
-                "value": value,
-                "tags": tags or {}
-            }
+            data={"metric": metric_name, "value": value, "tags": tags or {}},
         )
 
         message = json.dumps(asdict(event), default=str)
 
-        asyncio.run_coroutine_threadsafe(
-            self._broadcast_async(message),
-            self._loop
-        )
+        asyncio.run_coroutine_threadsafe(self._broadcast_async(message), self._loop)
 
     def broadcast_alert(self, alert_type: str, message: str, severity: str = "info") -> None:
         """
@@ -242,19 +242,12 @@ class WebSocketTraceServer:
         event = TraceEvent(
             event_type="alert",
             timestamp=datetime.utcnow().isoformat() + "Z",
-            data={
-                "alert_type": alert_type,
-                "message": message,
-                "severity": severity
-            }
+            data={"alert_type": alert_type, "message": message, "severity": severity},
         )
 
         message_str = json.dumps(asdict(event), default=str)
 
-        asyncio.run_coroutine_threadsafe(
-            self._broadcast_async(message_str),
-            self._loop
-        )
+        asyncio.run_coroutine_threadsafe(self._broadcast_async(message_str), self._loop)
 
     async def _run_server(self) -> None:
         """Run the WebSocket server."""
@@ -341,7 +334,7 @@ class WebSocketTracer:
         self,
         log_path: str = "cert_traces.jsonl",
         ws_server: Optional[WebSocketTraceServer] = None,
-        on_trace: Optional[Callable[[Dict], None]] = None
+        on_trace: Optional[Callable[[Dict], None]] = None,
     ):
         """
         Initialize WebSocket-enabled tracer.
@@ -352,6 +345,7 @@ class WebSocketTracer:
             on_trace: Callback function called for each trace (optional)
         """
         from cert.core.tracer import CertTracer
+
         self._file_tracer = CertTracer(log_path)
         self._ws_server = ws_server
         self._on_trace = on_trace
@@ -383,7 +377,7 @@ def create_streaming_tracer(
     log_path: str = "cert_traces.jsonl",
     ws_host: str = "localhost",
     ws_port: int = 8765,
-    auto_start: bool = True
+    auto_start: bool = True,
 ) -> tuple:
     """
     Create a tracer with WebSocket streaming enabled.
