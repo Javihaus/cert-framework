@@ -15,6 +15,8 @@ Stop guessing. Know exactly what your AI systems cost, how they perform, and whe
 [![Tests](https://img.shields.io/github/actions/workflow/status/javihaus/cert-framework/cert.yml?style=for-the-badge&logo=github&label=tests)](https://github.com/Javihaus/cert-framework/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=for-the-badge&logo=apache&logoColor=white)](LICENSE)
 
+---
+
 **[Quick Start](#quick-start)** • **[Monitoring](#monitoring)** • **[Cost Analysis](#cost-analysis)** • **[Compliance](#compliance)** • **[Dashboard](#dashboard)**
 
 </div>
