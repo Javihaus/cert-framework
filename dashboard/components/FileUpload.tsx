@@ -52,7 +52,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
         id="file-upload"
       />
 
-      <label htmlFor="file-upload" className="cursor-pointer">
+      <label htmlFor="file-upload" className="cursor-pointer flex justify-center">
         <Button
           variant="secondary"
           icon={<Upload size={20} />}
