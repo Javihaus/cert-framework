@@ -22,6 +22,8 @@ from cert.integrations.registry import (
     get_active_connectors,
     get_connector_status,
 )
+from cert.metrics.engine import MetricsEngine
+from cert.metrics.config import MetricConfig
 from cert.value.analyzer import CostAnalyzer
 from cert.value.optimizer import Optimizer
 
@@ -64,6 +66,12 @@ def root():
         "version": "4.0.0",
         "status": "running",
         "endpoints": [
+            "/api/metrics",
+            "/api/metrics/summary",
+            "/api/metrics/cost",
+            "/api/metrics/health",
+            "/api/metrics/quality",
+            "/api/metrics/config",
             "/api/connectors/status",
             "/api/connectors/health",
             "/api/costs/summary",
@@ -78,6 +86,159 @@ def root():
 def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+
+# Global metrics engine instance
+_metrics_engine: Optional[MetricsEngine] = None
+_metrics_config: Optional[MetricConfig] = None
+
+
+def get_metrics_engine() -> MetricsEngine:
+    """Get or create the global metrics engine instance."""
+    global _metrics_engine, _metrics_config
+    if _metrics_engine is None:
+        _metrics_config = _metrics_config or MetricConfig.default()
+        _metrics_engine = MetricsEngine(str(_trace_file), _metrics_config)
+    return _metrics_engine
+
+
+# Metrics endpoints - Primary dashboard API
+@app.get("/api/metrics")
+def get_metrics(time_window: str = "week"):
+    """
+    Get all three primary metrics (Cost, Health, Quality).
+
+    This is the primary endpoint for the dashboard overview.
+
+    Args:
+        time_window: Time window for metrics (hour, day, week, month)
+
+    Returns:
+        Complete metrics snapshot with cost, health, and quality
+    """
+    try:
+        engine = get_metrics_engine()
+        engine.reload_traces()  # Ensure fresh data
+        metrics = engine.get_metrics(time_window)
+        return metrics.to_dict()
+    except Exception as e:
+        logger.error(f"Failed to get metrics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/summary")
+def get_metrics_summary(time_window: str = "week"):
+    """
+    Get simplified metrics summary for quick dashboard display.
+
+    Returns display-ready strings with trend indicators.
+    """
+    try:
+        engine = get_metrics_engine()
+        engine.reload_traces()
+        return engine.get_metrics_summary(time_window)
+    except Exception as e:
+        logger.error(f"Failed to get metrics summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/cost")
+def get_cost_metric(time_window: str = "week"):
+    """
+    Get detailed cost metric.
+
+    Includes breakdown by model and platform.
+    """
+    try:
+        engine = get_metrics_engine()
+        engine.reload_traces()
+        return engine.cost_metric(time_window).to_dict()
+    except Exception as e:
+        logger.error(f"Failed to get cost metric: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/health")
+def get_health_metric(time_window: str = "week"):
+    """
+    Get detailed health metric.
+
+    Includes error rate, latency stats, and issues.
+    """
+    try:
+        engine = get_metrics_engine()
+        engine.reload_traces()
+        return engine.health_metric(time_window).to_dict()
+    except Exception as e:
+        logger.error(f"Failed to get health metric: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/quality")
+def get_quality_metric(time_window: str = "week"):
+    """
+    Get detailed quality metric.
+
+    Includes evaluation method and accuracy breakdown.
+    """
+    try:
+        engine = get_metrics_engine()
+        engine.reload_traces()
+        return engine.quality_metric(time_window).to_dict()
+    except Exception as e:
+        logger.error(f"Failed to get quality metric: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/config")
+def get_metrics_config():
+    """Get current metrics configuration."""
+    try:
+        global _metrics_config
+        if _metrics_config is None:
+            _metrics_config = MetricConfig.default()
+        return _metrics_config.to_dict()
+    except Exception as e:
+        logger.error(f"Failed to get metrics config: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class MetricConfigUpdate(BaseModel):
+    """Model for metrics configuration update."""
+
+    cost: Optional[Dict[str, Any]] = None
+    health: Optional[Dict[str, Any]] = None
+    quality: Optional[Dict[str, Any]] = None
+    default_time_window: Optional[str] = None
+
+
+@app.put("/api/metrics/config")
+def update_metrics_config(update: MetricConfigUpdate):
+    """Update metrics configuration."""
+    try:
+        global _metrics_config, _metrics_engine
+
+        current_config = _metrics_config or MetricConfig.default()
+        config_dict = current_config.to_dict()
+
+        # Apply updates
+        if update.cost:
+            config_dict["cost"].update(update.cost)
+        if update.health:
+            config_dict["health"].update(update.health)
+        if update.quality:
+            config_dict["quality"].update(update.quality)
+        if update.default_time_window:
+            config_dict["default_time_window"] = update.default_time_window
+
+        # Create new config and reset engine
+        _metrics_config = MetricConfig.from_dict(config_dict)
+        _metrics_engine = None  # Will be recreated on next request
+
+        return {"success": True, "config": _metrics_config.to_dict()}
+    except Exception as e:
+        logger.error(f"Failed to update metrics config: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Connector endpoints
