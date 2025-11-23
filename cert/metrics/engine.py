@@ -17,8 +17,8 @@ from cert.metrics.config import MetricConfig
 from cert.metrics.types import (
     CostMetric,
     HealthMetric,
-    QualityMetric,
     MetricsSnapshot,
+    QualityMetric,
     TimeWindow,
 )
 
@@ -299,7 +299,7 @@ class MetricsEngine:
 
         # Calculate latency penalty (slow requests)
         threshold = self.config.health.p95_latency_threshold_ms
-        slow_count = sum(1 for l in latencies if l > threshold)
+        slow_count = sum(1 for lat in latencies if lat > threshold)
         latency_penalty = (slow_count / len(current_traces)) * self.config.health.latency_penalty_weight
 
         # Calculate health score
@@ -307,7 +307,7 @@ class MetricsEngine:
 
         # Calculate SLA compliance
         sla_compliant_count = sum(
-            1 for l in latencies if l <= self.config.health.max_latency_threshold_ms
+            1 for lat in latencies if lat <= self.config.health.max_latency_threshold_ms
         )
         sla_compliance = (sla_compliant_count / len(latencies) * 100) if latencies else 100.0
 
@@ -329,7 +329,7 @@ class MetricsEngine:
                 )
                 if latency is not None:
                     prev_latencies.append(latency)
-            prev_slow_count = sum(1 for l in prev_latencies if l > threshold)
+            prev_slow_count = sum(1 for lat in prev_latencies if lat > threshold)
             prev_latency_penalty = (
                 (prev_slow_count / len(previous_traces)) * self.config.health.latency_penalty_weight
                 if previous_traces
