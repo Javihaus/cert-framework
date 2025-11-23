@@ -351,30 +351,27 @@ export default function Dashboard() {
             disabled={loading}
             className="p-2 bg-white dark:bg-midnight border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-5 h-5 text-porpoise ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 text-porpoise dark:text-white ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
             href="/settings"
             className="p-2 bg-white dark:bg-midnight border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
           >
-            <Settings className="w-5 h-5 text-porpoise" />
+            <Settings className="w-5 h-5 text-porpoise dark:text-white" />
           </Link>
         </div>
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="bg-warning-50 dark:bg-warning-500/10 border border-warning-200 dark:border-warning-500/20 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-warning-600" />
-            <div>
-              <span className="text-sm font-medium text-warning-800 dark:text-warning-200">
-                Using demo data - {error}
-              </span>
-              <p className="text-xs text-warning-600 dark:text-warning-300 mt-1">
-                Connect to the API server to see real metrics
-              </p>
-            </div>
+        <div className="bg-info-50 dark:bg-info-500/10 border border-info-200 dark:border-info-500/20 rounded-xl p-4">
+          <div>
+            <span className="text-sm font-medium text-info-800 dark:text-info-200">
+              Using demo data - {error}
+            </span>
+            <p className="text-xs text-info-600 dark:text-info-300 mt-1">
+              Connect to the API server to see real metrics
+            </p>
           </div>
         </div>
       )}
