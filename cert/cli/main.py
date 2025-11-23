@@ -35,11 +35,18 @@ def measure_cmd(text1, text2, detailed):
         cert measure "Apple's revenue was $450B" "Apple's revenue was $89.5B"
         cert measure "The cat sat" "A feline was sitting" --detailed
     """
+    # Show loading message - models can take 30+ seconds to load on first run
+    click.echo("Loading evaluation models...", err=True)
+    click.echo("(First run may take 30+ seconds to download models)", err=True)
+
     try:
         from cert.measure import measure, measure_detailed
     except ImportError:
-        click.echo("Error: Install cert-framework to use measure", err=True)
+        click.echo("\nError: Evaluation features required for 'measure' command.", err=True)
+        click.echo("Install with: pip install cert-framework[evaluation]", err=True)
         sys.exit(1)
+
+    click.echo("Models ready.\n", err=True)
 
     if detailed:
         result = measure_detailed(text1, text2)
@@ -76,7 +83,8 @@ def report(trace_file, format, output, system_name, system_version, provider_nam
     try:
         from cert.compliance.reporter import ComplianceReporter
     except ImportError:
-        click.echo("Error: Install cert-framework for compliance reports", err=True)
+        click.echo("Error: Compliance features required for 'report' command.", err=True)
+        click.echo("Install with: pip install cert-framework[compliance]", err=True)
         sys.exit(1)
 
     click.echo(f"Generating {format} compliance report...")

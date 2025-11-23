@@ -374,12 +374,66 @@ cert compliance \
 
 ---
 
+## Environment Setup
+
+### API Keys
+
+Set up API keys for your LLM provider:
+
+```bash
+# OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# Anthropic
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# AWS Bedrock (uses AWS credentials)
+export AWS_ACCESS_KEY_ID="..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_DEFAULT_REGION="us-east-1"
+```
+
+### LangChain Integration
+
+For LangChain-based applications, install the required extras:
+
+```bash
+pip install cert-framework[langchain,anthropic]  # For Claude
+pip install cert-framework[langchain,openai]     # For OpenAI
+```
+
+Example with LangChain + Claude:
+
+```python
+from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import HumanMessage
+from cert.integrations.langchain_connector import LangChainConnector, CERTCallbackHandler
+from cert.core.tracer import CertTracer
+
+# Initialize CERT callback
+tracer = CertTracer("cert_traces.jsonl")
+connector = LangChainConnector(tracer)
+connector.activate()
+
+# Use with LangChain
+llm = ChatAnthropic(
+    model="claude-sonnet-4-20250514",
+    callbacks=[connector.handler]
+)
+
+response = llm.invoke([HumanMessage(content="Hello!")])
+```
+
+For a complete multi-agent pipeline example, see `examples/04_agentic_pipeline.py`.
+
+---
+
 ## Supported Models & Pricing
 
 CERT automatically tracks costs for these models:
 
-**OpenAI**: GPT-4, GPT-4 Turbo, GPT-3.5 Turbo, text-embedding-ada-002  
-**Anthropic**: Claude 3 Opus, Claude 3 Sonnet, Claude 3 Haiku  
+**OpenAI**: GPT-4, GPT-4 Turbo, GPT-3.5 Turbo, text-embedding-ada-002
+**Anthropic**: Claude 4 Sonnet, Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus, Claude 3 Sonnet, Claude 3 Haiku
 **AWS Bedrock**: Claude, Llama 2, Titan, Cohere Command
 
 Pricing is updated automatically from provider rate cards.

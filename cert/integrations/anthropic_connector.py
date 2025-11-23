@@ -27,11 +27,20 @@ from cert.integrations.registry import register_connector
 logger = logging.getLogger(__name__)
 
 
-# Anthropic pricing per 1M tokens (as of January 2025)
+# Anthropic pricing per 1M tokens (as of November 2025)
+# Source: https://www.anthropic.com/pricing
 ANTHROPIC_PRICING = {
+    # Claude 4 models (2025)
+    "claude-sonnet-4": {"input": 3.0, "output": 15.0},
+    "claude-4-sonnet": {"input": 3.0, "output": 15.0},  # Alias
+    # Claude 3.5 models (2024-2025)
+    "claude-3-5-sonnet": {"input": 3.0, "output": 15.0},
+    "claude-3-5-haiku": {"input": 0.80, "output": 4.0},
+    # Claude 3 models (2024)
     "claude-3-opus": {"input": 15.0, "output": 75.0},
     "claude-3-sonnet": {"input": 3.0, "output": 15.0},
     "claude-3-haiku": {"input": 0.25, "output": 1.25},
+    # Legacy models
     "claude-2.1": {"input": 8.0, "output": 24.0},
     "claude-2.0": {"input": 8.0, "output": 24.0},
     "claude-instant": {"input": 0.80, "output": 2.40},

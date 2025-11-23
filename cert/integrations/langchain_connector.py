@@ -9,6 +9,8 @@ Unlike other connectors that use monkey-patching, this connector implements
 LangChain's BaseCallbackHandler interface to hook into the framework's
 event system.
 
+Supports both LangChain v0.1+ (langchain_core) and legacy versions.
+
 Usage:
     >>> import cert.integrations.auto  # Auto-activates this connector
     >>> # Or manually:
@@ -17,9 +19,11 @@ Usage:
     >>> connector = LangChainConnector(get_tracer())
     >>> connector.activate()
     >>>
-    >>> # Use the handler in your chains
-    >>> from langchain.chains import LLMChain
-    >>> chain = LLMChain(llm=llm, callbacks=[connector.handler])
+    >>> # Use the handler in your chains (LangChain v0.1+)
+    >>> from langchain_anthropic import ChatAnthropic
+    >>> from langchain_core.messages import HumanMessage
+    >>> llm = ChatAnthropic(model="claude-sonnet-4-20250514", callbacks=[connector.handler])
+    >>> response = llm.invoke([HumanMessage(content="Hello!")])
 """
 
 import logging
@@ -28,19 +32,27 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 try:
-    from langchain.callbacks.base import BaseCallbackHandler
-    from langchain.schema import LLMResult
+    # Try langchain_core first (LangChain v0.1+)
+    from langchain_core.callbacks import BaseCallbackHandler
+    from langchain_core.outputs import LLMResult
 
     LANGCHAIN_AVAILABLE = True
 except ImportError:
-    LANGCHAIN_AVAILABLE = False
+    try:
+        # Fallback to legacy imports (LangChain < v0.1)
+        from langchain.callbacks.base import BaseCallbackHandler
+        from langchain.schema import LLMResult
 
-    # Create dummy classes if LangChain is not installed
-    class BaseCallbackHandler:
-        pass
+        LANGCHAIN_AVAILABLE = True
+    except ImportError:
+        LANGCHAIN_AVAILABLE = False
 
-    class LLMResult:  # type: ignore
-        pass
+        # Create dummy classes if LangChain is not installed
+        class BaseCallbackHandler:
+            pass
+
+        class LLMResult:  # type: ignore
+            pass
 
 
 from cert.integrations.base import ConnectorAdapter, TracedCall

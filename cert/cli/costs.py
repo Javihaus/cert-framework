@@ -40,6 +40,13 @@ def costs_cmd(traces_file, days, format):
         click.echo(f"Daily Average: ${costs['daily_average']:.2f}")
         click.echo(f"Monthly Projection: ${costs['monthly_projection']:.2f}\n")
 
+        # Warn if no cost data found
+        if costs['total'] == 0:
+            click.echo("⚠️  Warning: No cost data found in traces.", err=True)
+            click.echo("   Ensure your traces include 'cost' field or use auto-instrumentation", err=True)
+            click.echo("   with: import cert.integrations.auto", err=True)
+            click.echo()
+
         click.echo("Top Models by Cost:")
         for i, (model, cost) in enumerate(list(summary["by_model"].items())[:5], 1):
             percentage = (cost / costs["total"] * 100) if costs["total"] > 0 else 0
