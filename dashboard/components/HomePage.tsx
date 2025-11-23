@@ -3,6 +3,14 @@
 import { BarChart3, FileText, ShieldCheck, Clock, CheckCircle2 } from 'lucide-react';
 import Card from '@/components/Card';
 
+// Icon color palette based on design spec
+const iconColors = {
+  orange: '#E7640E',
+  yellow: '#E6AA11',
+  teal: '#4F8383',
+  purple: '#883381',
+};
+
 export default function HomePage() {
   return (
     <div>
@@ -27,7 +35,7 @@ export default function HomePage() {
         </p>
         <div className="bg-zinc-100 dark:bg-zinc-800 p-6 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 size={28} className="text-blue-600" />
+            <CheckCircle2 size={28} style={{ color: iconColors.teal }} />
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Built for Compliance Consultants
             </h3>
@@ -44,7 +52,7 @@ export default function HomePage() {
         {/* Monitoring */}
         <Card className="p-8">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+            <div className="w-14 h-14 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: iconColors.teal }}>
               <BarChart3 size={32} />
             </div>
             <div className="flex-1">
@@ -67,7 +75,7 @@ export default function HomePage() {
         {/* Document Generation */}
         <Card className="p-8">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-14 h-14 bg-amber-500 rounded-lg flex items-center justify-center text-white">
+            <div className="w-14 h-14 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: iconColors.yellow }}>
               <FileText size={32} />
             </div>
             <div className="flex-1">
@@ -97,7 +105,7 @@ export default function HomePage() {
         <div className="flex flex-col gap-6">
           {/* Step 1 */}
           <div className="flex items-start gap-6">
-            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="min-w-[44px] h-11 text-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: iconColors.teal }}>
               1
             </div>
             <div>
@@ -113,7 +121,7 @@ export default function HomePage() {
 
           {/* Step 2 */}
           <div className="flex items-start gap-6">
-            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="min-w-[44px] h-11 text-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: iconColors.teal }}>
               2
             </div>
             <div>
@@ -129,7 +137,7 @@ export default function HomePage() {
 
           {/* Step 3 */}
           <div className="flex items-start gap-6">
-            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="min-w-[44px] h-11 text-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: iconColors.teal }}>
               3
             </div>
             <div>
@@ -145,7 +153,7 @@ export default function HomePage() {
 
           {/* Step 4 */}
           <div className="flex items-start gap-6">
-            <div className="min-w-[44px] h-11 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="min-w-[44px] h-11 text-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: iconColors.teal }}>
               4
             </div>
             <div>
@@ -166,7 +174,7 @@ export default function HomePage() {
         <div className="flex gap-16">
           <div className="flex-1">
             <div className="flex items-center gap-1 mb-2">
-              <ShieldCheck size={20} className="text-blue-600" />
+              <ShieldCheck size={20} style={{ color: iconColors.purple }} />
               <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 EU AI Act Focus
               </span>
@@ -180,7 +188,7 @@ export default function HomePage() {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-1 mb-2">
-              <FileText size={20} className="text-blue-600" />
+              <FileText size={20} style={{ color: iconColors.yellow }} />
               <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 Document Outputs
               </span>
@@ -194,7 +202,7 @@ export default function HomePage() {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-1 mb-2">
-              <Clock size={20} className="text-blue-600" />
+              <Clock size={20} style={{ color: iconColors.orange }} />
               <span className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
                 Time Savings
               </span>

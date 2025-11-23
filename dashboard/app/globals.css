@@ -227,23 +227,24 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 6px;
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   transition: all 150ms ease;
   cursor: pointer;
   border: none;
   outline: none;
+  text-align: center;
 }
 
 .btn:focus-visible {
   box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--color-brand);
 }
 
-.btn-sm { height: 32px; }
-.btn-lg { height: 40px; }
+.btn-sm { height: 36px; padding: 0 16px; }
+.btn-lg { height: 48px; padding: 0 32px; }
 
 .btn-primary {
   background-color: var(--color-brand);

@@ -21,7 +21,6 @@ import {
   LogOut,
   User,
   HelpCircle,
-  TrendingUp,
   AlertTriangle,
   DollarSign,
   Zap,
@@ -32,6 +31,7 @@ interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
+  iconColor?: string;
   badge?: string;
   badgeType?: 'live' | 'count' | 'warning';
 }
@@ -41,33 +41,41 @@ interface NavSection {
   items: NavItem[];
 }
 
+// Icon color palette based on design spec
+const iconColors = {
+  orange: '#E7640E',
+  yellow: '#E6AA11',
+  teal: '#4F8383',
+  purple: '#883381',
+};
+
 const navigation: NavSection[] = [
   {
     items: [
-      { name: 'Overview', href: '/', icon: LayoutDashboard },
-      { name: 'Monitoring', href: '/monitoring', icon: Activity, badge: 'Live', badgeType: 'live' },
+      { name: 'Overview', href: '/', icon: LayoutDashboard, iconColor: iconColors.orange },
+      { name: 'Monitoring', href: '/monitoring', icon: Activity, iconColor: iconColors.teal, badge: 'Live', badgeType: 'live' },
     ],
   },
   {
     label: 'Compliance',
     items: [
-      { name: 'Compliance', href: '/compliance', icon: Shield, badge: '3', badgeType: 'warning' },
-      { name: 'Assessment', href: '/assessment', icon: FileText },
-      { name: 'Reports', href: '/reports', icon: FileText },
+      { name: 'Compliance', href: '/compliance', icon: Shield, iconColor: iconColors.purple, badge: '3', badgeType: 'warning' },
+      { name: 'Assessment', href: '/assessment', icon: FileText, iconColor: iconColors.yellow },
+      { name: 'Reports', href: '/reports', icon: FileText, iconColor: iconColors.orange },
     ],
   },
   {
     label: 'Analysis',
     items: [
-      { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-      { name: 'Costs', href: '/costs', icon: DollarSign },
-      { name: 'Optimization', href: '/optimization', icon: Zap },
+      { name: 'Analytics', href: '/analytics', icon: BarChart3, iconColor: iconColors.teal },
+      { name: 'Costs', href: '/costs', icon: DollarSign, iconColor: iconColors.yellow },
+      { name: 'Optimization', href: '/optimization', icon: Zap, iconColor: iconColors.purple },
     ],
   },
   {
     label: 'Settings',
     items: [
-      { name: 'Settings', href: '/settings', icon: Settings },
+      { name: 'Settings', href: '/settings', icon: Settings, iconColor: iconColors.teal },
     ],
   },
 ];
@@ -98,8 +106,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }, [darkMode]);
 
-  const complianceScore = 87;
-
   return (
     <div className={darkMode ? 'dark' : ''}>
       {/* Mobile Menu Overlay */}
@@ -114,22 +120,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <aside className={cn('sidebar', mobileMenuOpen && 'open', 'lg:translate-x-0')}>
         {/* Logo - matching 56px header height */}
         <div className="flex items-center gap-3 px-4 h-14 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
             <Image
               src="/cert-logo.png"
               alt="CERT"
-              width={28}
-              height={28}
+              width={34}
+              height={34}
               className="object-contain"
               priority
             />
           </div>
           <div className="flex flex-col">
             <span className="text-zinc-900 dark:text-white font-semibold text-sm tracking-tight">
-              CERT Framework
-            </span>
-            <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
-              EU AI Act Compliance
+              CERT
             </span>
           </div>
           <button
@@ -138,38 +141,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Compliance Score Card */}
-        <div className="px-3 py-4 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-semibold uppercase tracking-wider">
-                Compliance Score
-              </span>
-              <span className={cn(
-                'text-sm font-semibold',
-                complianceScore >= 90 ? 'text-emerald-600 dark:text-emerald-400' :
-                complianceScore >= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
-              )}>
-                {complianceScore}%
-              </span>
-            </div>
-            <div className="progress-bar">
-              <div
-                className={cn(
-                  'progress-fill',
-                  complianceScore >= 90 ? 'success' :
-                  complianceScore >= 70 ? 'warning' : 'error'
-                )}
-                style={{ width: `${complianceScore}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 mt-2">
-              <TrendingUp className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-emerald-600 dark:text-emerald-400 text-xs">+5% this month</span>
-            </div>
-          </div>
         </div>
 
         {/* Navigation */}
@@ -191,7 +162,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       onClick={() => setMobileMenuOpen(false)}
                       className={cn('nav-item', isActive && 'active')}
                     >
-                      <Icon className="w-[18px] h-[18px]" />
+                      <Icon className="w-[18px] h-[18px]" style={{ color: item.iconColor }} />
                       <span className="flex-1">{item.name}</span>
                       {item.badge && (
                         <span className={cn(
