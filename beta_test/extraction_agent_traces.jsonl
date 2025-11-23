@@ -1,0 +1,2 @@
+{"timestamp": "2025-11-23T17:27:09.875891Z", "function": "extract", "duration_ms": 590.5308723449707, "status": "success", "error": null, "metadata": {"agent": "pdf_extraction"}}
+{"timestamp": "2025-11-23T17:27:10.933661Z", "function": "extract", "duration_ms": 651.9877910614014, "status": "success", "error": null, "metadata": {"agent": "pdf_extraction"}}
