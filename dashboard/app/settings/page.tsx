@@ -34,6 +34,14 @@ const PaintBrushIcon = Palette;
 const ServerStackIcon = Server;
 const CheckIcon = Check;
 
+// Icon color palette based on design spec
+const iconColors = {
+  orange: '#E7640E',
+  yellow: '#E6AA11',
+  teal: '#4F8383',
+  purple: '#883381',
+};
+
 interface MetricsConfig {
   cost: {
     currency: string;
@@ -62,18 +70,18 @@ interface MetricsConfig {
 }
 
 const settingsSections = [
-  { id: 'metrics', name: 'Metrics', icon: BarChart3 },
-  { id: 'profile', name: 'Profile', icon: UserCircleIcon },
-  { id: 'notifications', name: 'Notifications', icon: BellIcon },
-  { id: 'security', name: 'Security', icon: ShieldCheckIcon },
-  { id: 'api', name: 'API Keys', icon: KeyIcon },
-  { id: 'integrations', name: 'Integrations', icon: ServerStackIcon },
-  { id: 'appearance', name: 'Appearance', icon: PaintBrushIcon },
-  { id: 'region', name: 'Region & Language', icon: GlobeAltIcon },
+  { id: 'profile', name: 'Profile', icon: UserCircleIcon, iconColor: iconColors.orange },
+  { id: 'metrics', name: 'Metrics', icon: BarChart3, iconColor: iconColors.teal },
+  { id: 'notifications', name: 'Notifications', icon: BellIcon, iconColor: iconColors.yellow },
+  { id: 'security', name: 'Security', icon: ShieldCheckIcon, iconColor: iconColors.purple },
+  { id: 'api', name: 'API Keys', icon: KeyIcon, iconColor: iconColors.orange },
+  { id: 'integrations', name: 'Integrations', icon: ServerStackIcon, iconColor: iconColors.teal },
+  { id: 'appearance', name: 'Appearance', icon: PaintBrushIcon, iconColor: iconColors.purple },
+  { id: 'region', name: 'Region & Language', icon: GlobeAltIcon, iconColor: iconColors.yellow },
 ];
 
 export default function SettingsPage() {
-  const [activeSection, setActiveSection] = useState('metrics');
+  const [activeSection, setActiveSection] = useState('profile');
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -225,7 +233,7 @@ export default function SettingsPage() {
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <section.icon className="h-5 w-5" />
+                    <section.icon className="h-5 w-5" style={{ color: section.iconColor }} />
                     {section.name}
                   </button>
                 ))}
