@@ -22,7 +22,7 @@ class TimeWindow(Enum):
     def to_days(self) -> float:
         """Convert time window to days."""
         mapping = {
-            TimeWindow.HOUR: 1/24,
+            TimeWindow.HOUR: 1 / 24,
             TimeWindow.DAY: 1,
             TimeWindow.WEEK: 7,
             TimeWindow.MONTH: 30,
@@ -103,7 +103,9 @@ class CostMetric:
             "daily_average": round(self.daily_average, 2),
             "monthly_projection": round(self.monthly_projection, 2),
             "budget": self.budget,
-            "budget_utilization": round(self.budget_utilization, 1) if self.budget_utilization else None,
+            "budget_utilization": round(self.budget_utilization, 1)
+            if self.budget_utilization
+            else None,
             "time_window": self.time_window,
             "trace_count": self.trace_count,
         }
