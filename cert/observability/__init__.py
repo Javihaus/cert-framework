@@ -31,11 +31,12 @@ from cert.observability.visualization import (
 # WebSocket streaming (optional - requires 'websockets' package)
 try:
     from cert.observability.websocket import (
-        WebSocketTraceServer,
-        WebSocketTracer,
         TraceEvent,
+        WebSocketTracer,
+        WebSocketTraceServer,
         create_streaming_tracer,
     )
+
     WEBSOCKET_AVAILABLE = True
 except ImportError:
     WEBSOCKET_AVAILABLE = False

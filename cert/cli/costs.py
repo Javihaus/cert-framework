@@ -41,9 +41,11 @@ def costs_cmd(traces_file, days, format):
         click.echo(f"Monthly Projection: ${costs['monthly_projection']:.2f}\n")
 
         # Warn if no cost data found
-        if costs['total'] == 0:
+        if costs["total"] == 0:
             click.echo("⚠️  Warning: No cost data found in traces.", err=True)
-            click.echo("   Ensure your traces include 'cost' field or use auto-instrumentation", err=True)
+            click.echo(
+                "   Ensure your traces include 'cost' field or use auto-instrumentation", err=True
+            )
             click.echo("   with: import cert.integrations.auto", err=True)
             click.echo()
 
