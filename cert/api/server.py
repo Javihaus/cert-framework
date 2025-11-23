@@ -22,8 +22,8 @@ from cert.integrations.registry import (
     get_active_connectors,
     get_connector_status,
 )
-from cert.metrics.engine import MetricsEngine
 from cert.metrics.config import MetricConfig
+from cert.metrics.engine import MetricsEngine
 from cert.value.analyzer import CostAnalyzer
 from cert.value.optimizer import Optimizer
 
