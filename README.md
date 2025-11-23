@@ -3,9 +3,9 @@
 
 # CERT Framework
 
-**AI Implementation Pipeline — From Readiness to Production to Compliance**
+**Monitor, Analyze, and Document Production LLM Systems**
 
-Deploy AI systems that work, prove they create value, and generate regulatory documentation automatically.
+Stop guessing. Know exactly what your AI systems cost, how they perform, and whether they're compliant.
 
 <img src="docs/dashboard-hero.png" alt="CERT Dashboard" width="100%" />
 
@@ -13,507 +13,446 @@ Deploy AI systems that work, prove they create value, and generate regulatory do
 
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 [![PyPI](https://img.shields.io/pypi/v/cert-framework?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/cert-framework/)
-[![Tests](https://img.shields.io/github/actions/workflow/status/javihaus/cert-framework/cert.yml?style=for-the-badge&logo=github&label=tests)](https://github.com/Javihaus/cert-framework/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=for-the-badge&logo=apache&logoColor=white)](LICENSE)
-[![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg?style=for-the-badge)](https://github.com/astral-sh/ruff)
 
-**[Pipeline](#the-pipeline)** • **[Installation](#installation)** • **[Quick Start](#quick-start)** • **[Dashboard](#dashboard)** • **[API Reference](#api-reference)** • **[Contributing](#contributing)**
-
-</div>
-
----
-
-## The Problem
-
-Companies don't fail at AI because of technology. They fail because they skip steps:
-
-- **Build without assessing risk** → Surprise: your chatbot is a high-risk system under EU AI Act
-- **Deploy without monitoring** → No idea if the AI actually works in production
-- **No ROI tracking** → Can't justify continued investment, project gets killed
-- **Compliance as afterthought** → €15M+ in fines, or $100K+ in consulting fees
-
-The usual approach: hire consultants for each phase, use 5 different tools, hope they integrate.
-
-**CERT's approach:** One pipeline. Five stages. Same data flows through all of them.
-
----
-
-## The Pipeline
-
-<div align="center">
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                        CERT AI IMPLEMENTATION PIPELINE                          │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │   STAGE 1    │    │   STAGE 2    │    │   STAGE 3    │    │   STAGE 4    │   │
-│  │  READINESS   │───▶│  DEPLOYMENT  │───▶│    VALUE     │───▶│ OPTIMIZATION │   │
-│  │  ASSESSMENT  │    │  MONITORING  │    │  VALIDATION  │    │              │   │
-│  └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘   │
-│         │                   │                   │                   │           │
-│         ▼                   ▼                   ▼                   ▼           │
-│  Risk classification   Trace logs         ROI metrics        Recommendations   │
-│  Readiness scorecard   Cost data          Business value     Cost reduction    │
-│  Gap analysis          Performance        Accuracy rates     Model downgrades  │
-│                                                                                 │
-│                              │                                                  │
-│                              ▼                                                  │
-│                     ┌──────────────┐                                            │
-│                     │   STAGE 5    │                                            │
-│                     │  COMPLIANCE  │                                            │
-│                     │     DOCS     │                                            │
-│                     └──────────────┘                                            │
-│                              │                                                  │
-│                              ▼                                                  │
-│                     EU AI Act Article 15                                        │
-│                     Technical Documentation                                     │
-│                     Conformity Assessment                                       │
-│                                                                                 │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
+**[Quick Start](#quick-start)** • **[Monitoring](#monitoring)** • **[Cost Analysis](#cost-analysis)** • **[Compliance](#compliance)** • **[Dashboard](#dashboard)**
 
 </div>
 
-### Stage 1: Readiness Assessment
-
-**Before writing code, understand your regulatory risk.**
-
-```bash
-$ cert assess --interactive
-
-EU AI Act Risk Assessment
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Does the AI system make hiring decisions?
-→ Yes
-
-Will it process >10,000 applications per year?
-→ Yes
-
-[... guided questionnaire ...]
-
-═══════════════════════════════════════════════════════════════
-RESULT: HIGH-RISK SYSTEM (EU AI Act Annex III, Category 4)
-═══════════════════════════════════════════════════════════════
-
-Required obligations:
-  • Conformity assessment before deployment
-  • Technical documentation (Article 11)
-  • Quality management system (Article 17)
-  • Human oversight measures (Article 14)
-  • Continuous accuracy monitoring (Article 15)
-
-Estimated compliance timeline: 8-12 months
-Estimated compliance cost: €75K-€300K (or use CERT: €0)
-
-Readiness Score: 34/100
-  ├─ Data quality: 45/100
-  ├─ Infrastructure: 28/100
-  ├─ Team skills: 52/100
-  ├─ Security: 31/100
-  └─ Documentation: 15/100
-
-Next steps saved to: assessment_report.pdf
-```
-
-**What you get:** Risk classification citing specific EU AI Act articles, readiness scorecard across 5 dimensions, gap analysis, compliance roadmap.
-
-### Stage 2: Deployment Monitoring
-
-**Trace every inference in production. Zero code changes.**
-
-```python
-# Option 1: Auto-instrumentation (works with existing code)
-from cert.integrations.auto import *
-
-# Your existing code stays exactly the same
-from openai import OpenAI
-client = OpenAI()
-response = client.chat.completions.create(
-    model="gpt-4-turbo",
-    messages=[{"role": "user", "content": "Analyze this contract..."}]
-)
-# CERT automatically logged: request, response, tokens, cost, latency
-```
-
-```python
-# Option 2: Explicit tracing (more control)
-from cert import trace
-
-@trace(cost_tracking=True, metadata={"service": "contract-analysis"})
-def analyze_contract(document: str) -> dict:
-    context = vector_db.search(document)
-    analysis = llm.generate(context, document)
-    return {"analysis": analysis, "confidence": 0.87}
-```
-
-**Supported platforms:** OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, LangChain, LlamaIndex
-
-**What you get:** JSONL logs with every inference—full request/response, token counts, calculated cost, latency, timestamps. Foundation for everything else.
-
-### Stage 3: Business Value Validation
-
-**Prove ROI with real numbers. Not estimates—production data.**
-
-```bash
-$ cert roi --value-per-task 2.50
-
-Business Value Analysis (30 days)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Total AI spend:           €1,247.32
-Successful tasks:         18,234 (accuracy ≥70%)
-Failed tasks:             1,766 (accuracy <70%)
-Success rate:             91.2%
-
-Value generated:          €45,585.00
-Net value:                €44,337.68
-ROI:                      3,554%
-Cost per successful task: €0.068
-
-Monthly projection at current rate:
-  └─ Net value: €44,337/month | €532K/year
-```
-
-```python
-from cert.value.roi_calculator import ROICalculator
-
-calculator = ROICalculator(
-    traces_path="production.jsonl",
-    business_value_per_task=2.50  # Your metric: revenue saved, time saved, etc.
-)
-
-roi = calculator.calculate_roi(period_days=30)
-print(f"ROI: {roi['roi_percentage']}%")
-print(f"Net value: €{roi['net_value']:,.2f}")
-```
-
-**What you get:** Cost per task, value generated, ROI percentage, success rates, monthly/yearly projections. Board-ready numbers.
-
-### Stage 4: Optimization
-
-**Automated recommendations. Typical savings: 30-50%.**
-
-```bash
-$ cert optimize
-
-Optimization Opportunities
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Found 3 opportunities totaling €667/month (53% reduction)
-
-1. MODEL DOWNGRADE — simple_qa tasks
-   Current model: gpt-4-turbo
-   Average confidence: 0.91 (overkill for this task)
-   Recommended: gpt-3.5-turbo
-   ├─ Monthly savings: €417
-   └─ Risk: LOW (confidence stays above 0.85)
-
-2. PROMPT CACHING — 47 repeated prompts
-   Most repeated: "You are a helpful assistant..." (1,203× this month)
-   ├─ Monthly savings: €156
-   └─ Implementation: Enable response caching
-
-3. PROMPT SHORTENING — 12 prompts over 2000 tokens
-   Longest: Customer support context includes full chat history
-   ├─ Monthly savings: €94
-   └─ Implementation: Truncate to last 5 messages
-
-Total annual savings: €8,004
-Payback period: Immediate
-```
-
-**What you get:** Ranked recommendations with savings estimates, risk assessment, implementation guidance.
-
-### Stage 5: Compliance Documentation
-
-**Generate EU AI Act Article 15 documentation automatically from production traces.**
-
-```bash
-$ cert compliance --system-name "ContractAnalyzer" --output article15_report.pdf
-
-Generating EU AI Act Technical Documentation...
-
-✓ System overview (Article 11.1.a)
-✓ Risk management measures (Article 9)
-✓ Data governance documentation (Article 10)
-✓ Accuracy metrics from production (Article 15)
-✓ Human oversight procedures (Article 14)
-✓ Cybersecurity measures (Article 15.4)
-
-Report generated: article15_report.pdf (47 pages)
-```
-
-**The insight:** Compliance documentation and cost optimization use the same underlying data. If you're logging every inference anyway (Stage 2), generating Article 15 documentation is just reformatting those logs.
-
-Manual documentation costs: €100K-€500K in consulting fees
-CERT documentation cost: €0 (you already have the data)
-
 ---
 
-## Installation
+## What CERT Does
 
-```bash
-# Core (tracing only, zero dependencies)
-pip install cert-framework
+You've deployed an LLM application using OpenAI, Anthropic, or AWS Bedrock. Now you need answers to three questions:
 
-# With platform connectors
-pip install cert-framework[integrations]
+1. **How much is this costing?** → Cost analysis by model, timeframe, and usage pattern
+2. **Is it working reliably?** → Performance monitoring with latency and error tracking  
+3. **Are we compliant with regulations?** → EU AI Act documentation automation
 
-# Everything (connectors + evaluation + CLI)
-pip install cert-framework[all]
-```
+CERT instruments your LLM API calls, captures production data, and provides analysis tools and compliance documentation.
 
-| Tier | Size | What you get |
-|------|------|--------------|
-| Core | <100KB | `@trace()` decorator, JSONL logging |
-| Integrations | ~5MB | Auto-connectors for OpenAI, Anthropic, LangChain, Bedrock, Azure |
-| Evaluation | ~500MB | Accuracy measurement (semantic similarity + NLI models) |
-| CLI | <1MB | `cert assess`, `cert roi`, `cert optimize`, `cert compliance` |
+## Prerequisites
+
+CERT monitors **existing** LLM applications. Before installing CERT, you need:
+
+- A Python application making LLM API calls (OpenAI, Anthropic, Bedrock, LangChain, or LlamaIndex)
+- API calls happening in development or production
+- Access to modify your application code (for instrumentation)
+
+If you're starting from scratch, first build your LLM application, then add CERT monitoring.
 
 ---
 
 ## Quick Start
 
-### 5 minutes: See what CERT does
+### 1. Install
+```bash
+pip install cert-framework
+```
 
+### 2. Add Monitoring (Zero Code Changes)
 ```python
+# Add this line at the top of your application
 from cert.integrations.auto import *
+
+# Your existing code continues unchanged
 from openai import OpenAI
-
 client = OpenAI()
+
 response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": "What is 2+2?"}]
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Analyze this document..."}]
 )
-# Check production.jsonl — CERT logged everything
+
+# CERT automatically logs: request, response, cost, latency, errors
+# Traces saved to: cert_traces.jsonl
 ```
 
+That's it. Every LLM call is now logged with full context.
+
+### 3. Analyze Your Data
 ```bash
-# Analyze your costs
-cert costs --period 7d
+# View cost summary
+$ cert costs --days 7
 
-# Get optimization recommendations
-cert optimize
+Weekly Cost Report
+━━━━━━━━━━━━━━━━━━
+Total spend:        €847.32
+By model:
+  gpt-4: €623.10 (73.5%)
+  gpt-3.5: €224.22 (26.5%)
+Daily average:      €121.05
+Projected monthly:  €3,631.50
+```
+```bash
+# Check for optimization opportunities
+$ cert optimize
 
-# Run risk assessment
-cert assess --interactive
+Found 2 opportunities saving €312/month (37%)
+
+1. MODEL DOWNGRADE
+   Task: Simple Q&A (847 calls)
+   Current: gpt-4 (avg confidence: 0.94)
+   Recommended: gpt-3.5-turbo
+   Savings: €234/month
+
+2. PROMPT CACHING  
+   Repeated prompt: "You are a helpful assistant..."
+   Used 1,203 times this month
+   Savings: €78/month
 ```
 
-### 30 minutes: Full pipeline demo
+---
 
+## Monitoring
+
+CERT supports automatic instrumentation for these platforms:
+
+| Platform | Status | Auto-Instrumentation |
+|----------|--------|---------------------|
+| **OpenAI** | Production | ✓ Full support (chat, embeddings, streaming) |
+| **Anthropic** | Production | ✓ Full support (including tool use, prompt caching) |
+| **AWS Bedrock** | Production | ✓ Claude, Llama, Titan models |
+| **Azure OpenAI** | Production | ✓ OpenAI-compatible API |
+| **LangChain** | Production | ✓ Chains and agents |
+| **LlamaIndex** | Beta | ✓ Query engines |
+
+### What Gets Logged
+
+Each trace contains:
+- **Timestamp**: When the call happened
+- **Platform & Model**: Which API and model was used
+- **Input/Output**: Full request and response
+- **Tokens & Cost**: Token counts and calculated cost
+- **Latency**: Request duration in milliseconds
+- **Errors**: Any failures or exceptions
+- **Metadata**: Custom tags you add
+
+### Manual Tracing (Advanced)
+
+If auto-instrumentation doesn't work for your setup:
+```python
+from cert import trace
+
+@trace(cost_tracking=True, metadata={"service": "document-analysis"})
+def analyze_document(doc: str) -> dict:
+    context = vector_db.search(doc)
+    analysis = llm.generate(context, doc)
+    return {"analysis": analysis, "confidence": 0.87}
+```
+
+---
+
+## Cost Analysis
+
+### CLI Tools
 ```bash
-# 1. Clone and install
-git clone https://github.com/Javihaus/cert-framework.git
-cd cert-framework
-pip install -e ".[all]"
+# Cost breakdown by model
+$ cert costs --by-model
 
-# 2. Run the demo
-python examples/03_compliance_workflow.py
+Cost by Model (Last 30 Days)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+gpt-4-turbo:        €1,834.50 (61.2%)
+claude-3-opus:      €   847.20 (28.3%)
+gpt-3.5-turbo:      €   315.80 (10.5%)
+Total:              €2,997.50
+```
+```bash
+# Cost trend over time
+$ cert costs --trend daily
 
-# 3. Launch dashboard
-cd dashboard && npm install && npm run dev
-# Open http://localhost:3000
+Daily Cost Trend (Last 7 Days)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2025-01-20: €142.30
+2025-01-21: €156.80 (+10.2%)
+2025-01-22: €134.20 (-14.4%)
+...
+```
+
+### Python API
+```python
+from cert.value.analyzer import CostAnalyzer
+
+analyzer = CostAnalyzer("cert_traces.jsonl")
+
+# Total cost
+total = analyzer.total_cost(start_date="2025-01-01", end_date="2025-01-31")
+print(f"Monthly cost: €{total:.2f}")
+
+# Cost by platform
+by_platform = analyzer.cost_by_platform()
+# Returns: {"openai": 1834.50, "anthropic": 847.20}
+
+# Detect cost anomalies
+anomalies = analyzer.detect_anomalies()
+# Returns: [{"date": "2025-01-15", "cost": 450.20, "expected": 142.30, "severity": "high"}]
+```
+
+### ROI Calculation
+
+If you can quantify the business value of each successful task:
+```python
+from cert.value.roi_calculator import ROICalculator
+
+calculator = ROICalculator(
+    traces_path="cert_traces.jsonl",
+    business_value_per_task=2.50  # e.g., €2.50 saved per document analyzed
+)
+
+roi = calculator.calculate_roi(period_days=30)
+
+print(f"Total spend: €{roi['total_cost']:.2f}")
+print(f"Successful tasks: {roi['successful_tasks']}")
+print(f"Value generated: €{roi['value_generated']:.2f}")
+print(f"Net value: €{roi['net_value']:.2f}")
+print(f"ROI: {roi['roi_percentage']:.1f}%")
+```
+
+---
+
+## Compliance
+
+### EU AI Act Documentation
+
+CERT generates EU AI Act Article 15 technical documentation from your production traces. This is specifically useful for companies deploying high-risk AI systems who need conformity assessment documentation.
+
+**What CERT generates:**
+- Risk classification report (Annex III analysis)
+- Technical documentation (Annex IV structure)
+- Accuracy and robustness monitoring data (Article 15)
+- Audit trail with production metrics
+- Quality management documentation
+```bash
+$ cert compliance \
+    --system-name "ContractAnalyzer" \
+    --provider "Acme Corp" \
+    --output compliance_package/
+
+Generating EU AI Act Documentation...
+✓ Risk classification analysis
+✓ Technical documentation (32 pages)
+✓ Accuracy metrics from 45,203 traces
+✓ Performance monitoring data
+✓ Audit trail
+  
+Documents saved to: compliance_package/
+- risk_classification.docx
+- technical_documentation.docx  
+- monitoring_report.docx
+- audit_trail.docx
+- checklist.docx
+```
+
+**Important**: These documents contain `[EXPERT INPUT REQUIRED]` sections that need domain expertise to complete. CERT provides the structure and populates it with production data. A compliance consultant still needs 8-10 hours to review and complete the expert sections. This typically reduces total compliance documentation time from 40 hours to 10 hours.
+
+### Risk Assessment
+
+Before deploying a new AI system, assess its regulatory risk:
+```bash
+$ cert assess --interactive
+
+EU AI Act Risk Assessment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Does the AI system make hiring decisions? → Yes
+Will it process >10,000 applications per year? → Yes
+[... guided questionnaire ...]
+
+═══════════════════════════════════════════════════
+RESULT: HIGH-RISK SYSTEM (EU AI Act Annex III)
+═══════════════════════════════════════════════════
+
+Required obligations:
+- Conformity assessment before deployment
+- Technical documentation (Article 11)  
+- Human oversight measures (Article 14)
+- Continuous accuracy monitoring (Article 15)
+
+Readiness Score: 34/100
+├─ Data quality: 45/100
+├─ Infrastructure: 28/100
+└─ Documentation: 15/100
+
+Full report: assessment_report.pdf
 ```
 
 ---
 
 ## Dashboard
 
-Web interface for the complete pipeline. Upload traces, run assessments, generate reports.
-
-<img src="docs/dashboard-metrics.png" alt="CERT Metrics" width="100%" />
-
-**Features:**
-- **Assessment Wizard:** Guided EU AI Act risk classification
-- **Cost Analytics:** Real-time spend tracking with drill-down
-- **ROI Calculator:** Business value metrics from production data
-- **Optimization Engine:** Automated savings recommendations
-- **Compliance Center:** One-click Article 15 report generation
-
+Web interface for visualization and analysis:
 ```bash
 cd dashboard
-npm install
-npm run dev
-# Dashboard at http://localhost:3000
+npm install && npm run dev
+# Open http://localhost:3000
 ```
 
----
+**Features:**
+- Real-time cost and performance metrics
+- Interactive cost breakdowns (by model, platform, timeframe)
+- Trace explorer with filtering and search
+- Compliance document generation wizard
+- Optimization recommendations
 
-## Connectors
-
-CERT auto-instruments these platforms:
-
-| Platform | Tracing | Cost Tracking | Status |
-|----------|---------|---------------|--------|
-| **OpenAI** | Full (chat, completions, embeddings, streaming) | Automatic | Production |
-| **Anthropic** | Full (including tool use, prompt caching) | Automatic (with cache hits) | Production |
-| **AWS Bedrock** | Claude, Llama, Titan | Manual pricing | Production |
-| **Azure OpenAI** | OpenAI-compatible | Automatic | Production |
-| **LangChain** | Chains, agents, tools | Aggregated | Production |
-| **LlamaIndex** | Query engines, chat engines | Aggregated | Beta |
-
-```python
-# Auto-detect installed platforms
-from cert.integrations.auto import *
-
-# Or explicit activation
-from cert.integrations.openai import OpenAIConnector
-from cert.core.tracer import CertTracer
-
-tracer = CertTracer()
-OpenAIConnector(tracer).activate()
-```
-
----
-
-## API Reference
-
-### Assessment
-
-```python
-from cert.assessment import RiskClassifier, ReadinessAssessor
-
-# Risk classification
-classifier = RiskClassifier()
-result = classifier.classify(questionnaire_answers)
-# Returns: {"risk_level": "high", "category": "Annex III, Cat 4", "obligations": [...]}
-
-# Readiness scoring
-assessor = ReadinessAssessor()
-score = assessor.assess(company_profile)
-# Returns: {"total": 34, "data_quality": 45, "infrastructure": 28, ...}
-```
-
-### Tracing
-
-```python
-from cert import trace
-from cert.core.tracer import CertTracer
-
-# Decorator
-@trace(log_path="traces.jsonl", cost_tracking=True)
-def my_function(query):
-    return llm.generate(query)
-
-# Manual
-tracer = CertTracer(log_path="traces.jsonl")
-tracer.log_trace({
-    "timestamp": "2025-01-15T10:30:00Z",
-    "platform": "openai",
-    "model": "gpt-4",
-    "input_data": "What is 2+2?",
-    "output_data": "4",
-    "cost": 0.002,
-    "metadata": {"tokens": {"prompt": 12, "completion": 5}}
-})
-```
-
-### Value Analysis
-
-```python
-from cert.value.analyzer import CostAnalyzer
-from cert.value.optimizer import Optimizer
-from cert.value.roi_calculator import ROICalculator
-
-# Costs
-analyzer = CostAnalyzer("production.jsonl")
-total = analyzer.total_cost(start_date="2025-01-01", end_date="2025-01-31")
-by_model = analyzer.cost_by_model()
-
-# ROI
-calculator = ROICalculator(traces_path="production.jsonl", business_value_per_task=2.50)
-roi = calculator.calculate_roi(period_days=30)
-
-# Optimization
-optimizer = Optimizer("production.jsonl")
-recommendations = optimizer.recommend_model_changes()
-```
-
-### Compliance
-
-```python
-from cert.compliance import ComplianceReportGenerator
-
-generator = ComplianceReportGenerator(
-    traces_path="production.jsonl",
-    system_name="ContractAnalyzer",
-    provider="Acme Corp"
-)
-generator.generate_article15_report(output_path="article15_report.pdf")
-```
-
-Full API documentation: [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
-
----
-
-## Why CERT Works
-
-### Single Source of Truth
-
-Other tools: Langfuse for monitoring, spreadsheets for ROI, Vanta for compliance, custom scripts for optimization. Five data sources that don't talk to each other.
-
-CERT: One trace log → feeds into cost analysis → feeds into ROI calculation → feeds into optimization → feeds into compliance docs. Same data, different views.
-
-### Compliance as Output, Not Input
-
-Traditional approach: Hire €100K+ consultants to manually document your AI system for regulators.
-
-CERT approach: You're already logging traces for debugging. Those traces contain exactly what Article 15 requires: accuracy metrics, performance monitoring, system behavior documentation. CERT just reformats it.
-
-### Built for Consulting Delivery
-
-CERT is designed for the 80/20 rule: 80% automated analysis, 20% expert interpretation. The dashboard generates the reports; you add the strategic recommendations.
+<img src="docs/dashboard-metrics.png" alt="Dashboard" width="100%" />
 
 ---
 
 ## Architecture
-
 ```
 cert/
-├── assessment/        # Stage 1: Risk classification, readiness scoring
-├── integrations/      # Stage 2: Platform connectors (OpenAI, Anthropic, etc.)
-├── value/             # Stage 3-4: ROI calculation, cost analysis, optimization
-├── compliance/        # Stage 5: EU AI Act documentation generation
-├── core/              # Shared: Tracing, evaluation engine
-├── cli/               # Command-line interface
-└── monitoring/        # Real-time observability
+├── integrations/      # Platform connectors (OpenAI, Anthropic, etc.)
+├── core/              # Tracer and logging infrastructure  
+├── value/             # Cost analysis, ROI calculation, optimization
+├── evaluation/        # Quality metrics and evaluation engines
+├── compliance/        # EU AI Act documentation generators
+├── assessment/        # Risk classification and readiness scoring
+├── monitoring/        # Real-time performance tracking
+└── cli/               # Command-line interface
 
 dashboard/             # Next.js web interface
-├── app/               # Pages: assessment, costs, optimization, compliance
-├── components/        # Reusable UI components
-└── lib/               # Business logic (mirrors Python modules)
+├── app/               # Pages and API routes
+├── components/        # UI components
+└── lib/               # Business logic
 ```
 
 ---
 
-## Roadmap
+## Common Workflows
 
-| Quarter | Focus |
-|---------|-------|
-| **Q1 2026** | Hosted evaluation API, Prometheus exporters, Slack alerts |
-| **Q2 2026** | Multi-modal support (vision), custom evaluation presets |
-| **Q3 2026** | Drift detection, A/B testing framework, circuit breakers |
-| **Q4 2026** | SaaS offering, team collaboration, enterprise SSO |
+### Workflow 1: Cost Monitoring
+
+**Goal**: Track LLM spending in production
+```bash
+# 1. Install and instrument
+pip install cert-framework
+# Add: from cert.integrations.auto import *
+
+# 2. Run your application normally  
+# Traces accumulate in cert_traces.jsonl
+
+# 3. Analyze costs
+cert costs --days 30
+cert costs --by-model
+cert optimize
+```
+
+### Workflow 2: Performance Optimization
+
+**Goal**: Reduce costs without degrading quality
+```bash
+# 1. Get optimization recommendations
+cert optimize
+
+# 2. Review suggestions
+# Example: "Downgrade simple_qa tasks from gpt-4 to gpt-3.5"
+
+# 3. Implement change in your code
+# 4. Monitor for a week to verify quality maintained
+# 5. Measure savings with: cert costs --compare
+```
+
+### Workflow 3: Compliance Documentation
+
+**Goal**: Generate EU AI Act technical documentation
+```bash
+# 1. Ensure you have production traces (30+ days recommended)
+# 2. Run risk assessment
+cert assess --interactive
+
+# 3. Generate compliance package
+cert compliance \
+    --system-name "YourSystemName" \
+    --output compliance_docs/
+
+# 4. Review documents
+# 5. Complete [EXPERT INPUT REQUIRED] sections  
+# 6. Submit for conformity assessment
+```
 
 ---
 
-## Contributing
+## Supported Models & Pricing
 
+CERT automatically tracks costs for these models:
+
+**OpenAI**: GPT-4, GPT-4 Turbo, GPT-3.5 Turbo, text-embedding-ada-002  
+**Anthropic**: Claude 3 Opus, Claude 3 Sonnet, Claude 3 Haiku  
+**AWS Bedrock**: Claude, Llama 2, Titan, Cohere Command
+
+Pricing is updated automatically from provider rate cards.
+
+---
+
+## When to Use CERT
+
+✅ **Good fit:**
+- You have an LLM application in production
+- You're using OpenAI, Anthropic, or Bedrock APIs
+- You want cost visibility and optimization
+- You need EU AI Act compliance documentation
+- You want performance monitoring without vendor lock-in
+
+❌ **Not a fit:**
+- You're building your first LLM application (learn the basics first, add CERT later)
+- You're using local models exclusively (COST tracking won't work without API pricing)
+- You need real-time alerting (CERT analyzes historical data; for alerts, integrate with Prometheus)
+
+---
+
+## FAQ
+
+**Q: Does CERT send data to external servers?**  
+A: No. All traces are stored locally in JSONL files. CERT runs entirely on your infrastructure.
+
+**Q: Does auto-instrumentation affect performance?**  
+A: Minimal impact. Logging adds ~5-10ms per request. For most applications this is negligible compared to LLM API latency (200-2000ms).
+
+**Q: Can I use CERT with LangChain/LlamaIndex?**  
+A: Yes. Auto-instrumentation works for standard LangChain chains. For custom components, use manual `@trace` decorators.
+
+**Q: Do I need to change my existing code?**  
+A: For OpenAI/Anthropic direct API usage: just add `from cert.integrations.auto import *` at the top. For other setups, you may need manual instrumentation.
+
+**Q: How much does EU AI Act compliance cost with CERT?**  
+A: CERT is free open-source software. For compliance documentation, CERT reduces consultant time from ~40 hours to ~10 hours. At typical consultant rates (€150-200/hr), this saves €4,500-6,000 per system documented.
+
+**Q: Can CERT evaluate response quality?**  
+A: Yes, with the evaluation module: `pip install cert-framework[evaluation]`. Supports semantic similarity, exact match, and custom evaluation metrics.
+
+---
+
+## Installation
+
+### Standard Installation
+```bash
+pip install cert-framework
+```
+
+### With Evaluation Features
+```bash
+pip install cert-framework[evaluation]
+```
+
+Includes semantic similarity, NLI, and grounding analysis (requires sentence-transformers).
+
+### Development Installation
 ```bash
 git clone https://github.com/Javihaus/cert-framework.git
 cd cert-framework
 pip install -e ".[dev]"
 pytest
-ruff check .
 ```
 
-Priority areas:
-- Platform connectors ([docs/CONNECTOR_DEVELOPMENT_GUIDE.md](docs/CONNECTOR_DEVELOPMENT_GUIDE.md))
-- Industry-specific evaluation presets (healthcare, finance, legal)
-- Dashboard components
+---
+
+## Contributing
+
+Contributions welcome. Priority areas:
+
+- New platform connectors (see [docs/CONNECTOR_DEVELOPMENT_GUIDE.md](docs/CONNECTOR_DEVELOPMENT_GUIDE.md))
+- Industry-specific evaluation presets (healthcare, legal, finance)
+- Dashboard features
 
 See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
@@ -523,25 +462,21 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 Apache 2.0 — [LICENSE](LICENSE)
 
-Commercial use, modification, distribution permitted with attribution.
+Free for commercial use, modification, and distribution.
 
 ---
 
 ## Contact
 
 **Javier Marin**  
-AI Implementation Consultant
-
 Email: javier@jmarin.info  
 LinkedIn: [linkedin.com/in/javiermarinvalenzuela](https://linkedin.com/in/javiermarinvalenzuela)
-
-**Services:** EU AI Act implementation, AI deployment strategy, production LLM optimization.
 
 ---
 
 <div align="center">
 
-### Deploy AI systems that work. Prove they create value. Stay compliant.
+### Monitor your LLM systems. Optimize costs. Stay compliant.
 
 [![Install](https://img.shields.io/badge/pip_install-cert--framework-4B8BBE?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/cert-framework/)
 [![GitHub](https://img.shields.io/github/stars/Javihaus/cert-framework?style=for-the-badge&logo=github)](https://github.com/Javihaus/cert-framework)
