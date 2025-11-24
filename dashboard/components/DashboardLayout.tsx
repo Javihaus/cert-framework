@@ -53,13 +53,18 @@ const navigation: NavSection[] = [
     ],
   },
   {
-    label: 'Compliance',
+    label: 'Quality',
+    items: [
+      { name: 'Accuracy Testing', href: '/audit', icon: AlertTriangle, iconColor: iconColors.purple },
+      { name: 'Documentation', href: '/generate', icon: FileText, iconColor: iconColors.orange },
+      { name: 'Reports', href: '/reports', icon: FileText, iconColor: iconColors.orange },
+    ],
+  },
+  {
+    label: 'Governance',
     items: [
       { name: 'Compliance', href: '/compliance', icon: Shield, iconColor: iconColors.purple, badge: '3', badgeType: 'warning' },
       { name: 'Assessment', href: '/assessment', icon: FileText, iconColor: iconColors.yellow },
-      { name: 'Audit', href: '/audit', icon: AlertTriangle, iconColor: iconColors.purple },
-      { name: 'Generate Docs', href: '/generate', icon: FileText, iconColor: iconColors.orange },
-      { name: 'Reports', href: '/reports', icon: FileText, iconColor: iconColors.orange },
     ],
   },
   {
