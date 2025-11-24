@@ -29,22 +29,20 @@ interface AuditReport {
 }
 
 export default function AuditPage() {
-  const [tracesFile, setTracesFile] = useState<File | null>(null);
+  const [tracesData, setTracesData] = useState<any[] | null>(null);
   const [threshold, setThreshold] = useState(0.7);
   const [evaluator, setEvaluator] = useState<'semantic' | 'exact'>('semantic');
   const [isRunning, setIsRunning] = useState(false);
   const [report, setReport] = useState<AuditReport | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileUpload = (files: File[]) => {
-    if (files.length > 0) {
-      setTracesFile(files[0]);
-      setError(null);
-    }
+  const handleFileLoad = (data: any) => {
+    setTracesData(Array.isArray(data) ? data : [data]);
+    setError(null);
   };
 
   const handleRunAudit = async () => {
-    if (!tracesFile) {
+    if (!tracesData) {
       setError('Please upload a traces file first');
       return;
     }
@@ -53,8 +51,8 @@ export default function AuditPage() {
     setError(null);
 
     try {
-      // Read file content
-      const fileContent = await tracesFile.text();
+      // Convert traces data to JSONL format
+      const fileContent = tracesData.map(trace => JSON.stringify(trace)).join('\n');
 
       // Call audit API
       const response = await fetch('/api/run-audit', {
@@ -120,20 +118,11 @@ export default function AuditPage() {
 
               {/* File Upload */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-zinc-900 dark:text-white mb-2">
-                  Upload Traces File (JSONL)
-                </label>
                 <FileUpload
-                  onFilesSelected={handleFileUpload}
+                  onFileLoad={handleFileLoad}
                   accept=".jsonl,.json"
-                  maxFiles={1}
+                  label="Upload Traces File (JSONL)"
                 />
-                {tracesFile && (
-                  <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    <CheckCircle2 size={16} className="text-green-600" />
-                    <span>{tracesFile.name} ({(tracesFile.size / 1024).toFixed(1)} KB)</span>
-                  </div>
-                )}
               </div>
 
               {/* Evaluator Selection */}
@@ -203,7 +192,7 @@ export default function AuditPage() {
               {/* Run Button */}
               <Button
                 onClick={handleRunAudit}
-                disabled={!tracesFile || isRunning}
+                disabled={!tracesData || isRunning}
                 icon={isRunning ? undefined : <Play size={16} />}
                 variant="primary"
                 size="lg"
