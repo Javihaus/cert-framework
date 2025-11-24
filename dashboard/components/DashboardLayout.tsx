@@ -57,6 +57,8 @@ const navigation: NavSection[] = [
     items: [
       { name: 'Compliance', href: '/compliance', icon: Shield, iconColor: iconColors.purple, badge: '3', badgeType: 'warning' },
       { name: 'Assessment', href: '/assessment', icon: FileText, iconColor: iconColors.yellow },
+      { name: 'Audit', href: '/audit', icon: AlertTriangle, iconColor: iconColors.purple },
+      { name: 'Generate Docs', href: '/generate', icon: FileText, iconColor: iconColors.orange },
       { name: 'Reports', href: '/reports', icon: FileText, iconColor: iconColors.orange },
     ],
   },
@@ -72,6 +74,7 @@ const navigation: NavSection[] = [
     label: 'Settings',
     items: [
       { name: 'Settings', href: '/settings', icon: Settings, iconColor: iconColors.teal },
+      { name: 'Help', href: '/help', icon: HelpCircle, iconColor: iconColors.yellow },
     ],
   },
 ];
@@ -256,9 +259,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </button>
 
               {/* Help */}
-              <button className="hidden md:flex p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+              <Link
+                href="/help"
+                className="hidden md:flex p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+              >
                 <HelpCircle className="w-5 h-5" />
-              </button>
+              </Link>
 
               {/* User Menu */}
               <div className="relative ml-2">
