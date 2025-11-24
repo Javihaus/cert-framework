@@ -6,6 +6,7 @@ import Button from '@/components/Button';
 import FileUpload from '@/components/FileUpload';
 import { Upload, Play, Download, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { typographyClasses } from '@/theme/typography';
 
 interface AuditResult {
   timestamp: string;
@@ -100,10 +101,10 @@ export default function AuditPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+          <h1 className={cn(typographyClasses.pageTitle, "mb-2")}>
             EU AI Act Compliance Audit
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
+          <p className={typographyClasses.body}>
             Evaluate system accuracy against Article 15 requirements
           </p>
         </div>
@@ -112,7 +113,7 @@ export default function AuditPage() {
           <>
             {/* Configuration Card */}
             <Card className="mb-6">
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
+              <h2 className={cn(typographyClasses.sectionTitle, "mb-4")}>
                 Audit Configuration
               </h2>
 
@@ -127,7 +128,7 @@ export default function AuditPage() {
 
               {/* Evaluator Selection */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                <label className={cn(typographyClasses.label, "block mb-2")}>
                   Evaluator Type
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -140,8 +141,8 @@ export default function AuditPage() {
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-blue-400'
                     )}
                   >
-                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Semantic</h3>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>Semantic</h3>
+                    <p className={typographyClasses.body}>
                       Evaluates meaning similarity using embeddings. Best for most use cases.
                     </p>
                   </div>
@@ -154,8 +155,8 @@ export default function AuditPage() {
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-blue-400'
                     )}
                   >
-                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Exact Match</h3>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>Exact Match</h3>
+                    <p className={typographyClasses.body}>
                       Requires exact string matches. Use for financial or legal domains.
                     </p>
                   </div>
@@ -164,7 +165,7 @@ export default function AuditPage() {
 
               {/* Threshold Configuration */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                <label className={cn(typographyClasses.label, "block mb-2")}>
                   Accuracy Threshold: {(threshold * 100).toFixed(0)}%
                 </label>
                 <input
@@ -176,7 +177,7 @@ export default function AuditPage() {
                   onChange={(e) => setThreshold(parseFloat(e.target.value))}
                   className="w-full"
                 />
-                <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                <div className={cn(typographyClasses.caption, "flex justify-between mt-1")}>
                   <span>0%</span>
                   <span>50%</span>
                   <span>100%</span>
@@ -184,7 +185,7 @@ export default function AuditPage() {
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+                <div className={cn(typographyClasses.body, "mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200")}>
                   {error}
                 </div>
               )}
@@ -204,14 +205,14 @@ export default function AuditPage() {
 
             {/* Info Card */}
             <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              <h3 className={cn(typographyClasses.subsectionTitle, "text-blue-900 dark:text-blue-100 mb-2")}>
                 EU AI Act Article 15 Requirements
               </h3>
-              <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+              <p className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 mb-3")}>
                 High-risk AI systems must achieve appropriate levels of accuracy, robustness, and cybersecurity.
                 This audit evaluates your system's accuracy based on production traces.
               </p>
-              <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+              <ul className={cn(typographyClasses.body, "text-blue-700 dark:text-blue-300 space-y-1")}>
                 <li>• Article 15(1): Systems must achieve appropriate accuracy levels</li>
                 <li>• Article 15(2): Robustness and reliability testing required</li>
                 <li>• Typical compliance threshold: 90% accuracy rate</li>
@@ -236,13 +237,13 @@ export default function AuditPage() {
                   )}
                   <div>
                     <h2 className={cn(
-                      'text-2xl font-bold mb-1',
+                      typographyClasses.sectionTitle, 'mb-1',
                       report.compliant ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
                     )}>
                       {report.compliant ? 'Compliant' : 'Non-Compliant'}
                     </h2>
                     <p className={cn(
-                      'text-sm',
+                      typographyClasses.body,
                       report.compliant ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
                     )}>
                       Article 15 Accuracy Assessment - {report.evaluator_type}
@@ -263,7 +264,7 @@ export default function AuditPage() {
             {/* Metrics Cards */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               <Card>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Accuracy Rate</p>
+                <p className={cn(typographyClasses.body, "mb-1")}>Accuracy Rate</p>
                 <p className={cn(
                   'text-3xl font-bold',
                   report.pass_rate >= 0.9 ? 'text-green-600' : 'text-red-600'
@@ -272,15 +273,15 @@ export default function AuditPage() {
                 </p>
               </Card>
               <Card>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Total Traces</p>
+                <p className={cn(typographyClasses.body, "mb-1")}>Total Traces</p>
                 <p className="text-3xl font-bold text-zinc-900 dark:text-white">{report.total_traces}</p>
               </Card>
               <Card>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Passed</p>
+                <p className={cn(typographyClasses.body, "mb-1")}>Passed</p>
                 <p className="text-3xl font-bold text-green-600">{report.passed_traces}</p>
               </Card>
               <Card>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Failed</p>
+                <p className={cn(typographyClasses.body, "mb-1")}>Failed</p>
                 <p className="text-3xl font-bold text-red-600">{report.failed_traces}</p>
               </Card>
             </div>
@@ -288,34 +289,34 @@ export default function AuditPage() {
             {/* Failed Traces Table */}
             {report.results.filter(r => !r.passed).length > 0 && (
               <Card>
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+                <h3 className={cn(typographyClasses.cardTitle, "mb-4")}>
                   Failed Traces ({report.results.filter(r => !r.passed).length})
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
                       <tr>
-                        <th className="text-left p-3 text-sm font-medium text-zinc-900 dark:text-white">Query</th>
-                        <th className="text-left p-3 text-sm font-medium text-zinc-900 dark:text-white">Answer</th>
-                        <th className="text-center p-3 text-sm font-medium text-zinc-900 dark:text-white">Confidence</th>
-                        <th className="text-left p-3 text-sm font-medium text-zinc-900 dark:text-white">Reason</th>
+                        <th className={cn(typographyClasses.label, "text-left p-3")}>Query</th>
+                        <th className={cn(typographyClasses.label, "text-left p-3")}>Answer</th>
+                        <th className={cn(typographyClasses.label, "text-center p-3")}>Confidence</th>
+                        <th className={cn(typographyClasses.label, "text-left p-3")}>Reason</th>
                       </tr>
                     </thead>
                     <tbody>
                       {report.results.filter(r => !r.passed).slice(0, 10).map((result, idx) => (
                         <tr key={idx} className="border-b border-zinc-200 dark:border-zinc-700">
-                          <td className="p-3 text-sm text-zinc-700 dark:text-zinc-300 max-w-xs truncate">
+                          <td className={cn(typographyClasses.body, "p-3 max-w-xs truncate")}>
                             {result.input_query || 'N/A'}
                           </td>
-                          <td className="p-3 text-sm text-zinc-700 dark:text-zinc-300 max-w-xs truncate">
+                          <td className={cn(typographyClasses.body, "p-3 max-w-xs truncate")}>
                             {result.answer || 'N/A'}
                           </td>
                           <td className="p-3 text-center">
-                            <span className="inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm font-medium rounded">
+                            <span className={cn(typographyClasses.body, "inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-medium rounded")}>
                               {(result.confidence * 100).toFixed(1)}%
                             </span>
                           </td>
-                          <td className="p-3 text-sm text-zinc-600 dark:text-zinc-400 max-w-xs truncate">
+                          <td className={cn(typographyClasses.body, "p-3 max-w-xs truncate")}>
                             {result.reason || 'Below threshold'}
                           </td>
                         </tr>
@@ -323,7 +324,7 @@ export default function AuditPage() {
                     </tbody>
                   </table>
                   {report.results.filter(r => !r.passed).length > 10 && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center py-3">
+                    <p className={cn(typographyClasses.body, "text-center py-3")}>
                       Showing 10 of {report.results.filter(r => !r.passed).length} failed traces. Download full report for all results.
                     </p>
                   )}

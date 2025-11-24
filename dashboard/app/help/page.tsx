@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Card from '@/components/Card';
-import { ChevronDown, ChevronRight, CheckCircle, FileText, Upload, Play, Download, AlertCircle, Info } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle, FileText, Upload, Play, Download, AlertCircle, Info, Globe, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { typographyClasses } from '@/theme/typography';
 
 interface Section {
   id: string;
@@ -279,10 +280,10 @@ export default function HelpPage() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+          <h1 className={cn(typographyClasses.pageTitle, "mb-2")}>
             Help & Documentation
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
+          <p className={typographyClasses.body}>
             Learn how to use CERT Dashboard for EU AI Act compliance
           </p>
         </div>
@@ -292,13 +293,13 @@ export default function HelpPage() {
           <div className="flex items-start gap-3">
             <Info size={24} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              <h3 className={cn(typographyClasses.subsectionTitle, "text-blue-900 dark:text-blue-100 mb-2")}>
                 Quick Start Guide
               </h3>
-              <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+              <p className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 mb-3")}>
                 New to CERT Dashboard? Follow these steps:
               </p>
-              <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+              <ol className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 space-y-1")}>
                 <li><strong>1. Risk Assessment</strong> → Understand your compliance requirements</li>
                 <li><strong>2. Document Generation</strong> → Create compliance documents from traces</li>
                 <li><strong>3. Compliance Audit</strong> → Check accuracy and compliance status</li>
@@ -323,7 +324,7 @@ export default function HelpPage() {
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                       <Icon size={24} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+                    <h2 className={typographyClasses.sectionTitle}>
                       {section.title}
                     </h2>
                   </div>
@@ -338,7 +339,7 @@ export default function HelpPage() {
                   <div className="px-6 pb-6 space-y-6">
                     {/* Overview */}
                     <div className="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                      <p className="text-zinc-700 dark:text-zinc-300">
+                      <p className={typographyClasses.body}>
                         {section.content.overview}
                       </p>
                     </div>
@@ -351,10 +352,10 @@ export default function HelpPage() {
                             {idx + 1}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+                            <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                               {step.title}
                             </h3>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                            <p className={typographyClasses.body}>
                               {step.description}
                             </p>
                           </div>
@@ -365,11 +366,11 @@ export default function HelpPage() {
                     {/* Tips */}
                     {section.content.tips && section.content.tips.length > 0 && (
                       <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                        <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                        <h3 className={cn(typographyClasses.subsectionTitle, "text-green-900 dark:text-green-100 mb-2 flex items-center gap-2")}>
                           <CheckCircle size={18} />
                           Pro Tips
                         </h3>
-                        <ul className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                        <ul className={cn(typographyClasses.body, "text-green-800 dark:text-green-200 space-y-1")}>
                           {section.content.tips.map((tip, idx) => (
                             <li key={idx}>• {tip}</li>
                           ))}
@@ -385,38 +386,31 @@ export default function HelpPage() {
 
         {/* Additional Resources */}
         <Card className="mt-8">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
+          <h2 className={cn(typographyClasses.sectionTitle, "mb-4")}>
             Additional Resources
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
-                📄 Detailed Documentation
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                For technical details and API reference, see:
-              </p>
-              <ul className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
-                <li>• AUTOMATION_FEATURES.md (in dashboard folder)</li>
-                <li>• P1_IMPLEMENTATION_SUMMARY.md (in project root)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
-                🌐 External Resources
-              </h3>
-              <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Globe size={20} className="text-blue-600 dark:text-blue-400" />
+                <h3 className={typographyClasses.subsectionTitle}>
+                  External Resources
+                </h3>
+              </div>
+              <ul className={cn(typographyClasses.body, "space-y-2")}>
                 <li>• <a href="https://artificialintelligenceact.eu/" target="_blank" className="text-blue-600 dark:text-blue-400 hover:underline">EU AI Act Official Text</a></li>
                 <li>• <a href="https://github.com/Javihaus/cert-framework" target="_blank" className="text-blue-600 dark:text-blue-400 hover:underline">CERT Framework GitHub</a></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
-                💬 Need More Help?
-              </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <div className="flex items-center gap-2 mb-2">
+                <MessageCircle size={20} className="text-blue-600 dark:text-blue-400" />
+                <h3 className={typographyClasses.subsectionTitle}>
+                  Need More Help?
+                </h3>
+              </div>
+              <p className={typographyClasses.body}>
                 Contact: <a href="mailto:javier@jmarin.info" className="text-blue-600 dark:text-blue-400 hover:underline">javier@jmarin.info</a>
               </p>
             </div>
@@ -425,47 +419,47 @@ export default function HelpPage() {
 
         {/* FAQ */}
         <Card className="mt-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
+          <h2 className={cn(typographyClasses.sectionTitle, "mb-4")}>
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+              <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                 Q: Is my data sent to external servers?
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className={typographyClasses.body}>
                 A: No. All processing happens locally or on your infrastructure. Your traces never leave your control.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+              <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                 Q: How long does document generation take?
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className={typographyClasses.body}>
                 A: Typically 10-30 seconds for 5 documents with 1000 traces. The documents are 70% complete - you need 8-10 hours for expert review.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+              <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                 Q: What's the difference between semantic and exact evaluators?
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className={typographyClasses.body}>
                 A: Semantic uses AI to understand meaning (flexible, recommended). Exact requires identical text (strict, use for financial/legal).
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+              <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                 Q: How many traces do I need?
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className={typographyClasses.body}>
                 A: Minimum 100 for basic analysis. Recommended 1000-10000 covering 30+ days for robust compliance reporting.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+              <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>
                 Q: Can I use this for production compliance submissions?
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className={typographyClasses.body}>
                 A: Yes, but documents require expert review. The [EXPERT INPUT REQUIRED] sections need domain expertise before submission.
               </p>
             </div>
