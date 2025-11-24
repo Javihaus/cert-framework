@@ -1,32 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
-
-// Promisify fs functions for async/await
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
 
 /**
- * API endpoint to generate compliance documents.
+ * API endpoint to generate compliance documents using async FastAPI backend.
  *
- * Flow:
+ * New Flow (Production):
  * 1. Receive JSON data from frontend
- * 2. Write JSON to temporary files
- * 3. Spawn Python script to populate templates
- * 4. Create ZIP file of generated documents
- * 5. Return download URL
+ * 2. Send to FastAPI backend (/api/v2/documents/generate)
+ * 3. Receive job_id from backend
+ * 4. Poll job status until complete
+ * 5. Return download URL from MinIO
  *
- * Critical details:
- * - Use unique temp directory (multiple simultaneous requests)
- * - Clean up temp files after 1 hour
- * - Capture Python stderr for debugging
- * - Validate files exist before returning URLs
+ * Benefits:
+ * - Non-blocking: Can handle multiple concurrent requests
+ * - Scalable: Celery workers can be scaled independently
+ * - Reliable: Failed jobs auto-retry
+ * - Production-ready: Files stored in MinIO, not /tmp
  */
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const POLL_INTERVAL_MS = 2000;  // Poll every 2 seconds
+const MAX_POLL_ATTEMPTS = 150;  // 5 minutes max (150 * 2s)
+
 export async function POST(request: NextRequest) {
-  console.log('[API] Document generation requested');
+  console.log('[API] Document generation requested (v2 async)');
 
   try {
     // Parse request body
@@ -40,117 +36,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create unique temp directory
-    // Use timestamp to avoid collisions
-    const tempDir = path.join('/tmp', `cert-${Date.now()}`);
-    await mkdir(tempDir, { recursive: true });
-    console.log(`[API] Created temp directory: ${tempDir}`);
+    // Step 1: Start document generation job
+    console.log('[API] Starting document generation job...');
 
-    // Write JSON data to temp files
-    const riskPath = path.join(tempDir, 'risk.json');
-    const compliancePath = path.join(tempDir, 'compliance.json');
-
-    await writeFile(riskPath, JSON.stringify(riskData, null, 2));
-    await writeFile(compliancePath, JSON.stringify(complianceData, null, 2));
-    console.log('[API] Wrote JSON files');
-
-    // Output directory for generated documents
-    const outputDir = path.join(tempDir, 'documents');
-    await mkdir(outputDir, { recursive: true });
-
-    // Path to Python script
-    // Assumes dashboard is in cert-framework/dashboard/
-    // Script is in cert-framework/scripts/
-    const scriptPath = path.join(process.cwd(), '..', 'scripts', 'populate_templates.py');
-
-    console.log(`[API] Running Python script: ${scriptPath}`);
-
-    // Run Python script
-    // This spawns a subprocess that runs the populate_templates.py script
-    const pythonProcess = spawn('python3', [
-      scriptPath,
-      riskPath,
-      compliancePath,
-      '--output',
-      outputDir
-    ]);
-
-    // Capture stdout and stderr
-    let stdout = '';
-    let stderr = '';
-
-    pythonProcess.stdout.on('data', (data) => {
-      stdout += data.toString();
+    const startResponse = await fetch(`${API_BASE_URL}/api/v2/documents/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ riskData, complianceData }),
     });
 
-    pythonProcess.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-
-    // Wait for Python script to complete
-    await new Promise<void>((resolve, reject) => {
-      pythonProcess.on('close', (code) => {
-        if (code === 0) {
-          console.log('[API] Python script completed successfully');
-          console.log('[API] Output:', stdout);
-          resolve();
-        } else {
-          console.error('[API] Python script failed with code:', code);
-          console.error('[API] Error output:', stderr);
-          reject(new Error(`Python script failed: ${stderr}`));
-        }
-      });
-
-      pythonProcess.on('error', (error) => {
-        console.error('[API] Failed to spawn Python process:', error);
-        reject(error);
-      });
-    });
-
-    // Create ZIP file of generated documents
-    const zipPath = path.join(tempDir, 'compliance_package.zip');
-
-    console.log('[API] Creating ZIP file');
-
-    const zipProcess = spawn('zip', [
-      '-r',
-      '-j',  // Junk directory names (flat structure in ZIP)
-      zipPath,
-      outputDir
-    ]);
-
-    await new Promise<void>((resolve, reject) => {
-      zipProcess.on('close', (code) => {
-        if (code === 0) {
-          console.log('[API] ZIP file created');
-          resolve();
-        } else {
-          reject(new Error('ZIP creation failed'));
-        }
-      });
-    });
-
-    // Verify ZIP file exists and has content
-    const stats = fs.statSync(zipPath);
-    if (stats.size === 0) {
-      throw new Error('Generated ZIP file is empty');
+    if (!startResponse.ok) {
+      const errorData = await startResponse.json();
+      throw new Error(errorData.detail || 'Failed to start document generation');
     }
 
-    console.log(`[API] ZIP file size: ${stats.size} bytes`);
+    const { job_id } = await startResponse.json();
+    console.log(`[API] Job started: ${job_id}`);
 
-    // In production, upload to S3/cloud storage and return that URL
-    // For MVP, we'll serve it directly from /tmp
-    // This is NOT production-ready (temp files should be cleaned up)
+    // Step 2: Poll for job completion
+    let attempts = 0;
+    let jobResult = null;
 
-    // Return download URL
-    // The URL will be handled by another API endpoint
-    const downloadUrl = `/api/download/${path.basename(tempDir)}`;
+    while (attempts < MAX_POLL_ATTEMPTS) {
+      attempts++;
 
-    console.log(`[API] Success! Download URL: ${downloadUrl}`);
+      // Wait before polling
+      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+
+      // Check job status
+      const statusResponse = await fetch(`${API_BASE_URL}/api/v2/documents/status/${job_id}`);
+
+      if (!statusResponse.ok) {
+        console.error('[API] Failed to check job status');
+        continue;
+      }
+
+      const statusData = await statusResponse.json();
+      console.log(`[API] Job status (attempt ${attempts}): ${statusData.status}`);
+
+      if (statusData.status === 'SUCCESS') {
+        jobResult = statusData.result;
+        break;
+      } else if (statusData.status === 'FAILURE') {
+        throw new Error(statusData.error || 'Document generation failed');
+      }
+
+      // Continue polling if PENDING or STARTED
+    }
+
+    if (!jobResult) {
+      throw new Error('Document generation timed out. Please try again.');
+    }
+
+    console.log(`[API] Success! Download URL: ${jobResult.file_url}`);
 
     return NextResponse.json({
       success: true,
-      downloadUrl: downloadUrl
+      downloadUrl: jobResult.file_url,
+      fileName: jobResult.file_name,
+      jobId: job_id,
     });
 
   } catch (error) {

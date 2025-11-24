@@ -27,6 +27,18 @@ from cert.metrics.engine import MetricsEngine
 from cert.value.analyzer import CostAnalyzer
 from cert.value.optimizer import Optimizer
 
+# Import Celery tasks (lazy import to avoid circular dependencies)
+try:
+    from celery.result import AsyncResult
+    from backend.tasks.document_generation import generate_compliance_documents
+    from backend.tasks.audit_runner import run_accuracy_audit
+    from backend.tasks.pdf_generation import generate_assessment_pdf
+
+    CELERY_AVAILABLE = True
+except ImportError:
+    CELERY_AVAILABLE = False
+    logger.warning("Celery tasks not available - async endpoints will be disabled")
+
 logger = logging.getLogger(__name__)
 
 # Create FastAPI app
@@ -65,20 +77,31 @@ def root():
         "name": "CERT API",
         "version": "4.0.0",
         "status": "running",
-        "endpoints": [
-            "/api/metrics",
-            "/api/metrics/summary",
-            "/api/metrics/cost",
-            "/api/metrics/health",
-            "/api/metrics/quality",
-            "/api/metrics/config",
-            "/api/connectors/status",
-            "/api/connectors/health",
-            "/api/costs/summary",
-            "/api/costs/trend",
-            "/api/optimization/recommendations",
-            "/api/traces/recent",
-        ],
+        "celery_available": CELERY_AVAILABLE,
+        "endpoints": {
+            "metrics": [
+                "/api/metrics",
+                "/api/metrics/summary",
+                "/api/metrics/cost",
+                "/api/metrics/health",
+                "/api/metrics/quality",
+                "/api/metrics/config",
+            ],
+            "connectors": ["/api/connectors/status", "/api/connectors/health"],
+            "costs": ["/api/costs/summary", "/api/costs/trend"],
+            "optimization": ["/api/optimization/recommendations"],
+            "traces": ["/api/traces/recent"],
+            "async_v2": [
+                "/api/v2/documents/generate",
+                "/api/v2/documents/status/{job_id}",
+                "/api/v2/audit/run",
+                "/api/v2/audit/status/{job_id}",
+                "/api/v2/pdf/generate",
+                "/api/v2/pdf/status/{job_id}",
+            ]
+            if CELERY_AVAILABLE
+            else [],
+        },
     }
 
 
@@ -446,6 +469,252 @@ def submit_assessment(submission: AssessmentSubmission):
         }
     except Exception as e:
         logger.error(f"Failed to submit assessment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# =============================================================================
+# Async Document Generation Endpoints (Celery-based)
+# =============================================================================
+
+
+class DocumentGenerationRequest(BaseModel):
+    """Request model for document generation."""
+
+    riskData: Dict[str, Any]
+    complianceData: Dict[str, Any]
+
+
+class AuditRequest(BaseModel):
+    """Request model for audit execution."""
+
+    traces: str  # JSONL format
+    threshold: float = 0.7
+    evaluator: str = "semantic"
+
+
+class PDFGenerationRequest(BaseModel):
+    """Request model for PDF generation."""
+
+    reportData: Dict[str, Any]
+
+
+@app.post("/api/v2/documents/generate")
+def generate_documents_async(request: DocumentGenerationRequest):
+    """
+    Start async document generation job.
+
+    Returns job_id immediately, allowing client to poll for status.
+
+    Example:
+        POST /api/v2/documents/generate
+        {
+            "riskData": {...},
+            "complianceData": {...}
+        }
+
+        Response:
+        {
+            "job_id": "abc-123",
+            "status": "pending"
+        }
+    """
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="Async processing not available. Celery workers not configured.",
+        )
+
+    try:
+        # Start Celery task
+        task = generate_compliance_documents.delay(request.riskData, request.complianceData)
+
+        logger.info(f"Started document generation job: {task.id}")
+
+        return {"job_id": task.id, "status": "pending", "message": "Document generation started"}
+
+    except Exception as e:
+        logger.error(f"Failed to start document generation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v2/documents/status/{job_id}")
+def get_document_status(job_id: str):
+    """
+    Check status of document generation job.
+
+    Returns:
+        - status: 'PENDING', 'STARTED', 'SUCCESS', 'FAILURE', 'RETRY'
+        - result: Job result if completed
+        - error: Error message if failed
+
+    Example:
+        GET /api/v2/documents/status/abc-123
+
+        Response (in progress):
+        {
+            "job_id": "abc-123",
+            "status": "STARTED"
+        }
+
+        Response (completed):
+        {
+            "job_id": "abc-123",
+            "status": "SUCCESS",
+            "result": {
+                "file_url": "http://...",
+                "file_name": "compliance_package.zip"
+            }
+        }
+    """
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503, detail="Async processing not available. Celery workers not configured."
+        )
+
+    try:
+        task_result = AsyncResult(job_id)
+
+        response = {"job_id": job_id, "status": task_result.state}
+
+        if task_result.ready():
+            if task_result.successful():
+                response["result"] = task_result.result
+            else:
+                response["error"] = str(task_result.info)
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Failed to get job status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v2/audit/run")
+def run_audit_async(request: AuditRequest):
+    """
+    Start async accuracy audit job.
+
+    Returns job_id immediately for status polling.
+
+    Example:
+        POST /api/v2/audit/run
+        {
+            "traces": "...",  # JSONL format
+            "threshold": 0.7,
+            "evaluator": "semantic"
+        }
+
+        Response:
+        {
+            "job_id": "xyz-456",
+            "status": "pending"
+        }
+    """
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503, detail="Async processing not available. Celery workers not configured."
+        )
+
+    try:
+        # Start Celery task
+        task = run_accuracy_audit.delay(request.traces, request.threshold, request.evaluator)
+
+        logger.info(f"Started audit job: {task.id}")
+
+        return {"job_id": task.id, "status": "pending", "message": "Audit started"}
+
+    except Exception as e:
+        logger.error(f"Failed to start audit: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v2/audit/status/{job_id}")
+def get_audit_status(job_id: str):
+    """
+    Check status of audit job.
+
+    Same response format as document status endpoint.
+    """
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503, detail="Async processing not available. Celery workers not configured."
+        )
+
+    try:
+        task_result = AsyncResult(job_id)
+
+        response = {"job_id": job_id, "status": task_result.state}
+
+        if task_result.ready():
+            if task_result.successful():
+                response["result"] = task_result.result
+            else:
+                response["error"] = str(task_result.info)
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Failed to get audit status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v2/pdf/generate")
+def generate_pdf_async(request: PDFGenerationRequest):
+    """
+    Start async PDF generation job.
+
+    Example:
+        POST /api/v2/pdf/generate
+        {
+            "reportData": {...}
+        }
+
+        Response:
+        {
+            "job_id": "pdf-789",
+            "status": "pending"
+        }
+    """
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503, detail="Async processing not available. Celery workers not configured."
+        )
+
+    try:
+        task = generate_assessment_pdf.delay(request.reportData)
+
+        logger.info(f"Started PDF generation job: {task.id}")
+
+        return {"job_id": task.id, "status": "pending", "message": "PDF generation started"}
+
+    except Exception as e:
+        logger.error(f"Failed to start PDF generation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v2/pdf/status/{job_id}")
+def get_pdf_status(job_id: str):
+    """Check status of PDF generation job."""
+    if not CELERY_AVAILABLE:
+        raise HTTPException(
+            status_code=503, detail="Async processing not available. Celery workers not configured."
+        )
+
+    try:
+        task_result = AsyncResult(job_id)
+
+        response = {"job_id": job_id, "status": task_result.state}
+
+        if task_result.ready():
+            if task_result.successful():
+                response["result"] = task_result.result
+            else:
+                response["error"] = str(task_result.info)
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Failed to get PDF status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
