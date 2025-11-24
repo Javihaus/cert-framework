@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
-
-const writeFile = promisify(fs.writeFile);
-const readFile = promisify(fs.readFile);
-const mkdir = promisify(fs.mkdir);
 
 /**
- * API endpoint to run compliance audit on traces.
+ * API endpoint to run compliance audit on traces using async FastAPI backend.
  *
- * Receives traces data and runs accuracy evaluation using Python backend.
+ * New Flow (Production):
+ * 1. Receive traces data from frontend
+ * 2. Send to FastAPI backend (/api/v2/audit/run)
+ * 3. Receive job_id from backend
+ * 4. Poll job status until complete
+ * 5. Return audit results
+ *
+ * Benefits:
+ * - Non-blocking execution
+ * - Can handle multiple concurrent audits
+ * - Scalable Celery workers
+ * - Auto-retry on failures
  */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const POLL_INTERVAL_MS = 1000;  // Poll every 1 second (audits are faster)
+const MAX_POLL_ATTEMPTS = 180;  // 3 minutes max (180 * 1s)
+
 export async function POST(request: NextRequest) {
-  console.log('[API] Audit requested');
+  console.log('[API] Audit requested (v2 async)');
 
   try {
     const body = await request.json();
@@ -27,85 +35,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create unique temp directory
-    const tempDir = path.join('/tmp', `cert-audit-${Date.now()}`);
-    await mkdir(tempDir, { recursive: true });
-    console.log(`[API] Created temp directory: ${tempDir}`);
+    // Step 1: Start audit job
+    console.log(`[API] Starting audit job with ${evaluator} evaluator, threshold ${threshold}`);
 
-    // Write traces to temp file
-    const tracesPath = path.join(tempDir, 'traces.jsonl');
-    await writeFile(tracesPath, traces);
-    console.log('[API] Wrote traces file');
-
-    // Output path for results
-    const resultsPath = path.join(tempDir, 'audit_results.json');
-
-    // Path to Python script (use the cert CLI)
-    const certPath = 'cert';  // Assumes cert is installed in environment
-
-    console.log(`[API] Running audit with ${evaluator} evaluator, threshold ${threshold}`);
-
-    // Run cert audit command
-    const auditProcess = spawn('python3', [
-      '-m', 'cert.cli.main',
-      'audit',
-      tracesPath,
-      '--format', 'json',
-      '--output', resultsPath,
-      '--threshold', threshold.toString(),
-      '--evaluator', evaluator
-    ]);
-
-    let stdout = '';
-    let stderr = '';
-
-    auditProcess.stdout.on('data', (data) => {
-      stdout += data.toString();
+    const startResponse = await fetch(`${API_BASE_URL}/api/v2/audit/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ traces, threshold, evaluator }),
     });
 
-    auditProcess.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
+    if (!startResponse.ok) {
+      const errorData = await startResponse.json();
+      throw new Error(errorData.detail || 'Failed to start audit');
+    }
 
-    // Wait for audit to complete
-    await new Promise<void>((resolve, reject) => {
-      auditProcess.on('close', (code) => {
-        if (code === 0) {
-          console.log('[API] Audit completed successfully');
-          console.log('[API] Output:', stdout);
-          resolve();
-        } else {
-          console.error('[API] Audit failed with code:', code);
-          console.error('[API] Error output:', stderr);
-          reject(new Error(`Audit failed: ${stderr}`));
-        }
-      });
+    const { job_id } = await startResponse.json();
+    console.log(`[API] Audit job started: ${job_id}`);
 
-      auditProcess.on('error', (error) => {
-        console.error('[API] Failed to spawn audit process:', error);
-        reject(error);
-      });
-    });
+    // Step 2: Poll for job completion
+    let attempts = 0;
+    let jobResult = null;
 
-    // Read results
-    const resultsData = await readFile(resultsPath, 'utf-8');
-    const auditResults = JSON.parse(resultsData);
+    while (attempts < MAX_POLL_ATTEMPTS) {
+      attempts++;
 
-    console.log(`[API] Audit complete: ${auditResults.article_15.passed_traces}/${auditResults.article_15.total_traces} passed`);
+      // Wait before polling
+      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
 
-    // Format response
-    const response = {
-      total_traces: auditResults.article_15.total_traces,
-      passed_traces: auditResults.article_15.passed_traces,
-      failed_traces: auditResults.article_15.failed_traces,
-      pass_rate: auditResults.article_15.accuracy,
-      threshold: threshold,
-      evaluator_type: auditResults.article_15.evaluator_type,
-      compliant: auditResults.article_15.compliant,
-      results: auditResults.traces || []
-    };
+      // Check job status
+      const statusResponse = await fetch(`${API_BASE_URL}/api/v2/audit/status/${job_id}`);
 
-    return NextResponse.json(response);
+      if (!statusResponse.ok) {
+        console.error('[API] Failed to check audit status');
+        continue;
+      }
+
+      const statusData = await statusResponse.json();
+      console.log(`[API] Audit status (attempt ${attempts}): ${statusData.status}`);
+
+      if (statusData.status === 'SUCCESS') {
+        jobResult = statusData.result;
+        break;
+      } else if (statusData.status === 'FAILURE') {
+        throw new Error(statusData.error || 'Audit execution failed');
+      }
+
+      // Continue polling if PENDING or STARTED
+    }
+
+    if (!jobResult) {
+      throw new Error('Audit execution timed out. Please try again.');
+    }
+
+    console.log(`[API] Audit complete: ${jobResult.passed_traces}/${jobResult.total_traces} passed`);
+
+    return NextResponse.json(jobResult);
 
   } catch (error) {
     console.error('[API] Error:', error);

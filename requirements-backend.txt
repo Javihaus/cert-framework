@@ -1,0 +1,32 @@
+# CERT Backend Infrastructure Dependencies
+# Install with: pip install -r requirements-backend.txt
+
+# Task Queue
+celery>=5.3.0,<6.0.0
+celery[redis]
+redis>=5.0.0,<6.0.0
+
+# S3-Compatible Storage
+minio>=7.2.0,<8.0.0
+
+# PDF Generation
+weasyprint>=60.0,<61.0
+pillow>=10.0.0,<11.0.0
+
+# Document Generation (already in main requirements)
+# python-docx>=1.1.0
+
+# FastAPI Server (add if not in main requirements)
+fastapi>=0.104.0,<1.0.0
+uvicorn[standard]>=0.24.0,<1.0.0
+
+# Database (already in main requirements via Supabase)
+# supabase>=2.0.0
+
+# Additional utilities
+python-multipart>=0.0.6  # For file uploads
+pydantic-settings>=2.0.0  # For config management
+
+# Monitoring and observability
+flower>=2.0.0  # Celery task monitoring UI
+prometheus-client>=0.19.0  # Already in main requirements
