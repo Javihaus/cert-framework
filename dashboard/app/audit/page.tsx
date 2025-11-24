@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import FileUpload from '@/components/FileUpload';
-import { Upload, Play, Download, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { Upload, Play, Download, CheckCircle2, XCircle, AlertTriangle, Shield, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { typographyClasses } from '@/theme/typography';
 
@@ -102,10 +102,10 @@ export default function AuditPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className={cn(typographyClasses.pageTitle, "mb-2")}>
-            EU AI Act Compliance Audit
+            Accuracy Testing
           </h1>
           <p className={typographyClasses.body}>
-            Evaluate system accuracy against Article 15 requirements
+            Test your AI system's response quality against expected outputs
           </p>
         </div>
 
@@ -199,24 +199,58 @@ export default function AuditPage() {
                 size="lg"
                 fullWidth
               >
-                {isRunning ? 'Running Audit...' : 'Run Compliance Audit'}
+                {isRunning ? 'Running Test...' : 'Run Accuracy Test'}
               </Button>
             </Card>
 
-            {/* Info Card */}
+            {/* Info Card - General Value */}
             <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
               <h3 className={cn(typographyClasses.subsectionTitle, "text-blue-900 dark:text-blue-100 mb-2")}>
-                EU AI Act Article 15 Requirements
+                Why Accuracy Testing Matters
               </h3>
               <p className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 mb-3")}>
-                High-risk AI systems must achieve appropriate levels of accuracy, robustness, and cybersecurity.
-                This audit evaluates your system's accuracy based on production traces.
+                Regular accuracy testing helps you catch quality issues before they reach users.
               </p>
               <ul className={cn(typographyClasses.body, "text-blue-700 dark:text-blue-300 space-y-1")}>
-                <li>• Article 15(1): Systems must achieve appropriate accuracy levels</li>
-                <li>• Article 15(2): Robustness and reliability testing required</li>
-                <li>• Typical compliance threshold: 90% accuracy rate</li>
+                <li>• Detect quality degradation over time</li>
+                <li>• Compare performance across models (GPT-4 vs Claude vs alternatives)</li>
+                <li>• Validate changes before production deployment</li>
+                <li>• Meet regulatory accuracy requirements when needed</li>
               </ul>
+            </Card>
+
+            {/* Expandable: For Regulated Industries */}
+            <Card className="mt-4">
+              <details className="group">
+                <summary className={cn(typographyClasses.subsectionTitle, "cursor-pointer list-none flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors")}>
+                  <span className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    For Regulated Industries
+                  </span>
+                  <ChevronDown className="w-5 h-5 text-zinc-400 group-open:rotate-180 transition-transform" />
+                </summary>
+                <div className="px-4 pb-4 pt-2 space-y-3">
+                  <div>
+                    <h4 className={cn(typographyClasses.label, "mb-1")}>EU AI Act (Article 15)</h4>
+                    <p className={cn(typographyClasses.body, "text-zinc-600 dark:text-zinc-400")}>
+                      High-risk AI systems must achieve appropriate levels of accuracy, robustness, and cybersecurity.
+                      Use semantic evaluation with 90% threshold to meet Article 15 requirements.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className={cn(typographyClasses.label, "mb-1")}>FDA Software Validation</h4>
+                    <p className={cn(typographyClasses.body, "text-zinc-600 dark:text-zinc-400")}>
+                      Medical AI systems require documented accuracy testing. Configure thresholds based on your risk classification.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className={cn(typographyClasses.label, "mb-1")}>Financial Services</h4>
+                    <p className={cn(typographyClasses.body, "text-zinc-600 dark:text-zinc-400")}>
+                      Banking and insurance AI often requires exact match evaluation for regulatory compliance.
+                    </p>
+                  </div>
+                </div>
+              </details>
             </Card>
           </>
         ) : (
@@ -246,7 +280,7 @@ export default function AuditPage() {
                       typographyClasses.body,
                       report.compliant ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
                     )}>
-                      Article 15 Accuracy Assessment - {report.evaluator_type}
+                      Accuracy Test Results - {report.evaluator_type}
                     </p>
                   </div>
                 </div>

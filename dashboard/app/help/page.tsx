@@ -284,7 +284,7 @@ export default function HelpPage() {
             Help & Documentation
           </h1>
           <p className={typographyClasses.body}>
-            Learn how to use CERT Dashboard for EU AI Act compliance
+            Monitor, analyze, and optimize your production AI systems
           </p>
         </div>
 
@@ -297,13 +297,16 @@ export default function HelpPage() {
                 Quick Start Guide
               </h3>
               <p className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 mb-3")}>
-                New to CERT Dashboard? Follow these steps:
+                New to CERT Dashboard? Follow these essential workflows:
               </p>
               <ol className={cn(typographyClasses.body, "text-blue-800 dark:text-blue-200 space-y-1")}>
-                <li><strong>1. Risk Assessment</strong> → Understand your compliance requirements</li>
-                <li><strong>2. Document Generation</strong> → Create compliance documents from traces</li>
-                <li><strong>3. Compliance Audit</strong> → Check accuracy and compliance status</li>
+                <li><strong>1. View Metrics</strong> → Monitor cost, performance, and quality</li>
+                <li><strong>2. Run Tests</strong> → Evaluate accuracy and response quality</li>
+                <li><strong>3. Optimize</strong> → Find cost savings and performance improvements</li>
               </ol>
+              <p className={cn(typographyClasses.bodySmall, "text-blue-700 dark:text-blue-300 mt-3")}>
+                💡 For regulated industries: See the Governance section for compliance features
+              </p>
             </div>
           </div>
         </Card>

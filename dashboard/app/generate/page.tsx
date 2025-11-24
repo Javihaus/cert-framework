@@ -16,31 +16,31 @@ interface DocumentType {
   required: boolean;
 }
 
+interface DocumentCategory {
+  name: string;
+  description: string;
+  documents: DocumentType[];
+}
+
 const DOCUMENT_TYPES: DocumentType[] = [
+  // Standard Documentation
   {
-    id: 'risk_classification',
-    name: 'Risk Classification Report',
-    description: 'EU AI Act Annex III risk assessment',
-    pages: '2-3 pages',
-    required: true
-  },
-  {
-    id: 'annex_iv',
-    name: 'Annex IV Technical Documentation',
-    description: 'Complete technical documentation package',
+    id: 'technical_docs',
+    name: 'System Technical Documentation',
+    description: 'Comprehensive technical specifications from production data',
     pages: '20-25 pages',
-    required: true
+    required: false
   },
   {
-    id: 'article_15',
-    name: 'Article 15 Compliance Report',
-    description: 'Accuracy, robustness, and cybersecurity report',
+    id: 'performance_report',
+    name: 'Performance & Quality Report',
+    description: 'Cost, latency, accuracy, and error analysis',
     pages: '5-8 pages',
     required: false
   },
   {
     id: 'audit_trail',
-    name: 'Audit Trail Setup Guide',
+    name: 'Audit Trail Guide',
     description: 'Logging and record-keeping procedures',
     pages: '3-4 pages',
     required: false
@@ -48,9 +48,30 @@ const DOCUMENT_TYPES: DocumentType[] = [
   {
     id: 'monitoring',
     name: 'Monitoring Framework',
-    description: 'Continuous monitoring procedures',
+    description: 'Continuous monitoring and alerting setup',
     pages: '4-6 pages',
     required: false
+  },
+  // Compliance Templates
+  {
+    id: 'eu_ai_act_package',
+    name: 'EU AI Act Compliance Package',
+    description: 'Risk classification, Annex IV docs, Article 15 report',
+    pages: '30+ pages',
+    required: false
+  }
+];
+
+const DOCUMENT_CATEGORIES: DocumentCategory[] = [
+  {
+    name: 'Standard Documentation',
+    description: 'General technical documentation and reports',
+    documents: DOCUMENT_TYPES.filter(d => ['technical_docs', 'performance_report', 'audit_trail', 'monitoring'].includes(d.id))
+  },
+  {
+    name: 'Compliance Templates',
+    description: 'Regulatory compliance packages',
+    documents: DOCUMENT_TYPES.filter(d => d.id === 'eu_ai_act_package')
   }
 ];
 
@@ -60,9 +81,7 @@ export default function GenerateDocumentsPage() {
   const [systemVersion, setSystemVersion] = useState('v1.0');
   const [providerName, setProviderName] = useState('');
   const [intendedPurpose, setIntendedPurpose] = useState('');
-  const [selectedDocs, setSelectedDocs] = useState<string[]>(
-    DOCUMENT_TYPES.filter(d => d.required).map(d => d.id)
-  );
+  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,9 +92,6 @@ export default function GenerateDocumentsPage() {
   };
 
   const toggleDocument = (docId: string) => {
-    const doc = DOCUMENT_TYPES.find(d => d.id === docId);
-    if (doc?.required) return; // Can't unselect required docs
-
     if (selectedDocs.includes(docId)) {
       setSelectedDocs(selectedDocs.filter(id => id !== docId));
     } else {
@@ -189,10 +205,10 @@ export default function GenerateDocumentsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className={cn(typographyClasses.pageTitle, "mb-2")}>
-            Generate Compliance Documents
+            Documentation Generator
           </h1>
           <p className={typographyClasses.body}>
-            Auto-generate EU AI Act compliance documentation from your production traces
+            Generate technical documentation, reports, and compliance packages from your traces
           </p>
         </div>
 
@@ -290,46 +306,52 @@ export default function GenerateDocumentsPage() {
                   Select Documents
                 </h2>
               </div>
-              <div className="space-y-3">
-                {DOCUMENT_TYPES.map((doc) => (
-                  <div
-                    key={doc.id}
-                    onClick={() => toggleDocument(doc.id)}
-                    className={cn(
-                      'p-4 border-2 rounded-lg transition-all',
-                      doc.required
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10 cursor-not-allowed'
-                        : selectedDocs.includes(doc.id)
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10 cursor-pointer'
-                        : 'border-zinc-200 dark:border-zinc-700 hover:border-blue-400 cursor-pointer'
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={cn(
-                        'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5',
-                        selectedDocs.includes(doc.id)
-                          ? 'border-blue-600 bg-blue-600'
-                          : 'border-zinc-300 dark:border-zinc-600'
-                      )}>
-                        {selectedDocs.includes(doc.id) && (
-                          <CheckCircle2 size={14} className="text-white" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className={typographyClasses.subsectionTitle}>{doc.name}</h3>
-                          {doc.required && (
-                            <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded">
-                              Required
-                            </span>
-                          )}
-                        </div>
-                        <p className={cn(typographyClasses.body, "mt-1")}>{doc.description}</p>
-                        <p className={cn(typographyClasses.caption, "mt-1")}>{doc.pages}</p>
-                      </div>
-                    </div>
+
+              {DOCUMENT_CATEGORIES.map((category, categoryIdx) => (
+                <div key={category.name} className={categoryIdx > 0 ? 'mt-6' : ''}>
+                  <div className="mb-3">
+                    <h3 className={cn(typographyClasses.subsectionTitle, "mb-1")}>{category.name}</h3>
+                    <p className={cn(typographyClasses.bodySmall, "text-zinc-600 dark:text-zinc-400")}>{category.description}</p>
                   </div>
-                ))}
+                  <div className="space-y-3">
+                    {category.documents.map((doc) => (
+                      <div
+                        key={doc.id}
+                        onClick={() => toggleDocument(doc.id)}
+                        className={cn(
+                          'p-4 border-2 rounded-lg cursor-pointer transition-all',
+                          selectedDocs.includes(doc.id)
+                            ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10'
+                            : 'border-zinc-200 dark:border-zinc-700 hover:border-blue-400'
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={cn(
+                            'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5',
+                            selectedDocs.includes(doc.id)
+                              ? 'border-blue-600 bg-blue-600'
+                              : 'border-zinc-300 dark:border-zinc-600'
+                          )}>
+                            {selectedDocs.includes(doc.id) && (
+                              <CheckCircle2 size={14} className="text-white" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className={typographyClasses.subsectionTitle}>{doc.name}</h3>
+                            <p className={cn(typographyClasses.body, "mt-1")}>{doc.description}</p>
+                            <p className={cn(typographyClasses.caption, "mt-1")}>{doc.pages} • Auto-populated from traces</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className={cn(typographyClasses.bodySmall, "text-amber-800 dark:text-amber-200")}>
+                  💡 Coming soon: ISO 27001, SOC 2, and FDA validation templates
+                </p>
               </div>
             </Card>
 
@@ -378,7 +400,7 @@ export default function GenerateDocumentsPage() {
                 Documents Generated Successfully!
               </h2>
               <p className={cn(typographyClasses.body, "text-green-700 dark:text-green-300 mb-6")}>
-                Your compliance documentation package is ready for download
+                Your documentation package is ready for download
               </p>
               <div className="flex gap-4 justify-center">
                 <Button
