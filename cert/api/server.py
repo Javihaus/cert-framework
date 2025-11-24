@@ -27,19 +27,19 @@ from cert.metrics.engine import MetricsEngine
 from cert.value.analyzer import CostAnalyzer
 from cert.value.optimizer import Optimizer
 
+logger = logging.getLogger(__name__)
+
 # Import Celery tasks (lazy import to avoid circular dependencies)
 try:
-    from celery.result import AsyncResult
-    from backend.tasks.document_generation import generate_compliance_documents
     from backend.tasks.audit_runner import run_accuracy_audit
+    from backend.tasks.document_generation import generate_compliance_documents
     from backend.tasks.pdf_generation import generate_assessment_pdf
+    from celery.result import AsyncResult
 
     CELERY_AVAILABLE = True
 except ImportError:
     CELERY_AVAILABLE = False
     logger.warning("Celery tasks not available - async endpoints will be disabled")
-
-logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
