@@ -84,7 +84,7 @@ export default function ObservabilityPage() {
     // Group errors by type
     const errorsByType: Record<string, { count: number; lastOccurred: string }> = {};
     errorTraces.forEach((t) => {
-      const errorType = t.metadata?.error?.type || 'Unknown';
+      const errorType = typeof t.metadata?.error === 'string' ? t.metadata.error : 'Unknown';
       if (!errorsByType[errorType]) {
         errorsByType[errorType] = { count: 0, lastOccurred: t.timestamp };
       }
