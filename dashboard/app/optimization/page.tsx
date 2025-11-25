@@ -7,15 +7,16 @@ import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
 import { Zap, DollarSign, TrendingDown, Target, Package } from 'lucide-react';
 import { Trace, OptimizationOpportunity } from '@/types/trace';
-import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
+import { TraceAnalyzer } from '@/lib/trace-analyzer';
 
 export default function OptimizationPage() {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [recommendations, setRecommendations] = useState<OptimizationOpportunity[]>([]);
   const [sortBy, setSortBy] = useState<'savings' | 'impact'>('savings');
 
-  const handleFileLoad = (content: string) => {
-    const parsed = parseTraceFile(content);
+  const handleFileLoad = (data: Trace[] | Trace) => {
+    // FileUpload already parses JSONL/JSON, so data is already an array or object
+    const parsed = Array.isArray(data) ? data : [data];
     setTraces(parsed);
     analyzeOptimizations(parsed);
   };

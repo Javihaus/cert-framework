@@ -100,10 +100,26 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[API] Error:', error);
 
+    // Check if this is a connection error (backend not running)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isConnectionError = errorMessage.includes('fetch failed') ||
+                              errorMessage.includes('ECONNREFUSED') ||
+                              errorMessage.includes('network');
+
+    if (isConnectionError) {
+      return NextResponse.json(
+        {
+          error: 'Backend service unavailable',
+          details: `Unable to connect to document generation service at ${API_BASE_URL}. Please ensure the backend server is running.`
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       {
         error: 'Document generation failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: errorMessage
       },
       { status: 500 }
     );
