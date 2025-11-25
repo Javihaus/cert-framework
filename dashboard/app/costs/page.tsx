@@ -7,15 +7,16 @@ import CostTrendChart from '@/components/CostTrendChart';
 import Card from '@/components/Card';
 import { DollarSign, TrendingUp, TrendingDown, Calendar, Package } from 'lucide-react';
 import { Trace, CostSummary } from '@/types/trace';
-import { TraceAnalyzer, parseTraceFile } from '@/lib/trace-analyzer';
+import { TraceAnalyzer } from '@/lib/trace-analyzer';
 
 export default function CostsPage() {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [costData, setCostData] = useState<CostSummary | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
 
-  const handleFileLoad = (content: string) => {
-    const parsed = parseTraceFile(content);
+  const handleFileLoad = (data: Trace[] | Trace) => {
+    // FileUpload component already parses the JSON/JSONL file
+    const parsed = Array.isArray(data) ? data : [data];
     setTraces(parsed);
     analyzeCosts(parsed);
   };
