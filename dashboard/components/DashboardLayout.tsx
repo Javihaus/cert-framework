@@ -158,8 +158,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
                         isActive
-                          ? 'bg-[#16141C] text-white'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#16141C] hover:text-white'
+                          ? 'text-[#3F1D50] dark:text-[#E2EADE] font-medium'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-[#3F1D50] dark:hover:text-[#E2EADE]'
                       )}
                     >
                       <Icon className="w-[18px] h-[18px]" />
