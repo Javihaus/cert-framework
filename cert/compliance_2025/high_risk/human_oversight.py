@@ -154,12 +154,14 @@ class HumanOversight:
         if self._auto_decisions_count >= self.config.max_auto_decisions:
             return True
 
-        # Periodic sampling for standard level
+        # Periodic sampling for standard level (only when confidence is not explicitly high)
+        # If confidence is above threshold, we trust the decision and skip random sampling
         if self.config.level == OversightLevel.STANDARD:
-            import random
+            if confidence is None or confidence < self.config.confidence_threshold:
+                import random
 
-            if random.random() < self.config.review_sample_rate:
-                return True
+                if random.random() < self.config.review_sample_rate:
+                    return True
 
         return False
 
