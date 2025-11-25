@@ -1,648 +1,258 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-  Euro,
-  Heart,
-  Sparkles,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  AlertTriangle,
-  ArrowRight,
-  RefreshCw,
-  Clock,
-  Zap,
-  Shield,
-  Activity,
-  CheckCircle,
-  XCircle,
-  Cpu,
   Settings,
+  Zap,
+  Activity,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import { colors } from '@/theme/colors';
+import { cn } from '@/lib/utils';
 
-// Icon colors for consistency across all pages
-const iconColors = colors.icon;
-
-// API base URL - configurable for different environments
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-// Types for metrics
-interface CostMetric {
-  value: number;
-  trend: number;
-  trend_direction: 'up' | 'down' | 'stable';
-  trend_display: string;
-  currency: string;
-  by_model: Record<string, number>;
-  by_platform: Record<string, number>;
-  daily_average: number;
-  monthly_projection: number;
-  budget: number | null;
-  budget_utilization: number | null;
-  time_window: string;
-  trace_count: number;
-}
-
-interface HealthMetric {
-  value: number;
-  trend: number;
-  trend_direction: 'up' | 'down' | 'stable';
-  trend_display: string;
-  status: 'healthy' | 'degraded' | 'critical';
-  error_rate: number;
-  p95_latency: number;
-  latency_penalty: number;
-  sla_compliance: number;
-  total_requests: number;
-  error_count: number;
-  slow_request_count: number;
-  issues: string[];
-  time_window: string;
-}
-
-interface QualityMetric {
-  value: number;
-  trend: number;
-  trend_direction: 'up' | 'down' | 'stable';
-  trend_display: string;
-  method: string;
-  method_display: string;
-  accuracy_rate: number;
-  consistency_score: number;
-  evaluated_count: number;
-  passed_count: number;
-  failed_count: number;
-  by_model: Record<string, number>;
-  time_window: string;
-}
-
-interface MetricsSnapshot {
-  cost: CostMetric;
-  health: HealthMetric;
-  quality: QualityMetric;
-  timestamp: string;
-  time_window: string;
-}
-
-// Time window options
-const TIME_WINDOWS = [
-  { value: 'hour', label: 'Last Hour' },
-  { value: 'day', label: 'Today' },
-  { value: 'week', label: 'This Week' },
-  { value: 'month', label: 'This Month' },
-];
-
-// Trend icon component
-function TrendIcon({ direction, className }: { direction: string; className?: string }) {
-  if (direction === 'up') return <TrendingUp className={className || 'w-3 h-3'} />;
-  if (direction === 'down') return <TrendingDown className={className || 'w-3 h-3'} />;
-  return <Minus className={className || 'w-3 h-3'} />;
-}
-
-// Primary metric card component
-function PrimaryMetricCard({
-  title,
-  value,
-  trend,
-  trendDirection,
-  icon: Icon,
-  iconColor,
-  subtitle,
-  status,
-  colorClass,
-  onClick,
-}: {
-  title: string;
-  value: string;
-  trend: string;
-  trendDirection: 'up' | 'down' | 'stable';
-  icon: React.ElementType;
-  iconColor: string;
-  subtitle: string;
-  status?: 'healthy' | 'degraded' | 'critical';
-  colorClass: string;
-  onClick?: () => void;
-}) {
-  // For cost, down is good. For health/quality, up is good
-  const isPositiveTrend = title === 'Cost'
-    ? trendDirection === 'down'
-    : trendDirection === 'up';
-
-  const trendColorClass = trendDirection === 'stable'
-    ? 'text-porpoise'
-    : isPositiveTrend
-      ? 'text-success-600'
-      : 'text-error-600';
-
-  return (
-    <div
-      className={`card p-6 cursor-pointer hover:shadow-lg transition-all duration-200 ${onClick ? 'hover:scale-[1.02]' : ''}`}
-      onClick={onClick}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-xl ${colorClass}`}>
-          <Icon className="w-6 h-6" style={{ color: iconColor }} />
-        </div>
-        {status && (
-          <span className={`badge ${
-            status === 'healthy' ? 'badge-success' :
-            status === 'degraded' ? 'badge-warning' : 'badge-error'
-          }`}>
-            {status === 'healthy' && <CheckCircle className="w-3 h-3" />}
-            {status === 'degraded' && <AlertTriangle className="w-3 h-3" />}
-            {status === 'critical' && <XCircle className="w-3 h-3" />}
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </span>
-        )}
-        {!status && (
-          <span className={`flex items-center gap-1 text-sm font-medium ${trendColorClass}`}>
-            <TrendIcon direction={trendDirection} />
-            {trend}
-          </span>
-        )}
-      </div>
-      <div className="text-3xl font-bold text-midnight dark:text-white mb-1">
-        {value}
-      </div>
-      <div className="text-sm text-porpoise">{title}</div>
-      <div className="text-xs text-porpoise/70 mt-2">{subtitle}</div>
-      {status && (
-        <div className={`flex items-center gap-1 text-sm font-medium mt-3 ${trendColorClass}`}>
-          <TrendIcon direction={trendDirection} />
-          {trend}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Detail section for breakdown
-function BreakdownSection({
-  title,
-  data,
-  formatValue
-}: {
-  title: string;
-  data: Record<string, number>;
-  formatValue: (v: number) => string;
-}) {
-  const entries = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const total = Object.values(data).reduce((a, b) => a + b, 0);
-
-  if (entries.length === 0) return null;
-
-  return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-medium text-midnight dark:text-white">{title}</h4>
-      {entries.map(([key, value]) => (
-        <div key={key} className="flex items-center justify-between text-sm">
-          <span className="text-porpoise truncate max-w-[60%]">{key}</span>
-          <div className="flex items-center gap-2">
-            <div className="w-20 progress-bar h-1.5">
-              <div
-                className="progress-fill primary"
-                style={{ width: `${(value / total) * 100}%` }}
-              />
-            </div>
-            <span className="text-midnight dark:text-white font-medium w-16 text-right">
-              {formatValue(value)}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function Dashboard() {
-  const [metrics, setMetrics] = useState<MetricsSnapshot | null>(null);
+export default function HomePage() {
+  const router = useRouter();
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timeWindow, setTimeWindow] = useState('week');
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-
-  const fetchMetrics = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`${API_BASE_URL}/api/metrics?time_window=${timeWindow}`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch metrics: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setMetrics(data);
-      setLastUpdated(new Date());
-    } catch (err) {
-      console.error('Error fetching metrics:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load metrics');
-      // Use mock data for demo/development
-      setMetrics(getMockMetrics());
-      setLastUpdated(new Date());
-    } finally {
-      setLoading(false);
-    }
-  }, [timeWindow]);
 
   useEffect(() => {
-    fetchMetrics();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchMetrics, 30000);
-    return () => clearInterval(interval);
-  }, [fetchMetrics]);
+    // Check if the user has configured API connections
+    const checkConfiguration = () => {
+      const connections = localStorage.getItem('cert-api-connections');
+      const judgeConfig = localStorage.getItem('cert-judge-config');
 
-  // Mock data for development/demo
-  function getMockMetrics(): MetricsSnapshot {
-    return {
-      cost: {
-        value: 2847.32,
-        trend: -12.3,
-        trend_direction: 'down',
-        trend_display: '-12.3%',
-        currency: 'EUR',
-        by_model: {
-          'gpt-4': 1420.50,
-          'claude-3': 890.22,
-          'gpt-3.5-turbo': 536.60,
-        },
-        by_platform: {
-          'openai': 1957.10,
-          'anthropic': 890.22,
-        },
-        daily_average: 406.76,
-        monthly_projection: 12202.80,
-        budget: 5000,
-        budget_utilization: 56.9,
-        time_window: 'week',
-        trace_count: 1247,
-      },
-      health: {
-        value: 98.2,
-        trend: 0.8,
-        trend_direction: 'up',
-        trend_display: '+0.8%',
-        status: 'healthy',
-        error_rate: 0.3,
-        p95_latency: 234,
-        latency_penalty: 1.5,
-        sla_compliance: 99.1,
-        total_requests: 1247,
-        error_count: 4,
-        slow_request_count: 19,
-        issues: [],
-        time_window: 'week',
-      },
-      quality: {
-        value: 94.1,
-        trend: -2.1,
-        trend_direction: 'down',
-        trend_display: '-2.1%',
-        method: 'semantic_consistency',
-        method_display: 'Semantic consistency',
-        accuracy_rate: 94.1,
-        consistency_score: 91.3,
-        evaluated_count: 1089,
-        passed_count: 1024,
-        failed_count: 65,
-        by_model: {
-          'gpt-4': 96.2,
-          'claude-3': 93.8,
-          'gpt-3.5-turbo': 89.4,
-        },
-        time_window: 'week',
-      },
-      timestamp: new Date().toISOString(),
-      time_window: 'week',
+      if (connections && judgeConfig) {
+        try {
+          const parsedConnections = JSON.parse(connections);
+          const hasActiveConnection = parsedConnections.some(
+            (c: { status: string }) => c.status === 'connected'
+          );
+          setIsConfigured(hasActiveConnection);
+        } catch (e) {
+          setIsConfigured(false);
+        }
+      } else {
+        setIsConfigured(false);
+      }
+      setLoading(false);
     };
+
+    checkConfiguration();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    );
   }
 
-  const timeWindowLabel = TIME_WINDOWS.find(tw => tw.value === timeWindow)?.label || 'This Week';
-
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header with time controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-heading text-midnight dark:text-white">System Metrics</h1>
-          <p className="text-body text-porpoise mt-1">
-            {timeWindowLabel} overview of your AI system performance
-          </p>
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+          CERT Framework
+        </h1>
+        <p className="text-lg text-zinc-500 dark:text-zinc-400">
+          LLM Evaluation & Monitoring Dashboard
+        </p>
+      </div>
+
+      {/* Configuration Status */}
+      {!isConfigured && (
+        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-amber-800 dark:text-amber-300 mb-1">
+                Get Started
+              </h2>
+              <p className="text-amber-700 dark:text-amber-400 text-sm mb-4">
+                Configure your API connections to start evaluating LLM outputs. Add at least one provider (Claude, OpenAI, or Gemini) to enable all features.
+              </p>
+              <Link
+                href="/configuration"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Configure Now
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <select
-            value={timeWindow}
-            onChange={(e) => setTimeWindow(e.target.value)}
-            className="px-3 py-2 bg-white dark:bg-midnight border border-gray-200 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-planetarium"
-          >
-            {TIME_WINDOWS.map((tw) => (
-              <option key={tw.value} value={tw.value}>{tw.label}</option>
-            ))}
-          </select>
-          <button
-            onClick={fetchMetrics}
-            disabled={loading}
-            className="p-2 bg-white dark:bg-midnight border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-5 h-5 text-porpoise dark:text-white ${loading ? 'animate-spin' : ''}`} />
-          </button>
+      )}
+
+      {/* The Two Questions */}
+      <div className="bg-gradient-to-r from-purple-50 to-teal-50 dark:from-purple-500/10 dark:to-teal-500/10 rounded-xl border border-purple-200/50 dark:border-purple-500/20 p-8">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white text-center mb-6">
+          The Two Core Questions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
-            href="/settings"
-            className="p-2 bg-white dark:bg-midnight border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+            href="/quality"
+            className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-purple-200 dark:border-purple-500/30 hover:border-purple-400 dark:hover:border-purple-500/50 transition-colors group"
           >
-            <Settings className="w-5 h-5 text-porpoise dark:text-white" />
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <Zap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-zinc-900 dark:text-white">Quality Evals</h3>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  Is the output good?
+                </p>
+              </div>
+            </div>
+            <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 mb-4">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-purple-500" />
+                LLM Judge - Automated AI evaluation
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-purple-500" />
+                Human Review - Manual verification
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-purple-500" />
+                Test Results - Unit tests
+              </li>
+            </ul>
+            <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">
+              Explore Quality
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            href="/operational/performance"
+            className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-teal-200 dark:border-teal-500/30 hover:border-teal-400 dark:hover:border-teal-500/50 transition-colors group"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-teal-100 dark:bg-teal-500/20 rounded-lg flex items-center justify-center">
+                <Activity className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-zinc-900 dark:text-white">Operational Evals</h3>
+                <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+                  Can we run this in production?
+                </p>
+              </div>
+            </div>
+            <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 mb-4">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-teal-500" />
+                Performance - Latency P95 &lt; 30s
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-teal-500" />
+                Cost - API costs &lt; $0.25/query
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-teal-500" />
+                Observability - Error rates, traces
+              </li>
+            </ul>
+            <div className="flex items-center gap-1 text-teal-600 dark:text-teal-400 font-medium">
+              Explore Operations
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Link>
         </div>
       </div>
 
-      {/* Error Banner */}
-      {error && (
-        <div className="bg-info-50 dark:bg-info-500/10 border border-info-200 dark:border-info-500/20 rounded-xl p-4">
-          <div>
-            <span className="text-sm font-medium text-info-800 dark:text-info-200">
-              Using demo data - {error}
-            </span>
-            <p className="text-xs text-info-600 dark:text-info-300 mt-1">
-              Connect to the API server to see real metrics
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Primary Metrics - The Three Numbers */}
-      {metrics && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Cost Metric */}
-          <PrimaryMetricCard
-            title="Cost"
-            value={`${metrics.cost.currency}${metrics.cost.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            trend={metrics.cost.trend_display}
-            trendDirection={metrics.cost.trend_direction}
-            icon={Euro}
-            iconColor={iconColors.yellow}
-            subtitle={`${timeWindowLabel} • ${metrics.cost.trace_count.toLocaleString()} requests`}
-            colorClass="bg-amber-50 dark:bg-amber-500/20"
-          />
-
-          {/* Health Metric */}
-          <PrimaryMetricCard
-            title="Health"
-            value={`${metrics.health.value.toFixed(1)}%`}
-            trend={metrics.health.trend_display}
-            trendDirection={metrics.health.trend_direction}
-            icon={Heart}
-            iconColor={iconColors.pink}
-            subtitle={`${metrics.health.error_rate.toFixed(2)}% errors • ${Math.round(metrics.health.p95_latency)}ms p95`}
-            status={metrics.health.status}
-            colorClass="bg-pink-50 dark:bg-pink-500/20"
-          />
-
-          {/* Quality Metric */}
-          <PrimaryMetricCard
-            title="Quality"
-            value={`${metrics.quality.value.toFixed(1)}%`}
-            trend={metrics.quality.trend_display}
-            trendDirection={metrics.quality.trend_direction}
-            icon={Sparkles}
-            iconColor={iconColors.purple}
-            subtitle={metrics.quality.method_display}
-            colorClass="bg-purple-50 dark:bg-purple-500/20"
-          />
-        </div>
-      )}
-
-      {/* Detail Panels */}
-      {metrics && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Cost Details */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-title text-midnight dark:text-white">Cost Breakdown</h3>
-              <Link href="/costs" className="text-sm text-planetarium hover:underline flex items-center gap-1">
-                Details <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100 dark:border-white/10">
-                <div>
-                  <div className="text-xs text-porpoise mb-1">Daily Average</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.cost.currency}{metrics.cost.daily_average.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-porpoise mb-1">Monthly Projection</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.cost.currency}{metrics.cost.monthly_projection.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </div>
-                </div>
-              </div>
-              <BreakdownSection
-                title="By Model"
-                data={metrics.cost.by_model}
-                formatValue={(v) => `${metrics.cost.currency}${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-              />
-              {metrics.cost.budget && (
-                <div className="pt-4 border-t border-gray-100 dark:border-white/10">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-porpoise">Budget</span>
-                    <span className="text-midnight dark:text-white font-medium">
-                      {metrics.cost.budget_utilization?.toFixed(1)}% used
-                    </span>
-                  </div>
-                  <div className="progress-bar h-2">
-                    <div
-                      className={`progress-fill ${
-                        (metrics.cost.budget_utilization || 0) > 90 ? 'error' :
-                        (metrics.cost.budget_utilization || 0) > 75 ? 'warning' : 'success'
-                      }`}
-                      style={{ width: `${Math.min(100, metrics.cost.budget_utilization || 0)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Health Details */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-title text-midnight dark:text-white">Health Details</h3>
-              <Link href="/monitoring" className="text-sm text-planetarium hover:underline flex items-center gap-1">
-                Details <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100 dark:border-white/10">
-                <div>
-                  <div className="text-xs text-porpoise mb-1">Total Requests</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.health.total_requests.toLocaleString()}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-porpoise mb-1">SLA Compliance</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.health.sla_compliance.toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-error-500" />
-                    <span className="text-sm text-porpoise">Errors</span>
-                  </div>
-                  <span className="text-sm font-medium text-midnight dark:text-white">
-                    {metrics.health.error_count} ({metrics.health.error_rate.toFixed(2)}%)
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-warning-500" />
-                    <span className="text-sm text-porpoise">Slow Requests</span>
-                  </div>
-                  <span className="text-sm font-medium text-midnight dark:text-white">
-                    {metrics.health.slow_request_count} ({metrics.health.latency_penalty.toFixed(2)}%)
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" style={{ color: iconColors.teal }} />
-                    <span className="text-sm text-porpoise">P95 Latency</span>
-                  </div>
-                  <span className="text-sm font-medium text-midnight dark:text-white">
-                    {Math.round(metrics.health.p95_latency)}ms
-                  </span>
-                </div>
-              </div>
-              {metrics.health.issues.length > 0 && (
-                <div className="pt-4 border-t border-gray-100 dark:border-white/10">
-                  <div className="text-xs text-porpoise mb-2">Active Issues</div>
-                  <div className="space-y-2">
-                    {metrics.health.issues.map((issue, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-sm">
-                        <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: iconColors.warning }} />
-                        <span className="text-porpoise">{issue}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Quality Details */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-title text-midnight dark:text-white">Quality Details</h3>
-              <Link href="/analytics" className="text-sm text-planetarium hover:underline flex items-center gap-1">
-                Details <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100 dark:border-white/10">
-                <div>
-                  <div className="text-xs text-porpoise mb-1">Evaluated</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.quality.evaluated_count.toLocaleString()}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-porpoise mb-1">Pass Rate</div>
-                  <div className="text-lg font-semibold text-midnight dark:text-white">
-                    {metrics.quality.accuracy_rate.toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" style={{ color: iconColors.success }} />
-                    <span className="text-sm text-porpoise">Passed</span>
-                  </div>
-                  <span className="text-sm font-medium text-midnight dark:text-white">
-                    {metrics.quality.passed_count.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <XCircle className="w-4 h-4" style={{ color: iconColors.error }} />
-                    <span className="text-sm text-porpoise">Failed</span>
-                  </div>
-                  <span className="text-sm font-medium text-midnight dark:text-white">
-                    {metrics.quality.failed_count.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              <BreakdownSection
-                title="By Model"
-                data={metrics.quality.by_model}
-                formatValue={(v) => `${v.toFixed(1)}%`}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/monitoring" className="card p-5 hover:shadow-md transition-shadow group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-teal-50 dark:bg-teal-500/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Activity className="w-5 h-5" style={{ color: iconColors.teal }} />
+        <Link
+          href="/configuration"
+          className={cn(
+            "bg-white dark:bg-zinc-800 rounded-xl border p-6 transition-colors group",
+            isConfigured
+              ? "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+              : "border-blue-300 dark:border-blue-500/30 hover:border-blue-400 dark:hover:border-blue-500/50"
+          )}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className={cn(
+                "w-10 h-10 rounded-lg flex items-center justify-center",
+                isConfigured
+                  ? "bg-emerald-100 dark:bg-emerald-500/20"
+                  : "bg-blue-100 dark:bg-blue-500/20"
+              )}
+            >
+              {isConfigured ? (
+                <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              )}
             </div>
-            <div>
-              <h4 className="font-medium text-midnight dark:text-white">Live Monitoring</h4>
-              <p className="text-sm text-porpoise">Real-time trace analysis</p>
-            </div>
+            <span className="font-medium text-zinc-900 dark:text-white">Configuration</span>
+            <ArrowRight className="w-4 h-4 text-zinc-400 ml-auto group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
           </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {isConfigured
+              ? 'API connections configured'
+              : 'Set up API connections'}
+          </p>
         </Link>
 
-        <Link href="/optimization" className="card p-5 hover:shadow-md transition-shadow group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 dark:bg-purple-500/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5" style={{ color: iconColors.purple }} />
+        <Link
+          href="/quality/judge"
+          className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-purple-300 dark:hover:border-purple-500/50 transition-colors group"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <div>
-              <h4 className="font-medium text-midnight dark:text-white">Optimization</h4>
-              <p className="text-sm text-porpoise">Cost saving recommendations</p>
-            </div>
+            <span className="font-medium text-zinc-900 dark:text-white">LLM Judge</span>
+            <ArrowRight className="w-4 h-4 text-zinc-400 ml-auto group-hover:text-purple-500 transition-colors" />
           </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Run automated evaluations
+          </p>
         </Link>
 
-        <Link href="/compliance" className="card p-5 hover:shadow-md transition-shadow group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 dark:bg-purple-500/20 rounded-xl group-hover:scale-105 transition-transform">
-              <Shield className="w-5 h-5" style={{ color: iconColors.purple }} />
+        <Link
+          href="/help"
+          className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-yellow-300 dark:hover:border-yellow-500/50 transition-colors group"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-500/20 rounded-lg flex items-center justify-center">
+              <HelpCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <div>
-              <h4 className="font-medium text-midnight dark:text-white">Compliance</h4>
-              <p className="text-sm text-porpoise">EU AI Act status</p>
-            </div>
+            <span className="font-medium text-zinc-900 dark:text-white">Help</span>
+            <ArrowRight className="w-4 h-4 text-zinc-400 ml-auto group-hover:text-yellow-500 transition-colors" />
           </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Getting started guide
+          </p>
         </Link>
       </div>
 
-      {/* Last Updated */}
-      {lastUpdated && (
-        <div className="text-center text-xs text-porpoise">
-          Last updated: {lastUpdated.toLocaleTimeString()} • Auto-refreshes every 30s
-        </div>
-      )}
+      {/* Footer Note */}
+      <div className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+        <p>
+          Based on the{' '}
+          <a
+            href="https://www.anthropic.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+          >
+            Anthropic
+          </a>{' '}
+          evaluation framework for production LLM systems
+        </p>
+      </div>
     </div>
   );
 }

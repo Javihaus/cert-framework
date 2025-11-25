@@ -39,6 +39,8 @@ interface NavItem {
 
 interface NavSection {
   label?: string;
+  description?: string;
+  highlighted?: boolean;
   items: NavItem[];
 }
 
@@ -47,39 +49,35 @@ const iconColors = colors.icon;
 
 const navigation: NavSection[] = [
   {
+    label: 'Configuration',
+    highlighted: true,
     items: [
-      { name: 'Overview', href: '/', icon: LayoutDashboard, iconColor: iconColors.orange },
-      { name: 'Monitoring', href: '/monitoring', icon: Activity, iconColor: iconColors.teal, badge: 'Live', badgeType: 'live' },
+      { name: 'API & Judge Setup', href: '/configuration', icon: Settings, iconColor: '#2563EB' },
     ],
   },
   {
-    label: 'Quality',
+    label: 'Quality Evals',
+    description: 'Is the output good?',
     items: [
-      { name: 'Accuracy Testing', href: '/audit', icon: AlertTriangle, iconColor: iconColors.purple },
-      { name: 'Documentation', href: '/generate', icon: FileText, iconColor: iconColors.orange },
-      { name: 'Reports', href: '/reports', icon: FileText, iconColor: iconColors.orange },
+      { name: 'Overview', href: '/quality', icon: LayoutDashboard, iconColor: iconColors.purple },
+      { name: 'LLM Judge', href: '/quality/judge', icon: Zap, iconColor: iconColors.purple },
+      { name: 'Human Review', href: '/quality/review', icon: User, iconColor: iconColors.orange },
+      { name: 'Test Results', href: '/quality/tests', icon: AlertTriangle, iconColor: iconColors.teal },
     ],
   },
   {
-    label: 'Governance',
+    label: 'Operational Evals',
+    description: 'Can we run this in production?',
     items: [
-      { name: 'Compliance', href: '/compliance', icon: Shield, iconColor: iconColors.purple, badge: '3', badgeType: 'warning' },
-      { name: 'Assessment', href: '/assessment', icon: FileText, iconColor: iconColors.yellow },
+      { name: 'Performance', href: '/operational/performance', icon: Activity, iconColor: iconColors.teal },
+      { name: 'Cost Analysis', href: '/operational/costs', icon: DollarSign, iconColor: iconColors.yellow },
+      { name: 'Observability', href: '/operational/observability', icon: BarChart3, iconColor: iconColors.orange },
     ],
   },
   {
-    label: 'Analysis',
+    label: 'Help',
     items: [
-      { name: 'Analytics', href: '/analytics', icon: BarChart3, iconColor: iconColors.teal },
-      { name: 'Costs', href: '/costs', icon: DollarSign, iconColor: iconColors.yellow },
-      { name: 'Optimization', href: '/optimization', icon: Zap, iconColor: iconColors.purple },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      { name: 'Settings', href: '/settings', icon: Settings, iconColor: iconColors.teal },
-      { name: 'Help', href: '/help', icon: HelpCircle, iconColor: iconColors.yellow },
+      { name: 'Getting Started', href: '/help', icon: HelpCircle, iconColor: iconColors.yellow },
     ],
   },
 ];
@@ -152,7 +150,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {navigation.map((section, sectionIndex) => (
             <div key={sectionIndex} className={sectionIndex > 0 ? 'mt-6' : ''}>
               {section.label && (
-                <div className="nav-section-label">{section.label}</div>
+                <div className={cn(
+                  "nav-section-label",
+                  section.highlighted && "text-blue-600 dark:text-blue-400 font-semibold"
+                )}>
+                  {section.label}
+                  {section.description && (
+                    <span className="block text-[10px] font-normal text-zinc-400 dark:text-zinc-500 mt-0.5">
+                      {section.description}
+                    </span>
+                  )}
+                </div>
               )}
               <div className="space-y-1">
                 {section.items.map((item) => {
