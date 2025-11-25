@@ -38,11 +38,17 @@ export async function POST(request: NextRequest) {
     // Step 1: Start audit job
     console.log(`[API] Starting audit job with ${evaluator} evaluator, threshold ${threshold}`);
 
-    const startResponse = await fetch(`${API_BASE_URL}/api/v2/audit/run`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ traces, threshold, evaluator }),
-    });
+    let startResponse;
+    try {
+      startResponse = await fetch(`${API_BASE_URL}/api/v2/audit/run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ traces, threshold, evaluator }),
+      });
+    } catch (fetchError) {
+      console.error('[API] Failed to connect to backend:', fetchError);
+      throw new Error(`Unable to connect to audit service at ${API_BASE_URL}. Please ensure the backend server is running.`);
+    }
 
     if (!startResponse.ok) {
       const errorData = await startResponse.json();
@@ -63,7 +69,13 @@ export async function POST(request: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
 
       // Check job status
-      const statusResponse = await fetch(`${API_BASE_URL}/api/v2/audit/status/${job_id}`);
+      let statusResponse;
+      try {
+        statusResponse = await fetch(`${API_BASE_URL}/api/v2/audit/status/${job_id}`);
+      } catch (pollError) {
+        console.error('[API] Failed to poll audit status:', pollError);
+        continue;
+      }
 
       if (!statusResponse.ok) {
         console.error('[API] Failed to check audit status');
