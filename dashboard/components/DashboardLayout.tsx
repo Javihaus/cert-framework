@@ -24,60 +24,51 @@ import {
   AlertTriangle,
   DollarSign,
   Zap,
+  Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { colors } from '@/theme/colors';
 
 interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  iconColor?: string;
   badge?: string;
   badgeType?: 'live' | 'count' | 'warning';
 }
 
 interface NavSection {
   label?: string;
-  description?: string;
-  highlighted?: boolean;
   items: NavItem[];
 }
 
-// Icon colors from theme for consistency across all pages
-const iconColors = colors.icon;
-
 const navigation: NavSection[] = [
   {
-    label: 'Configuration',
-    highlighted: true,
     items: [
-      { name: 'API & Judge Setup', href: '/configuration', icon: Settings, iconColor: '#2563EB' },
+      { name: 'Home', href: '/', icon: Home },
     ],
   },
   {
     label: 'Quality Evals',
-    description: 'Is the output good?',
     items: [
-      { name: 'Overview', href: '/quality', icon: LayoutDashboard, iconColor: iconColors.purple },
-      { name: 'LLM Judge', href: '/quality/judge', icon: Zap, iconColor: iconColors.purple },
-      { name: 'Human Review', href: '/quality/review', icon: User, iconColor: iconColors.orange },
-      { name: 'Test Results', href: '/quality/tests', icon: AlertTriangle, iconColor: iconColors.teal },
+      { name: 'Overview', href: '/quality', icon: LayoutDashboard },
+      { name: 'LLM Judge', href: '/quality/judge', icon: Zap },
+      { name: 'Human Review', href: '/quality/review', icon: User },
+      { name: 'Test Results', href: '/quality/tests', icon: AlertTriangle },
     ],
   },
   {
     label: 'Operational Evals',
-    description: 'Can we run this in production?',
     items: [
-      { name: 'Performance', href: '/operational/performance', icon: Activity, iconColor: iconColors.teal },
-      { name: 'Cost Analysis', href: '/operational/costs', icon: DollarSign, iconColor: iconColors.yellow },
-      { name: 'Observability', href: '/operational/observability', icon: BarChart3, iconColor: iconColors.orange },
+      { name: 'Performance', href: '/operational/performance', icon: Activity },
+      { name: 'Cost Analysis', href: '/operational/costs', icon: DollarSign },
+      { name: 'Observability', href: '/operational/observability', icon: BarChart3 },
     ],
   },
   {
-    label: 'Help',
+    label: 'Settings',
     items: [
-      { name: 'Getting Started', href: '/help', icon: HelpCircle, iconColor: iconColors.yellow },
+      { name: 'Configuration', href: '/configuration', icon: Settings },
+      { name: 'Help', href: '/help', icon: HelpCircle },
     ],
   },
 ];
@@ -150,21 +141,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {navigation.map((section, sectionIndex) => (
             <div key={sectionIndex} className={sectionIndex > 0 ? 'mt-6' : ''}>
               {section.label && (
-                <div className={cn(
-                  "nav-section-label",
-                  section.highlighted && "text-blue-600 dark:text-blue-400 font-semibold"
-                )}>
+                <div className="px-3 py-2 text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   {section.label}
-                  {section.description && (
-                    <span className="block text-[10px] font-normal text-zinc-400 dark:text-zinc-500 mt-0.5">
-                      {section.description}
-                    </span>
-                  )}
                 </div>
               )}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                   const Icon = item.icon;
 
                   return (
@@ -172,9 +155,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={cn('nav-item', isActive && 'active')}
+                      className={cn(
+                        'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
+                        isActive
+                          ? 'bg-[#16141C] text-white'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#16141C] hover:text-white'
+                      )}
                     >
-                      <Icon className="w-[18px] h-[18px]" style={{ color: item.iconColor }} />
+                      <Icon className="w-[18px] h-[18px]" />
                       <span className="flex-1">{item.name}</span>
                       {item.badge && (
                         <span className={cn(
@@ -245,18 +233,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2">
-              {/* Quick Stats - Desktop */}
-              <div className="hidden xl:flex items-center gap-4 mr-4 text-sm">
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Activity className="w-4 h-4 text-emerald-500" />
-                  <span>4 Systems Active</span>
-                </div>
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <span>3 Alerts</span>
-                </div>
-              </div>
-
               {/* Notifications */}
               <button className="relative p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
                 <Bell className="w-5 h-5" />
