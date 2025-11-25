@@ -112,7 +112,7 @@ export default function ObservabilityPage() {
 
       return {
         provider,
-        status: errorRate > 0.1 ? 'degraded' : 'operational' as const,
+        status: (errorRate > 0.1 ? 'degraded' : 'operational') as 'operational' | 'degraded' | 'down',
         latency: avgLatency,
         errorCount,
       };
