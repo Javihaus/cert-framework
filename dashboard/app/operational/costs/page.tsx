@@ -334,7 +334,7 @@ export default function CostAnalysisPage() {
                     .map(([model, cost]) => {
                       const modelTraces = traces.filter((t) => t.model === model);
                       const totalTokens = modelTraces.reduce(
-                        (sum, t) => sum + (t.metadata?.tokens?.total || 0),
+                        (sum, t) => sum + ((t.metadata?.tokens?.prompt || 0) + (t.metadata?.tokens?.completion || 0)),
                         0
                       );
                       return (
