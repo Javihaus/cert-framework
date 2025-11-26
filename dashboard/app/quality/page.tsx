@@ -217,7 +217,7 @@ export default function QualityDashboard() {
                       className={cn(
                         "h-full rounded-full transition-all",
                         criterion.score >= 90 ? "bg-emerald-500" :
-                        criterion.score >= 70 ? "bg-blue-500" :
+                        criterion.score >= 70 ? "bg-[#3C6098]" :
                         criterion.score >= 50 ? "bg-amber-500" : "bg-red-500"
                       )}
                       style={{ width: `${criterion.score}%` }}
@@ -237,7 +237,7 @@ export default function QualityDashboard() {
               <h2 className="font-semibold text-zinc-900 dark:text-white">Recent Evaluations</h2>
               <Link
                 href="/quality/judge"
-                className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                className="text-sm text-[#3C6098] hover:text-[#3C6098]/80 dark:text-[#3C6098]"
               >
                 View All
               </Link>

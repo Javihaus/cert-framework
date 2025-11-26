@@ -96,7 +96,7 @@ export default function PrivacyPolicy() {
               </h2>
               <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-3">
                 For privacy questions:{' '}
-                <a href="mailto:javier@jmarin.info" className="text-blue-600 dark:text-blue-500 underline hover:text-blue-700 dark:hover:text-blue-400">
+                <a href="mailto:javier@jmarin.info" className="text-[#3C6098] dark:text-[#3C6098] underline hover:text-[#3C6098]/80 dark:hover:text-[#3C6098]/80">
                   javier@jmarin.info
                 </a>
               </p>

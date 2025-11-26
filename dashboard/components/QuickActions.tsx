@@ -37,8 +37,8 @@ export function QuickActionCard({
       className={cn(
         'flex flex-col items-start gap-2 p-6 rounded-lg cursor-pointer transition-all text-left hover:-translate-y-0.5 hover:shadow-md',
         isPrimary
-          ? 'bg-blue-700 hover:bg-blue-600 border-none'
-          : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-blue-500'
+          ? 'bg-[#3C6098] hover:bg-[#3C6098]/90 border-none'
+          : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-[#3C6098]'
       )}
     >
       <div
@@ -46,7 +46,7 @@ export function QuickActionCard({
           'flex items-center justify-center w-10 h-10 rounded-md',
           isPrimary
             ? 'bg-white/20 text-white'
-            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+            : 'bg-[#3C6098]/10 dark:bg-[#3C6098]/20 text-[#3C6098] dark:text-[#3C6098]'
         )}
       >
         {icon}
@@ -210,7 +210,7 @@ export function ActionLink({ children, onClick }: ActionLinkProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1 text-blue-600 dark:text-blue-500 text-sm font-medium cursor-pointer transition-colors hover:text-blue-700 dark:hover:text-blue-400"
+      className="flex items-center gap-1 text-[#3C6098] dark:text-[#3C6098] text-sm font-medium cursor-pointer transition-colors hover:text-[#3C6098]/80 dark:hover:text-[#3C6098]/80"
     >
       {children}
       <ArrowRight size={14} />

@@ -158,8 +158,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
                         isActive
-                          ? 'text-[#3F1D50] dark:text-[#E2EADE] font-medium'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-[#3F1D50] dark:hover:text-[#E2EADE]'
+                          ? 'text-[#3C6098] dark:text-[#3C6098] font-bold'
+                          : 'text-zinc-600 dark:text-zinc-400 font-medium hover:text-[#3C6098] dark:hover:text-[#3C6098]'
                       )}
                     >
                       <Icon className="w-[18px] h-[18px]" />
@@ -192,7 +192,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Sidebar Footer */}
         <div className="px-3 py-4 border-t border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#3C6098] flex items-center justify-center">
               <span className="text-white text-xs font-medium">JD</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#3C6098] flex items-center justify-center">
                     <span className="text-white text-xs font-medium">JD</span>
                   </div>
                   <ChevronDown className="hidden md:block w-4 h-4 text-zinc-500" />

@@ -18,7 +18,7 @@ const typeConfig = {
   model_downgrade: {
     icon: TrendingDown,
     label: 'Model Downgrade',
-    colorClass: 'text-blue-600 dark:text-blue-500',
+    colorClass: 'text-[#3C6098] dark:text-[#3C6098]',
   },
   caching: {
     icon: Database,

@@ -24,9 +24,9 @@ interface AlertProps {
 
 const severityConfig = {
   info: {
-    bgClass: 'bg-blue-50 dark:bg-blue-900/20',
-    borderClass: 'border-blue-500',
-    iconClass: 'text-blue-500',
+    bgClass: 'bg-[#3C6098]/10 dark:bg-[#3C6098]/20',
+    borderClass: 'border-[#3C6098]',
+    iconClass: 'text-[#3C6098]',
     Icon: Info,
   },
   success: {

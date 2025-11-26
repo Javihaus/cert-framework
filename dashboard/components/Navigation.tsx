@@ -117,7 +117,7 @@ export default function Navigation({
 function LogoSection() {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-10 h-10 rounded-md bg-blue-600 flex items-center justify-center">
+      <div className="w-10 h-10 rounded-md bg-[#3C6098] flex items-center justify-center">
         <span className="text-white font-bold text-lg">C</span>
       </div>
       <div className="flex items-center gap-1">
@@ -215,7 +215,7 @@ function UserAvatar({ name }: { name: string }) {
     .slice(0, 2);
 
   return (
-    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-blue-500">
+    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#3C6098] text-white text-sm font-semibold cursor-pointer transition-all hover:bg-[#3C6098]/90">
       {initials}
     </button>
   );

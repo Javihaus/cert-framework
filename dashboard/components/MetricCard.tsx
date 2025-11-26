@@ -38,8 +38,8 @@ const variantStyles: Record<MetricVariant, { iconBg: string; iconColor: string }
     iconColor: 'text-red-600 dark:text-red-400',
   },
   primary: {
-    iconBg: 'bg-blue-100 dark:bg-blue-500/20',
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    iconBg: 'bg-[#3C6098]/10 dark:bg-[#3C6098]/20',
+    iconColor: 'text-[#3C6098] dark:text-[#3C6098]',
   },
 };
 
@@ -127,7 +127,7 @@ function Sparkline({ data, variant = 'default', height = 32 }: SparklineProps) {
     success: '#10B981',
     warning: '#F59E0B',
     error: '#EF4444',
-    primary: '#2563EB',
+    primary: '#3C6098',
   };
 
   const points = data.map((value, index) => {
@@ -179,7 +179,7 @@ export function BigNumberCard({
         </span>
 
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-bold text-blue-600 dark:text-blue-400 leading-none tracking-tight">
+          <span className="text-5xl font-bold text-[#3C6098] dark:text-[#3C6098] leading-none tracking-tight">
             {value}
           </span>
           {unit && (
@@ -239,7 +239,7 @@ export function CompactMetric({
     success: 'bg-emerald-500',
     warning: 'bg-amber-500',
     error: 'bg-red-500',
-    primary: 'bg-blue-500',
+    primary: 'bg-[#3C6098]',
   };
 
   return (
