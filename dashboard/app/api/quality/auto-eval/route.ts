@@ -1,14 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateEvaluation } from '@/lib/trace-store';
 
+// Dynamic import for transformers (loads models on first use)
+let pipeline: any = null;
+let featureExtractor: any = null;
+let nliClassifier: any = null;
+
+async function loadModels() {
+  if (!pipeline) {
+    // Dynamic import to avoid issues with SSR
+    const transformers = await import('@huggingface/transformers');
+    pipeline = transformers.pipeline;
+  }
+
+  // Load feature extraction model for embeddings (semantic similarity)
+  if (!featureExtractor) {
+    console.log('Loading embedding model (Xenova/all-MiniLM-L6-v2)...');
+    featureExtractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    console.log('✓ Embedding model loaded');
+  }
+
+  // Load NLI model for textual entailment
+  if (!nliClassifier) {
+    console.log('Loading NLI model (Xenova/nli-deberta-v3-xsmall)...');
+    nliClassifier = await pipeline('text-classification', 'Xenova/nli-deberta-v3-xsmall');
+    console.log('✓ NLI model loaded');
+  }
+}
+
 interface AutoEvalRequest {
   traceId: string;
   input: string;
   output: string;
-  apiKey: string;
-  semanticWeight: number;  // 0-100
-  nliWeight: number;       // 0-100
-  passThreshold: number;   // 0-10
+  semanticWeight?: number;  // 0-100
+  nliWeight?: number;       // 0-100
+  passThreshold?: number;   // 0-10
 }
 
 interface AutoEvalResult {
@@ -21,48 +47,72 @@ interface AutoEvalResult {
 }
 
 /**
- * Compute semantic similarity using OpenAI embeddings
+ * Compute cosine similarity between two vectors
+ */
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+
+  const similarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  // Convert from [-1, 1] to [0, 1] range
+  return (similarity + 1) / 2;
+}
+
+/**
+ * Mean pooling for sentence embeddings
+ */
+function meanPooling(embeddings: number[][]): number[] {
+  const numTokens = embeddings.length;
+  const embeddingSize = embeddings[0].length;
+  const pooled = new Array(embeddingSize).fill(0);
+
+  for (let i = 0; i < numTokens; i++) {
+    for (let j = 0; j < embeddingSize; j++) {
+      pooled[j] += embeddings[i][j];
+    }
+  }
+
+  for (let j = 0; j < embeddingSize; j++) {
+    pooled[j] /= numTokens;
+  }
+
+  return pooled;
+}
+
+/**
+ * Compute semantic similarity using local embedding model
  */
 async function computeSemanticSimilarity(
   input: string,
-  output: string,
-  apiKey: string
+  output: string
 ): Promise<number> {
   try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: [input, output],
-      }),
-    });
+    await loadModels();
 
-    if (!response.ok) {
-      throw new Error(`Embeddings API error: ${response.status}`);
-    }
+    // Truncate inputs to avoid memory issues
+    const maxLen = 512;
+    const truncInput = input.slice(0, maxLen);
+    const truncOutput = output.slice(0, maxLen);
 
-    const data = await response.json();
-    const embeddings = data.data.map((d: { embedding: number[] }) => d.embedding);
+    // Get embeddings
+    const inputEmbedding = await featureExtractor(truncInput, { pooling: 'mean', normalize: true });
+    const outputEmbedding = await featureExtractor(truncOutput, { pooling: 'mean', normalize: true });
+
+    // Extract the pooled embeddings
+    const inputVec = Array.from(inputEmbedding.data as Float32Array);
+    const outputVec = Array.from(outputEmbedding.data as Float32Array);
 
     // Compute cosine similarity
-    const [embedding1, embedding2] = embeddings;
-    let dotProduct = 0;
-    let norm1 = 0;
-    let norm2 = 0;
+    const similarity = cosineSimilarity(inputVec, outputVec);
 
-    for (let i = 0; i < embedding1.length; i++) {
-      dotProduct += embedding1[i] * embedding2[i];
-      norm1 += embedding1[i] * embedding1[i];
-      norm2 += embedding2[i] * embedding2[i];
-    }
-
-    const similarity = dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
-    // Convert from [-1, 1] range to [0, 1]
-    return (similarity + 1) / 2;
+    return Math.max(0, Math.min(1, similarity));
   } catch (error) {
     console.error('Semantic similarity error:', error);
     return 0.5; // Default to neutral if error
@@ -70,81 +120,58 @@ async function computeSemanticSimilarity(
 }
 
 /**
- * Compute NLI score using GPT
- * Determines if the output logically follows from/is supported by the input
+ * Compute NLI score using local model
+ * Determines if the output logically follows from the input
  */
 async function computeNLIScore(
   input: string,
-  output: string,
-  apiKey: string
+  output: string
 ): Promise<{ score: number; reasoning: string }> {
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are an NLI (Natural Language Inference) evaluator. Your task is to determine if a response (hypothesis) logically follows from a prompt (premise).
+    await loadModels();
 
-Evaluate the relationship and provide:
-1. A score from 0 to 1:
-   - 1.0: Strong entailment - the response directly and logically follows from the prompt
-   - 0.7-0.9: Moderate entailment - mostly supported but with some assumptions
-   - 0.4-0.6: Neutral - neither supported nor contradicted
-   - 0.1-0.3: Weak contradiction - mostly unsupported
-   - 0.0: Strong contradiction - directly contradicts the prompt
+    // Truncate inputs
+    const maxLen = 256;
+    const truncInput = input.slice(0, maxLen);
+    const truncOutput = output.slice(0, maxLen);
 
-2. Brief reasoning (1-2 sentences)
+    // NLI models expect premise-hypothesis pairs
+    // Format: "[CLS] premise [SEP] hypothesis [SEP]"
+    const nliInput = `${truncInput} [SEP] ${truncOutput}`;
 
-Respond in JSON format: {"score": 0.X, "reasoning": "..."}`
-          },
-          {
-            role: 'user',
-            content: `Premise (Input): ${input.slice(0, 2000)}
+    const result = await nliClassifier(nliInput);
 
-Hypothesis (Output): ${output.slice(0, 2000)}
+    // Result contains labels like 'entailment', 'neutral', 'contradiction'
+    // Map to score
+    let score = 0.5;
+    let reasoning = 'NLI evaluation completed';
 
-Evaluate the NLI relationship.`
-          }
-        ],
-        temperature: 0.1,
-        max_tokens: 200,
-      }),
-    });
+    if (Array.isArray(result) && result.length > 0) {
+      const label = result[0].label?.toLowerCase() || '';
+      const confidence = result[0].score || 0.5;
 
-    if (!response.ok) {
-      throw new Error(`NLI API error: ${response.status}`);
+      if (label.includes('entail')) {
+        score = 0.5 + (confidence * 0.5); // 0.5 to 1.0
+        reasoning = `Entailment detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
+      } else if (label.includes('contradict')) {
+        score = 0.5 - (confidence * 0.5); // 0.0 to 0.5
+        reasoning = `Contradiction detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
+      } else {
+        score = 0.5;
+        reasoning = `Neutral relationship (confidence: ${(confidence * 100).toFixed(0)}%)`;
+      }
     }
 
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-
-    // Parse JSON response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      return {
-        score: Math.max(0, Math.min(1, parsed.score || 0.5)),
-        reasoning: parsed.reasoning || 'NLI evaluation completed',
-      };
-    }
-
-    return { score: 0.5, reasoning: 'Could not parse NLI response' };
+    return { score: Math.max(0, Math.min(1, score)), reasoning };
   } catch (error) {
     console.error('NLI score error:', error);
-    return { score: 0.5, reasoning: 'NLI evaluation failed' };
+    return { score: 0.5, reasoning: 'NLI evaluation encountered an error' };
   }
 }
 
 /**
  * POST /api/quality/auto-eval
- * Performs automatic evaluation using semantic similarity + NLI
+ * Performs automatic evaluation using local models (semantic similarity + NLI)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -154,7 +181,6 @@ export async function POST(request: NextRequest) {
       traceId,
       input,
       output,
-      apiKey,
       semanticWeight = 30,
       nliWeight = 70,
       passThreshold = 7,
@@ -174,18 +200,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenAI API key is required for auto-evaluation' },
-        { status: 400 }
-      );
-    }
+    // Compute semantic similarity using local model
+    const semanticScore = await computeSemanticSimilarity(input, output);
 
-    // Compute semantic similarity
-    const semanticScore = await computeSemanticSimilarity(input, output, apiKey);
-
-    // Compute NLI score
-    const { score: nliScore, reasoning: nliReasoning } = await computeNLIScore(input, output, apiKey);
+    // Compute NLI score using local model
+    const { score: nliScore, reasoning: nliReasoning } = await computeNLIScore(input, output);
 
     // Normalize weights
     const totalWeight = semanticWeight + nliWeight;
@@ -252,7 +271,7 @@ export async function POST(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
-    const { traces, apiKey, semanticWeight, nliWeight, passThreshold } = await request.json();
+    const { traces, semanticWeight = 30, nliWeight = 70, passThreshold = 7 } = await request.json();
 
     if (!traces || !Array.isArray(traces)) {
       return NextResponse.json(
@@ -261,32 +280,27 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenAI API key is required' },
-        { status: 400 }
-      );
-    }
+    // Pre-load models before processing
+    await loadModels();
 
     const results = [];
 
     for (const trace of traces.slice(0, 10)) { // Limit to 10 traces per batch
       if (!trace.input || !trace.output) continue;
 
-      const semanticScore = await computeSemanticSimilarity(trace.input, trace.output, apiKey);
-      const { score: nliScore, reasoning } = await computeNLIScore(trace.input, trace.output, apiKey);
+      const semanticScore = await computeSemanticSimilarity(trace.input, trace.output);
+      const { score: nliScore, reasoning } = await computeNLIScore(trace.input, trace.output);
 
-      const totalWeight = (semanticWeight || 30) + (nliWeight || 70);
-      const normSemanticWeight = totalWeight > 0 ? (semanticWeight || 30) / totalWeight : 0.5;
-      const normNliWeight = totalWeight > 0 ? (nliWeight || 70) / totalWeight : 0.5;
+      const totalWeight = semanticWeight + nliWeight;
+      const normSemanticWeight = totalWeight > 0 ? semanticWeight / totalWeight : 0.5;
+      const normNliWeight = totalWeight > 0 ? nliWeight / totalWeight : 0.5;
 
       const rawScore = (normSemanticWeight * semanticScore) + (normNliWeight * nliScore);
       const finalScore = rawScore * 10;
-      const threshold = passThreshold || 7;
 
       const status: 'pass' | 'fail' | 'review' =
-        finalScore >= threshold ? 'pass' :
-        finalScore >= threshold - 2 ? 'review' : 'fail';
+        finalScore >= passThreshold ? 'pass' :
+        finalScore >= passThreshold - 2 ? 'review' : 'fail';
 
       await updateEvaluation(trace.id, {
         score: Math.round(finalScore * 10) / 10,

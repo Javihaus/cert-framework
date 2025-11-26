@@ -33,10 +33,8 @@ interface JudgeConfig {
 interface AutoEvalConfig {
   enabled: boolean;
   semanticWeight: number;  // 0-100, default 30
-  nliWeight: number;       // 0-100, default 70 (since we're not using grounding)
+  nliWeight: number;       // 0-100, default 70
   passThreshold: number;   // 0-10 scale
-  embeddingModel: 'openai' | 'local';
-  openaiApiKey: string;
 }
 
 // Default pricing (per 1M tokens)
@@ -70,13 +68,10 @@ export default function ConfigurationPage() {
     semanticWeight: 30,
     nliWeight: 70,
     passThreshold: 7,
-    embeddingModel: 'openai',
-    openaiApiKey: '',
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
-  const [showAutoEvalApiKey, setShowAutoEvalApiKey] = useState(false);
 
   // Load saved configuration
   useEffect(() => {
@@ -323,30 +318,16 @@ export default function ConfigurationPage() {
         </div>
 
         <div className={cn("p-6 space-y-6", !autoEvalConfig.enabled && "opacity-50 pointer-events-none")}>
-          {/* API Key for Embeddings */}
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              OpenAI API Key (for embeddings & NLI)
-            </label>
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <input
-                  type={showAutoEvalApiKey ? 'text' : 'password'}
-                  value={autoEvalConfig.openaiApiKey}
-                  onChange={(e) => setAutoEvalConfig(prev => ({ ...prev, openaiApiKey: e.target.value }))}
-                  placeholder="sk-..."
-                  className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              <button
-                onClick={() => setShowAutoEvalApiKey(!showAutoEvalApiKey)}
-                className="px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-600 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700"
-              >
-                {showAutoEvalApiKey ? 'Hide' : 'Show'}
-              </button>
+          {/* Local Models Info */}
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/30">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                Uses Local Models - No API Key Required
+              </span>
             </div>
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-              Used for computing embeddings (semantic similarity) and NLI scoring via GPT.
+            <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1 ml-6">
+              Models are downloaded automatically on first use: all-MiniLM-L6-v2 (embeddings), nli-deberta-v3-xsmall (NLI)
             </p>
           </div>
 
@@ -467,11 +448,11 @@ export default function ConfigurationPage() {
               <div>
                 <h4 className="font-medium text-teal-900 dark:text-teal-300 text-sm">How CERT Auto-Evaluation Works</h4>
                 <p className="text-xs text-teal-700 dark:text-teal-400 mt-1">
-                  When traces are received, CERT automatically evaluates them using:
+                  CERT automatically evaluates LLM traces using local ML models (no API calls):
                 </p>
                 <ul className="text-xs text-teal-700 dark:text-teal-400 mt-2 space-y-1 list-disc list-inside">
-                  <li><strong>Semantic Similarity:</strong> Cosine similarity between input/output embeddings</li>
-                  <li><strong>NLI Score:</strong> Natural Language Inference to check if output logically follows from input</li>
+                  <li><strong>Semantic Similarity:</strong> all-MiniLM-L6-v2 embeddings + cosine similarity</li>
+                  <li><strong>NLI Score:</strong> DeBERTa-v3-xsmall for entailment/contradiction detection</li>
                 </ul>
                 <p className="text-xs text-teal-700 dark:text-teal-400 mt-2">
                   Final score = ({autoEvalConfig.semanticWeight}% × Semantic) + ({autoEvalConfig.nliWeight}% × NLI)
@@ -605,11 +586,11 @@ export default function ConfigurationPage() {
           <div className="flex items-center gap-2">
             <span className={cn(
               "w-2 h-2 rounded-full",
-              autoEvalConfig.enabled && autoEvalConfig.openaiApiKey ? "bg-teal-500" : "bg-zinc-300"
+              autoEvalConfig.enabled ? "bg-teal-500" : "bg-zinc-300"
             )} />
             <span className="text-zinc-600 dark:text-zinc-400">
               Auto-Eval: {autoEvalConfig.enabled
-                ? (autoEvalConfig.openaiApiKey ? `${autoEvalConfig.semanticWeight}% semantic, ${autoEvalConfig.nliWeight}% NLI` : 'No API key')
+                ? `${autoEvalConfig.semanticWeight}% semantic, ${autoEvalConfig.nliWeight}% NLI (local models)`
                 : 'Disabled'}
             </span>
           </div>
