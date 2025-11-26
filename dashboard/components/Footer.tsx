@@ -8,7 +8,7 @@ export default function Footer() {
               href="/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-blue-600 hover:underline cursor-pointer"
+              className="hover:text-[#3C6098] hover:underline cursor-pointer"
             >
               Privacy Policy
             </a>
@@ -17,14 +17,14 @@ export default function Footer() {
               href="https://github.com/Javihaus/cert-framework"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-blue-600 hover:underline cursor-pointer"
+              className="hover:text-[#3C6098] hover:underline cursor-pointer"
             >
               GitHub
             </a>
             <span className="text-zinc-300 dark:text-zinc-600">·</span>
             <a
               href="mailto:javier@jmarin.info"
-              className="hover:text-blue-600 hover:underline cursor-pointer"
+              className="hover:text-[#3C6098] hover:underline cursor-pointer"
             >
               Contact
             </a>

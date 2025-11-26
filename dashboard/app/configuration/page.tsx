@@ -207,7 +207,7 @@ export default function ConfigurationPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Settings className="w-7 h-7 text-blue-600" />
+            <Settings className="w-7 h-7 text-[#3C6098]" />
             Configuration
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -221,7 +221,7 @@ export default function ConfigurationPage() {
             "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all",
             saved
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
-              : "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-[#3C6098] text-white hover:bg-[#3C6098]/90"
           )}
         >
           {saving ? (
@@ -298,7 +298,7 @@ export default function ConfigurationPage() {
                           </span>
                         )}
                         {isConnecting && (
-                          <span className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
+                          <span className="flex items-center gap-1.5 text-xs text-[#3C6098] dark:text-[#3C6098]">
                             <Loader2 className="w-3 h-3 animate-spin" />
                             Connecting...
                           </span>
@@ -334,7 +334,7 @@ export default function ConfigurationPage() {
                       value={connection.apiKey}
                       onChange={(e) => updateApiKey(connection.provider, e.target.value)}
                       placeholder={`Enter ${info.name} API key`}
-                      className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                      className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#3C6098] focus:border-transparent pr-10"
                     />
                     <button
                       onClick={() =>
@@ -413,7 +413,7 @@ export default function ConfigurationPage() {
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
                       isSelected
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10"
+                        ? "border-[#3C6098] bg-[#3C6098]/10 dark:bg-[#3C6098]/10"
                         : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600",
                       !isConnected && "opacity-50 cursor-not-allowed"
                     )}
@@ -431,13 +431,13 @@ export default function ConfigurationPage() {
                           model: PROVIDER_INFO[e.target.value as Provider].models[0],
                         }))
                       }
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-[#3C6098]"
                     />
                     <span className="flex-1 text-sm text-zinc-900 dark:text-white">
                       {info.name}
                     </span>
                     {provider === 'anthropic' && isConnected && (
-                      <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      <span className="text-xs text-[#3C6098] dark:text-[#3C6098] font-medium">
                         Recommended
                       </span>
                     )}
@@ -460,7 +460,7 @@ export default function ConfigurationPage() {
               onChange={(e) =>
                 setJudgeConfig(prev => ({ ...prev, model: e.target.value }))
               }
-              className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#3C6098]"
             >
               {PROVIDER_INFO[judgeConfig.provider].models.map((model) => (
                 <option key={model} value={model}>
@@ -498,7 +498,7 @@ export default function ConfigurationPage() {
                         },
                       }))
                     }
-                    className="w-4 h-4 text-blue-600 rounded"
+                    className="w-4 h-4 text-[#3C6098] rounded"
                   />
                   <div className="flex-1">
                     <span className="text-sm text-zinc-900 dark:text-white">
@@ -535,7 +535,7 @@ export default function ConfigurationPage() {
                   confidenceThreshold: parseFloat(e.target.value),
                 }))
               }
-              className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#3C6098]"
             />
             <div className="flex items-start gap-2 mt-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg">
               <Info className="w-4 h-4 text-zinc-400 flex-shrink-0 mt-0.5" />
@@ -567,7 +567,7 @@ export default function ConfigurationPage() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="w-2 h-2 rounded-full bg-[#3C6098]" />
             <span className="text-zinc-600 dark:text-zinc-400">
               Threshold: {(judgeConfig.confidenceThreshold * 100).toFixed(0)}%
             </span>

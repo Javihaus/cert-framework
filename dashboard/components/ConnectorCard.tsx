@@ -73,7 +73,7 @@ export default function ConnectorCard({
         {/* Metrics */}
         <div className="flex gap-6">
           <div className="flex flex-col flex-1">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-500">
+            <span className="text-2xl font-bold text-[#3C6098] dark:text-[#3C6098]">
               {tracesLogged.toLocaleString()}
             </span>
             <span className="text-sm text-zinc-500 dark:text-zinc-400">

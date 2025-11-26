@@ -42,7 +42,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#3C6098] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function HomePage() {
             href="/configuration"
             className="group flex flex-col items-center"
           >
-            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mb-4 group-hover:bg-blue-700 transition-colors">
+            <div className="w-16 h-16 rounded-full bg-[#3C6098] flex items-center justify-center mb-4 group-hover:bg-[#3C6098]/90 transition-colors">
               <Plus className="w-8 h-8 text-white" />
             </div>
             <span className="text-zinc-600 dark:text-zinc-400 text-sm">

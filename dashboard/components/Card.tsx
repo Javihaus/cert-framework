@@ -51,7 +51,7 @@ export default function Card({
         'card',
         paddingClasses[padding],
         onClick && 'cursor-pointer',
-        isInteractive && 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated hover:border-blue-500',
+        isInteractive && 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated hover:border-[#3C6098]',
         className
       )}
       {...props}

@@ -23,7 +23,7 @@ interface BadgeProps {
 
 const variantClasses: Record<BadgeVariant, string> = {
   default: 'badge-neutral',
-  primary: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+  primary: 'bg-[#3C6098]/10 text-[#3C6098] dark:bg-[#3C6098]/20 dark:text-[#3C6098]',
   success: 'badge-success',
   warning: 'badge-warning',
   error: 'badge-error',
@@ -32,11 +32,11 @@ const variantClasses: Record<BadgeVariant, string> = {
 
 const dotColors: Record<BadgeVariant, string> = {
   default: 'bg-zinc-400',
-  primary: 'bg-blue-500',
+  primary: 'bg-[#3C6098]',
   success: 'bg-emerald-500',
   warning: 'bg-amber-500',
   error: 'bg-red-500',
-  info: 'bg-blue-500',
+  info: 'bg-[#3C6098]',
 };
 
 const sizeClasses: Record<BadgeSize, string> = {

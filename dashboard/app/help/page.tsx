@@ -41,7 +41,7 @@ export default function HelpPage() {
       id: 'getting-started',
       title: 'Getting Started',
       icon: HelpCircle,
-      iconColor: '#2563EB',
+      iconColor: '#3C6098',
       description: 'Set up CERT Framework in 4 easy steps',
       expanded: true,
       steps: [
@@ -131,7 +131,7 @@ export default function HelpPage() {
       id: 'configuration',
       title: 'Configuration',
       icon: Settings,
-      iconColor: '#2563EB',
+      iconColor: '#3C6098',
       description: 'Set up API connections and judge settings',
       expanded: false,
       steps: [
@@ -371,7 +371,7 @@ export default function HelpPage() {
                       {step.link && (
                         <Link
                           href={step.link}
-                          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 whitespace-nowrap"
+                          className="flex items-center gap-1 text-sm text-[#3C6098] hover:text-[#3C6098]/80 dark:text-[#3C6098] whitespace-nowrap"
                         >
                           Go <ArrowRight className="w-4 h-4" />
                         </Link>
