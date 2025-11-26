@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { traceStore } from '@/lib/trace-store';
+import { getCostMetrics } from '@/lib/trace-store';
 
 /**
  * GET /api/operational/costs - Get cost metrics
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const range = searchParams.get('range') || '30d';
-
-  const costs = traceStore.getCostMetrics();
+  const costs = await getCostMetrics();
 
   if (!costs) {
     return NextResponse.json({ costs: null, suggestions: [] });
@@ -27,7 +24,7 @@ export async function GET(request: NextRequest) {
   const expensiveModels = Object.entries(costs.byModel)
     .filter(([model]) => 
       model.includes('opus') || 
-      model.includes('gpt-4') && !model.includes('mini')
+      (model.includes('gpt-4') && !model.includes('mini'))
     )
     .sort((a, b) => b[1] - a[1]);
 

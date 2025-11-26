@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { traceStore, CERTTrace } from '@/lib/trace-store';
+import { addTraces, getTraces, getStats, clearTraces, getTraceCount, CERTTrace } from '@/lib/trace-store';
 
 /**
  * OTLP Trace Receiver Endpoint
@@ -181,15 +181,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store traces using shared store
-    traceStore.addTraces(newTraces);
+    // Store traces using shared store (async)
+    await addTraces(newTraces);
 
-    console.log(`[CERT] Received ${newTraces.length} traces. Total stored: ${traceStore.getCount()}`);
+    const total = await getTraceCount();
+    console.log(`[CERT] Received ${newTraces.length} traces. Total stored: ${total}`);
 
     return NextResponse.json({
       success: true,
       received: newTraces.length,
-      total: traceStore.getCount(),
+      total,
     });
 
   } catch (error) {
@@ -212,7 +213,7 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status') || undefined;
   const llmOnly = searchParams.get('llm_only') === 'true';
 
-  const traces = traceStore.getTraces({
+  const traces = await getTraces({
     limit,
     offset,
     llmOnly,
@@ -220,7 +221,7 @@ export async function GET(request: NextRequest) {
     status,
   });
 
-  const stats = traceStore.getStats();
+  const stats = await getStats();
 
   return NextResponse.json({
     traces,
@@ -238,7 +239,7 @@ export async function GET(request: NextRequest) {
  * DELETE /api/v1/traces - Clear traces
  */
 export async function DELETE() {
-  const count = traceStore.clear();
+  const count = await clearTraces();
 
   return NextResponse.json({
     success: true,

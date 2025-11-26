@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { traceStore } from '@/lib/trace-store';
+import { getQualityMetrics } from '@/lib/trace-store';
 
 /**
  * GET /api/quality/summary - Get quality metrics summary
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const range = searchParams.get('range') || '24h';
-
-  const metrics = traceStore.getQualityMetrics();
-
+  const metrics = await getQualityMetrics();
   return NextResponse.json(metrics);
 }
