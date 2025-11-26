@@ -1,143 +1,189 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   RefreshCw,
-  Upload,
-  FileText,
   Lightbulb,
   CheckCircle,
   AlertCircle,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Trace, CostSummary } from '@/types/trace';
-import { TraceAnalyzer } from '@/lib/trace-analyzer';
 
-interface OptimizationSuggestion {
-  type: string;
-  title: string;
-  description: string;
-  potentialSavings: number;
-  confidence: number;
+interface ModelPricing {
+  id: string;
+  vendor: string;
+  model: string;
+  inputPricePerMillion: number;
+  outputPricePerMillion: number;
+}
+
+interface LLMTrace {
+  id: string;
+  llm?: {
+    vendor: string;
+    model: string;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  receivedAt: string;
+  durationMs: number;
+}
+
+interface CostData {
+  totalCost: number;
+  byModel: Record<string, { cost: number; calls: number; tokens: number }>;
+  byVendor: Record<string, number>;
+  dailyCosts: Record<string, number>;
+  avgCostPerQuery: number;
+  projectedMonthlyCost: number;
 }
 
 export default function CostAnalysisPage() {
-  const [traces, setTraces] = useState<Trace[]>([]);
-  const [costData, setCostData] = useState<CostSummary | null>(null);
+  const [traces, setTraces] = useState<LLMTrace[]>([]);
+  const [pricing, setPricing] = useState<ModelPricing[]>([]);
+  const [costData, setCostData] = useState<CostData | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('30d');
   const [loading, setLoading] = useState(true);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
+  const [hasPricing, setHasPricing] = useState(false);
 
   useEffect(() => {
-    loadCostData();
-  }, [timeRange]);
+    // Load pricing from localStorage
+    const storedPricing = localStorage.getItem('cert-model-pricing');
+    if (storedPricing) {
+      const parsed = JSON.parse(storedPricing);
+      setPricing(parsed);
+      setHasPricing(parsed.length > 0);
+    }
+    loadTraces();
+  }, []);
 
-  const loadCostData = async () => {
+  useEffect(() => {
+    if (traces.length > 0 && pricing.length > 0) {
+      calculateCosts();
+    }
+  }, [traces, pricing, timeRange]);
+
+  const loadTraces = async () => {
     setLoading(true);
     try {
-      // Try to get from API
-      const response = await fetch(`/api/operational/costs?range=${timeRange}`);
+      const response = await fetch('/api/v1/traces?llmOnly=true&limit=1000');
       if (response.ok) {
         const data = await response.json();
-        setCostData(data.costs);
-        setSuggestions(data.suggestions || []);
-      } else {
-        // Load from localStorage
-        const stored = localStorage.getItem('cert-traces');
-        if (stored) {
-          const parsedTraces = JSON.parse(stored);
-          setTraces(parsedTraces);
-          analyzeCosts(parsedTraces);
-        }
+        setTraces(data.traces || []);
       }
     } catch (e) {
-      const stored = localStorage.getItem('cert-traces');
-      if (stored) {
-        const parsedTraces = JSON.parse(stored);
-        setTraces(parsedTraces);
-        analyzeCosts(parsedTraces);
-      }
+      console.error('Failed to load traces:', e);
     }
     setLoading(false);
   };
 
-  const analyzeCosts = (allTraces: Trace[]) => {
+  const getPriceForModel = (vendor: string, model: string): { input: number; output: number } => {
+    // Try exact match first
+    let priceConfig = pricing.find(
+      p => p.vendor.toLowerCase() === vendor.toLowerCase() &&
+           p.model.toLowerCase() === model.toLowerCase()
+    );
+
+    // Try partial match
+    if (!priceConfig) {
+      priceConfig = pricing.find(
+        p => p.vendor.toLowerCase() === vendor.toLowerCase() &&
+             model.toLowerCase().includes(p.model.toLowerCase())
+      );
+    }
+
+    // Try just model name match
+    if (!priceConfig) {
+      priceConfig = pricing.find(
+        p => model.toLowerCase().includes(p.model.toLowerCase())
+      );
+    }
+
+    if (priceConfig) {
+      return {
+        input: priceConfig.inputPricePerMillion,
+        output: priceConfig.outputPricePerMillion,
+      };
+    }
+
+    // Default fallback
+    return { input: 1, output: 2 };
+  };
+
+  const calculateCosts = () => {
     const now = new Date();
     const cutoff = new Date();
     if (timeRange === '7d') cutoff.setDate(now.getDate() - 7);
     else if (timeRange === '30d') cutoff.setDate(now.getDate() - 30);
 
-    const filteredTraces =
-      timeRange === 'all'
-        ? allTraces
-        : allTraces.filter((t) => {
-            const traceDate = new Date(t.timestamp);
-            return traceDate >= cutoff;
-          });
+    const filteredTraces = timeRange === 'all'
+      ? traces
+      : traces.filter(t => new Date(t.receivedAt) >= cutoff);
 
-    const analyzer = new TraceAnalyzer(filteredTraces);
-    const costs = analyzer.calculateCosts();
-    setCostData(costs);
+    const llmTraces = filteredTraces.filter(t => t.llm);
 
-    // Generate optimization suggestions
-    const newSuggestions: OptimizationSuggestion[] = [];
-
-    // Check for model downgrade opportunities
-    const expensiveModels = Object.entries(costs.byModel)
-      .filter(([model]) => model.includes('opus') || model.includes('gpt-4'))
-      .sort((a, b) => b[1] - a[1]);
-
-    if (expensiveModels.length > 0) {
-      const [model, cost] = expensiveModels[0];
-      newSuggestions.push({
-        type: 'model_downgrade',
-        title: `Consider using a smaller model for some ${model} calls`,
-        description: `${Math.round(cost * 0.3)} of your ${model} calls could potentially use a smaller model.`,
-        potentialSavings: cost * 0.3 * 0.6,
-        confidence: 0.7,
-      });
+    if (llmTraces.length === 0) {
+      setCostData(null);
+      return;
     }
 
-    setSuggestions(newSuggestions);
-  };
+    let totalCost = 0;
+    const byModel: Record<string, { cost: number; calls: number; tokens: number }> = {};
+    const byVendor: Record<string, number> = {};
+    const dailyCosts: Record<string, number> = {};
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    for (const trace of llmTraces) {
+      const vendor = trace.llm?.vendor || 'unknown';
+      const model = trace.llm?.model || 'unknown';
+      const promptTokens = trace.llm?.promptTokens || 0;
+      const completionTokens = trace.llm?.completionTokens || 0;
+      const totalTokens = promptTokens + completionTokens;
 
-    setUploadedFile(file);
+      const priceInfo = getPriceForModel(vendor, model);
+      const cost = (promptTokens * priceInfo.input + completionTokens * priceInfo.output) / 1_000_000;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        let parsed: Trace[];
+      totalCost += cost;
 
-        if (file.name.endsWith('.jsonl')) {
-          parsed = content
-            .trim()
-            .split('\n')
-            .map((line) => JSON.parse(line));
-        } else {
-          const data = JSON.parse(content);
-          parsed = Array.isArray(data) ? data : [data];
-        }
-
-        setTraces(parsed);
-        localStorage.setItem('cert-traces', JSON.stringify(parsed));
-        analyzeCosts(parsed);
-      } catch (e) {
-        console.error('Failed to parse file');
+      if (!byModel[model]) {
+        byModel[model] = { cost: 0, calls: 0, tokens: 0 };
       }
-    };
-    reader.readAsText(file);
+      byModel[model].cost += cost;
+      byModel[model].calls += 1;
+      byModel[model].tokens += totalTokens;
+
+      byVendor[vendor] = (byVendor[vendor] || 0) + cost;
+
+      const date = new Date(trace.receivedAt).toISOString().split('T')[0];
+      dailyCosts[date] = (dailyCosts[date] || 0) + cost;
+    }
+
+    const days = Object.keys(dailyCosts).length || 1;
+    const dailyAvg = totalCost / days;
+
+    setCostData({
+      totalCost,
+      byModel,
+      byVendor,
+      dailyCosts,
+      avgCostPerQuery: totalCost / llmTraces.length,
+      projectedMonthlyCost: dailyAvg * 30,
+    });
   };
 
   const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+    }).format(amount);
+  };
+
+  const formatCurrencyShort = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -146,11 +192,11 @@ export default function CostAnalysisPage() {
     }).format(amount);
   };
 
-  const costPerQuery = costData && traces.length > 0
-    ? costData.totalCost / traces.length
-    : 0;
-
-  const costStatus = costPerQuery < 0.25 ? 'good' : costPerQuery < 0.50 ? 'warning' : 'high';
+  const costStatus = costData
+    ? costData.avgCostPerQuery < 0.01 ? 'good'
+    : costData.avgCostPerQuery < 0.05 ? 'warning'
+    : 'high'
+    : 'good';
 
   if (loading) {
     return (
@@ -170,7 +216,7 @@ export default function CostAnalysisPage() {
             Cost Analysis
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            Token usage and API costs tracking
+            Token usage and API costs based on configured pricing
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -183,18 +229,36 @@ export default function CostAnalysisPage() {
             <option value="30d">Last 30 days</option>
             <option value="all">All time</option>
           </select>
-          <label className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">
-            <Upload className="w-4 h-4" />
-            Upload Traces
-            <input
-              type="file"
-              accept=".json,.jsonl"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </label>
+          <button
+            onClick={loadTraces}
+            className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
         </div>
       </div>
+
+      {/* No pricing configured */}
+      {!hasPricing && (
+        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <Settings className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-amber-800 dark:text-amber-300">
+                No pricing configured
+              </h3>
+              <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                Configure model pricing in the{' '}
+                <Link href="/configuration" className="underline font-medium">
+                  Configuration page
+                </Link>{' '}
+                to see accurate cost calculations.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!costData || traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
@@ -202,30 +266,20 @@ export default function CostAnalysisPage() {
             <DollarSign className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
           </div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-            No cost data available
+            No trace data available
           </h2>
-          <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-6">
-            Upload a trace file (JSONL format) to analyze your LLM API costs.
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
+            Run your LLM application with the CERT tracer to start collecting cost data.
           </p>
-          <label className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg cursor-pointer hover:bg-yellow-700 transition-colors">
-            <Upload className="w-4 h-4" />
-            Upload Trace File
-            <input
-              type="file"
-              accept=".json,.jsonl"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </label>
         </div>
       ) : (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
               <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Cost</span>
               <p className="text-3xl font-bold text-zinc-900 dark:text-white mt-2">
-                {formatCurrency(costData.totalCost)}
+                {formatCurrencyShort(costData.totalCost)}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                 {timeRange === '7d' ? 'This week' : timeRange === '30d' ? 'This month' : 'All time'}
@@ -253,50 +307,60 @@ export default function CostAnalysisPage() {
                 )}
               </div>
               <p className="text-3xl font-bold text-zinc-900 dark:text-white">
-                {formatCurrency(costPerQuery)}
+                {formatCurrency(costData.avgCostPerQuery)}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                Target: &lt; $0.25
+                Target: &lt; $0.01
               </p>
             </div>
 
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
               <span className="text-sm text-zinc-500 dark:text-zinc-400">Projected Monthly</span>
               <p className="text-3xl font-bold text-zinc-900 dark:text-white mt-2">
-                {formatCurrency(costData.projectedMonthlyCost)}
+                {formatCurrencyShort(costData.projectedMonthlyCost)}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                 Based on current usage
               </p>
             </div>
+
+            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Calls</span>
+              <p className="text-3xl font-bold text-zinc-900 dark:text-white mt-2">
+                {traces.filter(t => t.llm).length.toLocaleString()}
+              </p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                LLM API calls
+              </p>
+            </div>
           </div>
 
-          {/* Cost by Provider */}
+          {/* Cost by Vendor */}
           <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
             <h2 className="font-semibold text-zinc-900 dark:text-white mb-4">Cost by Provider</h2>
             <div className="space-y-3">
-              {Object.entries(costData.byPlatform)
+              {Object.entries(costData.byVendor)
                 .sort((a, b) => b[1] - a[1])
-                .map(([platform, cost]) => {
-                  const percentage = (cost / costData.totalCost) * 100;
+                .map(([vendor, cost]) => {
+                  const percentage = costData.totalCost > 0 ? (cost / costData.totalCost) * 100 : 0;
                   return (
-                    <div key={platform} className="flex items-center gap-4">
+                    <div key={vendor} className="flex items-center gap-4">
                       <span className="w-24 text-sm text-zinc-600 dark:text-zinc-400 capitalize">
-                        {platform}
+                        {vendor}
                       </span>
                       <div className="flex-1 h-4 bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
                         <div
                           className={cn(
                             "h-full rounded-full",
-                            platform === 'anthropic' && "bg-orange-500",
-                            platform === 'openai' && "bg-emerald-500",
-                            platform === 'google' && "bg-blue-500",
-                            !['anthropic', 'openai', 'google'].includes(platform) && "bg-purple-500"
+                            vendor === 'anthropic' && "bg-orange-500",
+                            vendor === 'openai' && "bg-emerald-500",
+                            vendor === 'google' && "bg-blue-500",
+                            !['anthropic', 'openai', 'google'].includes(vendor) && "bg-purple-500"
                           )}
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="w-24 text-sm font-medium text-zinc-900 dark:text-white text-right">
+                      <span className="w-32 text-sm font-medium text-zinc-900 dark:text-white text-right">
                         {formatCurrency(cost)} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
@@ -326,38 +390,37 @@ export default function CostAnalysisPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       Cost
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                      Avg/Call
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
                   {Object.entries(costData.byModel)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([model, cost]) => {
-                      const modelTraces = traces.filter((t) => t.model === model);
-                      const totalTokens = modelTraces.reduce(
-                        (sum, t) => sum + ((t.metadata?.tokens?.prompt || 0) + (t.metadata?.tokens?.completion || 0)),
-                        0
-                      );
-                      return (
-                        <tr key={model}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
-                            {model}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                            {modelTraces.length.toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                            {totalTokens > 1000000
-                              ? `${(totalTokens / 1000000).toFixed(1)}M`
-                              : totalTokens > 1000
-                              ? `${(totalTokens / 1000).toFixed(0)}K`
-                              : totalTokens.toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
-                            {formatCurrency(cost)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    .sort((a, b) => b[1].cost - a[1].cost)
+                    .map(([model, data]) => (
+                      <tr key={model}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
+                          {model}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {data.calls.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {data.tokens > 1000000
+                            ? `${(data.tokens / 1000000).toFixed(1)}M`
+                            : data.tokens > 1000
+                            ? `${(data.tokens / 1000).toFixed(0)}K`
+                            : data.tokens.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
+                          {formatCurrency(data.cost)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {formatCurrency(data.cost / data.calls)}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -389,42 +452,35 @@ export default function CostAnalysisPage() {
             </div>
           </div>
 
-          {/* Optimization Suggestions */}
-          {suggestions.length > 0 && (
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2">
+          {/* Pricing Info */}
+          <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
-                <h2 className="font-semibold text-zinc-900 dark:text-white">
-                  Optimization Suggestions
-                </h2>
+                <h2 className="font-semibold text-zinc-900 dark:text-white">Pricing Configuration</h2>
               </div>
-              <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {suggestions.map((suggestion, i) => (
-                  <div key={i} className="p-6 flex items-start gap-4">
-                    <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Lightbulb className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-zinc-900 dark:text-white">
-                        {suggestion.title}
-                      </h3>
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                        {suggestion.description}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-emerald-600 dark:text-emerald-400">
-                        Save {formatCurrency(suggestion.potentialSavings)}/mo
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        {Math.round(suggestion.confidence * 100)}% confidence
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <Link
+                href="/configuration"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Edit Pricing →
+              </Link>
             </div>
-          )}
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+              Costs are calculated based on your configured model pricing ({pricing.length} models configured).
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {pricing.slice(0, 4).map((p) => (
+                <div key={p.id} className="bg-zinc-50 dark:bg-zinc-700/50 rounded-lg p-3">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">{p.vendor}</p>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-white">{p.model}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    ${p.inputPricePerMillion} / ${p.outputPricePerMillion} per 1M
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </>
       )}
     </div>
