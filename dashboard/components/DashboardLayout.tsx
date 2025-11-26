@@ -21,7 +21,6 @@ import {
   LogOut,
   User,
   HelpCircle,
-  AlertTriangle,
   DollarSign,
   Zap,
   Home,
@@ -53,7 +52,6 @@ const navigation: NavSection[] = [
       { name: 'Overview', href: '/quality', icon: LayoutDashboard },
       { name: 'LLM Judge', href: '/quality/judge', icon: Zap },
       { name: 'Human Review', href: '/quality/review', icon: User },
-      { name: 'Test Results', href: '/quality/tests', icon: AlertTriangle },
     ],
   },
   {

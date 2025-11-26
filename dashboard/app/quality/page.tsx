@@ -49,12 +49,25 @@ interface LLMTrace {
   durationMs: number;
 }
 
+type StatusFilter = 'all' | 'pass' | 'fail' | 'review' | 'pending';
+type MethodFilter = 'all' | 'auto' | 'llm' | 'human';
+
 export default function QualityDashboard() {
   const [traces, setTraces] = useState<LLMTrace[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoEvalConfig, setAutoEvalConfig] = useState<AutoEvalConfig | null>(null);
   const [runningAutoEval, setRunningAutoEval] = useState(false);
   const [autoEvalProgress, setAutoEvalProgress] = useState({ current: 0, total: 0 });
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [methodFilter, setMethodFilter] = useState<MethodFilter>('all');
+  const [selectedTrace, setSelectedTrace] = useState<LLMTrace | null>(null);
+
+  const getEvalMethod = (trace: LLMTrace): 'auto' | 'llm' | 'human' | 'pending' => {
+    if (!trace.evaluation?.judgeModel && !trace.evaluation?.status) return 'pending';
+    if (trace.evaluation?.judgeModel === 'cert-auto-eval') return 'auto';
+    if (trace.evaluation?.judgeModel) return 'llm';
+    return 'human';
+  };
 
   useEffect(() => {
     loadTraces();
@@ -188,6 +201,25 @@ export default function QualityDashboard() {
     if (t.evaluation?.status === 'review') acc[model].review++;
     return acc;
   }, {} as Record<string, { total: number; passed: number; failed: number; review: number }>);
+
+  // Filtered traces for results table
+  const filteredTraces = traces.filter(t => {
+    // Status filter
+    if (statusFilter === 'pending' && t.evaluation?.status) return false;
+    if (statusFilter === 'pass' && t.evaluation?.status !== 'pass') return false;
+    if (statusFilter === 'fail' && t.evaluation?.status !== 'fail') return false;
+    if (statusFilter === 'review' && t.evaluation?.status !== 'review') return false;
+
+    // Method filter
+    if (methodFilter !== 'all') {
+      const method = getEvalMethod(t);
+      if (methodFilter === 'auto' && method !== 'auto') return false;
+      if (methodFilter === 'llm' && method !== 'llm') return false;
+      if (methodFilter === 'human' && method !== 'human') return false;
+    }
+
+    return true;
+  });
 
   const hasData = totalTraces > 0;
 
@@ -526,77 +558,226 @@ export default function QualityDashboard() {
             </div>
           )}
 
-          {/* Recent Evaluations */}
-          {recentEvaluations.length > 0 && (
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                <h2 className="font-semibold text-zinc-900 dark:text-white">Recent Evaluations</h2>
-                <Link
-                  href="/quality/tests"
-                  className="text-sm text-[#3C6098] hover:text-[#3C6098]/80"
-                >
-                  View All →
-                </Link>
+          {/* Evaluation Results */}
+          <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-zinc-900 dark:text-white">Evaluation Results</h2>
+                  <div className="flex items-center gap-2">
+                    {(['all', 'pass', 'fail', 'review', 'pending'] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setStatusFilter(f)}
+                        className={cn(
+                          "px-3 py-1 text-xs font-medium rounded-full transition-colors",
+                          statusFilter === f
+                            ? "bg-[#3C6098] text-white"
+                            : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                        )}
+                      >
+                        {f === 'all' ? `All (${traces.length})` :
+                         f === 'pass' ? `Pass (${passedTraces.length})` :
+                         f === 'fail' ? `Fail (${failedTraces.length})` :
+                         f === 'review' ? `Review (${reviewTraces.length})` :
+                         `Pending (${pendingTraces.length})`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Method Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Method:</span>
+                  {([
+                    { key: 'all', label: 'All', count: traces.length },
+                    { key: 'auto', label: 'Auto-Eval', count: autoEvalTraces.length },
+                    { key: 'llm', label: 'LLM Judge', count: llmJudgeTraces.length },
+                    { key: 'human', label: 'Human', count: humanReviewTraces.length },
+                  ] as const).map((m) => (
+                    <button
+                      key={m.key}
+                      onClick={() => setMethodFilter(m.key as MethodFilter)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors",
+                        methodFilter === m.key
+                          ? m.key === 'auto' ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                          : m.key === 'llm' ? "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
+                          : m.key === 'human' ? "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400"
+                          : "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
+                          : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                      )}
+                    >
+                      {m.key === 'auto' && <Sparkles className="w-3 h-3" />}
+                      {m.key === 'llm' && <Zap className="w-3 h-3" />}
+                      {m.key === 'human' && <User className="w-3 h-3" />}
+                      {m.label} ({m.count})
+                    </button>
+                  ))}
+                </div>
               </div>
+            </div>
+
+            {filteredTraces.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-zinc-500 dark:text-zinc-400">No traces match the filter</p>
+              </div>
+            ) : (
               <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {recentEvaluations.map((trace) => (
-                  <div key={trace.id} className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
-                        trace.evaluation?.status === 'pass'
-                          ? "bg-emerald-100 dark:bg-emerald-500/20"
-                          : trace.evaluation?.status === 'fail'
-                          ? "bg-red-100 dark:bg-red-500/20"
-                          : "bg-amber-100 dark:bg-amber-500/20"
-                      )}>
-                        {trace.evaluation?.status === 'pass' ? (
-                          <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        ) : trace.evaluation?.status === 'fail' ? (
-                          <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                {filteredTraces.slice(0, 50).map((trace) => (
+                  <div
+                    key={trace.id}
+                    className="px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors cursor-pointer"
+                    onClick={() => setSelectedTrace(selectedTrace?.id === trace.id ? null : trace)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                          trace.evaluation?.status === 'pass'
+                            ? "bg-emerald-100 dark:bg-emerald-500/20"
+                            : trace.evaluation?.status === 'fail'
+                            ? "bg-red-100 dark:bg-red-500/20"
+                            : trace.evaluation?.status === 'review'
+                            ? "bg-amber-100 dark:bg-amber-500/20"
+                            : "bg-zinc-100 dark:bg-zinc-700"
+                        )}>
+                          {trace.evaluation?.status === 'pass' ? (
+                            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          ) : trace.evaluation?.status === 'fail' ? (
+                            <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          ) : trace.evaluation?.status === 'review' ? (
+                            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                          ) : (
+                            <Clock className="w-4 h-4 text-zinc-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                            {trace.llm?.model || 'Unknown model'}
+                          </p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                            {trace.llm?.input?.slice(0, 80) || 'No input'}...
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 ml-4">
+                        {/* Evaluation Method Badge */}
+                        {trace.evaluation?.judgeModel && (
+                          <span className={cn(
+                            "flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
+                            getEvalMethod(trace) === 'auto'
+                              ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                              : "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
+                          )}>
+                            {getEvalMethod(trace) === 'auto' ? (
+                              <><Sparkles className="w-3 h-3" /> Auto</>
+                            ) : (
+                              <><Zap className="w-3 h-3" /> LLM</>
+                            )}
+                          </span>
+                        )}
+                        {trace.evaluation?.status && !trace.evaluation?.judgeModel && (
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400">
+                            <User className="w-3 h-3" /> Human
+                          </span>
+                        )}
+                        {trace.evaluation?.score !== undefined && (
+                          <span className={cn(
+                            "text-sm font-medium",
+                            trace.evaluation.status === 'pass'
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : trace.evaluation.status === 'fail'
+                              ? "text-red-600 dark:text-red-400"
+                              : "text-amber-600 dark:text-amber-400"
+                          )}>
+                            {trace.evaluation.score.toFixed(1)}/10
+                          </span>
+                        )}
+                        <span className="text-xs text-zinc-400">{trace.llm?.vendor}</span>
+                        <span className="text-xs text-zinc-400">{trace.durationMs}ms</span>
+                      </div>
+                    </div>
+
+                    {/* Expanded Details */}
+                    {selectedTrace?.id === trace.id && (
+                      <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                        {/* Auto-Eval Score Breakdown */}
+                        {trace.evaluation?.criteria && (
+                          <div className="mb-4 p-3 bg-teal-50 dark:bg-teal-500/10 rounded-lg border border-teal-200 dark:border-teal-500/30">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                              <span className="text-xs font-medium text-teal-800 dark:text-teal-300">CERT Auto-Evaluation Breakdown</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-teal-700 dark:text-teal-400">Semantic Similarity</span>
+                                  <span className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                                    {((trace.evaluation.criteria.semantic || 0) * 10).toFixed(1)}/10
+                                  </span>
+                                </div>
+                                <div className="h-1.5 bg-teal-200 dark:bg-teal-700 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-teal-500 transition-all"
+                                    style={{ width: `${(trace.evaluation.criteria.semantic || 0) * 100}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-teal-700 dark:text-teal-400">NLI Score</span>
+                                  <span className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                                    {((trace.evaluation.criteria.nli || 0) * 10).toFixed(1)}/10
+                                  </span>
+                                </div>
+                                <div className="h-1.5 bg-teal-200 dark:bg-teal-700 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-teal-500 transition-all"
+                                    style={{ width: `${(trace.evaluation.criteria.nli || 0) * 100}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Input</label>
+                            <div className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded text-xs text-zinc-700 dark:text-zinc-300 max-h-32 overflow-y-auto whitespace-pre-wrap">
+                              {trace.llm?.input || 'No input'}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Output</label>
+                            <div className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded text-xs text-zinc-700 dark:text-zinc-300 max-h-32 overflow-y-auto whitespace-pre-wrap">
+                              {trace.llm?.output || 'No output'}
+                            </div>
+                          </div>
+                        </div>
+                        {trace.evaluation?.judgeModel && (
+                          <p className="text-xs text-zinc-400 mt-2">
+                            Evaluated by: {trace.evaluation.judgeModel === 'cert-auto-eval' ? 'CERT Auto-Evaluation' : trace.evaluation.judgeModel}
+                          </p>
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                          {trace.llm?.model || 'Unknown model'}
-                        </p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {trace.llm?.vendor} • {trace.durationMs}ms
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={cn(
-                        "text-sm font-medium",
-                        (trace.evaluation?.score || 0) >= 7
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : (trace.evaluation?.score || 0) >= 5
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-red-600 dark:text-red-400"
-                      )}>
-                        {trace.evaluation?.score?.toFixed(1) || '-'}/10
-                      </span>
-                      <span className={cn(
-                        "px-2 py-1 rounded text-xs font-medium",
-                        trace.evaluation?.status === 'pass'
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
-                          : trace.evaluation?.status === 'fail'
-                          ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
-                      )}>
-                        {trace.evaluation?.status || 'Pending'}
-                      </span>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+
+            {filteredTraces.length > 50 && (
+              <div className="px-6 py-3 border-t border-zinc-200 dark:border-zinc-700 text-center">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Showing 50 of {filteredTraces.length} traces
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Auto-Eval */}
             <button
               onClick={runAutoEvaluation}
@@ -616,7 +797,7 @@ export default function QualityDashboard() {
                 )}
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Semantic + NLI evaluation
+                Automatic validation
               </p>
               {autoEvalConfig?.enabled ? (
                 pendingTraces.length > 0 && (
@@ -641,7 +822,7 @@ export default function QualityDashboard() {
                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-purple-500 ml-auto transition-colors" />
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                AI-powered evaluation
+                Use another model to check accuracy
               </p>
             </Link>
 
@@ -655,21 +836,7 @@ export default function QualityDashboard() {
                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-orange-500 ml-auto transition-colors" />
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Manual 0-10 rating
-              </p>
-            </Link>
-
-            <Link
-              href="/quality/tests"
-              className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors group"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-5 h-5 text-blue-500" />
-                <span className="font-medium text-zinc-900 dark:text-white">Test Results</span>
-                <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-blue-500 ml-auto transition-colors" />
-              </div>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                View all evaluations
+                Check accuracy manually
               </p>
             </Link>
           </div>
