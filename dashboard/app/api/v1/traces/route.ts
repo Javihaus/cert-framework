@@ -1,75 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { addTraces, getTraces, getStats, clearTraces, getTraceCount, CERTTrace } from '@/lib/trace-store';
 
 /**
  * OTLP Trace Receiver Endpoint
  *
  * Receives traces from OpenLLMetry/OpenTelemetry instrumented applications.
  * Supports both OTLP JSON format and simplified CERT format.
- *
- * Standard OTLP endpoint: POST /api/v1/traces
  */
-
-// In-memory store for demo (in production, use a database)
-const traceStore: CERTTrace[] = [];
-const MAX_TRACES = 1000;
-
-export interface LLMSpanAttributes {
-  'llm.vendor'?: string;
-  'llm.request.type'?: string;
-  'llm.request.model'?: string;
-  'llm.response.model'?: string;
-  'llm.usage.prompt_tokens'?: number;
-  'llm.usage.completion_tokens'?: number;
-  'llm.usage.total_tokens'?: number;
-  'llm.prompts'?: string;
-  'llm.completions'?: string;
-  'llm.temperature'?: number;
-  'llm.top_p'?: number;
-  'llm.frequency_penalty'?: number;
-  'llm.presence_penalty'?: number;
-  'llm.chat.stop_sequences'?: string[];
-  'gen_ai.system'?: string;
-  'gen_ai.request.model'?: string;
-  'gen_ai.response.model'?: string;
-  'gen_ai.usage.input_tokens'?: number;
-  'gen_ai.usage.output_tokens'?: number;
-}
-
-export interface CERTTrace {
-  id: string;
-  traceId: string;
-  spanId: string;
-  parentSpanId?: string;
-  name: string;
-  kind: string;
-  startTime: string;
-  endTime: string;
-  durationMs: number;
-  status: 'ok' | 'error' | 'unset';
-  attributes: LLMSpanAttributes & Record<string, unknown>;
-  // Extracted LLM-specific fields for easy access
-  llm?: {
-    vendor: string;
-    model: string;
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-    input?: string;
-    output?: string;
-    temperature?: number;
-  };
-  // Evaluation results (added by CERT)
-  evaluation?: {
-    score?: number;
-    status?: 'pass' | 'fail' | 'review';
-    criteria?: Record<string, number>;
-    judgeModel?: string;
-    evaluatedAt?: string;
-  };
-  // Metadata
-  receivedAt: string;
-  source: 'otlp' | 'sdk' | 'manual';
-}
 
 /**
  * Parse OTLP JSON format into CERT traces
@@ -77,7 +14,6 @@ export interface CERTTrace {
 function parseOTLPTraces(body: Record<string, unknown>): CERTTrace[] {
   const traces: CERTTrace[] = [];
 
-  // OTLP format: { resourceSpans: [{ scopeSpans: [{ spans: [...] }] }] }
   const resourceSpans = body.resourceSpans as Array<{
     resource?: { attributes?: Array<{ key: string; value: unknown }> };
     scopeSpans?: Array<{
@@ -105,19 +41,16 @@ function parseOTLPTraces(body: Record<string, unknown>): CERTTrace[] {
       const spans = scopeSpan.spans || [];
 
       for (const span of spans) {
-        // Convert attributes array to object
         const attrs: Record<string, unknown> = {};
         for (const attr of span.attributes || []) {
           const value = attr.value as { stringValue?: string; intValue?: string; doubleValue?: number; boolValue?: boolean };
           attrs[attr.key] = value.stringValue || value.intValue || value.doubleValue || value.boolValue;
         }
 
-        // Calculate duration
         const startNano = BigInt(span.startTimeUnixNano);
         const endNano = BigInt(span.endTimeUnixNano);
         const durationMs = Number((endNano - startNano) / BigInt(1_000_000));
 
-        // Extract LLM-specific data
         const llmData = extractLLMData(attrs);
 
         const certTrace: CERTTrace = {
@@ -131,7 +64,7 @@ function parseOTLPTraces(body: Record<string, unknown>): CERTTrace[] {
           endTime: new Date(Number(endNano / BigInt(1_000_000))).toISOString(),
           durationMs,
           status: span.status?.code === 2 ? 'error' : span.status?.code === 1 ? 'ok' : 'unset',
-          attributes: attrs as LLMSpanAttributes & Record<string, unknown>,
+          attributes: attrs,
           llm: llmData,
           receivedAt: new Date().toISOString(),
           source: 'otlp',
@@ -156,7 +89,6 @@ function extractLLMData(attrs: Record<string, unknown>) {
   const completionTokens = Number(attrs['llm.usage.completion_tokens'] || attrs['gen_ai.usage.output_tokens'] || 0);
   const totalTokens = Number(attrs['llm.usage.total_tokens'] || promptTokens + completionTokens);
 
-  // Only return if this looks like an LLM span
   if (vendor === 'unknown' && model === 'unknown' && totalTokens === 0) {
     return undefined;
   }
@@ -225,11 +157,9 @@ export async function POST(request: NextRequest) {
     const contentType = request.headers.get('content-type') || '';
     let body: Record<string, unknown>;
 
-    // Parse body based on content type
     if (contentType.includes('application/json')) {
       body = await request.json();
     } else if (contentType.includes('application/x-protobuf')) {
-      // For protobuf, we'd need to decode - for now, return unsupported
       return NextResponse.json(
         { error: 'Protobuf not supported yet. Use JSON format with Content-Type: application/json' },
         { status: 415 }
@@ -238,14 +168,11 @@ export async function POST(request: NextRequest) {
       body = await request.json();
     }
 
-    // Detect format and parse
     let newTraces: CERTTrace[];
 
     if (body.resourceSpans) {
-      // OTLP format
       newTraces = parseOTLPTraces(body);
     } else if (body.traces) {
-      // CERT SDK format
       newTraces = parseCERTFormat(body);
     } else {
       return NextResponse.json(
@@ -254,22 +181,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store traces (with limit)
-    for (const trace of newTraces) {
-      traceStore.unshift(trace);
-    }
+    // Store traces using shared store (async)
+    await addTraces(newTraces);
 
-    // Trim to max size
-    while (traceStore.length > MAX_TRACES) {
-      traceStore.pop();
-    }
-
-    console.log(`[CERT] Received ${newTraces.length} traces. Total stored: ${traceStore.length}`);
+    const total = await getTraceCount();
+    console.log(`[CERT] Received ${newTraces.length} traces. Total stored: ${total}`);
 
     return NextResponse.json({
       success: true,
       received: newTraces.length,
-      total: traceStore.length,
+      total,
     });
 
   } catch (error) {
@@ -288,56 +209,27 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get('limit') || '100');
   const offset = parseInt(searchParams.get('offset') || '0');
-  const model = searchParams.get('model');
-  const status = searchParams.get('status');
-  const hasLLM = searchParams.get('llm_only') === 'true';
+  const model = searchParams.get('model') || undefined;
+  const status = searchParams.get('status') || undefined;
+  const llmOnly = searchParams.get('llm_only') === 'true';
 
-  let filtered = [...traceStore];
+  const traces = await getTraces({
+    limit,
+    offset,
+    llmOnly,
+    model,
+    status,
+  });
 
-  // Filter by LLM traces only
-  if (hasLLM) {
-    filtered = filtered.filter(t => t.llm);
-  }
-
-  // Filter by model
-  if (model) {
-    filtered = filtered.filter(t => t.llm?.model?.includes(model));
-  }
-
-  // Filter by evaluation status
-  if (status) {
-    filtered = filtered.filter(t => t.evaluation?.status === status);
-  }
-
-  // Paginate
-  const paginated = filtered.slice(offset, offset + limit);
-
-  // Calculate stats
-  const llmTraces = traceStore.filter(t => t.llm);
-  const stats = {
-    total: traceStore.length,
-    llmTraces: llmTraces.length,
-    evaluated: traceStore.filter(t => t.evaluation).length,
-    byStatus: {
-      pass: traceStore.filter(t => t.evaluation?.status === 'pass').length,
-      fail: traceStore.filter(t => t.evaluation?.status === 'fail').length,
-      review: traceStore.filter(t => t.evaluation?.status === 'review').length,
-    },
-    byVendor: llmTraces.reduce((acc, t) => {
-      const vendor = t.llm?.vendor || 'unknown';
-      acc[vendor] = (acc[vendor] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>),
-    totalTokens: llmTraces.reduce((acc, t) => acc + (t.llm?.totalTokens || 0), 0),
-  };
+  const stats = await getStats();
 
   return NextResponse.json({
-    traces: paginated,
+    traces,
     pagination: {
-      total: filtered.length,
+      total: stats.total,
       limit,
       offset,
-      hasMore: offset + limit < filtered.length,
+      hasMore: offset + limit < stats.total,
     },
     stats,
   });
@@ -347,8 +239,7 @@ export async function GET(request: NextRequest) {
  * DELETE /api/v1/traces - Clear traces
  */
 export async function DELETE() {
-  const count = traceStore.length;
-  traceStore.length = 0;
+  const count = await clearTraces();
 
   return NextResponse.json({
     success: true,
