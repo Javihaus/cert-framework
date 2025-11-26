@@ -2,13 +2,20 @@ from setuptools import setup, find_packages
 import pathlib
 import re
 
-# Read README
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+# Get the directory where setup.py is located
+here = pathlib.Path(__file__).parent.resolve()
+
+# Read README - use absolute path to handle different working directories
+readme_path = here / "README.md"
+if readme_path.exists():
+    long_description = readme_path.read_text(encoding="utf-8")
+else:
+    long_description = "EU AI Act Article 15 compliance monitoring for LLM systems"
 
 # Single source of truth for version - read from __init__.py
 def get_version():
-    init_py = pathlib.Path("cert/__init__.py").read_text()
+    init_path = here / "cert" / "__init__.py"
+    init_py = init_path.read_text()
     match = re.search(r'^__version__ = ["\']([^"\']+)["\']', init_py, re.M)
     if match:
         return match.group(1)
