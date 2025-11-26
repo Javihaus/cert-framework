@@ -12,6 +12,7 @@ import {
   Zap,
   User,
   Eye,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -38,14 +39,28 @@ interface LLMTrace {
     humanScore?: number;
     humanNotes?: string;
     humanReviewedAt?: string;
+    criteria?: {
+      semantic?: number;
+      nli?: number;
+    };
   };
 }
+
+type EvalMethod = 'all' | 'auto' | 'llm' | 'human';
 
 export default function TestResultsPage() {
   const [traces, setTraces] = useState<LLMTrace[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrace, setSelectedTrace] = useState<LLMTrace | null>(null);
   const [filter, setFilter] = useState<'all' | 'pass' | 'fail' | 'review' | 'pending'>('all');
+  const [methodFilter, setMethodFilter] = useState<EvalMethod>('all');
+
+  const getEvalMethod = (trace: LLMTrace): 'auto' | 'llm' | 'human' | 'pending' => {
+    if (!trace.evaluation?.judgeModel && !trace.evaluation?.status) return 'pending';
+    if (trace.evaluation?.judgeModel === 'cert-auto-eval') return 'auto';
+    if (trace.evaluation?.judgeModel) return 'llm';
+    return 'human';
+  };
 
   useEffect(() => {
     loadTraces();
@@ -71,11 +86,26 @@ export default function TestResultsPage() {
   const failedTraces = traces.filter(t => t.evaluation?.status === 'fail');
   const reviewTraces = traces.filter(t => t.evaluation?.status === 'review');
 
+  // Count by method
+  const autoEvalTraces = traces.filter(t => getEvalMethod(t) === 'auto');
+  const llmJudgeTraces = traces.filter(t => getEvalMethod(t) === 'llm');
+  const humanReviewTraces = traces.filter(t => getEvalMethod(t) === 'human');
+
   const filteredTraces = traces.filter(t => {
-    if (filter === 'pending') return !t.evaluation?.status;
-    if (filter === 'pass') return t.evaluation?.status === 'pass';
-    if (filter === 'fail') return t.evaluation?.status === 'fail';
-    if (filter === 'review') return t.evaluation?.status === 'review';
+    // Status filter
+    if (filter === 'pending' && t.evaluation?.status) return false;
+    if (filter === 'pass' && t.evaluation?.status !== 'pass') return false;
+    if (filter === 'fail' && t.evaluation?.status !== 'fail') return false;
+    if (filter === 'review' && t.evaluation?.status !== 'review') return false;
+
+    // Method filter
+    if (methodFilter !== 'all') {
+      const method = getEvalMethod(t);
+      if (methodFilter === 'auto' && method !== 'auto') return false;
+      if (methodFilter === 'llm' && method !== 'llm') return false;
+      if (methodFilter === 'human' && method !== 'human') return false;
+    }
+
     return true;
   });
 
@@ -221,27 +251,56 @@ export default function TestResultsPage() {
       {/* Filter & Results Table */}
       <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-zinc-900 dark:text-white">
-              Evaluation Results
-            </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-zinc-900 dark:text-white">
+                Evaluation Results
+              </h2>
+              <div className="flex items-center gap-2">
+                {(['all', 'pass', 'fail', 'review', 'pending'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={cn(
+                      "px-3 py-1 text-xs font-medium rounded-full transition-colors",
+                      filter === f
+                        ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                        : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                    )}
+                  >
+                    {f === 'all' ? `All (${traces.length})` :
+                     f === 'pass' ? `Pass (${passedTraces.length})` :
+                     f === 'fail' ? `Fail (${failedTraces.length})` :
+                     f === 'review' ? `Review (${reviewTraces.length})` :
+                     `Pending (${pendingTraces.length})`}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Method Filter */}
             <div className="flex items-center gap-2">
-              {(['all', 'pass', 'fail', 'review', 'pending'] as const).map((f) => (
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">Method:</span>
+              {([
+                { key: 'all', label: 'All', icon: null, count: traces.length },
+                { key: 'auto', label: 'Auto-Eval', icon: Sparkles, count: autoEvalTraces.length, color: 'teal' },
+                { key: 'llm', label: 'LLM Judge', icon: Zap, count: llmJudgeTraces.length, color: 'purple' },
+                { key: 'human', label: 'Human', icon: User, count: humanReviewTraces.length, color: 'orange' },
+              ] as const).map((m) => (
                 <button
-                  key={f}
-                  onClick={() => setFilter(f)}
+                  key={m.key}
+                  onClick={() => setMethodFilter(m.key as EvalMethod)}
                   className={cn(
-                    "px-3 py-1 text-xs font-medium rounded-full transition-colors",
-                    filter === f
-                      ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                    "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors",
+                    methodFilter === m.key
+                      ? m.key === 'auto' ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                      : m.key === 'llm' ? "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
+                      : m.key === 'human' ? "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400"
+                      : "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                       : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                   )}
                 >
-                  {f === 'all' ? `All (${traces.length})` :
-                   f === 'pass' ? `Pass (${passedTraces.length})` :
-                   f === 'fail' ? `Fail (${failedTraces.length})` :
-                   f === 'review' ? `Review (${reviewTraces.length})` :
-                   `Pending (${pendingTraces.length})`}
+                  {m.icon && <m.icon className="w-3 h-3" />}
+                  {m.label} ({m.count})
                 </button>
               ))}
             </div>
@@ -293,7 +352,27 @@ export default function TestResultsPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 ml-4">
+                  <div className="flex items-center gap-3 ml-4">
+                    {/* Evaluation Method Badge */}
+                    {trace.evaluation?.judgeModel && (
+                      <span className={cn(
+                        "flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
+                        getEvalMethod(trace) === 'auto'
+                          ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                          : "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
+                      )}>
+                        {getEvalMethod(trace) === 'auto' ? (
+                          <><Sparkles className="w-3 h-3" /> Auto</>
+                        ) : (
+                          <><Zap className="w-3 h-3" /> LLM</>
+                        )}
+                      </span>
+                    )}
+                    {trace.evaluation?.status && !trace.evaluation?.judgeModel && (
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400">
+                        <User className="w-3 h-3" /> Human
+                      </span>
+                    )}
                     {trace.evaluation?.score !== undefined && (
                       <span className={cn(
                         "text-sm font-medium",
@@ -318,6 +397,46 @@ export default function TestResultsPage() {
                 {/* Expanded Details */}
                 {selectedTrace?.id === trace.id && (
                   <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                    {/* Auto-Eval Score Breakdown */}
+                    {trace.evaluation?.criteria && (
+                      <div className="mb-4 p-3 bg-teal-50 dark:bg-teal-500/10 rounded-lg border border-teal-200 dark:border-teal-500/30">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                          <span className="text-xs font-medium text-teal-800 dark:text-teal-300">CERT Auto-Evaluation Breakdown</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-teal-700 dark:text-teal-400">Semantic Similarity</span>
+                              <span className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                                {((trace.evaluation.criteria.semantic || 0) * 10).toFixed(1)}/10
+                              </span>
+                            </div>
+                            <div className="h-1.5 bg-teal-200 dark:bg-teal-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-teal-500 transition-all"
+                                style={{ width: `${(trace.evaluation.criteria.semantic || 0) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-teal-700 dark:text-teal-400">NLI Score</span>
+                              <span className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                                {((trace.evaluation.criteria.nli || 0) * 10).toFixed(1)}/10
+                              </span>
+                            </div>
+                            <div className="h-1.5 bg-teal-200 dark:bg-teal-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-teal-500 transition-all"
+                                style={{ width: `${(trace.evaluation.criteria.nli || 0) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
@@ -348,7 +467,7 @@ export default function TestResultsPage() {
                     )}
                     {trace.evaluation?.judgeModel && (
                       <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2">
-                        Evaluated by: {trace.evaluation.judgeModel}
+                        Evaluated by: {trace.evaluation.judgeModel === 'cert-auto-eval' ? 'CERT Auto-Evaluation' : trace.evaluation.judgeModel}
                       </p>
                     )}
                   </div>

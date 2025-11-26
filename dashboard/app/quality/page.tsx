@@ -13,8 +13,19 @@ import {
   RefreshCw,
   Clock,
   TrendingUp,
+  Sparkles,
+  Play,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface AutoEvalConfig {
+  enabled: boolean;
+  semanticWeight: number;
+  nliWeight: number;
+  passThreshold: number;
+  openaiApiKey: string;
+}
 
 interface LLMTrace {
   id: string;
@@ -29,6 +40,10 @@ interface LLMTrace {
     status?: 'pass' | 'fail' | 'review';
     judgeModel?: string;
     evaluatedAt?: string;
+    criteria?: {
+      semantic?: number;
+      nli?: number;
+    };
   };
   receivedAt: string;
   durationMs: number;
@@ -37,10 +52,25 @@ interface LLMTrace {
 export default function QualityDashboard() {
   const [traces, setTraces] = useState<LLMTrace[]>([]);
   const [loading, setLoading] = useState(true);
+  const [autoEvalConfig, setAutoEvalConfig] = useState<AutoEvalConfig | null>(null);
+  const [runningAutoEval, setRunningAutoEval] = useState(false);
+  const [autoEvalProgress, setAutoEvalProgress] = useState({ current: 0, total: 0 });
 
   useEffect(() => {
     loadTraces();
+    loadAutoEvalConfig();
   }, []);
+
+  const loadAutoEvalConfig = () => {
+    const saved = localStorage.getItem('cert-auto-eval-config');
+    if (saved) {
+      try {
+        setAutoEvalConfig(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load auto-eval config', e);
+      }
+    }
+  };
 
   const loadTraces = async () => {
     setLoading(true);
@@ -56,6 +86,58 @@ export default function QualityDashboard() {
     setLoading(false);
   };
 
+  const runAutoEvaluation = async () => {
+    if (!autoEvalConfig?.enabled || !autoEvalConfig?.openaiApiKey) {
+      alert('Please configure Auto-Evaluation in the Configuration page first.');
+      return;
+    }
+
+    const pending = traces.filter(t => !t.evaluation?.status && t.llm?.input && t.llm?.output);
+    if (pending.length === 0) {
+      alert('No pending traces to evaluate.');
+      return;
+    }
+
+    setRunningAutoEval(true);
+    setAutoEvalProgress({ current: 0, total: Math.min(pending.length, 10) });
+
+    try {
+      // Batch evaluate (max 10 at a time)
+      const toEvaluate = pending.slice(0, 10).map(t => ({
+        id: t.id,
+        input: t.llm?.input || '',
+        output: t.llm?.output || '',
+      }));
+
+      const response = await fetch('/api/quality/auto-eval', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          traces: toEvaluate,
+          apiKey: autoEvalConfig.openaiApiKey,
+          semanticWeight: autoEvalConfig.semanticWeight,
+          nliWeight: autoEvalConfig.nliWeight,
+          passThreshold: autoEvalConfig.passThreshold,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAutoEvalProgress({ current: result.evaluated, total: result.evaluated });
+        // Reload traces to show updated evaluations
+        await loadTraces();
+      } else {
+        const error = await response.json();
+        alert(`Auto-evaluation failed: ${error.error}`);
+      }
+    } catch (e) {
+      console.error('Auto-evaluation error:', e);
+      alert('Auto-evaluation failed. Check the console for details.');
+    }
+
+    setRunningAutoEval(false);
+  };
+
   // Calculate metrics from traces
   const totalTraces = traces.length;
   const evaluatedTraces = traces.filter(t => t.evaluation?.status);
@@ -63,6 +145,19 @@ export default function QualityDashboard() {
   const failedTraces = traces.filter(t => t.evaluation?.status === 'fail');
   const reviewTraces = traces.filter(t => t.evaluation?.status === 'review');
   const pendingTraces = traces.filter(t => !t.evaluation?.status);
+
+  // Breakdown by evaluation method
+  const autoEvalTraces = evaluatedTraces.filter(t => t.evaluation?.judgeModel === 'cert-auto-eval');
+  const llmJudgeTraces = evaluatedTraces.filter(t => t.evaluation?.judgeModel && t.evaluation?.judgeModel !== 'cert-auto-eval');
+  const humanReviewTraces = evaluatedTraces.filter(t => !t.evaluation?.judgeModel);
+
+  // Auto-eval averages
+  const avgSemanticScore = autoEvalTraces.length > 0
+    ? autoEvalTraces.reduce((sum, t) => sum + (t.evaluation?.criteria?.semantic || 0), 0) / autoEvalTraces.length
+    : 0;
+  const avgNliScore = autoEvalTraces.length > 0
+    ? autoEvalTraces.reduce((sum, t) => sum + (t.evaluation?.criteria?.nli || 0), 0) / autoEvalTraces.length
+    : 0;
 
   const passRate = evaluatedTraces.length > 0
     ? (passedTraces.length / evaluatedTraces.length) * 100
@@ -117,13 +212,39 @@ export default function QualityDashboard() {
             Track evaluation quality metrics across all LLM traces
           </p>
         </div>
-        <button
-          onClick={loadTraces}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          {pendingTraces.length > 0 && autoEvalConfig?.enabled && (
+            <button
+              onClick={runAutoEvaluation}
+              disabled={runningAutoEval}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors",
+                runningAutoEval
+                  ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                  : "bg-teal-500 text-white hover:bg-teal-600"
+              )}
+            >
+              {runningAutoEval ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Evaluating {autoEvalProgress.current}/{autoEvalProgress.total}...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Run Auto-Eval ({Math.min(pendingTraces.length, 10)})
+                </>
+              )}
+            </button>
+          )}
+          <button
+            onClick={loadTraces}
+            className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {!hasData ? (
@@ -240,6 +361,120 @@ export default function QualityDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Auto-Eval Breakdown (CERT Core) */}
+          {autoEvalTraces.length > 0 && (
+            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Sparkles className="w-5 h-5 text-teal-500" />
+                <h2 className="font-semibold text-zinc-900 dark:text-white">CERT Auto-Evaluation</h2>
+                <span className="text-xs px-2 py-1 bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 rounded-full">
+                  {autoEvalTraces.length} traces
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Semantic Score */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">Avg Semantic Similarity</span>
+                    <span className={cn(
+                      "text-sm font-bold",
+                      avgSemanticScore >= 0.7 ? "text-emerald-600 dark:text-emerald-400" :
+                      avgSemanticScore >= 0.5 ? "text-amber-600 dark:text-amber-400" :
+                      "text-red-600 dark:text-red-400"
+                    )}>
+                      {(avgSemanticScore * 10).toFixed(1)}/10
+                    </span>
+                  </div>
+                  <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full transition-all",
+                        avgSemanticScore >= 0.7 ? "bg-emerald-500" :
+                        avgSemanticScore >= 0.5 ? "bg-amber-500" : "bg-red-500"
+                      )}
+                      style={{ width: `${avgSemanticScore * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    Embedding cosine similarity
+                  </p>
+                </div>
+
+                {/* NLI Score */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">Avg NLI Score</span>
+                    <span className={cn(
+                      "text-sm font-bold",
+                      avgNliScore >= 0.7 ? "text-emerald-600 dark:text-emerald-400" :
+                      avgNliScore >= 0.5 ? "text-amber-600 dark:text-amber-400" :
+                      "text-red-600 dark:text-red-400"
+                    )}>
+                      {(avgNliScore * 10).toFixed(1)}/10
+                    </span>
+                  </div>
+                  <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full transition-all",
+                        avgNliScore >= 0.7 ? "bg-emerald-500" :
+                        avgNliScore >= 0.5 ? "bg-amber-500" : "bg-red-500"
+                      )}
+                      style={{ width: `${avgNliScore * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    Logical entailment score
+                  </p>
+                </div>
+
+                {/* Evaluation Method Breakdown */}
+                <div>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400 block mb-2">Evaluation Methods</span>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-teal-500" />
+                        <span className="text-zinc-600 dark:text-zinc-400">Auto-Eval (CERT)</span>
+                      </div>
+                      <span className="font-medium text-zinc-900 dark:text-white">{autoEvalTraces.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-purple-500" />
+                        <span className="text-zinc-600 dark:text-zinc-400">LLM Judge</span>
+                      </div>
+                      <span className="font-medium text-zinc-900 dark:text-white">{llmJudgeTraces.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-orange-500" />
+                        <span className="text-zinc-600 dark:text-zinc-400">Human Review</span>
+                      </div>
+                      <span className="font-medium text-zinc-900 dark:text-white">{humanReviewTraces.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Auto-Eval Not Configured Warning */}
+          {!autoEvalConfig?.enabled && pendingTraces.length > 0 && (
+            <div className="bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/30 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-teal-900 dark:text-teal-300">Enable CERT Auto-Evaluation</h3>
+                  <p className="text-sm text-teal-700 dark:text-teal-400 mt-1">
+                    You have {pendingTraces.length} traces pending evaluation. Enable automatic evaluation using semantic similarity + NLI in the{' '}
+                    <Link href="/configuration" className="underline hover:no-underline">Configuration page</Link>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Quality by Model */}
           {Object.keys(tracesByModel).length > 0 && (
@@ -361,7 +596,41 @@ export default function QualityDashboard() {
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Auto-Eval */}
+            <button
+              onClick={runAutoEvaluation}
+              disabled={runningAutoEval || !autoEvalConfig?.enabled || pendingTraces.length === 0}
+              className={cn(
+                "bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 text-left transition-colors group",
+                autoEvalConfig?.enabled && pendingTraces.length > 0
+                  ? "hover:border-teal-300 dark:hover:border-teal-500/50 cursor-pointer"
+                  : "opacity-60 cursor-not-allowed"
+              )}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Sparkles className="w-5 h-5 text-teal-500" />
+                <span className="font-medium text-zinc-900 dark:text-white">Auto-Eval</span>
+                {autoEvalConfig?.enabled && pendingTraces.length > 0 && (
+                  <Play className="w-4 h-4 text-zinc-400 group-hover:text-teal-500 ml-auto transition-colors" />
+                )}
+              </div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Semantic + NLI evaluation
+              </p>
+              {autoEvalConfig?.enabled ? (
+                pendingTraces.length > 0 && (
+                  <p className="text-xs text-teal-600 dark:text-teal-400 mt-2">
+                    {pendingTraces.length} traces pending
+                  </p>
+                )
+              ) : (
+                <p className="text-xs text-zinc-400 mt-2">
+                  Configure in Settings
+                </p>
+              )}
+            </button>
+
             <Link
               href="/quality/judge"
               className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-purple-300 dark:hover:border-purple-500/50 transition-colors group"
@@ -372,13 +641,8 @@ export default function QualityDashboard() {
                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-purple-500 ml-auto transition-colors" />
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Run automated evaluations using AI
+                AI-powered evaluation
               </p>
-              {pendingTraces.length > 0 && (
-                <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
-                  {pendingTraces.length} traces pending evaluation
-                </p>
-              )}
             </Link>
 
             <Link
@@ -391,21 +655,21 @@ export default function QualityDashboard() {
                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-orange-500 ml-auto transition-colors" />
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Rate traces manually on a 0-10 scale
+                Manual 0-10 rating
               </p>
             </Link>
 
             <Link
               href="/quality/tests"
-              className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-teal-300 dark:hover:border-teal-500/50 transition-colors group"
+              className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors group"
             >
               <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-5 h-5 text-teal-500" />
+                <TrendingUp className="w-5 h-5 text-blue-500" />
                 <span className="font-medium text-zinc-900 dark:text-white">Test Results</span>
-                <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-teal-500 ml-auto transition-colors" />
+                <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-blue-500 ml-auto transition-colors" />
               </div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                View all evaluation results
+                View all evaluations
               </p>
             </Link>
           </div>
