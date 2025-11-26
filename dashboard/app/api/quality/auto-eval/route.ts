@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateEvaluation } from '@/lib/trace-store';
 
-// Dynamic import for transformers (loads models on first use)
-let pipeline: any = null;
-let featureExtractor: any = null;
-let nliClassifier: any = null;
+/**
+ * CERT Auto-Evaluation API
+ *
+ * Uses HuggingFace Inference API (free tier, no API key required) for:
+ * - Semantic similarity via sentence embeddings
+ * - NLI (Natural Language Inference) for entailment detection
+ *
+ * Falls back to algorithmic methods if API is unavailable.
+ */
 
-async function loadModels() {
-  if (!pipeline) {
-    // Dynamic import to avoid issues with SSR
-    const transformers = await import('@huggingface/transformers');
-    pipeline = transformers.pipeline;
-  }
-
-  // Load feature extraction model for embeddings (semantic similarity)
-  if (!featureExtractor) {
-    console.log('Loading embedding model (Xenova/all-MiniLM-L6-v2)...');
-    featureExtractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-    console.log('✓ Embedding model loaded');
-  }
-
-  // Load NLI model for textual entailment
-  if (!nliClassifier) {
-    console.log('Loading NLI model (Xenova/nli-deberta-v3-xsmall)...');
-    nliClassifier = await pipeline('text-classification', 'Xenova/nli-deberta-v3-xsmall');
-    console.log('✓ NLI model loaded');
-  }
-}
+const HF_INFERENCE_URL = 'https://api-inference.huggingface.co/models';
+const EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2';
+const NLI_MODEL = 'cross-encoder/nli-deberta-v3-small';
 
 interface AutoEvalRequest {
   traceId: string;
@@ -44,6 +31,7 @@ interface AutoEvalResult {
   status: 'pass' | 'fail' | 'review';
   reasoning: string;
   evaluatedAt: string;
+  method: 'huggingface' | 'algorithmic';
 }
 
 /**
@@ -60,118 +48,293 @@ function cosineSimilarity(a: number[], b: number[]): number {
     normB += b[i] * b[i];
   }
 
+  if (normA === 0 || normB === 0) return 0;
   const similarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   // Convert from [-1, 1] to [0, 1] range
   return (similarity + 1) / 2;
 }
 
 /**
- * Mean pooling for sentence embeddings
+ * Tokenize text into words (simple tokenizer)
  */
-function meanPooling(embeddings: number[][]): number[] {
-  const numTokens = embeddings.length;
-  const embeddingSize = embeddings[0].length;
-  const pooled = new Array(embeddingSize).fill(0);
-
-  for (let i = 0; i < numTokens; i++) {
-    for (let j = 0; j < embeddingSize; j++) {
-      pooled[j] += embeddings[i][j];
-    }
-  }
-
-  for (let j = 0; j < embeddingSize; j++) {
-    pooled[j] /= numTokens;
-  }
-
-  return pooled;
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 2);
 }
 
 /**
- * Compute semantic similarity using local embedding model
+ * Compute n-grams from text
+ */
+function getNgrams(tokens: string[], n: number): Set<string> {
+  const ngrams = new Set<string>();
+  for (let i = 0; i <= tokens.length - n; i++) {
+    ngrams.add(tokens.slice(i, i + n).join(' '));
+  }
+  return ngrams;
+}
+
+/**
+ * Algorithmic semantic similarity using n-gram overlap
+ * Used as fallback when HuggingFace API is unavailable
+ */
+function algorithmicSemanticSimilarity(input: string, output: string): number {
+  const inputTokens = tokenize(input);
+  const outputTokens = tokenize(output);
+
+  if (inputTokens.length === 0 || outputTokens.length === 0) {
+    return 0.5;
+  }
+
+  // Compute overlap scores for different n-gram sizes
+  let totalScore = 0;
+  let weights = 0;
+
+  for (let n = 1; n <= 3; n++) {
+    const inputNgrams = getNgrams(inputTokens, n);
+    const outputNgrams = getNgrams(outputTokens, n);
+
+    if (inputNgrams.size === 0 || outputNgrams.size === 0) continue;
+
+    // Jaccard similarity
+    const intersection = new Set(Array.from(inputNgrams).filter(x => outputNgrams.has(x)));
+    const union = new Set([...Array.from(inputNgrams), ...Array.from(outputNgrams)]);
+    const jaccard = intersection.size / union.size;
+
+    // Weight by n-gram size (higher n = more weight)
+    const weight = n;
+    totalScore += jaccard * weight;
+    weights += weight;
+  }
+
+  // Normalize to 0-1 range
+  const similarity = weights > 0 ? totalScore / weights : 0.5;
+
+  // Scale to be less harsh (most outputs have some relevance)
+  return 0.3 + (similarity * 0.7);
+}
+
+/**
+ * Algorithmic NLI using keyword and structure analysis
+ * Used as fallback when HuggingFace API is unavailable
+ */
+function algorithmicNLI(input: string, output: string): { score: number; reasoning: string } {
+  const inputLower = input.toLowerCase();
+  const outputLower = output.toLowerCase();
+
+  // Check for contradiction indicators
+  const contradictionIndicators = [
+    'however', 'but actually', 'incorrect', 'wrong', 'false',
+    'not true', 'contrary', 'opposite', 'disagree'
+  ];
+
+  const hasContradiction = contradictionIndicators.some(
+    indicator => outputLower.includes(indicator) && inputLower.length > 0
+  );
+
+  // Check for affirmation indicators
+  const affirmationIndicators = [
+    'yes', 'correct', 'right', 'true', 'exactly', 'indeed',
+    'as you mentioned', 'as stated', 'confirms'
+  ];
+
+  const hasAffirmation = affirmationIndicators.some(
+    indicator => outputLower.includes(indicator)
+  );
+
+  // Extract key concepts from input
+  const inputTokens = tokenize(input);
+  const outputTokens = tokenize(output);
+  const inputSet = new Set(inputTokens);
+  const outputSet = new Set(outputTokens);
+
+  // Calculate concept overlap
+  const overlap = Array.from(inputSet).filter(t => outputSet.has(t)).length;
+  const overlapRatio = inputSet.size > 0 ? overlap / inputSet.size : 0;
+
+  // Determine score and reasoning
+  let score: number;
+  let reasoning: string;
+
+  if (hasContradiction && overlapRatio < 0.3) {
+    score = 0.3;
+    reasoning = 'Potential contradiction detected (low concept overlap)';
+  } else if (hasAffirmation || overlapRatio > 0.5) {
+    score = 0.7 + (overlapRatio * 0.3);
+    reasoning = `Entailment likely (${Math.round(overlapRatio * 100)}% concept overlap)`;
+  } else {
+    score = 0.5 + (overlapRatio * 0.2);
+    reasoning = `Neutral relationship (${Math.round(overlapRatio * 100)}% concept overlap)`;
+  }
+
+  return { score: Math.min(1, Math.max(0, score)), reasoning };
+}
+
+/**
+ * Get embeddings from HuggingFace Inference API
+ */
+async function getHFEmbeddings(texts: string[]): Promise<number[][] | null> {
+  try {
+    const response = await fetch(`${HF_INFERENCE_URL}/${EMBEDDING_MODEL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: texts,
+        options: { wait_for_model: true },
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn(`HF Embeddings API returned ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Handle different response formats
+    if (Array.isArray(data) && data.length === texts.length) {
+      // Check if it's already pooled embeddings or needs pooling
+      if (Array.isArray(data[0]) && typeof data[0][0] === 'number') {
+        return data as number[][];
+      }
+      // If nested (token-level embeddings), perform mean pooling
+      if (Array.isArray(data[0]) && Array.isArray(data[0][0])) {
+        return data.map((tokenEmbeddings: number[][]) => {
+          const embeddingSize = tokenEmbeddings[0].length;
+          const pooled = new Array(embeddingSize).fill(0);
+          for (const embedding of tokenEmbeddings) {
+            for (let i = 0; i < embeddingSize; i++) {
+              pooled[i] += embedding[i];
+            }
+          }
+          return pooled.map(v => v / tokenEmbeddings.length);
+        });
+      }
+    }
+
+    console.warn('Unexpected HF embedding response format');
+    return null;
+  } catch (error) {
+    console.warn('HF Embeddings API error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get NLI classification from HuggingFace Inference API
+ */
+async function getHFNLI(premise: string, hypothesis: string): Promise<{ label: string; score: number } | null> {
+  try {
+    // Cross-encoder NLI models expect the text pair as a single input
+    const response = await fetch(`${HF_INFERENCE_URL}/${NLI_MODEL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: `${premise} [SEP] ${hypothesis}`,
+        options: { wait_for_model: true },
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn(`HF NLI API returned ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Parse response - could be array of arrays or single array
+    if (Array.isArray(data)) {
+      const results = Array.isArray(data[0]) ? data[0] : data;
+      if (results.length > 0 && results[0].label) {
+        // Find the highest scoring label
+        const sorted = [...results].sort((a, b) => b.score - a.score);
+        return { label: sorted[0].label.toLowerCase(), score: sorted[0].score };
+      }
+    }
+
+    console.warn('Unexpected HF NLI response format');
+    return null;
+  } catch (error) {
+    console.warn('HF NLI API error:', error);
+    return null;
+  }
+}
+
+/**
+ * Compute semantic similarity - tries HuggingFace API first, falls back to algorithmic
  */
 async function computeSemanticSimilarity(
   input: string,
   output: string
-): Promise<number> {
-  try {
-    await loadModels();
+): Promise<{ score: number; method: 'huggingface' | 'algorithmic' }> {
+  // Truncate to reasonable length
+  const maxLen = 512;
+  const truncInput = input.slice(0, maxLen);
+  const truncOutput = output.slice(0, maxLen);
 
-    // Truncate inputs to avoid memory issues
-    const maxLen = 512;
-    const truncInput = input.slice(0, maxLen);
-    const truncOutput = output.slice(0, maxLen);
+  // Try HuggingFace API first
+  const embeddings = await getHFEmbeddings([truncInput, truncOutput]);
 
-    // Get embeddings
-    const inputEmbedding = await featureExtractor(truncInput, { pooling: 'mean', normalize: true });
-    const outputEmbedding = await featureExtractor(truncOutput, { pooling: 'mean', normalize: true });
-
-    // Extract the pooled embeddings
-    const inputVec = Array.from(inputEmbedding.data as Float32Array);
-    const outputVec = Array.from(outputEmbedding.data as Float32Array);
-
-    // Compute cosine similarity
-    const similarity = cosineSimilarity(inputVec, outputVec);
-
-    return Math.max(0, Math.min(1, similarity));
-  } catch (error) {
-    console.error('Semantic similarity error:', error);
-    return 0.5; // Default to neutral if error
+  if (embeddings && embeddings.length === 2) {
+    const similarity = cosineSimilarity(embeddings[0], embeddings[1]);
+    return { score: Math.max(0, Math.min(1, similarity)), method: 'huggingface' };
   }
+
+  // Fall back to algorithmic method
+  const score = algorithmicSemanticSimilarity(truncInput, truncOutput);
+  return { score, method: 'algorithmic' };
 }
 
 /**
- * Compute NLI score using local model
- * Determines if the output logically follows from the input
+ * Compute NLI score - tries HuggingFace API first, falls back to algorithmic
  */
 async function computeNLIScore(
   input: string,
   output: string
-): Promise<{ score: number; reasoning: string }> {
-  try {
-    await loadModels();
+): Promise<{ score: number; reasoning: string; method: 'huggingface' | 'algorithmic' }> {
+  // Truncate inputs
+  const maxLen = 256;
+  const truncInput = input.slice(0, maxLen);
+  const truncOutput = output.slice(0, maxLen);
 
-    // Truncate inputs
-    const maxLen = 256;
-    const truncInput = input.slice(0, maxLen);
-    const truncOutput = output.slice(0, maxLen);
+  // Try HuggingFace API first
+  const nliResult = await getHFNLI(truncInput, truncOutput);
 
-    // NLI models expect premise-hypothesis pairs
-    // Format: "[CLS] premise [SEP] hypothesis [SEP]"
-    const nliInput = `${truncInput} [SEP] ${truncOutput}`;
-
-    const result = await nliClassifier(nliInput);
-
-    // Result contains labels like 'entailment', 'neutral', 'contradiction'
-    // Map to score
+  if (nliResult) {
     let score = 0.5;
     let reasoning = 'NLI evaluation completed';
 
-    if (Array.isArray(result) && result.length > 0) {
-      const label = result[0].label?.toLowerCase() || '';
-      const confidence = result[0].score || 0.5;
+    const label = nliResult.label;
+    const confidence = nliResult.score;
 
-      if (label.includes('entail')) {
-        score = 0.5 + (confidence * 0.5); // 0.5 to 1.0
-        reasoning = `Entailment detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
-      } else if (label.includes('contradict')) {
-        score = 0.5 - (confidence * 0.5); // 0.0 to 0.5
-        reasoning = `Contradiction detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
-      } else {
-        score = 0.5;
-        reasoning = `Neutral relationship (confidence: ${(confidence * 100).toFixed(0)}%)`;
-      }
+    if (label.includes('entail')) {
+      score = 0.5 + (confidence * 0.5);
+      reasoning = `Entailment detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
+    } else if (label.includes('contradict')) {
+      score = 0.5 - (confidence * 0.5);
+      reasoning = `Contradiction detected (confidence: ${(confidence * 100).toFixed(0)}%)`;
+    } else {
+      score = 0.5;
+      reasoning = `Neutral relationship (confidence: ${(confidence * 100).toFixed(0)}%)`;
     }
 
-    return { score: Math.max(0, Math.min(1, score)), reasoning };
-  } catch (error) {
-    console.error('NLI score error:', error);
-    return { score: 0.5, reasoning: 'NLI evaluation encountered an error' };
+    return { score: Math.max(0, Math.min(1, score)), reasoning, method: 'huggingface' };
   }
+
+  // Fall back to algorithmic method
+  const { score, reasoning } = algorithmicNLI(truncInput, truncOutput);
+  return { score, reasoning: `${reasoning} (algorithmic)`, method: 'algorithmic' };
 }
 
 /**
  * POST /api/quality/auto-eval
- * Performs automatic evaluation using local models (semantic similarity + NLI)
+ * Performs automatic evaluation using HuggingFace API or algorithmic fallback
  */
 export async function POST(request: NextRequest) {
   try {
@@ -200,11 +363,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Compute semantic similarity using local model
-    const semanticScore = await computeSemanticSimilarity(input, output);
+    // Compute semantic similarity
+    const semanticResult = await computeSemanticSimilarity(input, output);
 
-    // Compute NLI score using local model
-    const { score: nliScore, reasoning: nliReasoning } = await computeNLIScore(input, output);
+    // Compute NLI score
+    const nliResult = await computeNLIScore(input, output);
 
     // Normalize weights
     const totalWeight = semanticWeight + nliWeight;
@@ -212,7 +375,7 @@ export async function POST(request: NextRequest) {
     const normNliWeight = totalWeight > 0 ? nliWeight / totalWeight : 0.5;
 
     // Compute weighted final score (0-1 scale)
-    const rawScore = (normSemanticWeight * semanticScore) + (normNliWeight * nliScore);
+    const rawScore = (normSemanticWeight * semanticResult.score) + (normNliWeight * nliResult.score);
 
     // Convert to 0-10 scale
     const finalScore = rawScore * 10;
@@ -227,13 +390,19 @@ export async function POST(request: NextRequest) {
       status = 'fail';
     }
 
+    // Determine method used (huggingface if both used it, otherwise algorithmic)
+    const method = (semanticResult.method === 'huggingface' && nliResult.method === 'huggingface')
+      ? 'huggingface'
+      : 'algorithmic';
+
     const result: AutoEvalResult = {
       score: Math.round(finalScore * 10) / 10,
-      semanticScore: Math.round(semanticScore * 100) / 100,
-      nliScore: Math.round(nliScore * 100) / 100,
+      semanticScore: Math.round(semanticResult.score * 100) / 100,
+      nliScore: Math.round(nliResult.score * 100) / 100,
       status,
-      reasoning: `Semantic: ${(semanticScore * 10).toFixed(1)}/10, NLI: ${(nliScore * 10).toFixed(1)}/10. ${nliReasoning}`,
+      reasoning: `Semantic: ${(semanticResult.score * 10).toFixed(1)}/10, NLI: ${(nliResult.score * 10).toFixed(1)}/10. ${nliResult.reasoning}`,
       evaluatedAt: new Date().toISOString(),
+      method,
     };
 
     // Update trace with evaluation
@@ -241,10 +410,10 @@ export async function POST(request: NextRequest) {
       score: result.score,
       status: result.status,
       criteria: {
-        semantic: semanticScore,
-        nli: nliScore,
+        semantic: semanticResult.score,
+        nli: nliResult.score,
       },
-      judgeModel: 'cert-auto-eval',
+      judgeModel: `cert-auto-eval-${method}`,
       evaluatedAt: result.evaluatedAt,
     });
 
@@ -280,33 +449,34 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Pre-load models before processing
-    await loadModels();
-
     const results = [];
 
     for (const trace of traces.slice(0, 10)) { // Limit to 10 traces per batch
       if (!trace.input || !trace.output) continue;
 
-      const semanticScore = await computeSemanticSimilarity(trace.input, trace.output);
-      const { score: nliScore, reasoning } = await computeNLIScore(trace.input, trace.output);
+      const semanticResult = await computeSemanticSimilarity(trace.input, trace.output);
+      const nliResult = await computeNLIScore(trace.input, trace.output);
 
       const totalWeight = semanticWeight + nliWeight;
       const normSemanticWeight = totalWeight > 0 ? semanticWeight / totalWeight : 0.5;
       const normNliWeight = totalWeight > 0 ? nliWeight / totalWeight : 0.5;
 
-      const rawScore = (normSemanticWeight * semanticScore) + (normNliWeight * nliScore);
+      const rawScore = (normSemanticWeight * semanticResult.score) + (normNliWeight * nliResult.score);
       const finalScore = rawScore * 10;
 
       const status: 'pass' | 'fail' | 'review' =
         finalScore >= passThreshold ? 'pass' :
         finalScore >= passThreshold - 2 ? 'review' : 'fail';
 
+      const method = (semanticResult.method === 'huggingface' && nliResult.method === 'huggingface')
+        ? 'huggingface'
+        : 'algorithmic';
+
       await updateEvaluation(trace.id, {
         score: Math.round(finalScore * 10) / 10,
         status,
-        criteria: { semantic: semanticScore, nli: nliScore },
-        judgeModel: 'cert-auto-eval',
+        criteria: { semantic: semanticResult.score, nli: nliResult.score },
+        judgeModel: `cert-auto-eval-${method}`,
         evaluatedAt: new Date().toISOString(),
       });
 
@@ -314,9 +484,10 @@ export async function PUT(request: NextRequest) {
         traceId: trace.id,
         score: Math.round(finalScore * 10) / 10,
         status,
-        semanticScore,
-        nliScore,
-        reasoning,
+        semanticScore: semanticResult.score,
+        nliScore: nliResult.score,
+        reasoning: nliResult.reasoning,
+        method,
       });
     }
 

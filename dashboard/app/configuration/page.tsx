@@ -318,16 +318,16 @@ export default function ConfigurationPage() {
         </div>
 
         <div className={cn("p-6 space-y-6", !autoEvalConfig.enabled && "opacity-50 pointer-events-none")}>
-          {/* Local Models Info */}
+          {/* No API Key Info */}
           <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/30">
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                Uses Local Models - No API Key Required
+                No API Key Required - Fully Automatic
               </span>
             </div>
             <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1 ml-6">
-              Models are downloaded automatically on first use: all-MiniLM-L6-v2 (embeddings), nli-deberta-v3-xsmall (NLI)
+              Uses HuggingFace Inference API (free tier) with algorithmic fallback for reliability
             </p>
           </div>
 
@@ -448,11 +448,12 @@ export default function ConfigurationPage() {
               <div>
                 <h4 className="font-medium text-teal-900 dark:text-teal-300 text-sm">How CERT Auto-Evaluation Works</h4>
                 <p className="text-xs text-teal-700 dark:text-teal-400 mt-1">
-                  CERT automatically evaluates LLM traces using local ML models (no API calls):
+                  CERT automatically evaluates LLM traces using HuggingFace Inference API (free tier):
                 </p>
                 <ul className="text-xs text-teal-700 dark:text-teal-400 mt-2 space-y-1 list-disc list-inside">
                   <li><strong>Semantic Similarity:</strong> all-MiniLM-L6-v2 embeddings + cosine similarity</li>
-                  <li><strong>NLI Score:</strong> DeBERTa-v3-xsmall for entailment/contradiction detection</li>
+                  <li><strong>NLI Score:</strong> DeBERTa-v3-small for entailment/contradiction detection</li>
+                  <li><strong>Fallback:</strong> Algorithmic methods (n-gram overlap, keyword analysis) if API unavailable</li>
                 </ul>
                 <p className="text-xs text-teal-700 dark:text-teal-400 mt-2">
                   Final score = ({autoEvalConfig.semanticWeight}% × Semantic) + ({autoEvalConfig.nliWeight}% × NLI)
@@ -590,7 +591,7 @@ export default function ConfigurationPage() {
             )} />
             <span className="text-zinc-600 dark:text-zinc-400">
               Auto-Eval: {autoEvalConfig.enabled
-                ? `${autoEvalConfig.semanticWeight}% semantic, ${autoEvalConfig.nliWeight}% NLI (local models)`
+                ? `${autoEvalConfig.semanticWeight}% semantic, ${autoEvalConfig.nliWeight}% NLI (HuggingFace)`
                 : 'Disabled'}
             </span>
           </div>
