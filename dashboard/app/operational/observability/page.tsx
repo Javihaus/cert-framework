@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   BarChart3,
   CheckCircle,
@@ -10,155 +10,110 @@ import {
   Activity,
   Clock,
   Upload,
+  Copy,
+  Check,
+  Zap,
+  Server,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Trace } from '@/types/trace';
 
-interface HealthMetrics {
-  successRate: number;
-  errorRate: number;
-  totalTraces: number;
-  errors: {
-    type: string;
-    count: number;
-    lastOccurred: string;
-  }[];
-  providerStatus: {
-    provider: string;
-    status: 'operational' | 'degraded' | 'down';
-    latency: number;
-    errorCount: number;
-  }[];
+interface LLMData {
+  vendor: string;
+  model: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  input?: string;
+  output?: string;
+  temperature?: number;
+}
+
+interface CERTTrace {
+  id: string;
+  traceId: string;
+  spanId: string;
+  name: string;
+  kind: string;
+  startTime: string;
+  endTime: string;
+  durationMs: number;
+  status: 'ok' | 'error' | 'unset';
+  llm?: LLMData;
+  receivedAt: string;
+  source: 'otlp' | 'sdk' | 'manual';
+}
+
+interface TraceStats {
+  total: number;
+  llmTraces: number;
+  evaluated: number;
+  byStatus: {
+    pass: number;
+    fail: number;
+    review: number;
+  };
+  byVendor: Record<string, number>;
+  totalTokens: number;
+}
+
+interface TraceResponse {
+  traces: CERTTrace[];
+  stats: TraceStats;
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
 }
 
 export default function ObservabilityPage() {
-  const [traces, setTraces] = useState<Trace[]>([]);
-  const [metrics, setMetrics] = useState<HealthMetrics | null>(null);
+  const [traces, setTraces] = useState<CERTTrace[]>([]);
+  const [stats, setStats] = useState<TraceStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('24h');
-  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [showIntegration, setShowIntegration] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const loadTraces = useCallback(async () => {
+    try {
+      const response = await fetch('/api/v1/traces?llm_only=true&limit=100');
+      if (response.ok) {
+        const data: TraceResponse = await response.json();
+        setTraces(data.traces);
+        setStats(data.stats);
+      }
+    } catch (e) {
+      console.error('Failed to load traces:', e);
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    loadMetrics();
-  }, [timeRange]);
+    loadTraces();
+  }, [loadTraces]);
 
   useEffect(() => {
     if (autoRefresh) {
-      const interval = setInterval(loadMetrics, 30000);
+      const interval = setInterval(loadTraces, 5000); // Refresh every 5 seconds
       return () => clearInterval(interval);
     }
-  }, [autoRefresh, timeRange]);
+  }, [autoRefresh, loadTraces]);
 
-  const loadMetrics = async () => {
-    setLoading(true);
+  const clearTraces = async () => {
     try {
-      const response = await fetch(`/api/operational/observability?range=${timeRange}`);
-      if (response.ok) {
-        const data = await response.json();
-        setTraces(data.traces || []);
-        setMetrics(data.metrics);
-      } else {
-        // Load from localStorage
-        const stored = localStorage.getItem('cert-traces');
-        if (stored) {
-          const parsedTraces: Trace[] = JSON.parse(stored);
-          setTraces(parsedTraces);
-          calculateMetrics(parsedTraces);
-        }
-      }
+      await fetch('/api/v1/traces', { method: 'DELETE' });
+      setTraces([]);
+      setStats(null);
     } catch (e) {
-      const stored = localStorage.getItem('cert-traces');
-      if (stored) {
-        const parsedTraces: Trace[] = JSON.parse(stored);
-        setTraces(parsedTraces);
-        calculateMetrics(parsedTraces);
-      }
+      console.error('Failed to clear traces:', e);
     }
-    setLoading(false);
   };
 
-  const calculateMetrics = (allTraces: Trace[]) => {
-    const errorTraces = allTraces.filter((t) => t.metadata?.error);
-    const successTraces = allTraces.filter((t) => !t.metadata?.error);
-
-    // Group errors by type
-    const errorsByType: Record<string, { count: number; lastOccurred: string }> = {};
-    errorTraces.forEach((t) => {
-      const errorType = typeof t.metadata?.error === 'string' ? t.metadata.error : 'Unknown';
-      if (!errorsByType[errorType]) {
-        errorsByType[errorType] = { count: 0, lastOccurred: t.timestamp };
-      }
-      errorsByType[errorType].count++;
-      if (t.timestamp > errorsByType[errorType].lastOccurred) {
-        errorsByType[errorType].lastOccurred = t.timestamp;
-      }
-    });
-
-    // Calculate provider status
-    const providerGroups: Record<string, Trace[]> = {};
-    allTraces.forEach((t) => {
-      const provider = t.platform || 'unknown';
-      if (!providerGroups[provider]) {
-        providerGroups[provider] = [];
-      }
-      providerGroups[provider].push(t);
-    });
-
-    const providerStatus = Object.entries(providerGroups).map(([provider, traces]) => {
-      const errorCount = traces.filter((t) => t.metadata?.error).length;
-      const avgLatency =
-        traces.reduce((sum, t) => sum + (t.metadata?.latency_ms || 0), 0) / traces.length;
-      const errorRate = traces.length > 0 ? errorCount / traces.length : 0;
-
-      return {
-        provider,
-        status: (errorRate > 0.1 ? 'degraded' : 'operational') as 'operational' | 'degraded' | 'down',
-        latency: avgLatency,
-        errorCount,
-      };
-    });
-
-    setMetrics({
-      successRate: allTraces.length > 0 ? (successTraces.length / allTraces.length) * 100 : 0,
-      errorRate: allTraces.length > 0 ? (errorTraces.length / allTraces.length) * 100 : 0,
-      totalTraces: allTraces.length,
-      errors: Object.entries(errorsByType).map(([type, data]) => ({
-        type,
-        count: data.count,
-        lastOccurred: data.lastOccurred,
-      })),
-      providerStatus,
-    });
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        let parsed: Trace[];
-
-        if (file.name.endsWith('.jsonl')) {
-          parsed = content
-            .trim()
-            .split('\n')
-            .map((line) => JSON.parse(line));
-        } else {
-          const data = JSON.parse(content);
-          parsed = Array.isArray(data) ? data : [data];
-        }
-
-        setTraces(parsed);
-        localStorage.setItem('cert-traces', JSON.stringify(parsed));
-        calculateMetrics(parsed);
-      } catch (e) {
-        console.error('Failed to parse file');
-      }
-    };
-    reader.readAsText(file);
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const formatTime = (timestamp: string) => {
@@ -166,22 +121,31 @@ export default function ObservabilityPage() {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     });
   };
 
-  const formatTimeAgo = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
+  const integrationCode = `# Install OpenLLMetry
+pip install traceloop-sdk openai anthropic
 
-    if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffMins > 0) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    return 'Just now';
-  };
+# In your Python code:
+import os
+from traceloop.sdk import Traceloop
+
+# Point to your CERT dashboard
+os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/v1/traces"
+
+# Initialize - instruments ALL LLM calls automatically
+Traceloop.init(app_name="my-app", disable_batch=True)
+
+# Now all your LLM calls are traced!
+from openai import OpenAI
+client = OpenAI()
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+# → Trace automatically sent to CERT`;
 
   if (loading) {
     return (
@@ -201,7 +165,7 @@ export default function ObservabilityPage() {
             Observability
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            Error rates, traces, and system monitoring
+            Live traces from your LLM applications via OpenLLMetry
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -214,27 +178,20 @@ export default function ObservabilityPage() {
             />
             Auto-refresh
           </label>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm"
-          >
-            <option value="1h">Last 1 hour</option>
-            <option value="24h">Last 24 hours</option>
-            <option value="7d">Last 7 days</option>
-          </select>
-          <label className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">
-            <Upload className="w-4 h-4" />
-            Upload
-            <input
-              type="file"
-              accept=".json,.jsonl"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </label>
           <button
-            onClick={loadMetrics}
+            onClick={() => setShowIntegration(!showIntegration)}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              showIntegration
+                ? "bg-[#3C6098] text-white"
+                : "bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600"
+            )}
+          >
+            <Server className="w-4 h-4" />
+            Integration
+          </button>
+          <button
+            onClick={loadTraces}
             className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
           >
             <RefreshCw className="w-5 h-5" />
@@ -242,252 +199,196 @@ export default function ObservabilityPage() {
         </div>
       </div>
 
-      {!metrics || traces.length === 0 ? (
+      {/* Integration Panel */}
+      {showIntegration && (
+        <div className="bg-zinc-900 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-yellow-400" />
+              <h2 className="font-semibold">Connect Your Application</h2>
+            </div>
+            <button
+              onClick={() => copyCode(integrationCode)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors"
+            >
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <pre className="text-sm text-zinc-300 overflow-x-auto">
+            <code>{integrationCode}</code>
+          </pre>
+          <p className="mt-4 text-sm text-zinc-400">
+            Works with: OpenAI, Anthropic, Cohere, Gemini, Mistral, LangChain, LlamaIndex, and more.
+          </p>
+        </div>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Traces</span>
+            <Activity className="w-4 h-4 text-zinc-400" />
+          </div>
+          <p className="text-3xl font-bold text-zinc-900 dark:text-white">
+            {stats?.total || 0}
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">LLM Calls</span>
+            <Zap className="w-4 h-4 text-purple-500" />
+          </div>
+          <p className="text-3xl font-bold text-zinc-900 dark:text-white">
+            {stats?.llmTraces || 0}
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Tokens</span>
+            <BarChart3 className="w-4 h-4 text-teal-500" />
+          </div>
+          <p className="text-3xl font-bold text-zinc-900 dark:text-white">
+            {(stats?.totalTokens || 0).toLocaleString()}
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">Providers</span>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {Object.entries(stats?.byVendor || {}).map(([vendor, count]) => (
+              <span
+                key={vendor}
+                className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-full"
+              >
+                {vendor}: {count}
+              </span>
+            ))}
+            {Object.keys(stats?.byVendor || {}).length === 0 && (
+              <span className="text-zinc-400 text-sm">None yet</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Live Traces */}
+      {traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
           <div className="w-16 h-16 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+            <Activity className="w-8 h-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-            No observability data
+            Waiting for traces...
           </h2>
           <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-6">
-            Upload trace files to monitor error rates and system health.
+            Connect your application using OpenLLMetry to see live LLM traces here.
           </p>
-          <label className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg cursor-pointer hover:bg-orange-700 transition-colors">
-            <Upload className="w-4 h-4" />
-            Upload Trace File
-            <input
-              type="file"
-              accept=".json,.jsonl"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </label>
+          <button
+            onClick={() => setShowIntegration(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#3C6098] text-white rounded-lg hover:bg-[#3C6098]/90 transition-colors"
+          >
+            <Server className="w-4 h-4" />
+            View Integration Code
+          </button>
         </div>
       ) : (
-        <>
-          {/* Health Status */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-zinc-500 dark:text-zinc-400">Success Rate</span>
-                {metrics.successRate >= 95 ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <CheckCircle className="w-3 h-3" />
-                    Good
-                  </span>
-                ) : metrics.successRate >= 90 ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-amber-600">
-                    <AlertCircle className="w-3 h-3" />
-                    Warning
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-xs font-medium text-red-600">
-                    <XCircle className="w-3 h-3" />
-                    Critical
-                  </span>
-                )}
-              </div>
-              <p className="text-3xl font-bold text-zinc-900 dark:text-white">
-                {metrics.successRate.toFixed(1)}%
-              </p>
+        <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="font-semibold text-zinc-900 dark:text-white">Live Traces</h2>
+              {autoRefresh && (
+                <span className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs rounded-full">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  Live
+                </span>
+              )}
             </div>
-
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-zinc-500 dark:text-zinc-400">Error Rate</span>
-                {metrics.errorRate < 5 ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <CheckCircle className="w-3 h-3" />
-                    &lt; 5%
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-xs font-medium text-red-600">
-                    <AlertCircle className="w-3 h-3" />
-                    High
-                  </span>
-                )}
-              </div>
-              <p className="text-3xl font-bold text-zinc-900 dark:text-white">
-                {metrics.errorRate.toFixed(1)}%
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Traces</span>
-              <p className="text-3xl font-bold text-zinc-900 dark:text-white mt-2">
-                {metrics.totalTraces.toLocaleString()}
-              </p>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                Collected
-              </p>
-            </div>
+            <button
+              onClick={clearTraces}
+              className="text-sm text-zinc-500 hover:text-red-600 transition-colors"
+            >
+              Clear all
+            </button>
           </div>
-
-          {/* Error Breakdown */}
-          {metrics.errors.length > 0 && (
-            <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
-                <h2 className="font-semibold text-zinc-900 dark:text-white">Error Breakdown</h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-zinc-50 dark:bg-zinc-900">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                        Error Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                        Count
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                        Last Occurred
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                    {metrics.errors.map((error) => (
-                      <tr key={error.type}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
-                          {error.type}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                          {error.count}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                          {formatTimeAgo(error.lastOccurred)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Trace Log */}
-          <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-              <h2 className="font-semibold text-zinc-900 dark:text-white">Recent Traces</h2>
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Showing last 50
-              </span>
-            </div>
-            <div className="overflow-x-auto max-h-96">
-              <table className="w-full">
-                <thead className="bg-zinc-50 dark:bg-zinc-900 sticky top-0">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Provider
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Model
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Latency
-                    </th>
+          <div className="overflow-x-auto max-h-[500px]">
+            <table className="w-full">
+              <thead className="bg-zinc-50 dark:bg-zinc-900 sticky top-0">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Time
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Provider
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Model
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Tokens
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Latency
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Source
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+                {traces.map((trace) => (
+                  <tr key={trace.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
+                    <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                      {formatTime(trace.receivedAt)}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-900 dark:text-white capitalize">
+                      {trace.llm?.vendor || '-'}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                      {trace.llm?.model || trace.name}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                      {trace.llm?.totalTokens?.toLocaleString() || '-'}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                      {trace.durationMs > 0 ? `${(trace.durationMs / 1000).toFixed(2)}s` : '-'}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      {trace.status === 'error' ? (
+                        <span className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+                          <XCircle className="w-4 h-4" />
+                          Error
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
+                          <CheckCircle className="w-4 h-4" />
+                          OK
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <span className={cn(
+                        "px-2 py-0.5 text-xs rounded-full",
+                        trace.source === 'otlp' && "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400",
+                        trace.source === 'sdk' && "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
+                        trace.source === 'manual' && "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
+                      )}>
+                        {trace.source}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                  {traces
-                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                    .slice(0, 50)
-                    .map((trace, i) => (
-                      <tr key={i}>
-                        <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                          {formatTime(trace.timestamp)}
-                        </td>
-                        <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-900 dark:text-white capitalize">
-                          {trace.platform}
-                        </td>
-                        <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                          {trace.model}
-                        </td>
-                        <td className="px-6 py-3 whitespace-nowrap">
-                          {trace.metadata?.error ? (
-                            <span className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-                              <XCircle className="w-4 h-4" />
-                              Error
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
-                              <CheckCircle className="w-4 h-4" />
-                              200
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                          {trace.metadata?.latency_ms
-                            ? `${(trace.metadata.latency_ms / 1000).toFixed(1)}s`
-                            : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
-
-          {/* Provider Status */}
-          <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
-              <h2 className="font-semibold text-zinc-900 dark:text-white">Provider Status</h2>
-            </div>
-            <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
-              {metrics.providerStatus.map((provider) => (
-                <div
-                  key={provider.provider}
-                  className="px-6 py-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "w-3 h-3 rounded-full",
-                        provider.status === 'operational' && "bg-emerald-500",
-                        provider.status === 'degraded' && "bg-amber-500",
-                        provider.status === 'down' && "bg-red-500"
-                      )}
-                    />
-                    <span className="font-medium text-zinc-900 dark:text-white capitalize">
-                      {provider.provider}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-xs px-2 py-0.5 rounded-full",
-                        provider.status === 'operational' &&
-                          "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400",
-                        provider.status === 'degraded' &&
-                          "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
-                        provider.status === 'down' &&
-                          "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
-                      )}
-                    >
-                      {provider.status === 'operational'
-                        ? 'Operational'
-                        : provider.status === 'degraded'
-                        ? 'Degraded'
-                        : 'Down'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-6 text-sm text-zinc-500 dark:text-zinc-400">
-                    <span>
-                      Latency: {(provider.latency / 1000).toFixed(1)}s
-                    </span>
-                    <span>
-                      Errors: {provider.errorCount}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
