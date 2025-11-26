@@ -23,7 +23,6 @@ interface AutoEvalConfig {
   semanticWeight: number;
   nliWeight: number;
   passThreshold: number;
-  openaiApiKey: string;
 }
 
 interface LLMTrace {
@@ -99,11 +98,6 @@ export default function QualityOverview() {
   };
 
   const runAutoEvaluation = async () => {
-    if (!autoEvalConfig?.enabled || !autoEvalConfig?.openaiApiKey) {
-      alert('Please configure Auto-Evaluation in the Configuration page first.');
-      return;
-    }
-
     const pending = traces.filter(t => !t.evaluation?.status && t.llm?.input && t.llm?.output);
     if (pending.length === 0) {
       alert('No pending traces to evaluate.');
@@ -125,10 +119,9 @@ export default function QualityOverview() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           traces: toEvaluate,
-          apiKey: autoEvalConfig.openaiApiKey,
-          semanticWeight: autoEvalConfig.semanticWeight,
-          nliWeight: autoEvalConfig.nliWeight,
-          passThreshold: autoEvalConfig.passThreshold,
+          semanticWeight: autoEvalConfig?.semanticWeight ?? 30,
+          nliWeight: autoEvalConfig?.nliWeight ?? 70,
+          passThreshold: autoEvalConfig?.passThreshold ?? 7,
         }),
       });
 
@@ -216,10 +209,10 @@ export default function QualityOverview() {
         {/* Auto-Eval Card */}
         <button
           onClick={runAutoEvaluation}
-          disabled={runningAutoEval || !autoEvalConfig?.enabled || pendingTraces.length === 0}
+          disabled={runningAutoEval || pendingTraces.length === 0}
           className={cn(
             "bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 text-left transition-colors group",
-            autoEvalConfig?.enabled && pendingTraces.length > 0
+            pendingTraces.length > 0
               ? "hover:border-teal-300 dark:hover:border-teal-500/50 cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
@@ -235,18 +228,18 @@ export default function QualityOverview() {
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Evaluating {autoEvalProgress.current}/{autoEvalProgress.total}...
                 </div>
-              ) : autoEvalConfig?.enabled && pendingTraces.length > 0 ? (
-                <p className="text-xs text-teal-600 dark:text-teal-400">{autoEvalTraces.length} evaluated</p>
+              ) : pendingTraces.length > 0 ? (
+                <p className="text-xs text-teal-600 dark:text-teal-400">{pendingTraces.length} pending · {autoEvalTraces.length} evaluated</p>
               ) : (
-                <p className="text-xs text-zinc-400">Configure in Settings</p>
+                <p className="text-xs text-zinc-400">{autoEvalTraces.length} evaluated · No pending</p>
               )}
             </div>
-            {autoEvalConfig?.enabled && pendingTraces.length > 0 && !runningAutoEval && (
+            {pendingTraces.length > 0 && !runningAutoEval && (
               <Play className="w-5 h-5 text-zinc-400 group-hover:text-teal-500 transition-colors" />
             )}
           </div>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Automatic validation using semantic similarity + NLI
+            Automatic validation using semantic similarity + NLI (local models)
           </p>
         </button>
 
