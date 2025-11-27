@@ -124,14 +124,14 @@ export default function HomePage() {
       <footer className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700">
         <div className="space-y-6">
           {/* Security Notice */}
-          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg p-4">
+          <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#33436e] flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-amber-800 dark:text-amber-300 mb-1">
+                <p className="font-medium text-zinc-900 dark:text-white mb-1">
                   Security & Privacy Notice
                 </p>
-                <p className="text-amber-700 dark:text-amber-400">
+                <p className="text-zinc-500 dark:text-zinc-400">
                   API keys and credentials are sensitive information. This application is designed to be
                   self-hosted on your own infrastructure. All data remains on your premises and is never
                   transmitted to external servers. We recommend deploying this application within your
