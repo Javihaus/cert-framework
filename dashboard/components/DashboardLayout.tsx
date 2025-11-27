@@ -122,7 +122,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[#0A2540] dark:text-[#E8ECF1] font-semibold text-[15px]">
+            <span className="text-[#0A2540] dark:text-[#E8ECF1] font-semibold text-[17px]">
               CERT
             </span>
             <ChevronDown className="w-4 h-4 text-[#8792A2]" />
