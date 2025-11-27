@@ -174,7 +174,7 @@ export default function LLMJudgePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Zap className="w-7 h-7 text-purple-500" />
+            <Zap className="w-7 h-7 text-[#10069F]" />
             LLM Judge
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -213,22 +213,22 @@ export default function LLMJudgePage() {
 
       {/* Current Judge Config */}
       {isConfigured && (
-        <div className="bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 rounded-xl p-4">
+        <div className="bg-[#10069F]/10 dark:bg-[#10069F]/10 border border-[#10069F]/30 dark:border-[#10069F]/30 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <Zap className="w-5 h-5 text-[#10069F] dark:text-[#7ea0bf]" />
               <div>
-                <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
+                <p className="text-sm font-medium text-[#10069F] dark:text-[#7ea0bf]">
                   Judge Model: {judgeConfig.provider}/{judgeConfig.model}
                 </p>
-                <p className="text-xs text-purple-600 dark:text-purple-400">
+                <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">
                   Pass threshold: {judgeConfig.passThreshold}/10
                 </p>
               </div>
             </div>
             <Link
               href="/configuration"
-              className="text-sm text-purple-600 dark:text-purple-400 hover:underline"
+              className="text-sm text-[#10069F] dark:text-[#7ea0bf] hover:underline"
             >
               Change →
             </Link>
@@ -272,7 +272,7 @@ export default function LLMJudgePage() {
                     }}
                     className={cn(
                       "w-full px-6 py-4 text-left hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors",
-                      selectedTrace?.id === trace.id && "bg-purple-50 dark:bg-purple-500/10"
+                      selectedTrace?.id === trace.id && "bg-[#10069F]/10 dark:bg-[#10069F]/10"
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -384,7 +384,7 @@ export default function LLMJudgePage() {
                     "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors",
                     !isConfigured || evaluating
                       ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500 cursor-not-allowed"
-                      : "bg-purple-600 text-white hover:bg-purple-700"
+                      : "bg-[#10069F] text-white hover:bg-[#0d0580]"
                   )}
                 >
                   {evaluating ? (
@@ -477,8 +477,8 @@ export default function LLMJudgePage() {
             </>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
               </div>
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
                 Select a trace to evaluate

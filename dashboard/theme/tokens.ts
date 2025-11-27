@@ -111,7 +111,7 @@ export const shadows = {
   modal: '0 8px 30px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)',
 
   // Focus ring (Dark Blue)
-  focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #33436e',
+  focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #10069F',
   focusError: '0 0 0 2px #FFFFFF, 0 0 0 4px #DF1B41',
 } as const;
 
@@ -267,7 +267,7 @@ export const componentTokens = {
     padding: '12px 0',
     gap: '24px',
     indicatorHeight: '2px',
-    indicatorColor: '#33436e',
+    indicatorColor: '#10069F',
   },
 
   // Table (Stripe-style)
@@ -289,7 +289,7 @@ export const componentTokens = {
     fontSize: '14px',
     borderRadius: '6px',
     borderColor: '#E3E8EE',
-    focusBorderColor: '#33436e',
+    focusBorderColor: '#10069F',
   },
 
   // Chart (Stripe-style)

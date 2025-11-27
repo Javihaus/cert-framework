@@ -91,7 +91,7 @@ export default function PerformancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Activity className="w-7 h-7 text-teal-500" />
+            <Activity className="w-7 h-7 text-[#10069F]" />
             Performance
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -120,8 +120,8 @@ export default function PerformancePage() {
 
       {!metrics ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <div className="w-16 h-16 bg-teal-100 dark:bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Activity className="w-8 h-8 text-teal-600 dark:text-teal-400" />
+          <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Activity className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
           </div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             No performance data yet
@@ -206,7 +206,7 @@ export default function PerformancePage() {
                 return (
                   <div
                     key={i}
-                    className="w-4 bg-teal-500 rounded-t"
+                    className="w-4 bg-[#10069F] rounded-t"
                     style={{ height: `${height}%` }}
                   />
                 );
@@ -278,12 +278,12 @@ export default function PerformancePage() {
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full flex flex-col gap-1">
                     <div
-                      className="w-full bg-teal-500 rounded-t"
+                      className="w-full bg-[#10069F] rounded-t"
                       style={{ height: `${(point.p95 / 5000) * 100}px` }}
                       title={`P95: ${formatLatency(point.p95)}`}
                     />
                     <div
-                      className="w-full bg-teal-300 rounded-t"
+                      className="w-full bg-[#10069F]/60 rounded-t"
                       style={{ height: `${(point.p50 / 5000) * 100}px` }}
                       title={`P50: ${formatLatency(point.p50)}`}
                     />
@@ -296,11 +296,11 @@ export default function PerformancePage() {
             </div>
             <div className="flex items-center gap-4 mt-4 justify-center">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-teal-300 rounded" />
+                <div className="w-3 h-3 bg-[#10069F]/60 rounded" />
                 <span className="text-xs text-zinc-500 dark:text-zinc-400">P50</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-teal-500 rounded" />
+                <div className="w-3 h-3 bg-[#10069F] rounded" />
                 <span className="text-xs text-zinc-500 dark:text-zinc-400">P95</span>
               </div>
             </div>

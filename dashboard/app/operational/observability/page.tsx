@@ -161,7 +161,7 @@ response = client.chat.completions.create(
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <BarChart3 className="w-7 h-7 text-orange-500" />
+            <BarChart3 className="w-7 h-7 text-[#10069F]" />
             Observability
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -183,7 +183,7 @@ response = client.chat.completions.create(
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
               showIntegration
-                ? "bg-[#3C6098] text-white"
+                ? "bg-[#10069F] text-white"
                 : "bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600"
             )}
           >
@@ -204,7 +204,7 @@ response = client.chat.completions.create(
         <div className="bg-zinc-900 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-400" />
+              <Zap className="w-5 h-5 text-[#10069F]" />
               <h2 className="font-semibold">Connect Your Application</h2>
             </div>
             <button
@@ -239,7 +239,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">LLM Calls</span>
-            <Zap className="w-4 h-4 text-purple-500" />
+            <Zap className="w-4 h-4 text-[#10069F]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {stats?.llmTraces || 0}
@@ -249,7 +249,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Tokens</span>
-            <BarChart3 className="w-4 h-4 text-teal-500" />
+            <BarChart3 className="w-4 h-4 text-[#10069F]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {(stats?.totalTokens || 0).toLocaleString()}
@@ -279,8 +279,8 @@ response = client.chat.completions.create(
       {/* Live Traces */}
       {traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <div className="w-16 h-16 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Activity className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+          <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Activity className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
           </div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Waiting for traces...
@@ -290,7 +290,7 @@ response = client.chat.completions.create(
           </p>
           <button
             onClick={() => setShowIntegration(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#3C6098] text-white rounded-lg hover:bg-[#3C6098]/90 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#10069F] text-white rounded-lg hover:bg-[#10069F]/90 transition-colors"
           >
             <Server className="w-4 h-4" />
             View Integration Code
@@ -376,8 +376,8 @@ response = client.chat.completions.create(
                     <td className="px-6 py-3 whitespace-nowrap">
                       <span className={cn(
                         "px-2 py-0.5 text-xs rounded-full",
-                        trace.source === 'otlp' && "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400",
-                        trace.source === 'sdk' && "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
+                        trace.source === 'otlp' && "bg-[#10069F]/10 text-[#10069F] dark:bg-[#10069F]/20 dark:text-[#7ea0bf]",
+                        trace.source === 'sdk' && "bg-[#10069F]/10 text-[#10069F] dark:bg-[#10069F]/20 dark:text-[#7ea0bf]",
                         trace.source === 'manual' && "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                       )}>
                         {trace.source}

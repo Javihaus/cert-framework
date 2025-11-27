@@ -57,7 +57,7 @@ export default function HomePage() {
             className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors group"
           >
             <div className="flex items-center gap-3 mb-3">
-              <Zap className="w-6 h-6 text-[#33436e]" />
+              <Zap className="w-6 h-6 text-[#10069F]" />
               <div>
                 <h3 className="font-semibold text-zinc-900 dark:text-white">Quality Evals</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -90,7 +90,7 @@ export default function HomePage() {
             className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors group"
           >
             <div className="flex items-center gap-3 mb-3">
-              <Activity className="w-6 h-6 text-[#33436e]" />
+              <Activity className="w-6 h-6 text-[#10069F]" />
               <div>
                 <h3 className="font-semibold text-zinc-900 dark:text-white">Operational Evals</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -126,7 +126,7 @@ export default function HomePage() {
           {/* Security Notice */}
           <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-[#33436e] flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#10069F] flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-zinc-900 dark:text-white mb-1">
                   Security & Privacy Notice

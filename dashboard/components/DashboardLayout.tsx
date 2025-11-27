@@ -191,7 +191,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Sidebar Footer */}
         <div className="px-3 py-3 border-t border-[#E3E8EE] dark:border-[#1D2530]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#33436e] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center">
               <span className="text-white text-xs font-medium">JD</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -260,7 +260,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="relative ml-1">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-8 h-8 rounded-full bg-[#33436e] flex items-center justify-center hover:ring-2 hover:ring-[#33436e]/20 transition-all"
+                  className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center hover:ring-2 hover:ring-[#10069F]/20 transition-all"
                 >
                   <span className="text-white text-xs font-medium">JD</span>
                 </button>

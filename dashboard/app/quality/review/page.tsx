@@ -168,7 +168,7 @@ export default function HumanReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <User className="w-7 h-7 text-orange-500" />
+            <User className="w-7 h-7 text-[#10069F]" />
             Human Review
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -246,7 +246,7 @@ export default function HumanReviewPage() {
                     onClick={() => handleSelectTrace(trace)}
                     className={cn(
                       "w-full px-6 py-4 text-left hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors",
-                      selectedTrace?.id === trace.id && "bg-orange-50 dark:bg-orange-500/10"
+                      selectedTrace?.id === trace.id && "bg-[#10069F]/10 dark:bg-[#10069F]/10"
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -336,11 +336,11 @@ export default function HumanReviewPage() {
                         className="w-full flex items-center justify-between text-left"
                       >
                         <div className="flex items-center gap-2">
-                          <BookOpen className="w-4 h-4 text-blue-500" />
-                          <label className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                          <BookOpen className="w-4 h-4 text-[#10069F]" />
+                          <label className="text-xs font-medium text-[#10069F] dark:text-[#7ea0bf]">
                             Source Context (Retrieved Chunks)
                           </label>
-                          <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                          <span className="px-2 py-0.5 bg-[#10069F]/10 dark:bg-[#10069F]/20 text-[#10069F] dark:text-[#7ea0bf] text-xs rounded-full">
                             {Array.isArray(selectedTrace.llm.context)
                               ? `${selectedTrace.llm.context.length} chunks`
                               : '1 chunk'}
@@ -359,16 +359,16 @@ export default function HumanReviewPage() {
                             selectedTrace.llm.context.map((chunk, idx) => (
                               <div
                                 key={idx}
-                                className="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-32 overflow-y-auto whitespace-pre-wrap"
+                                className="p-3 bg-[#10069F]/10 dark:bg-[#10069F]/10 border border-[#10069F]/30 dark:border-[#10069F]/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-32 overflow-y-auto whitespace-pre-wrap"
                               >
-                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 block mb-1">
+                                <span className="text-xs font-medium text-[#10069F] dark:text-[#7ea0bf] block mb-1">
                                   Chunk {idx + 1}
                                 </span>
                                 {chunk}
                               </div>
                             ))
                           ) : (
-                            <div className="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-48 overflow-y-auto whitespace-pre-wrap">
+                            <div className="p-3 bg-[#10069F]/10 dark:bg-[#10069F]/10 border border-[#10069F]/30 dark:border-[#10069F]/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-48 overflow-y-auto whitespace-pre-wrap">
                               {selectedTrace.llm.context}
                             </div>
                           )}
@@ -427,7 +427,7 @@ export default function HumanReviewPage() {
                     step="0.5"
                     value={score}
                     onChange={(e) => setScore(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#10069F]"
                   />
                   <div className="flex justify-between text-xs text-zinc-400 mt-1">
                     <span>Poor</span>
@@ -445,7 +445,7 @@ export default function HumanReviewPage() {
                       className={cn(
                         "flex-1 py-2 rounded text-sm font-medium transition-colors",
                         score === s
-                          ? "bg-orange-500 text-white"
+                          ? "bg-[#10069F] text-white"
                           : "bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-600"
                       )}
                     >
@@ -464,7 +464,7 @@ export default function HumanReviewPage() {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add any notes about this response..."
                     rows={3}
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#10069F] resize-none"
                   />
                 </div>
 
@@ -495,7 +495,7 @@ export default function HumanReviewPage() {
                     "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors",
                     saving
                       ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500 cursor-not-allowed"
-                      : "bg-orange-500 text-white hover:bg-orange-600"
+                      : "bg-[#10069F] text-white hover:bg-[#0d0580]"
                   )}
                 >
                   {saving ? (
@@ -509,8 +509,8 @@ export default function HumanReviewPage() {
             </>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-              <div className="w-16 h-16 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+              <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Star className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
               </div>
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
                 Select a trace to review
