@@ -49,7 +49,7 @@ export default function HomePage() {
   return (
     <>
       {/* Hero - Full width */}
-      <section className="relative bg-[#F6F9FC] dark:bg-[#0A0E14] border-b border-[#10069F]/30 overflow-hidden">
+      <section className="relative bg-[#F6F9FC] dark:bg-[#0A0E14] overflow-hidden">
         {/* Radial gradient background */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[140%] h-full bg-[radial-gradient(ellipse_at_center,rgba(16,6,159,0.08)_0%,transparent_70%)]" />
@@ -215,17 +215,17 @@ export default function HomePage() {
         </div>
 
         {/* Footer */}
-        <footer className="pt-8 border-t border-zinc-200 dark:border-zinc-700">
+        <footer className="pt-8">
           <div className="space-y-6">
             {/* Security Notice */}
-            <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
+            <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-[#10069F] flex-shrink-0 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-zinc-900 dark:text-white mb-1">
+                <Shield className="w-5 h-5 text-[#10069F] flex-shrink-0 mt-0.5" strokeWidth={2} />
+                <div>
+                  <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-3">
                     Security & Privacy Notice
-                  </p>
-                  <p className="text-zinc-500 dark:text-zinc-400">
+                  </h3>
+                  <p className="text-[13px] leading-[1.6] text-[#596780] dark:text-[#8792A2]">
                     API keys and credentials are sensitive information. This application is designed to be
                     self-hosted on your own infrastructure. All data remains on your premises and is never
                     transmitted to external servers. We recommend deploying this application within your
