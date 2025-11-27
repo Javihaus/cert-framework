@@ -12,12 +12,10 @@ import {
   BarChart3,
   Settings,
   Bell,
-  Search,
   Moon,
   Sun,
   Menu,
   X,
-  ChevronDown,
   LogOut,
   User,
   HelpCircle,
@@ -111,21 +109,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <aside className={cn('sidebar', mobileMenuOpen && 'open', 'lg:translate-x-0')}>
         {/* Logo - Stripe style header */}
         <div className="flex items-center gap-3 px-4 h-[52px] border-b border-[#E3E8EE] dark:border-[#1D2530]">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
             <Image
               src="/cert-logo.png"
               alt="CERT"
-              width={28}
-              height={28}
+              width={40}
+              height={40}
               className="object-contain"
               priority
             />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#0A2540] dark:text-[#E8ECF1] font-semibold text-[17px]">
-              CERT
-            </span>
-            <ChevronDown className="w-4 h-4 text-[#8792A2]" />
           </div>
           <button
             onClick={() => setMobileMenuOpen(false)}
@@ -218,17 +210,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Search - Stripe style centered */}
-            <div className="hidden md:flex flex-1 justify-center max-w-[400px] mx-auto">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8792A2]" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="input search-input input-with-icon w-full h-9 rounded-lg"
-                />
-              </div>
-            </div>
+            {/* Spacer */}
+            <div className="flex-1" />
 
             {/* Right Actions - Stripe style */}
             <div className="flex items-center gap-1">
