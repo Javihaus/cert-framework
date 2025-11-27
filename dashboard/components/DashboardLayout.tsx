@@ -32,7 +32,7 @@ interface NavItem {
   href: string;
   icon: React.ElementType;
   badge?: string;
-  badgeType?: 'live' | 'count' | 'warning';
+  badgeType?: 'live' | 'count' | 'warning' | 'new';
 }
 
 interface NavSection {
@@ -107,39 +107,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Stripe style */}
       <aside className={cn('sidebar', mobileMenuOpen && 'open', 'lg:translate-x-0')}>
-        {/* Logo - matching 56px header height */}
-        <div className="flex items-center gap-3 px-4 h-14 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+        {/* Logo - Stripe style header */}
+        <div className="flex items-center gap-3 px-4 h-[52px] border-b border-[#E3E8EE] dark:border-[#1D2530]">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
             <Image
               src="/cert-logo.png"
               alt="CERT"
-              width={34}
-              height={34}
+              width={28}
+              height={28}
               className="object-contain"
               priority
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-zinc-900 dark:text-white font-semibold text-sm tracking-tight">
+          <div className="flex items-center gap-2">
+            <span className="text-[#0A2540] dark:text-[#E8ECF1] font-semibold text-[15px]">
               CERT
             </span>
+            <ChevronDown className="w-4 h-4 text-[#8792A2]" />
           </div>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden ml-auto p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+            className="lg:hidden ml-auto p-1.5 text-[#596780] hover:text-[#0A2540] dark:hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Navigation */}
+        {/* Navigation - Stripe style */}
         <nav className="flex-1 px-3 py-4 overflow-y-auto scrollbar-thin">
           {navigation.map((section, sectionIndex) => (
-            <div key={sectionIndex} className={sectionIndex > 0 ? 'mt-6' : ''}>
+            <div key={sectionIndex} className={sectionIndex > 0 ? 'mt-5' : ''}>
               {section.label && (
-                <div className="px-3 py-2 text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                <div className="nav-section-label">
                   {section.label}
                 </div>
               )}
@@ -154,26 +155,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-                        isActive
-                          ? 'text-[#3C6098] dark:text-[#3C6098] font-bold'
-                          : 'text-zinc-600 dark:text-zinc-400 font-medium hover:text-[#3C6098] dark:hover:text-[#3C6098]'
+                        'nav-item',
+                        isActive && 'active'
                       )}
                     >
-                      <Icon className="w-[18px] h-[18px]" />
+                      <Icon className="w-4 h-4" />
                       <span className="flex-1">{item.name}</span>
                       {item.badge && (
                         <span className={cn(
                           item.badgeType === 'live'
-                            ? 'flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-medium'
+                            ? 'flex items-center gap-1.5 px-2 py-0.5 bg-[#D4EDDA] dark:bg-[rgba(48,177,48,0.2)] text-[#228B22] dark:text-[#4ADE4A] rounded text-[11px] font-medium'
                             : item.badgeType === 'warning'
-                            ? 'flex items-center justify-center w-5 h-5 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full text-xs font-medium'
-                            : 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full text-xs font-medium'
+                            ? 'flex items-center justify-center w-5 h-5 bg-[#FDECEA] dark:bg-[rgba(223,27,65,0.2)] text-[#C41230] dark:text-[#FF6B8A] rounded-full text-[11px] font-medium'
+                            : item.badgeType === 'new'
+                            ? 'badge-new'
+                            : 'px-2 py-0.5 bg-[#F0F3F7] dark:bg-[#1D2530] text-[#596780] dark:text-[#8792A2] rounded text-[11px] font-medium'
                         )}>
                           {item.badgeType === 'live' && (
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#30B130] opacity-75" />
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#30B130]" />
                             </span>
                           )}
                           {item.badge}
@@ -187,17 +188,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           ))}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="px-3 py-4 border-t border-zinc-200 dark:border-zinc-800">
+        {/* Sidebar Footer - Stripe style */}
+        <div className="px-3 py-3 border-t border-[#E3E8EE] dark:border-[#1D2530]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#3C6098] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#635BFF] flex items-center justify-center">
               <span className="text-white text-xs font-medium">JD</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-zinc-900 dark:text-white text-sm font-medium truncate">John Doe</p>
-              <p className="text-zinc-500 dark:text-zinc-400 text-xs truncate">Admin</p>
+              <p className="text-[#0A2540] dark:text-[#E8ECF1] text-sm font-medium truncate">John Doe</p>
+              <p className="text-[#8792A2] text-xs truncate">Admin</p>
             </div>
-            <button className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
+            <button className="p-1.5 text-[#8792A2] hover:text-[#596780] dark:hover:text-[#E8ECF1] transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -206,89 +207,100 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Top Header - 56px height */}
-        <header className="sticky top-0 z-30 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+        {/* Top Header - Stripe style */}
+        <header className="sticky top-0 z-30 h-[52px] bg-white dark:bg-[#151B24] border-b border-[#E3E8EE] dark:border-[#1D2530]">
           <div className="flex items-center justify-between h-full px-4 lg:px-6">
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+              className="lg:hidden p-2 text-[#596780] hover:text-[#0A2540] dark:hover:text-white transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Search */}
-            <div className="hidden md:flex flex-1 max-w-md">
+            {/* Search - Stripe style centered */}
+            <div className="hidden md:flex flex-1 justify-center max-w-[400px] mx-auto">
               <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8792A2]" />
                 <input
                   type="text"
-                  placeholder="Search systems, traces, reports..."
-                  className="input input-with-icon"
+                  placeholder="Search..."
+                  className="input search-input input-with-icon w-full h-9 rounded-lg"
                 />
               </div>
             </div>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-2">
-              {/* Notifications */}
-              <button className="relative p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            {/* Right Actions - Stripe style */}
+            <div className="flex items-center gap-1">
+              {/* Mode toggle */}
+              <span className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-[13px] text-[#596780] dark:text-[#8792A2]">
+                Test mode
+                <button
+                  onClick={() => {}}
+                  className="relative w-9 h-5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-full transition-colors"
+                >
+                  <span className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform" />
+                </button>
+              </span>
+
+              {/* Icon buttons */}
+              <button className="relative p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors">
+                <Bell className="w-[18px] h-[18px]" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DF1B41] rounded-full" />
               </button>
+
+              <Link
+                href="/help"
+                className="hidden md:flex p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
+              >
+                <HelpCircle className="w-[18px] h-[18px]" />
+              </Link>
 
               {/* Dark Mode Toggle */}
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
               >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
               </button>
 
-              {/* Help */}
-              <Link
-                href="/help"
-                className="hidden md:flex p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-              >
-                <HelpCircle className="w-5 h-5" />
-              </Link>
+              <button className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors">
+                <Settings className="w-[18px] h-[18px]" />
+              </button>
 
-              {/* User Menu */}
-              <div className="relative ml-2">
+              {/* User Menu - Stripe style avatar */}
+              <div className="relative ml-1">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="w-8 h-8 rounded-full bg-[#635BFF] flex items-center justify-center hover:ring-2 hover:ring-[#635BFF]/20 transition-all"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#3C6098] flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">JD</span>
-                  </div>
-                  <ChevronDown className="hidden md:block w-4 h-4 text-zinc-500" />
+                  <span className="text-white text-xs font-medium">JD</span>
                 </button>
 
-                {/* User Dropdown */}
+                {/* User Dropdown - Stripe style */}
                 {userMenuOpen && (
                   <>
                     <div
                       className="fixed inset-0 z-40"
                       onClick={() => setUserMenuOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-xl shadow-elevated border border-zinc-200 dark:border-zinc-700 py-2 z-50 animate-scale-in">
-                      <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-700">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">John Doe</p>
-                        <p className="text-xs text-zinc-500">john@company.com</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#151B24] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.12)] border border-[#E3E8EE] dark:border-[#1D2530] py-1 z-50 animate-scale-in">
+                      <div className="px-4 py-3 border-b border-[#E3E8EE] dark:border-[#1D2530]">
+                        <p className="text-sm font-medium text-[#0A2540] dark:text-[#E8ECF1]">John Doe</p>
+                        <p className="text-xs text-[#8792A2]">john@company.com</p>
                       </div>
                       <div className="py-1">
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700">
+                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
                           <User className="w-4 h-4" />
                           Profile
                         </a>
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700">
+                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
                           <Settings className="w-4 h-4" />
                           Settings
                         </a>
                       </div>
-                      <div className="border-t border-zinc-100 dark:border-zinc-700 pt-1">
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-700">
+                      <div className="border-t border-[#E3E8EE] dark:border-[#1D2530] pt-1">
+                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#DF1B41] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530]">
                           <LogOut className="w-4 h-4" />
                           Sign out
                         </a>
@@ -302,7 +314,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-4 lg:p-6">
+        <main className="p-4 lg:p-8">
           {children}
         </main>
       </div>
