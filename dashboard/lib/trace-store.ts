@@ -15,6 +15,7 @@ export interface LLMData {
   totalTokens: number;
   input?: string;
   output?: string;
+  context?: string | string[];  // Source context/retrieved chunks for document extraction
   temperature?: number;
 }
 

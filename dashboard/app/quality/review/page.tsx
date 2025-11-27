@@ -8,10 +8,14 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   AlertCircle,
   RefreshCw,
   Save,
   Star,
+  FileText,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +32,7 @@ interface LLMTrace {
     completionTokens: number;
     input?: string;
     output?: string;
+    context?: string | string[];  // Source context/retrieved chunks
   };
   evaluation?: {
     score?: number;
@@ -38,6 +43,7 @@ interface LLMTrace {
     humanScore?: number;
     humanNotes?: string;
     humanReviewedAt?: string;
+    groundingScore?: number;  // How well output is grounded in context
   };
 }
 
@@ -50,6 +56,7 @@ export default function HumanReviewPage() {
   const [score, setScore] = useState<number>(7);
   const [notes, setNotes] = useState('');
   const [passThreshold, setPassThreshold] = useState(7);
+  const [contextExpanded, setContextExpanded] = useState(true);
 
   useEffect(() => {
     // Load pass threshold from config
@@ -253,6 +260,12 @@ export default function HumanReviewPage() {
                         <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 truncate">
                           {trace.llm?.input?.slice(0, 50) || 'No input'}...
                         </p>
+                        {trace.llm?.context && (
+                          <span className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400">
+                            <BookOpen className="w-3 h-3" />
+                            Has source context
+                          </span>
+                        )}
                       </div>
                       <div className="ml-4 flex-shrink-0">
                         {trace.evaluation?.humanScore !== undefined ? (
@@ -314,6 +327,71 @@ export default function HumanReviewPage() {
                       {selectedTrace.llm?.output || 'No output data'}
                     </div>
                   </div>
+
+                  {/* Source Context Section - for document extraction verification */}
+                  {selectedTrace.llm?.context && (
+                    <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
+                      <button
+                        onClick={() => setContextExpanded(!contextExpanded)}
+                        className="w-full flex items-center justify-between text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-blue-500" />
+                          <label className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                            Source Context (Retrieved Chunks)
+                          </label>
+                          <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                            {Array.isArray(selectedTrace.llm.context)
+                              ? `${selectedTrace.llm.context.length} chunks`
+                              : '1 chunk'}
+                          </span>
+                        </div>
+                        {contextExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-zinc-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-zinc-400" />
+                        )}
+                      </button>
+
+                      {contextExpanded && (
+                        <div className="mt-3 space-y-2">
+                          {Array.isArray(selectedTrace.llm.context) ? (
+                            selectedTrace.llm.context.map((chunk, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-32 overflow-y-auto whitespace-pre-wrap"
+                              >
+                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 block mb-1">
+                                  Chunk {idx + 1}
+                                </span>
+                                {chunk}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 max-h-48 overflow-y-auto whitespace-pre-wrap">
+                              {selectedTrace.llm.context}
+                            </div>
+                          )}
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 flex items-center gap-1">
+                            <FileText className="w-3 h-3" />
+                            Use this source content to verify the accuracy of the output above
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* No Context Warning */}
+                  {!selectedTrace.llm?.context && (
+                    <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
+                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-xs">
+                          No source context available. Cannot verify output against source document.
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

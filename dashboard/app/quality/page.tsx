@@ -15,6 +15,8 @@ import {
   Sparkles,
   Play,
   Loader2,
+  BookOpen,
+  FileCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +34,7 @@ interface LLMTrace {
     model: string;
     input?: string;
     output?: string;
+    context?: string | string[];  // Source context for grounding check
   };
   evaluation?: {
     score?: number;
@@ -41,6 +44,7 @@ interface LLMTrace {
     criteria?: {
       semantic?: number;
       nli?: number;
+      grounding?: number;
     };
   };
   receivedAt: string;
@@ -48,21 +52,24 @@ interface LLMTrace {
 }
 
 type StatusFilter = 'all' | 'pass' | 'fail' | 'review' | 'pending';
-type MethodFilter = 'all' | 'auto' | 'llm' | 'human';
+type MethodFilter = 'all' | 'auto' | 'llm' | 'human' | 'grounding';
 
 export default function QualityOverview() {
   const [traces, setTraces] = useState<LLMTrace[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoEvalConfig, setAutoEvalConfig] = useState<AutoEvalConfig | null>(null);
   const [runningAutoEval, setRunningAutoEval] = useState(false);
+  const [runningGrounding, setRunningGrounding] = useState(false);
   const [autoEvalProgress, setAutoEvalProgress] = useState({ current: 0, total: 0 });
+  const [groundingProgress, setGroundingProgress] = useState({ current: 0, total: 0 });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [methodFilter, setMethodFilter] = useState<MethodFilter>('all');
   const [selectedTrace, setSelectedTrace] = useState<LLMTrace | null>(null);
 
-  const getEvalMethod = (trace: LLMTrace): 'auto' | 'llm' | 'human' | 'pending' => {
+  const getEvalMethod = (trace: LLMTrace): 'auto' | 'llm' | 'human' | 'grounding' | 'pending' => {
     if (!trace.evaluation?.judgeModel && !trace.evaluation?.status) return 'pending';
-    if (trace.evaluation?.judgeModel === 'cert-auto-eval') return 'auto';
+    if (trace.evaluation?.judgeModel?.includes('cert-auto-eval')) return 'auto';
+    if (trace.evaluation?.judgeModel?.includes('cert-grounding')) return 'grounding';
     if (trace.evaluation?.judgeModel) return 'llm';
     return 'human';
   };
@@ -141,6 +148,52 @@ export default function QualityOverview() {
     setRunningAutoEval(false);
   };
 
+  const runGroundingCheck = async () => {
+    // Get traces with context that haven't been evaluated with grounding
+    const pendingWithContext = traces.filter(
+      t => t.llm?.context && t.llm?.output && !t.evaluation?.criteria?.grounding
+    );
+
+    if (pendingWithContext.length === 0) {
+      alert('No traces with source context available for grounding check.');
+      return;
+    }
+
+    setRunningGrounding(true);
+    setGroundingProgress({ current: 0, total: Math.min(pendingWithContext.length, 10) });
+
+    try {
+      const toEvaluate = pendingWithContext.slice(0, 10).map(t => ({
+        id: t.id,
+        output: t.llm?.output || '',
+        context: t.llm?.context || '',
+      }));
+
+      const response = await fetch('/api/quality/grounding', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          traces: toEvaluate,
+          passThreshold: autoEvalConfig?.passThreshold ?? 7,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setGroundingProgress({ current: result.evaluated, total: result.evaluated });
+        await loadTraces();
+      } else {
+        const error = await response.json();
+        alert(`Grounding check failed: ${error.error}`);
+      }
+    } catch (e) {
+      console.error('Grounding check error:', e);
+      alert('Grounding check failed. Check the console for details.');
+    }
+
+    setRunningGrounding(false);
+  };
+
   // Calculate metrics
   const evaluatedTraces = traces.filter(t => t.evaluation?.status);
   const passedTraces = traces.filter(t => t.evaluation?.status === 'pass');
@@ -152,6 +205,8 @@ export default function QualityOverview() {
   const autoEvalTraces = traces.filter(t => getEvalMethod(t) === 'auto');
   const llmJudgeTraces = traces.filter(t => getEvalMethod(t) === 'llm');
   const humanReviewTraces = traces.filter(t => getEvalMethod(t) === 'human');
+  const groundingTraces = traces.filter(t => getEvalMethod(t) === 'grounding');
+  const tracesWithContext = traces.filter(t => t.llm?.context);
 
   const passRate = evaluatedTraces.length > 0
     ? (passedTraces.length / evaluatedTraces.length) * 100
@@ -169,6 +224,7 @@ export default function QualityOverview() {
       if (methodFilter === 'auto' && method !== 'auto') return false;
       if (methodFilter === 'llm' && method !== 'llm') return false;
       if (methodFilter === 'human' && method !== 'human') return false;
+      if (methodFilter === 'grounding' && method !== 'grounding') return false;
     }
 
     return true;
@@ -204,8 +260,8 @@ export default function QualityOverview() {
         </button>
       </div>
 
-      {/* Quick Actions - Three Evaluation Methods */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Quick Actions - Evaluation Methods */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Auto-Eval Card */}
         <button
           onClick={runAutoEvaluation}
@@ -282,6 +338,45 @@ export default function QualityOverview() {
             Check accuracy manually
           </p>
         </Link>
+
+        {/* Grounding Check Card - for document extraction */}
+        <button
+          onClick={runGroundingCheck}
+          disabled={runningGrounding || tracesWithContext.length === 0}
+          className={cn(
+            "bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 text-left transition-colors group",
+            tracesWithContext.length > 0
+              ? "hover:border-blue-300 dark:hover:border-blue-500/50 cursor-pointer"
+              : "opacity-60 cursor-not-allowed"
+          )}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <FileCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <span className="font-medium text-zinc-900 dark:text-white">Grounding Check</span>
+              {runningGrounding ? (
+                <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Checking {groundingProgress.current}/{groundingProgress.total}...
+                </div>
+              ) : tracesWithContext.length > 0 ? (
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {tracesWithContext.length} with context · {groundingTraces.length} checked
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-400">No traces with source context</p>
+              )}
+            </div>
+            {tracesWithContext.length > 0 && !runningGrounding && (
+              <Play className="w-5 h-5 text-zinc-400 group-hover:text-blue-500 transition-colors" />
+            )}
+          </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Verify output is grounded in source documents
+          </p>
+        </button>
       </div>
 
       {/* Summary Stats */}
@@ -369,6 +464,7 @@ export default function QualityOverview() {
                 { key: 'auto', label: 'Auto-Eval', icon: Sparkles, count: autoEvalTraces.length },
                 { key: 'llm', label: 'LLM Judge', icon: Zap, count: llmJudgeTraces.length },
                 { key: 'human', label: 'Human', icon: User, count: humanReviewTraces.length },
+                { key: 'grounding', label: 'Grounding', icon: FileCheck, count: groundingTraces.length },
               ] as const).map((m) => (
                 <button
                   key={m.key}
@@ -379,6 +475,7 @@ export default function QualityOverview() {
                       ? m.key === 'auto' ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
                       : m.key === 'llm' ? "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
                       : m.key === 'human' ? "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400"
+                      : m.key === 'grounding' ? "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400"
                       : "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                       : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                   )}
@@ -443,10 +540,14 @@ export default function QualityOverview() {
                         "flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
                         getEvalMethod(trace) === 'auto'
                           ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400"
+                          : getEvalMethod(trace) === 'grounding'
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400"
                           : "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
                       )}>
                         {getEvalMethod(trace) === 'auto' ? (
                           <><Sparkles className="w-3 h-3" /> Auto</>
+                        ) : getEvalMethod(trace) === 'grounding' ? (
+                          <><FileCheck className="w-3 h-3" /> Grounding</>
                         ) : (
                           <><Zap className="w-3 h-3" /> LLM</>
                         )}
@@ -482,7 +583,7 @@ export default function QualityOverview() {
                 {selectedTrace?.id === trace.id && (
                   <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
                     {/* Auto-Eval Score Breakdown */}
-                    {trace.evaluation?.criteria && (
+                    {trace.evaluation?.criteria && (trace.evaluation.criteria.semantic !== undefined || trace.evaluation.criteria.nli !== undefined) && (
                       <div className="mb-4 p-3 bg-teal-50 dark:bg-teal-500/10 rounded-lg border border-teal-200 dark:border-teal-500/30">
                         <div className="flex items-center gap-2 mb-3">
                           <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
@@ -517,6 +618,33 @@ export default function QualityOverview() {
                               />
                             </div>
                           </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Grounding Check Breakdown */}
+                    {trace.evaluation?.criteria?.grounding !== undefined && (
+                      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/30">
+                        <div className="flex items-center gap-2 mb-3">
+                          <FileCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <span className="text-xs font-medium text-blue-800 dark:text-blue-300">Grounding Check Results</span>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-blue-700 dark:text-blue-400">Claims Grounded in Source</span>
+                            <span className="text-xs font-bold text-blue-800 dark:text-blue-300">
+                              {(trace.evaluation.criteria.grounding * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-blue-200 dark:bg-blue-700 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-500 transition-all"
+                              style={{ width: `${trace.evaluation.criteria.grounding * 100}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                            Output claims verified against source context/documents
+                          </p>
                         </div>
                       </div>
                     )}

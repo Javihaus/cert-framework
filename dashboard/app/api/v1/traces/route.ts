@@ -93,6 +93,16 @@ function extractLLMData(attrs: Record<string, unknown>) {
     return undefined;
   }
 
+  // Extract context/retrieved documents if available
+  const context = (
+    attrs['llm.context'] ||
+    attrs['llm.retrieved_docs'] ||
+    attrs['llm.retrieved_context'] ||
+    attrs['gen_ai.context'] ||
+    attrs['rag.retrieved_documents'] ||
+    attrs['rag.context']
+  ) as string | string[] | undefined;
+
   return {
     vendor,
     model,
@@ -101,6 +111,7 @@ function extractLLMData(attrs: Record<string, unknown>) {
     totalTokens,
     input: attrs['llm.prompts'] as string | undefined,
     output: attrs['llm.completions'] as string | undefined,
+    context,
     temperature: attrs['llm.temperature'] as number | undefined,
   };
 }
@@ -115,6 +126,7 @@ function parseCERTFormat(body: Record<string, unknown>): CERTTrace[] {
     provider: string;
     input: string;
     output: string;
+    context?: string | string[];  // Source context/retrieved chunks
     promptTokens?: number;
     completionTokens?: number;
     durationMs?: number;
@@ -143,6 +155,7 @@ function parseCERTFormat(body: Record<string, unknown>): CERTTrace[] {
       totalTokens: (t.promptTokens || 0) + (t.completionTokens || 0),
       input: t.input,
       output: t.output,
+      context: t.context,
     },
     receivedAt: new Date().toISOString(),
     source: 'sdk' as const,
