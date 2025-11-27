@@ -266,31 +266,29 @@ export default function QualityOverview() {
           onClick={runAutoEvaluation}
           disabled={runningAutoEval || pendingTraces.length === 0}
           className={cn(
-            "bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
+            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 text-left transition-colors group",
             pendingTraces.length > 0
-              ? "hover:border-[#C1C9D2] dark:hover:border-[#30405A] cursor-pointer"
+              ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+            <Sparkles className="w-5 h-5 text-[#33436e]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Eval</span>
               {runningAutoEval ? (
-                <div className="flex items-center gap-2 text-xs text-[#635BFF] dark:text-[#A5A0FF]">
+                <div className="flex items-center gap-2 text-xs text-[#33436e] dark:text-[#7ea0bf]">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Evaluating {autoEvalProgress.current}/{autoEvalProgress.total}...
                 </div>
               ) : pendingTraces.length > 0 ? (
-                <p className="text-xs text-[#635BFF] dark:text-[#A5A0FF]">{pendingTraces.length} pending · {autoEvalTraces.length} evaluated</p>
+                <p className="text-xs text-[#33436e] dark:text-[#7ea0bf]">{pendingTraces.length} pending · {autoEvalTraces.length} evaluated</p>
               ) : (
                 <p className="text-xs text-[#8792A2]">{autoEvalTraces.length} evaluated · No pending</p>
               )}
             </div>
             {pendingTraces.length > 0 && !runningAutoEval && (
-              <Play className="w-5 h-5 text-[#8792A2] group-hover:text-[#635BFF] transition-colors" />
+              <Play className="w-5 h-5 text-[#33436e] group-hover:text-[#222d4a] transition-colors" />
             )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
@@ -301,17 +299,15 @@ export default function QualityOverview() {
         {/* LLM Judge Card */}
         <Link
           href="/quality/judge"
-          className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-colors group"
+          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+            <Zap className="w-5 h-5 text-[#33436e]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">LLM Judge</span>
-              <p className="text-xs text-[#635BFF] dark:text-[#A5A0FF]">{llmJudgeTraces.length} evaluated</p>
+              <p className="text-xs text-[#33436e] dark:text-[#7ea0bf]">{llmJudgeTraces.length} evaluated</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-[#8792A2] group-hover:text-[#635BFF] transition-colors" />
+            <ArrowRight className="w-5 h-5 text-[#33436e] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Use another model to check accuracy
@@ -321,17 +317,15 @@ export default function QualityOverview() {
         {/* Human Review Card */}
         <Link
           href="/quality/review"
-          className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-colors group"
+          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg flex items-center justify-center">
-              <User className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+            <User className="w-5 h-5 text-[#33436e]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Human Review</span>
-              <p className="text-xs text-[#635BFF] dark:text-[#A5A0FF]">{humanReviewTraces.length} reviewed</p>
+              <p className="text-xs text-[#33436e] dark:text-[#7ea0bf]">{humanReviewTraces.length} reviewed</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-[#8792A2] group-hover:text-[#635BFF] transition-colors" />
+            <ArrowRight className="w-5 h-5 text-[#33436e] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Check accuracy manually
@@ -343,25 +337,23 @@ export default function QualityOverview() {
           onClick={runGroundingCheck}
           disabled={runningGrounding || tracesWithContext.length === 0}
           className={cn(
-            "bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
+            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 text-left transition-colors group",
             tracesWithContext.length > 0
-              ? "hover:border-[#C1C9D2] dark:hover:border-[#30405A] cursor-pointer"
+              ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg flex items-center justify-center">
-              <FileCheck className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+            <FileCheck className="w-5 h-5 text-[#33436e]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check</span>
               {runningGrounding ? (
-                <div className="flex items-center gap-2 text-xs text-[#635BFF] dark:text-[#A5A0FF]">
+                <div className="flex items-center gap-2 text-xs text-[#33436e] dark:text-[#7ea0bf]">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Checking {groundingProgress.current}/{groundingProgress.total}...
                 </div>
               ) : tracesWithContext.length > 0 ? (
-                <p className="text-xs text-[#635BFF] dark:text-[#A5A0FF]">
+                <p className="text-xs text-[#33436e] dark:text-[#7ea0bf]">
                   {tracesWithContext.length} with context · {groundingTraces.length} checked
                 </p>
               ) : (
@@ -369,7 +361,7 @@ export default function QualityOverview() {
               )}
             </div>
             {tracesWithContext.length > 0 && !runningGrounding && (
-              <Play className="w-5 h-5 text-[#8792A2] group-hover:text-[#635BFF] transition-colors" />
+              <Play className="w-5 h-5 text-[#33436e] group-hover:text-[#222d4a] transition-colors" />
             )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
@@ -380,31 +372,31 @@ export default function QualityOverview() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Total Traces</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {traces.length}
           </p>
         </div>
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Passed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {passedTraces.length}
           </p>
         </div>
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Failed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {failedTraces.length}
           </p>
         </div>
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Review</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {reviewTraces.length}
           </p>
         </div>
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Pass Rate</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {evaluatedTraces.length > 0 ? `${passRate.toFixed(0)}%` : '-'}
@@ -413,8 +405,8 @@ export default function QualityOverview() {
       </div>
 
       {/* Evaluation Results */}
-      <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
+      <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#33436e] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#33436e]">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
@@ -428,8 +420,8 @@ export default function QualityOverview() {
                     className={cn(
                       "px-3 py-1 text-xs font-medium rounded-md transition-colors",
                       statusFilter === f
-                        ? "bg-[#635BFF] text-white"
-                        : "text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530]"
+                        ? "bg-[#33436e] text-white"
+                        : "text-[#596780] dark:text-[#8792A2] hover:bg-[#c9d4d8] dark:hover:bg-[#1D2530]"
                     )}
                   >
                     {f === 'all' ? `All (${traces.length})` :
@@ -457,7 +449,7 @@ export default function QualityOverview() {
                   className={cn(
                     "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors",
                     methodFilter === m.key
-                      ? "bg-[#F6F9FC] dark:bg-[#1D2530] text-[#635BFF] dark:text-[#A5A0FF] border border-[#635BFF]/20"
+                      ? "bg-[#F6F9FC] dark:bg-[#1D2530] text-[#33436e] dark:text-[#7ea0bf] border border-[#33436e]/20"
                       : "text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530]"
                   )}
                 >
@@ -555,7 +547,7 @@ export default function QualityOverview() {
                             </div>
                             <div className="h-1.5 bg-[#E3E8EE] dark:bg-[#252D3A] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#635BFF] transition-all"
+                                className="h-full bg-[#33436e] transition-all"
                                 style={{ width: `${(trace.evaluation.criteria.semantic || 0) * 100}%` }}
                               />
                             </div>
@@ -569,7 +561,7 @@ export default function QualityOverview() {
                             </div>
                             <div className="h-1.5 bg-[#E3E8EE] dark:bg-[#252D3A] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#635BFF] transition-all"
+                                className="h-full bg-[#33436e] transition-all"
                                 style={{ width: `${(trace.evaluation.criteria.nli || 0) * 100}%` }}
                               />
                             </div>
@@ -594,7 +586,7 @@ export default function QualityOverview() {
                           </div>
                           <div className="h-1.5 bg-[#E3E8EE] dark:bg-[#252D3A] rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#635BFF] transition-all"
+                              className="h-full bg-[#33436e] transition-all"
                               style={{ width: `${trace.evaluation.criteria.grounding * 100}%` }}
                             />
                           </div>

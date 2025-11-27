@@ -69,9 +69,9 @@ interface ConfigItemProps {
 function ConfigItem({ icon: Icon, title, description, href, onClick }: ConfigItemProps) {
   const content = (
     <div className="flex items-start gap-3 group cursor-pointer">
-      <Icon className="w-5 h-5 text-[#596780] dark:text-[#8792A2] mt-0.5 flex-shrink-0" />
+      <Icon className="w-5 h-5 text-[#33436e] mt-0.5 flex-shrink-0" />
       <div>
-        <h3 className="text-[14px] font-medium text-[#635BFF] dark:text-[#A5A0FF] group-hover:text-[#5851DB] dark:group-hover:text-[#C5C1FF] transition-colors">
+        <h3 className="text-[14px] font-medium text-[#33436e] dark:text-[#7ea0bf] group-hover:text-[#2a3759] dark:group-hover:text-[#c9d4d8] transition-colors">
           {title}
         </h3>
         <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mt-0.5">
@@ -103,7 +103,7 @@ function ConfigPanel({ title, onClose, wide, children }: ConfigPanelProps) {
         "fixed right-0 top-0 h-full bg-white dark:bg-[#151B24] shadow-lg z-50 overflow-y-auto",
         wide ? "w-[600px]" : "w-[400px]"
       )}>
-        <div className="sticky top-0 bg-white dark:bg-[#151B24] border-b border-[#E3E8EE] dark:border-[#1D2530] px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white dark:bg-[#151B24] border-b border-[#33436e] px-6 py-4 flex items-center justify-between">
           <h3 className="text-[16px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">{title}</h3>
           <button onClick={onClose} className="text-[#596780] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
             <X className="w-5 h-5" />
@@ -168,7 +168,7 @@ export default function ConfigurationPage() {
             "flex items-center gap-2 px-4 py-2 rounded-lg text-[14px] font-medium transition-all",
             saved
               ? "bg-[#D4EDDA] text-[#228B22] dark:bg-[rgba(48,177,48,0.2)] dark:text-[#4ADE4A]"
-              : "bg-[#635BFF] text-white hover:bg-[#5851DB]"
+              : "bg-[#33436e] text-white hover:bg-[#2a3759]"
           )}
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : null}
@@ -250,7 +250,7 @@ export default function ConfigurationPage() {
                 onClick={() => setAutoEvalConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
                 className={cn(
                   "relative w-11 h-6 rounded-full transition-colors",
-                  autoEvalConfig.enabled ? "bg-[#635BFF]" : "bg-[#E3E8EE] dark:bg-[#1D2530]"
+                  autoEvalConfig.enabled ? "bg-[#33436e]" : "bg-[#E3E8EE] dark:bg-[#1D2530]"
                 )}
               >
                 <span className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-transform", autoEvalConfig.enabled ? "left-6" : "left-1")} />
@@ -268,7 +268,7 @@ export default function ConfigurationPage() {
                   <input
                     type="range" min="0" max="100" step="5" value={autoEvalConfig.semanticWeight}
                     onChange={(e) => { const s = parseInt(e.target.value); setAutoEvalConfig(prev => ({ ...prev, semanticWeight: s, nliWeight: 100 - s })); }}
-                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#635BFF]"
+                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#33436e]"
                   />
                 </div>
                 <div>
@@ -279,7 +279,7 @@ export default function ConfigurationPage() {
                   <input
                     type="range" min="0" max="100" step="5" value={autoEvalConfig.nliWeight}
                     onChange={(e) => { const n = parseInt(e.target.value); setAutoEvalConfig(prev => ({ ...prev, nliWeight: n, semanticWeight: 100 - n })); }}
-                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#635BFF]"
+                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#33436e]"
                   />
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function ConfigurationPage() {
                 <input
                   type="range" min="0" max="10" step="0.5" value={autoEvalConfig.passThreshold}
                   onChange={(e) => setAutoEvalConfig(prev => ({ ...prev, passThreshold: parseFloat(e.target.value) }))}
-                  className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#635BFF]"
+                  className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#33436e]"
                 />
               </div>
             </div>
@@ -310,7 +310,7 @@ export default function ConfigurationPage() {
                 type="password" value={judgeConfig.apiKey}
                 onChange={(e) => setJudgeConfig(prev => ({ ...prev, apiKey: e.target.value }))}
                 placeholder="Enter your API key"
-                className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#635BFF]/20 focus:border-[#635BFF]"
+                className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#33436e]/20 focus:border-[#33436e]"
               />
               <p className="text-[12px] text-[#596780] dark:text-[#8792A2] mt-1">Stored locally in your browser.</p>
             </div>
@@ -321,7 +321,7 @@ export default function ConfigurationPage() {
                 <select
                   value={judgeConfig.provider}
                   onChange={(e) => { const p = e.target.value as 'anthropic' | 'openai' | 'google'; setJudgeConfig(prev => ({ ...prev, provider: p, model: JUDGE_MODELS[p][0] })); }}
-                  className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#635BFF]/20"
+                  className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#33436e]/20"
                 >
                   <option value="anthropic">Anthropic</option>
                   <option value="openai">OpenAI</option>
@@ -333,7 +333,7 @@ export default function ConfigurationPage() {
                 <select
                   value={judgeConfig.model}
                   onChange={(e) => setJudgeConfig(prev => ({ ...prev, model: e.target.value }))}
-                  className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#635BFF]/20"
+                  className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#33436e]/20"
                 >
                   {JUDGE_MODELS[judgeConfig.provider].map((model) => <option key={model} value={model}>{model}</option>)}
                 </select>
@@ -348,7 +348,7 @@ export default function ConfigurationPage() {
               <input
                 type="range" min="0" max="10" step="1" value={judgeConfig.passThreshold}
                 onChange={(e) => setJudgeConfig(prev => ({ ...prev, passThreshold: parseInt(e.target.value) }))}
-                className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#635BFF]"
+                className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#33436e]"
               />
             </div>
           </div>
@@ -373,19 +373,19 @@ export default function ConfigurationPage() {
                   <tr key={row.id} className="border-b border-[#E3E8EE] dark:border-[#1D2530]">
                     <td className="py-2">
                       <input type="text" value={row.vendor} onChange={(e) => setPricing(prev => prev.map(p => p.id === row.id ? { ...p, vendor: e.target.value } : p))}
-                        className="w-full px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#635BFF] rounded text-[#0A2540] dark:text-[#E8ECF1]" />
+                        className="w-full px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#33436e] rounded text-[#0A2540] dark:text-[#E8ECF1]" />
                     </td>
                     <td className="py-2">
                       <input type="text" value={row.model} onChange={(e) => setPricing(prev => prev.map(p => p.id === row.id ? { ...p, model: e.target.value } : p))}
-                        className="w-full px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#635BFF] rounded text-[#0A2540] dark:text-[#E8ECF1]" />
+                        className="w-full px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#33436e] rounded text-[#0A2540] dark:text-[#E8ECF1]" />
                     </td>
                     <td className="py-2">
                       <input type="number" step="0.01" value={row.inputPricePerMillion} onChange={(e) => setPricing(prev => prev.map(p => p.id === row.id ? { ...p, inputPricePerMillion: parseFloat(e.target.value) || 0 } : p))}
-                        className="w-20 px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#635BFF] rounded font-mono text-[#0A2540] dark:text-[#E8ECF1]" />
+                        className="w-20 px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#33436e] rounded font-mono text-[#0A2540] dark:text-[#E8ECF1]" />
                     </td>
                     <td className="py-2">
                       <input type="number" step="0.01" value={row.outputPricePerMillion} onChange={(e) => setPricing(prev => prev.map(p => p.id === row.id ? { ...p, outputPricePerMillion: parseFloat(e.target.value) || 0 } : p))}
-                        className="w-20 px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#635BFF] rounded font-mono text-[#0A2540] dark:text-[#E8ECF1]" />
+                        className="w-20 px-2 py-1 bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#33436e] rounded font-mono text-[#0A2540] dark:text-[#E8ECF1]" />
                     </td>
                   </tr>
                 ))}
@@ -394,7 +394,7 @@ export default function ConfigurationPage() {
           </div>
           <div className="mt-4 flex gap-3">
             <button onClick={() => { const id = Date.now().toString(); setPricing(prev => [...prev, { id, vendor: '', model: '', inputPricePerMillion: 0, outputPricePerMillion: 0 }]); }}
-              className="text-[13px] text-[#635BFF] dark:text-[#A5A0FF] font-medium hover:text-[#5851DB]">+ Add Model</button>
+              className="text-[13px] text-[#33436e] dark:text-[#7ea0bf] font-medium hover:text-[#2a3759]">+ Add Model</button>
             <button onClick={() => setPricing(DEFAULT_PRICING)}
               className="text-[13px] text-[#596780] dark:text-[#8792A2] font-medium hover:text-[#0A2540]">Reset to Defaults</button>
           </div>
