@@ -1,133 +1,135 @@
 /**
  * CERT Dashboard Color Palette
- * Design System based on Stripe Dashboard UI
- *
- * Unified color system for EU AI Act compliance dashboard.
+ * Custom color scheme for EU AI Act compliance dashboard.
  */
 
 export const colors = {
-  // Light Mode Backgrounds (Stripe-style)
+  // CERT Custom Color Palette
+  cert: {
+    brown: '#5f4033',
+    darkBlue: '#33436e',
+    darkPlum: '#471424',
+    lightBlue: '#7ea0bf',
+    lightGray: '#c9d4d8',
+    green: '#7b8f45',
+  },
+
+  // Light Mode Backgrounds
   background: {
-    page: '#F6F9FC',        // Stripe's page background
-    surface: '#FFFFFF',      // Cards, panels
-    subtle: '#F0F3F7',       // Subtle backgrounds
-    hover: '#EDF1F7',        // Hover states
+    page: '#F6F9FC',
+    surface: '#FFFFFF',
+    subtle: '#c9d4d8',       // Light gray
+    hover: '#b8c4c9',
   },
 
-  // Dark Mode Backgrounds (Enhanced for readability)
+  // Dark Mode Backgrounds
   backgroundDark: {
-    page: '#0A0E14',         // Deep dark background
-    surface: '#151B24',      // Card surfaces
-    elevated: '#1D2530',     // Elevated elements
-    hover: '#252D3A',        // Hover states
+    page: '#0A0E14',
+    surface: '#151B24',
+    elevated: '#1D2530',
+    hover: '#252D3A',
   },
 
-  // Text Hierarchy (Stripe-style)
+  // Text Hierarchy
   text: {
-    primary: '#0A2540',      // Stripe's primary dark navy
-    secondary: '#596780',    // Secondary text
-    tertiary: '#8792A2',     // Muted text
-    inverse: '#FFFFFF',      // Text on dark backgrounds
-    link: '#635BFF',         // Stripe purple for links
-    linkHover: '#5851DB',    // Darker on hover
+    primary: '#0A2540',
+    secondary: '#596780',
+    tertiary: '#8792A2',
+    inverse: '#FFFFFF',
+    link: '#33436e',         // Dark Blue for links
+    linkHover: '#2a3759',
   },
 
-  // Brand Color (Stripe Purple)
+  // Brand Color (Dark Blue)
   brand: {
-    DEFAULT: '#635BFF',      // Stripe's signature purple
-    hover: '#5851DB',
-    active: '#4B45C6',
-    light: 'rgba(99, 91, 255, 0.1)',
-    lighter: 'rgba(99, 91, 255, 0.06)',
+    DEFAULT: '#33436e',
+    hover: '#2a3759',
+    active: '#222d4a',
+    light: 'rgba(51, 67, 110, 0.1)',
+    lighter: 'rgba(51, 67, 110, 0.06)',
   },
 
   // Status Colors (Semantic)
   status: {
-    success: '#30B130',      // Green
-    successLight: '#D4EDDA',
-    successDark: '#228B22',
-    warning: '#F5A623',      // Amber
-    warningLight: '#FFF3CD',
+    success: '#7b8f45',      // Green from palette
+    successLight: '#c9d4d8',
+    successDark: '#5f7035',
+    warning: '#F5A623',
+    warningLight: '#c9d4d8',
     warningDark: '#D68910',
-    error: '#DF1B41',        // Stripe's danger red
-    errorLight: '#FDECEA',
+    error: '#DF1B41',
+    errorLight: '#c9d4d8',
     errorDark: '#C41230',
-    info: '#0570DE',         // Stripe's info blue
-    infoLight: '#E3F2FD',
-    infoDark: '#0455B2',
+    info: '#33436e',         // Dark Blue
+    infoLight: '#c9d4d8',
+    infoDark: '#2a3759',
   },
 
-  // Neutral Palette (Stripe-aligned)
+  // Neutral Palette
   neutral: {
     50: '#F6F9FC',
-    100: '#EDF1F7',
-    200: '#E3E8EE',
-    300: '#C1C9D2',
+    100: '#c9d4d8',          // Light gray
+    200: '#b8c4c9',
+    300: '#a5b1b6',
     400: '#8792A2',
     500: '#596780',
-    600: '#425166',
-    700: '#30405A',
+    600: '#33436e',          // Dark Blue
+    700: '#2a3759',
     800: '#1D2530',
     900: '#151B24',
     950: '#0A0E14',
   },
 
-  // Border Colors (Stripe-style subtle)
+  // Border Colors (Dark Blue)
   border: {
-    default: '#E3E8EE',      // Main borders
-    light: '#EDF1F7',        // Subtle borders
-    dark: '#C1C9D2',         // Emphasized borders
-    focus: '#635BFF',        // Focus ring
+    default: '#33436e',
+    light: 'rgba(51, 67, 110, 0.3)',
+    dark: '#222d4a',
+    focus: '#33436e',
   },
 
   // Primary palette for gradients/variations
   primary: {
-    50: '#F5F4FF',
-    100: '#EBEBFF',
-    200: '#D4D2FF',
-    300: '#B5B1FF',
-    400: '#8F89FF',
-    500: '#635BFF',          // Base
-    600: '#5851DB',
-    700: '#4B45C6',
-    800: '#3D38A8',
-    900: '#2F2B89',
+    50: '#c9d4d8',
+    100: '#b8c4c9',
+    200: '#a5b1b6',
+    300: '#7ea0bf',
+    400: '#5a7a9e',
+    500: '#33436e',          // Base Dark Blue
+    600: '#2a3759',
+    700: '#222d4a',
+    800: '#1a233b',
+    900: '#12192c',
   },
 
   semantic: {
-    success: '#30B130',
-    successLight: '#D4EDDA',
-    successDark: '#228B22',
+    success: '#7b8f45',
+    successLight: '#c9d4d8',
+    successDark: '#5f7035',
     warning: '#F5A623',
-    warningLight: '#FFF3CD',
+    warningLight: '#c9d4d8',
     warningDark: '#D68910',
     error: '#DF1B41',
-    errorLight: '#FDECEA',
+    errorLight: '#c9d4d8',
     errorDark: '#C41230',
-    info: '#0570DE',
-    infoLight: '#E3F2FD',
-    infoDark: '#0455B2',
+    info: '#33436e',
+    infoLight: '#c9d4d8',
+    infoDark: '#2a3759',
   },
 
   // Chart colors
   chart: {
-    stroke: '#635BFF',
-    fill: 'rgba(99, 91, 255, 0.1)',
-    grid: '#EDF1F7',
+    stroke: '#33436e',
+    fill: 'rgba(51, 67, 110, 0.1)',
+    grid: '#c9d4d8',
   },
 
-  // Icon Colors - Stripe-inspired with user's palette accents
+  // Icon Colors - Dark Blue for all icons
   icon: {
-    purple: '#635BFF',       // Primary actions, navigation active
-    blue: '#0570DE',         // Info, links
-    teal: '#3ECFA8',         // Success, monitoring
-    orange: '#F5A623',       // Warnings, costs
-    red: '#DF1B41',          // Errors, alerts
-    navy: '#0A2540',         // Default icons
-    gray: '#596780',         // Muted icons
-    // Custom palette accents
-    periwinkle: '#8B8BCD',   // From user's palette
-    walnut: '#573129',       // From user's palette
+    default: '#33436e',      // Dark Blue for all icons
+    hover: '#2a3759',
+    active: '#222d4a',
+    muted: '#596780',
   },
 } as const;
 

@@ -31,19 +31,17 @@ export default function HomePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
         {/* Quality Monitoring Card */}
         <Link href="/quality" className="group">
-          <div className="h-full p-6 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-all">
+          <div className="h-full p-6 bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] hover:border-[#222d4a] hover:border-2 transition-all">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
-                <BarChart3 className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-              </div>
+              <BarChart3 className="w-6 h-6 text-[#33436e] flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#635BFF] dark:group-hover:text-[#A5A0FF] transition-colors">
+                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#33436e] dark:group-hover:text-[#7ea0bf] transition-colors">
                   Quality Monitoring
                 </h2>
                 <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mb-4">
                   Upload LLM traces to analyze accuracy, identify failures, and track performance metrics required by Article 15.
                 </p>
-                <span className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                <span className="text-[13px] font-medium text-[#33436e] dark:text-[#7ea0bf] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                   Go to Monitoring
                   <ArrowRight className="w-4 h-4" />
                 </span>
@@ -54,19 +52,17 @@ export default function HomePage() {
 
         {/* Document Generation Card */}
         <Link href="/configuration" className="group">
-          <div className="h-full p-6 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-all">
+          <div className="h-full p-6 bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] hover:border-[#222d4a] hover:border-2 transition-all">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
-              </div>
+              <FileText className="w-6 h-6 text-[#33436e] flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#635BFF] dark:group-hover:text-[#A5A0FF] transition-colors">
+                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#33436e] dark:group-hover:text-[#7ea0bf] transition-colors">
                   Compliance Documents
                 </h2>
                 <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mb-4">
                   Generate professional Word documents for EU AI Act compliance: Risk Classification, Annex IV Technical Documentation, and more.
                 </p>
-                <span className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                <span className="text-[13px] font-medium text-[#33436e] dark:text-[#7ea0bf] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                   Generate Documents
                   <ArrowRight className="w-4 h-4" />
                 </span>
@@ -82,12 +78,10 @@ export default function HomePage() {
           Getting Started
         </h2>
 
-        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] overflow-hidden">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] overflow-hidden">
           {/* Step 1 */}
-          <div className="flex items-start gap-4 p-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
-            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
-              <Upload className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+          <div className="flex items-start gap-4 p-4 border-b border-[#33436e]">
+            <Upload className="w-5 h-5 text-[#33436e] flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
                 Upload your traces
@@ -99,10 +93,8 @@ export default function HomePage() {
           </div>
 
           {/* Step 2 */}
-          <div className="flex items-start gap-4 p-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
-            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
-              <BarChart3 className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+          <div className="flex items-start gap-4 p-4 border-b border-[#33436e]">
+            <BarChart3 className="w-5 h-5 text-[#33436e] flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
                 Review metrics
@@ -115,9 +107,7 @@ export default function HomePage() {
 
           {/* Step 3 */}
           <div className="flex items-start gap-4 p-4">
-            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
-              <Download className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
-            </div>
+            <Download className="w-5 h-5 text-[#33436e] flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
                 Export reports
@@ -130,11 +120,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Info Section - Subtle, no colored backgrounds */}
+      {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+        <div className="p-4 bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e]">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <CheckCircle className="w-4 h-4 text-[#33436e]" />
             <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
               EU AI Act Ready
             </span>
@@ -144,9 +134,9 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+        <div className="p-4 bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e]">
           <div className="flex items-center gap-2 mb-2">
-            <FileText className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <FileText className="w-4 h-4 text-[#33436e]" />
             <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
               5 Document Types
             </span>
@@ -156,9 +146,9 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+        <div className="p-4 bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e]">
           <div className="flex items-center gap-2 mb-2">
-            <BarChart3 className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <BarChart3 className="w-4 h-4 text-[#33436e]" />
             <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
               80% Time Savings
             </span>

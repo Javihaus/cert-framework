@@ -188,10 +188,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           ))}
         </nav>
 
-        {/* Sidebar Footer - Stripe style */}
-        <div className="px-3 py-3 border-t border-[#E3E8EE] dark:border-[#1D2530]">
+        {/* Sidebar Footer */}
+        <div className="px-3 py-3 border-t border-[#33436e]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#635BFF] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#33436e] flex items-center justify-center">
               <span className="text-white text-xs font-medium">JD</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -256,11 +256,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Settings className="w-[18px] h-[18px]" />
               </button>
 
-              {/* User Menu - Stripe style avatar */}
+              {/* User Menu */}
               <div className="relative ml-1">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-8 h-8 rounded-full bg-[#635BFF] flex items-center justify-center hover:ring-2 hover:ring-[#635BFF]/20 transition-all"
+                  className="w-8 h-8 rounded-full bg-[#33436e] flex items-center justify-center hover:ring-2 hover:ring-[#33436e]/20 transition-all"
                 >
                   <span className="text-white text-xs font-medium">JD</span>
                 </button>

@@ -10,21 +10,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand color (Stripe Purple)
-        brand: {
-          DEFAULT: '#635BFF',
-          hover: '#5851DB',
-          active: '#4B45C6',
-          light: 'rgba(99, 91, 255, 0.1)',
-          lighter: 'rgba(99, 91, 255, 0.06)',
+        // CERT Custom Color Palette
+        cert: {
+          brown: '#5f4033',
+          'dark-blue': '#33436e',
+          'dark-plum': '#471424',
+          'light-blue': '#7ea0bf',
+          'light-gray': '#c9d4d8',
+          green: '#7b8f45',
         },
 
-        // Light mode backgrounds (Stripe-style)
+        // Brand color (Dark Blue)
+        brand: {
+          DEFAULT: '#33436e',
+          hover: '#2a3759',
+          active: '#222d4a',
+          light: 'rgba(51, 67, 110, 0.1)',
+          lighter: 'rgba(51, 67, 110, 0.06)',
+        },
+
+        // Light mode backgrounds
         background: {
           page: '#F6F9FC',
           surface: '#FFFFFF',
-          subtle: '#F0F3F7',
-          hover: '#EDF1F7',
+          subtle: '#c9d4d8',
+          hover: '#b8c4c9',
         },
 
         // Dark mode backgrounds
@@ -35,7 +45,7 @@ const config: Config = {
           hover: '#252D3A',
         },
 
-        // Text hierarchy (Stripe-style)
+        // Text hierarchy
         text: {
           primary: '#0A2540',
           secondary: '#596780',
@@ -44,31 +54,31 @@ const config: Config = {
 
         // Status colors
         status: {
-          success: '#30B130',
-          'success-light': '#D4EDDA',
-          'success-dark': '#228B22',
+          success: '#7b8f45',
+          'success-light': '#c9d4d8',
+          'success-dark': '#5f7035',
           warning: '#F5A623',
-          'warning-light': '#FFF3CD',
+          'warning-light': '#c9d4d8',
           'warning-dark': '#D68910',
           error: '#DF1B41',
-          'error-light': '#FDECEA',
+          'error-light': '#c9d4d8',
           'error-dark': '#C41230',
-          info: '#0570DE',
-          'info-light': '#E3F2FD',
-          'info-dark': '#0455B2',
+          info: '#33436e',
+          'info-light': '#c9d4d8',
+          'info-dark': '#2a3759',
         },
 
-        // Border colors (Stripe-style)
+        // Border colors (Dark Blue)
         border: {
-          DEFAULT: '#E3E8EE',
-          light: '#EDF1F7',
-          dark: '#C1C9D2',
+          DEFAULT: '#33436e',
+          light: 'rgba(51, 67, 110, 0.3)',
+          dark: '#222d4a',
         },
 
         // Chart colors
         chart: {
-          stroke: '#635BFF',
-          grid: '#EDF1F7',
+          stroke: '#33436e',
+          grid: '#c9d4d8',
         },
       },
 
@@ -102,10 +112,10 @@ const config: Config = {
       },
 
       boxShadow: {
-        card: '0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04)',
-        elevated: '0 2px 5px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)',
-        dropdown: '0 4px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #635BFF',
+        card: '0 0 0 1px rgba(51, 67, 110, 0.1), 0 1px 2px rgba(51, 67, 110, 0.08)',
+        elevated: '0 2px 5px rgba(51, 67, 110, 0.15), 0 1px 2px rgba(51, 67, 110, 0.1)',
+        dropdown: '0 4px 12px rgba(51, 67, 110, 0.2), 0 1px 3px rgba(51, 67, 110, 0.12)',
+        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #33436e',
         'focus-error': '0 0 0 2px #FFFFFF, 0 0 0 4px #DF1B41',
       },
 
