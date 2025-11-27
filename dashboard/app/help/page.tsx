@@ -30,9 +30,9 @@ interface HelpItemProps {
 function HelpItem({ icon: Icon, title, description, href, onClick }: HelpItemProps) {
   const content = (
     <div className="flex items-start gap-3 group cursor-pointer">
-      <Icon className="w-5 h-5 text-[#471424] dark:text-[#d4a4b0] mt-0.5 flex-shrink-0" />
+      <Icon className="w-5 h-5 text-[#47742d] dark:text-[#d4a4b0] mt-0.5 flex-shrink-0" />
       <div>
-        <h3 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] group-hover:text-[#5a1a2e] dark:group-hover:text-[#e8c8d0] transition-colors">
+        <h3 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] group-hover:text-[#5a1a2e] dark:group-hover:text-[#e8c8d0] transition-colors">
           {title}
         </h3>
         <p className="text-[13px] text-black dark:text-white leading-relaxed mt-0.5">
@@ -60,9 +60,9 @@ function HelpPanel({ title, onClose, children }: HelpPanelProps) {
     <>
       <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
       <div className="fixed right-0 top-0 h-full w-[400px] bg-white dark:bg-[#151B24] shadow-lg z-50 overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-[#151B24] border-b border-[#471424] dark:border-[#d4a4b0] px-6 py-4 flex items-center justify-between">
-          <h3 className="text-[16px] font-semibold text-[#471424] dark:text-[#d4a4b0]">{title}</h3>
-          <button onClick={onClose} className="text-[#471424] dark:text-[#d4a4b0] hover:text-[#5a1a2e] dark:hover:text-[#e8c8d0]">
+        <div className="sticky top-0 bg-white dark:bg-[#151B24] border-b border-[#47742d] dark:border-[#d4a4b0] px-6 py-4 flex items-center justify-between">
+          <h3 className="text-[16px] font-semibold text-[#47742d] dark:text-[#d4a4b0]">{title}</h3>
+          <button onClick={onClose} className="text-[#47742d] dark:text-[#d4a4b0] hover:text-[#5a1a2e] dark:hover:text-[#e8c8d0]">
             ×
           </button>
         </div>
@@ -82,7 +82,7 @@ export default function HelpPage() {
     <div className="max-w-5xl mx-auto">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-[22px] font-semibold text-[#471424] dark:text-[#d4a4b0]">
+        <h1 className="text-[22px] font-semibold text-[#47742d] dark:text-[#d4a4b0]">
           Help & Documentation
         </h1>
         <p className="text-[15px] text-black dark:text-white mt-1">
@@ -92,7 +92,7 @@ export default function HelpPage() {
 
       {/* Getting Started */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#471424] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
           Getting Started
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,7 +119,7 @@ export default function HelpPage() {
 
       {/* Core Concepts */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#471424] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
           Core Concepts
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -146,7 +146,7 @@ export default function HelpPage() {
 
       {/* Resources */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#471424] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
           Resources
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -173,7 +173,7 @@ export default function HelpPage() {
 
       {/* Contact & Support */}
       <section>
-        <h2 className="text-[13px] font-semibold text-[#471424] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
           Support
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -190,39 +190,39 @@ export default function HelpPage() {
       {showGettingStartedPanel && (
         <HelpPanel title="Quick Start Guide" onClose={() => setShowGettingStartedPanel(false)}>
           <div className="space-y-6">
-            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-              <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Step 1: Configure API Connections</h4>
+            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+              <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 1: Configure API Connections</h4>
               <p className="text-[13px] text-black dark:text-white">
                 Go to Configuration and add your API keys for Claude, OpenAI, or Gemini. You need at least one active connection to use the evaluation features.
               </p>
-              <Link href="/configuration" className="text-[13px] text-[#471424] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
+              <Link href="/configuration" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
                 Go to Configuration <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
-            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-              <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Step 2: Set Up the LLM Judge</h4>
+            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+              <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 2: Set Up the LLM Judge</h4>
               <p className="text-[13px] text-black dark:text-white">
                 Choose which LLM model will evaluate your outputs. We recommend Claude for best results. Configure the evaluation criteria and confidence threshold.
               </p>
             </div>
 
-            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-              <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Step 3: Run Your First Evaluation</h4>
+            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+              <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 3: Run Your First Evaluation</h4>
               <p className="text-[13px] text-black dark:text-white">
                 Go to LLM Judge and either enter a manual input/output pair or upload a JSONL trace file for batch evaluation.
               </p>
-              <Link href="/quality/judge" className="text-[13px] text-[#471424] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
+              <Link href="/quality/judge" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
                 Go to LLM Judge <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
-            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-              <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Step 4: Review Results</h4>
+            <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+              <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 4: Review Results</h4>
               <p className="text-[13px] text-black dark:text-white">
                 Check the Quality Dashboard for scores. Items below your confidence threshold will appear in the Human Review Queue for manual verification.
               </p>
-              <Link href="/quality" className="text-[13px] text-[#471424] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
+              <Link href="/quality" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
                 Go to Quality Overview <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -234,7 +234,7 @@ export default function HelpPage() {
       {showQualityEvalsPanel && (
         <HelpPanel title="Quality Evals" onClose={() => setShowQualityEvalsPanel(false)}>
           <div className="space-y-5">
-            <p className="text-[14px] text-[#471424] dark:text-[#d4a4b0] font-medium">
+            <p className="text-[14px] text-[#47742d] dark:text-[#d4a4b0] font-medium">
               Is the output good?
             </p>
             <p className="text-[13px] text-black dark:text-white">
@@ -242,22 +242,22 @@ export default function HelpPage() {
             </p>
 
             <div className="space-y-4 mt-6">
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Automated evaluation using AI. The judge model scores each output on accuracy, relevance, safety, and coherence.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Human Review Queue</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Human Review Queue</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   When the LLM judge is uncertain (score below threshold), items go to the Human Review Queue. You can approve, reject, or add notes.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Auto-Evaluation</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Auto-Evaluation</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Automatic validation using semantic similarity and NLI (Natural Language Inference) to compare outputs against expected results.
                 </p>
@@ -271,7 +271,7 @@ export default function HelpPage() {
       {showOperationalEvalsPanel && (
         <HelpPanel title="Operational Evals" onClose={() => setShowOperationalEvalsPanel(false)}>
           <div className="space-y-5">
-            <p className="text-[14px] text-[#471424] dark:text-[#d4a4b0] font-medium">
+            <p className="text-[14px] text-[#47742d] dark:text-[#d4a4b0] font-medium">
               Can we run this in production?
             </p>
             <p className="text-[13px] text-black dark:text-white">
@@ -279,22 +279,22 @@ export default function HelpPage() {
             </p>
 
             <div className="space-y-4 mt-6">
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Performance</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Performance</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Track latency metrics (P50, P95, P99) and throughput. Target: P95 latency under 30 seconds.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Cost Analysis</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Cost Analysis</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Monitor token usage and API costs. Target: under $0.25 per query. Get optimization suggestions.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Observability</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Observability</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Monitor error rates, trace logs, and provider status. Target: over 95% success rate and under 5% error rate.
                 </p>
@@ -313,29 +313,29 @@ export default function HelpPage() {
             </p>
 
             <div className="space-y-4 mt-4">
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Auto-Eval</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Auto-Eval</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Fast, automated evaluation using semantic similarity and NLI. Best for high-volume batch processing.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Use a powerful LLM to evaluate outputs. More accurate but slower and more expensive.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Human Review</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Human Review</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Manual verification for critical decisions. Highest accuracy but slowest.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#471424] dark:border-[#d4a4b0]">
-                <h4 className="text-[14px] font-medium text-[#471424] dark:text-[#d4a4b0] mb-2">Grounding Check</h4>
+              <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
+                <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Grounding Check</h4>
                 <p className="text-[13px] text-black dark:text-white">
                   Verify that outputs are grounded in source documents. Essential for RAG systems.
                 </p>
