@@ -8,6 +8,21 @@ import { addTraces, getTraces, getStats, clearTraces, getTraceCount, CERTTrace }
  * Supports both OTLP JSON format and simplified CERT format.
  */
 
+// CORS headers for cross-origin requests (notebooks, external clients)
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
+
+/**
+ * OPTIONS handler for CORS preflight requests
+ */
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 /**
  * Parse OTLP JSON format into CERT traces
  */
@@ -204,13 +219,14 @@ export async function POST(request: NextRequest) {
       success: true,
       received: newTraces.length,
       total,
-    });
+      storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error('[CERT] Error processing traces:', error);
     return NextResponse.json(
       { error: 'Failed to process traces', details: String(error) },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -245,7 +261,8 @@ export async function GET(request: NextRequest) {
       hasMore: offset + limit < stats.total,
     },
     stats,
-  });
+    storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
+  }, { headers: corsHeaders });
 }
 
 /**
@@ -257,5 +274,5 @@ export async function DELETE() {
   return NextResponse.json({
     success: true,
     deleted: count,
-  });
+  }, { headers: corsHeaders });
 }
