@@ -266,9 +266,9 @@ export default function QualityOverview() {
           onClick={runAutoEvaluation}
           disabled={runningAutoEval || pendingTraces.length === 0}
           className={cn(
-            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
+            "bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-all group",
             pendingTraces.length > 0
-              ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
+              ? "hover:border-2 hover:border-[#10069F] cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
@@ -299,7 +299,7 @@ export default function QualityOverview() {
         {/* LLM Judge Card */}
         <Link
           href="/quality/judge"
-          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
+          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
             <Zap className="w-5 h-5 text-[#10069F]" />
@@ -317,7 +317,7 @@ export default function QualityOverview() {
         {/* Human Review Card */}
         <Link
           href="/quality/review"
-          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
+          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
             <User className="w-5 h-5 text-[#10069F]" />
@@ -337,9 +337,9 @@ export default function QualityOverview() {
           onClick={runGroundingCheck}
           disabled={runningGrounding || tracesWithContext.length === 0}
           className={cn(
-            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
+            "bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-all group",
             tracesWithContext.length > 0
-              ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
+              ? "hover:border-2 hover:border-[#10069F] cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
@@ -372,31 +372,31 @@ export default function QualityOverview() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Total Traces</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {traces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Passed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {passedTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Failed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {failedTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Review</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {reviewTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
+        <div className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Pass Rate</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {evaluatedTraces.length > 0 ? `${passRate.toFixed(0)}%` : '-'}

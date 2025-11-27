@@ -81,7 +81,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
           {/* Quality Evals Card */}
           <Link href="/quality" className="group block">
-            <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-10 transition-all hover:border-[#222d4a] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
+            <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#E3E8EE] dark:border-[#1D2530] rounded-xl p-10 transition-all hover:border-2 hover:border-[#10069F] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
               <div className="text-[#10069F] mb-6">
                 <Zap className="w-8 h-8" strokeWidth={2} />
@@ -123,7 +123,7 @@ export default function HomePage() {
 
           {/* Operational Evals Card */}
           <Link href="/operational/performance" className="group block">
-            <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-10 transition-all hover:border-[#222d4a] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
+            <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#E3E8EE] dark:border-[#1D2530] rounded-xl p-10 transition-all hover:border-2 hover:border-[#10069F] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
               <div className="text-[#10069F] mb-6">
                 <Activity className="w-8 h-8" strokeWidth={2} />
