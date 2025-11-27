@@ -10,83 +10,87 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand color
+        // Brand color (Stripe Purple)
         brand: {
-          DEFAULT: '#2563EB',
-          hover: '#1D4ED8',
-          active: '#1E40AF',
-          light: 'rgba(37, 99, 235, 0.1)',
+          DEFAULT: '#635BFF',
+          hover: '#5851DB',
+          active: '#4B45C6',
+          light: 'rgba(99, 91, 255, 0.1)',
+          lighter: 'rgba(99, 91, 255, 0.06)',
         },
 
-        // Light mode backgrounds
+        // Light mode backgrounds (Stripe-style)
         background: {
-          page: '#FAFAFA',
+          page: '#F6F9FC',
           surface: '#FFFFFF',
-          subtle: '#F4F4F5',
+          subtle: '#F0F3F7',
+          hover: '#EDF1F7',
         },
 
         // Dark mode backgrounds
         'background-dark': {
-          page: '#09090B',
-          surface: '#18181B',
-          elevated: '#27272A',
+          page: '#0A0E14',
+          surface: '#151B24',
+          elevated: '#1D2530',
+          hover: '#252D3A',
         },
 
-        // Text hierarchy
+        // Text hierarchy (Stripe-style)
         text: {
-          primary: '#09090B',
-          secondary: '#71717A',
-          tertiary: '#A1A1AA',
+          primary: '#0A2540',
+          secondary: '#596780',
+          tertiary: '#8792A2',
         },
 
         // Status colors
         status: {
-          success: '#10B981',
-          'success-light': '#D1FAE5',
-          'success-dark': '#059669',
-          warning: '#F59E0B',
-          'warning-light': '#FEF3C7',
-          'warning-dark': '#D97706',
-          error: '#EF4444',
-          'error-light': '#FEE2E2',
-          'error-dark': '#DC2626',
-          info: '#3B82F6',
-          'info-light': '#DBEAFE',
-          'info-dark': '#2563EB',
+          success: '#30B130',
+          'success-light': '#D4EDDA',
+          'success-dark': '#228B22',
+          warning: '#F5A623',
+          'warning-light': '#FFF3CD',
+          'warning-dark': '#D68910',
+          error: '#DF1B41',
+          'error-light': '#FDECEA',
+          'error-dark': '#C41230',
+          info: '#0570DE',
+          'info-light': '#E3F2FD',
+          'info-dark': '#0455B2',
         },
 
-        // Border colors
+        // Border colors (Stripe-style)
         border: {
-          DEFAULT: '#E4E4E7',
-          light: '#F4F4F5',
-          dark: '#D4D4D8',
+          DEFAULT: '#E3E8EE',
+          light: '#EDF1F7',
+          dark: '#C1C9D2',
         },
 
         // Chart colors
         chart: {
-          stroke: '#2563EB',
-          grid: '#F4F4F5',
+          stroke: '#635BFF',
+          grid: '#EDF1F7',
         },
       },
 
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Ubuntu', 'sans-serif'],
+        mono: ['SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'monospace'],
       },
 
       fontSize: {
-        xs: ['12px', { lineHeight: '16px' }],
+        xs: ['11px', { lineHeight: '16px' }],
         sm: ['13px', { lineHeight: '20px' }],
         base: ['14px', { lineHeight: '20px' }],
-        lg: ['16px', { lineHeight: '24px' }],
-        xl: ['18px', { lineHeight: '28px' }],
-        '2xl': ['24px', { lineHeight: '32px' }],
-        '3xl': ['30px', { lineHeight: '36px' }],
+        lg: ['15px', { lineHeight: '24px' }],
+        xl: ['17px', { lineHeight: '28px' }],
+        '2xl': ['20px', { lineHeight: '28px' }],
+        '3xl': ['24px', { lineHeight: '32px' }],
+        '4xl': ['28px', { lineHeight: '36px' }],
       },
 
       spacing: {
-        'sidebar': '240px',
-        'header': '56px',
+        'sidebar': '220px',
+        'header': '52px',
       },
 
       borderRadius: {
@@ -98,14 +102,15 @@ const config: Config = {
       },
 
       boxShadow: {
-        card: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
-        elevated: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB',
-        'focus-error': '0 0 0 2px #FFFFFF, 0 0 0 4px #EF4444',
+        card: '0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04)',
+        elevated: '0 2px 5px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)',
+        dropdown: '0 4px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08)',
+        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #635BFF',
+        'focus-error': '0 0 0 2px #FFFFFF, 0 0 0 4px #DF1B41',
       },
 
       transitionDuration: {
-        DEFAULT: '150ms',
+        DEFAULT: '200ms',
       },
 
       animation: {
