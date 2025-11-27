@@ -212,7 +212,7 @@ export default function CostAnalysisPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <DollarSign className="w-7 h-7 text-yellow-500" />
+            <DollarSign className="w-7 h-7 text-[#10069F]" />
             Cost Analysis
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -262,8 +262,8 @@ export default function CostAnalysisPage() {
 
       {!costData || traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <DollarSign className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+          <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <DollarSign className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
           </div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             No trace data available
@@ -439,7 +439,7 @@ export default function CostAnalysisPage() {
                   return (
                     <div key={date} className="flex-1 flex flex-col items-center gap-1">
                       <div
-                        className="w-full bg-yellow-500 rounded-t min-h-[4px]"
+                        className="w-full bg-[#10069F] rounded-t min-h-[4px]"
                         style={{ height: `${Math.max(4, height)}%` }}
                         title={`${date}: ${formatCurrency(cost)}`}
                       />
@@ -456,12 +456,12 @@ export default function CostAnalysisPage() {
           <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                <Lightbulb className="w-5 h-5 text-[#10069F]" />
                 <h2 className="font-semibold text-zinc-900 dark:text-white">Pricing Configuration</h2>
               </div>
               <Link
                 href="/configuration"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-sm text-[#10069F] dark:text-[#7ea0bf] hover:underline"
               >
                 Edit Pricing →
               </Link>

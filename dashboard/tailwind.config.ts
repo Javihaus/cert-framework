@@ -13,7 +13,7 @@ const config: Config = {
         // CERT Custom Color Palette
         cert: {
           brown: '#5f4033',
-          'dark-blue': '#33436e',
+          'dark-blue': '#10069F',
           'dark-plum': '#471424',
           'light-blue': '#7ea0bf',
           'light-gray': '#c9d4d8',
@@ -22,7 +22,7 @@ const config: Config = {
 
         // Brand color (Dark Blue)
         brand: {
-          DEFAULT: '#33436e',
+          DEFAULT: '#10069F',
           hover: '#2a3759',
           active: '#222d4a',
           light: 'rgba(51, 67, 110, 0.1)',
@@ -63,21 +63,21 @@ const config: Config = {
           error: '#DF1B41',
           'error-light': '#c9d4d8',
           'error-dark': '#C41230',
-          info: '#33436e',
+          info: '#10069F',
           'info-light': '#c9d4d8',
           'info-dark': '#2a3759',
         },
 
         // Border colors (Dark Blue)
         border: {
-          DEFAULT: '#33436e',
+          DEFAULT: '#10069F',
           light: 'rgba(51, 67, 110, 0.3)',
           dark: '#222d4a',
         },
 
         // Chart colors
         chart: {
-          stroke: '#33436e',
+          stroke: '#10069F',
           grid: '#c9d4d8',
         },
       },
@@ -115,7 +115,7 @@ const config: Config = {
         card: '0 0 0 1px rgba(51, 67, 110, 0.1), 0 1px 2px rgba(51, 67, 110, 0.08)',
         elevated: '0 2px 5px rgba(51, 67, 110, 0.15), 0 1px 2px rgba(51, 67, 110, 0.1)',
         dropdown: '0 4px 12px rgba(51, 67, 110, 0.2), 0 1px 3px rgba(51, 67, 110, 0.12)',
-        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #33436e',
+        focus: '0 0 0 2px #FFFFFF, 0 0 0 4px #10069F',
         'focus-error': '0 0 0 2px #FFFFFF, 0 0 0 4px #DF1B41',
       },
 
