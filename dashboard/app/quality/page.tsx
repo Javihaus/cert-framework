@@ -266,7 +266,7 @@ export default function QualityOverview() {
           onClick={runAutoEvaluation}
           disabled={runningAutoEval || pendingTraces.length === 0}
           className={cn(
-            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 text-left transition-colors group",
+            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
             pendingTraces.length > 0
               ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
               : "opacity-60 cursor-not-allowed"
@@ -299,7 +299,7 @@ export default function QualityOverview() {
         {/* LLM Judge Card */}
         <Link
           href="/quality/judge"
-          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
+          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-2">
             <Zap className="w-5 h-5 text-[#33436e]" />
@@ -317,7 +317,7 @@ export default function QualityOverview() {
         {/* Human Review Card */}
         <Link
           href="/quality/review"
-          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
+          className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-[#222d4a] hover:border-2 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-2">
             <User className="w-5 h-5 text-[#33436e]" />
@@ -337,7 +337,7 @@ export default function QualityOverview() {
           onClick={runGroundingCheck}
           disabled={runningGrounding || tracesWithContext.length === 0}
           className={cn(
-            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-5 text-left transition-colors group",
+            "bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-colors group",
             tracesWithContext.length > 0
               ? "hover:border-[#222d4a] hover:border-2 cursor-pointer"
               : "opacity-60 cursor-not-allowed"
@@ -372,31 +372,31 @@ export default function QualityOverview() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Total Traces</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {traces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Passed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {passedTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Failed</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {failedTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Review</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {reviewTraces.length}
           </p>
         </div>
-        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#33436e] p-4">
+        <div className="bg-[#c9d4d8] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-4">
           <span className="text-[13px] text-[#596780] dark:text-[#8792A2]">Pass Rate</span>
           <p className="text-2xl font-semibold text-[#0A2540] dark:text-[#E8ECF1] mt-1">
             {evaluatedTraces.length > 0 ? `${passRate.toFixed(0)}%` : '-'}
@@ -405,8 +405,8 @@ export default function QualityOverview() {
       </div>
 
       {/* Evaluation Results */}
-      <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#33436e] overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#33436e]">
+      <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
@@ -449,7 +449,7 @@ export default function QualityOverview() {
                   className={cn(
                     "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors",
                     methodFilter === m.key
-                      ? "bg-[#F6F9FC] dark:bg-[#1D2530] text-[#33436e] dark:text-[#7ea0bf] border border-[#33436e]/20"
+                      ? "bg-[#F6F9FC] dark:bg-[#1D2530] text-[#33436e] dark:text-[#7ea0bf] border border-[#E3E8EE] dark:border-[#1D2530]"
                       : "text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530]"
                   )}
                 >
