@@ -232,21 +232,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* Right Actions - Stripe style */}
             <div className="flex items-center gap-1">
-              {/* Mode toggle */}
-              <span className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-[13px] text-[#596780] dark:text-[#8792A2]">
-                Test mode
-                <button
-                  onClick={() => {}}
-                  className="relative w-9 h-5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-full transition-colors"
-                >
-                  <span className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform" />
-                </button>
-              </span>
-
               {/* Icon buttons */}
               <button className="relative p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors">
                 <Bell className="w-[18px] h-[18px]" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DF1B41] rounded-full" />
               </button>
 
               <Link

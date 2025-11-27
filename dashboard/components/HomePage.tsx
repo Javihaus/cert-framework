@@ -1,212 +1,171 @@
 'use client';
 
-import { BarChart3, FileText, ShieldCheck, Clock, CheckCircle2 } from 'lucide-react';
-import Card from '@/components/Card';
+import { BarChart3, FileText, ArrowRight, Upload, Download, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
-// Icon color palette - Stripe-inspired
-const iconColors = {
-  purple: '#635BFF',    // Primary brand
-  blue: '#0570DE',      // Info
-  teal: '#3ECFA8',      // Success, monitoring
-  orange: '#F5A623',    // Warnings
-  navy: '#0A2540',      // Default
-};
-
+/**
+ * HomePage - Stripe-inspired minimalist design
+ * Two prominent cards highlighting the backbone of the application:
+ * 1. Quality Monitoring (trace analysis)
+ * 2. Document Generation (compliance docs)
+ *
+ * Design principles:
+ * - No colored icon backgrounds
+ * - Gray icons, purple only for interactive elements
+ * - Clean, professional, minimal
+ */
 export default function HomePage() {
   return (
-    <div>
-      {/* Hero Section - Stripe style */}
-      <div className="mb-12 text-center">
-        <h1 className="text-[28px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-4 tracking-tight leading-tight">
-          AI systems you can deploy with confidence
+    <div className="max-w-4xl mx-auto">
+      {/* Page Header - Clean and simple */}
+      <div className="mb-8">
+        <h1 className="text-[22px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-2">
+          Welcome to CERT
         </h1>
-        <p className="text-[17px] text-[#596780] dark:text-[#8792A2] leading-relaxed max-w-[700px] mx-auto">
-          Built for the August 2025 EU AI Act deadline. Trace analysis that proves 90%+ accuracy. Documentation ready for conformity assessment.
+        <p className="text-[15px] text-[#596780] dark:text-[#8792A2]">
+          EU AI Act compliance monitoring and documentation for your AI systems.
         </p>
       </div>
 
-      {/* Overview Card - Stripe style */}
-      <Card className="mb-8 p-6">
-        <h2 className="text-[20px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-4">
-          What CERT Does
-        </h2>
-        <p className="text-[14px] leading-relaxed text-[#596780] dark:text-[#8792A2] mb-6">
-          CERT combines production LLM monitoring with EU AI Act compliance automation.
-          Track accuracy, analyze failures, and generate audit-ready documentation automatically.
-        </p>
-        <div className="bg-[#F6F9FC] dark:bg-[#1D2530] p-5 rounded-lg border border-[#E3E8EE] dark:border-[#252D3A]">
-          <div className="flex items-center gap-3 mb-2">
-            <CheckCircle2 size={20} style={{ color: iconColors.teal }} />
-            <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
-              Built for Compliance Consultants
-            </h3>
+      {/* Two Main Feature Cards - The backbone of the application */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+        {/* Quality Monitoring Card */}
+        <Link href="/quality" className="group">
+          <div className="h-full p-6 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
+                <BarChart3 className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#635BFF] dark:group-hover:text-[#A5A0FF] transition-colors">
+                  Quality Monitoring
+                </h2>
+                <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mb-4">
+                  Upload LLM traces to analyze accuracy, identify failures, and track performance metrics required by Article 15.
+                </p>
+                <span className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Go to Monitoring
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </div>
           </div>
-          <p className="text-[14px] leading-relaxed text-[#596780] dark:text-[#8792A2]">
-            Turn weeks of manual documentation into hours. CERT analyzes your traces,
-            classifies risk, and generates professional Word documents ready for expert review.
-          </p>
-        </div>
-      </Card>
+        </Link>
 
-      {/* Features Grid - Stripe style cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Monitoring */}
-        <Card className="p-5 card-interactive">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(62, 207, 168, 0.1)' }}>
-              <BarChart3 size={20} style={{ color: iconColors.teal }} />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Production Monitoring
-              </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2] mb-4">
-                Upload LLM traces to analyze accuracy, identify failures, and track
-                performance metrics required by Article 15.
-              </p>
-              <a href="/quality" className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] hover:text-[#5851DB] dark:hover:text-[#C5C1FF] inline-flex items-center gap-1">
-                Go to Monitoring →
-              </a>
-            </div>
-          </div>
-        </Card>
-
-        {/* Document Generation */}
-        <Card className="p-5 card-interactive">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(245, 166, 35, 0.1)' }}>
-              <FileText size={20} style={{ color: iconColors.orange }} />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Compliance Documents
-              </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2] mb-4">
-                Generate 5 professional Word documents for EU AI Act compliance:
-                Risk Classification, Annex IV Technical Documentation, and more.
-              </p>
-              <a href="/configuration" className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] hover:text-[#5851DB] dark:hover:text-[#C5C1FF] inline-flex items-center gap-1">
-                Generate Documents →
-              </a>
+        {/* Document Generation Card */}
+        <Link href="/configuration" className="group">
+          <div className="h-full p-6 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] hover:border-[#C1C9D2] dark:hover:border-[#30405A] transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 text-[#596780] dark:text-[#8792A2]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1 group-hover:text-[#635BFF] dark:group-hover:text-[#A5A0FF] transition-colors">
+                  Compliance Documents
+                </h2>
+                <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mb-4">
+                  Generate professional Word documents for EU AI Act compliance: Risk Classification, Annex IV Technical Documentation, and more.
+                </p>
+                <span className="text-[13px] font-medium text-[#635BFF] dark:text-[#A5A0FF] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Generate Documents
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
             </div>
           </div>
-        </Card>
+        </Link>
       </div>
 
-      {/* Workflow Card - Stripe style */}
-      <Card className="p-6 bg-[#F6F9FC] dark:bg-[#151B24] border-[#E3E8EE] dark:border-[#1D2530]">
-        <h2 className="text-[17px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-6">
-          Typical Workflow
+      {/* Getting Started Section */}
+      <div className="mb-10">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider mb-4">
+          Getting Started
         </h2>
 
-        <div className="flex flex-col gap-5">
+        <div className="bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] overflow-hidden">
           {/* Step 1 */}
-          <div className="flex items-start gap-4">
-            <div className="min-w-[28px] h-7 text-white rounded-full flex items-center justify-center text-[13px] font-semibold" style={{ backgroundColor: iconColors.purple }}>
-              1
+          <div className="flex items-start gap-4 p-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
+            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
+              <Upload className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
             </div>
             <div>
-              <h3 className="text-[14px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Load Production Traces
+              <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
+                Upload your traces
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2]">
-                Upload JSON file with LLM traces from your production system. CERT analyzes accuracy and failure patterns.
+              <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
+                Import JSON files with LLM traces from your production system.
               </p>
             </div>
           </div>
 
           {/* Step 2 */}
-          <div className="flex items-start gap-4">
-            <div className="min-w-[28px] h-7 text-white rounded-full flex items-center justify-center text-[13px] font-semibold" style={{ backgroundColor: iconColors.purple }}>
-              2
+          <div className="flex items-start gap-4 p-4 border-b border-[#E3E8EE] dark:border-[#1D2530]">
+            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
+              <BarChart3 className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
             </div>
             <div>
-              <h3 className="text-[14px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Review Monitoring Dashboards
+              <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
+                Review metrics
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2]">
-                Explore overview metrics, failed traces, and distribution charts. Identify issues to address.
+              <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
+                Analyze accuracy, failed traces, and distribution charts automatically.
               </p>
             </div>
           </div>
 
           {/* Step 3 */}
-          <div className="flex items-start gap-4">
-            <div className="min-w-[28px] h-7 text-white rounded-full flex items-center justify-center text-[13px] font-semibold" style={{ backgroundColor: iconColors.purple }}>
-              3
+          <div className="flex items-start gap-4 p-4">
+            <div className="w-8 h-8 rounded-full bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
+              <Download className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
             </div>
             <div>
-              <h3 className="text-[14px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Download Reports
+              <h3 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1] mb-0.5">
+                Export reports
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2]">
-                Generate a professional PDF report directly in your browser or use the CERT CLI for Word documents.
-              </p>
-            </div>
-          </div>
-
-          {/* Step 4 */}
-          <div className="flex items-start gap-4">
-            <div className="min-w-[28px] h-7 text-white rounded-full flex items-center justify-center text-[13px] font-semibold" style={{ backgroundColor: iconColors.purple }}>
-              4
-            </div>
-            <div>
-              <h3 className="text-[14px] font-semibold text-[#0A2540] dark:text-[#E8ECF1] mb-1">
-                Expert Review & Delivery
-              </h3>
-              <p className="text-[13px] leading-relaxed text-[#596780] dark:text-[#8792A2]">
-                Documents include [EXPERT INPUT REQUIRED] markers. Add professional commentary (8-10 hours) and deliver.
+              <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
+                Generate PDF or Word documents ready for compliance review.
               </p>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Footer Info - Stripe style resource cards */}
-      <div className="mt-10 pt-8 border-t border-[#E3E8EE] dark:border-[#1D2530]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="resource-card">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck size={16} style={{ color: iconColors.purple }} />
-              <span className="resource-card-title">
-                EU AI Act Focus
-              </span>
-            </div>
-            <p className="resource-card-description">
-              Risk classification (Annex III), Technical documentation (Annex IV), Accuracy & robustness (Article 15), Logging requirements (Article 19)
-            </p>
-            <a href="/help" className="resource-card-link">
-              Learn more →
-            </a>
+      {/* Info Section - Subtle, no colored backgrounds */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
+              EU AI Act Ready
+            </span>
           </div>
-          <div className="resource-card">
-            <div className="flex items-center gap-2 mb-3">
-              <FileText size={16} style={{ color: iconColors.orange }} />
-              <span className="resource-card-title">
-                Document Outputs
-              </span>
-            </div>
-            <p className="resource-card-description">
-              5 Microsoft Word documents, 32 pages total, auto-populated with trace data, expert sections marked for review
-            </p>
-            <a href="/configuration" className="resource-card-link">
-              View templates →
-            </a>
+          <p className="text-[12px] text-[#596780] dark:text-[#8792A2] leading-relaxed">
+            Built for August 2025 deadline. Article 15 accuracy requirements.
+          </p>
+        </div>
+
+        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
+              5 Document Types
+            </span>
           </div>
-          <div className="resource-card">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock size={16} style={{ color: iconColors.blue }} />
-              <span className="resource-card-title">
-                Time Savings
-              </span>
-            </div>
-            <p className="resource-card-description">
-              Traditional: 40-60 hours manual work. With CERT: 8-10 hours expert review. 80% time reduction with consistent, audit-ready output.
-            </p>
-            <a href="/quality" className="resource-card-link">
-              Get started →
-            </a>
+          <p className="text-[12px] text-[#596780] dark:text-[#8792A2] leading-relaxed">
+            Risk Classification, Annex IV Technical Documentation, and more.
+          </p>
+        </div>
+
+        <div className="p-4 bg-white dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530]">
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+            <span className="text-[13px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
+              80% Time Savings
+            </span>
           </div>
+          <p className="text-[12px] text-[#596780] dark:text-[#8792A2] leading-relaxed">
+            From 40-60 hours manual work to 8-10 hours expert review.
+          </p>
         </div>
       </div>
     </div>
