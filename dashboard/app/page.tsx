@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Plus,
   Zap,
   Activity,
   ArrowRight,
@@ -51,21 +50,6 @@ export default function HomePage() {
     <div className="max-w-4xl mx-auto flex flex-col min-h-[calc(100vh-120px)]">
       {/* Main Content */}
       <div className="flex-1 space-y-8">
-        {/* Add Connection Button */}
-        <div className="flex flex-col items-center justify-center py-16">
-          <Link
-            href="/configuration"
-            className="group flex flex-col items-center"
-          >
-            <div className="w-16 h-16 rounded-full bg-[#3C6098] flex items-center justify-center mb-4 group-hover:bg-[#3C6098]/90 transition-colors">
-              <Plus className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-zinc-600 dark:text-zinc-400 text-sm">
-              Add a new connection
-            </span>
-          </Link>
-        </div>
-
         {/* Two Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
@@ -73,9 +57,7 @@ export default function HomePage() {
             className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors group"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </div>
+              <Zap className="w-6 h-6 text-[#33436e]" />
               <div>
                 <h3 className="font-semibold text-zinc-900 dark:text-white">Quality Evals</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -108,9 +90,7 @@ export default function HomePage() {
             className="bg-white dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors group"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-teal-100 dark:bg-teal-500/20 rounded-lg flex items-center justify-center">
-                <Activity className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-              </div>
+              <Activity className="w-6 h-6 text-[#33436e]" />
               <div>
                 <h3 className="font-semibold text-zinc-900 dark:text-white">Operational Evals</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
