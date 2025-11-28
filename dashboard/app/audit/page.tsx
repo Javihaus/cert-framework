@@ -175,7 +175,7 @@ export default function AuditPage() {
                   min={0}
                   max={1}
                   step={0.05}
-                  sx={{ color: '#10069F' }}
+                  sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
                 />
                 <div className={cn(typographyClasses.caption, "flex justify-between mt-1")}>
                   <span>0%</span>
