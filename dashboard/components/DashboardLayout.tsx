@@ -108,13 +108,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Sidebar - Stripe style */}
       <aside className={cn('sidebar', mobileMenuOpen && 'open', 'lg:translate-x-0')}>
         {/* Logo - Stripe style header */}
-        <div className="flex items-center gap-3 px-4 h-[90px] border-b border-[#E3E8EE] dark:border-[#1D2530]">
-          <div className="w-20 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+        <div className="flex items-center gap-3 px-4 h-[52px] border-b border-[#E3E8EE] dark:border-[#1D2530]">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
             <Image
               src="/cert-logo.png"
               alt="CERT"
-              width={80}
-              height={80}
+              width={40}
+              height={40}
               className="object-contain"
               priority
             />

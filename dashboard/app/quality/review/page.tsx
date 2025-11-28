@@ -168,7 +168,7 @@ export default function HumanReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <User className="w-7 h-7 text-[#10069F]" />
+            <User className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Human Review
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -336,7 +336,7 @@ export default function HumanReviewPage() {
                         className="w-full flex items-center justify-between text-left"
                       >
                         <div className="flex items-center gap-2">
-                          <BookOpen className="w-4 h-4 text-[#10069F]" />
+                          <BookOpen className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
                           <label className="text-xs font-medium text-[#10069F] dark:text-[#7ea0bf]">
                             Source Context (Retrieved Chunks)
                           </label>

@@ -35,7 +35,7 @@ function HelpItem({ icon: Icon, title, description, href, onClick }: HelpItemPro
         <h3 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] group-hover:text-[#5a1a2e] dark:group-hover:text-[#e8c8d0] transition-colors">
           {title}
         </h3>
-        <p className="text-[13px] text-black dark:text-white leading-relaxed mt-0.5">
+        <p className="text-[13px] text-black dark:text-[#afb6bf] leading-relaxed mt-0.5">
           {description}
         </p>
       </div>
@@ -85,7 +85,7 @@ export default function HelpPage() {
         <h1 className="text-[22px] font-semibold text-[#47742d] dark:text-[#d4a4b0]">
           Help & Documentation
         </h1>
-        <p className="text-[15px] text-black dark:text-white mt-1">
+        <p className="text-[15px] text-black dark:text-[#afb6bf] mt-1">
           Learn how to use CERT Framework for LLM evaluation and EU AI Act compliance
         </p>
       </div>
@@ -192,7 +192,7 @@ export default function HelpPage() {
           <div className="space-y-6">
             <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
               <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 1: Configure API Connections</h4>
-              <p className="text-[13px] text-black dark:text-white">
+              <p className="text-[13px] text-black dark:text-[#afb6bf]">
                 Go to Configuration and add your API keys for Claude, OpenAI, or Gemini. You need at least one active connection to use the evaluation features.
               </p>
               <Link href="/configuration" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
@@ -202,14 +202,14 @@ export default function HelpPage() {
 
             <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
               <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 2: Set Up the LLM Judge</h4>
-              <p className="text-[13px] text-black dark:text-white">
+              <p className="text-[13px] text-black dark:text-[#afb6bf]">
                 Choose which LLM model will evaluate your outputs. We recommend Claude for best results. Configure the evaluation criteria and confidence threshold.
               </p>
             </div>
 
             <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
               <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 3: Run Your First Evaluation</h4>
-              <p className="text-[13px] text-black dark:text-white">
+              <p className="text-[13px] text-black dark:text-[#afb6bf]">
                 Go to LLM Judge and either enter a manual input/output pair or upload a JSONL trace file for batch evaluation.
               </p>
               <Link href="/quality/judge" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
@@ -219,7 +219,7 @@ export default function HelpPage() {
 
             <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
               <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Step 4: Review Results</h4>
-              <p className="text-[13px] text-black dark:text-white">
+              <p className="text-[13px] text-black dark:text-[#afb6bf]">
                 Check the Quality Dashboard for scores. Items below your confidence threshold will appear in the Human Review Queue for manual verification.
               </p>
               <Link href="/quality" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
@@ -237,28 +237,28 @@ export default function HelpPage() {
             <p className="text-[14px] text-[#47742d] dark:text-[#d4a4b0] font-medium">
               Is the output good?
             </p>
-            <p className="text-[13px] text-black dark:text-white">
+            <p className="text-[13px] text-black dark:text-[#afb6bf]">
               Quality evaluations help you determine if LLM outputs meet your accuracy and quality standards.
             </p>
 
             <div className="space-y-4 mt-6">
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Automated evaluation using AI. The judge model scores each output on accuracy, relevance, safety, and coherence.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Human Review Queue</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   When the LLM judge is uncertain (score below threshold), items go to the Human Review Queue. You can approve, reject, or add notes.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Auto-Evaluation</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Automatic validation using semantic similarity and NLI (Natural Language Inference) to compare outputs against expected results.
                 </p>
               </div>
@@ -274,28 +274,28 @@ export default function HelpPage() {
             <p className="text-[14px] text-[#47742d] dark:text-[#d4a4b0] font-medium">
               Can we run this in production?
             </p>
-            <p className="text-[13px] text-black dark:text-white">
+            <p className="text-[13px] text-black dark:text-[#afb6bf]">
               Operational evaluations help you assess if your LLM system is ready for production deployment.
             </p>
 
             <div className="space-y-4 mt-6">
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Performance</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Track latency metrics (P50, P95, P99) and throughput. Target: P95 latency under 30 seconds.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Cost Analysis</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Monitor token usage and API costs. Target: under $0.25 per query. Get optimization suggestions.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Observability</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Monitor error rates, trace logs, and provider status. Target: over 95% success rate and under 5% error rate.
                 </p>
               </div>
@@ -308,35 +308,35 @@ export default function HelpPage() {
       {showConfigurationPanel && (
         <HelpPanel title="Evaluation Methods" onClose={() => setShowConfigurationPanel(false)}>
           <div className="space-y-5">
-            <p className="text-[13px] text-black dark:text-white">
+            <p className="text-[13px] text-black dark:text-[#afb6bf]">
               CERT Framework offers multiple evaluation methods to suit different needs.
             </p>
 
             <div className="space-y-4 mt-4">
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Auto-Eval</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Fast, automated evaluation using semantic similarity and NLI. Best for high-volume batch processing.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">LLM Judge</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Use a powerful LLM to evaluate outputs. More accurate but slower and more expensive.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Human Review</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Manual verification for critical decisions. Highest accuracy but slowest.
                 </p>
               </div>
 
               <div className="p-4 bg-[#c9d4d8] dark:bg-[#1D2530] rounded-lg border border-[#47742d] dark:border-[#d4a4b0]">
                 <h4 className="text-[14px] font-medium text-[#47742d] dark:text-[#d4a4b0] mb-2">Grounding Check</h4>
-                <p className="text-[13px] text-black dark:text-white">
+                <p className="text-[13px] text-black dark:text-[#afb6bf]">
                   Verify that outputs are grounded in source documents. Essential for RAG systems.
                 </p>
               </div>

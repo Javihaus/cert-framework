@@ -176,7 +176,7 @@ export default function HomePage() {
             {/* Self-hosted */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Shield className="w-5 h-5 text-[#10069F]" strokeWidth={2} />
+                <Shield className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Self-Hosted
                 </h3>
@@ -189,7 +189,7 @@ export default function HomePage() {
             {/* Production Grade */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Activity className="w-5 h-5 text-[#10069F]" strokeWidth={2} />
+                <Activity className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Production Grade
                 </h3>
@@ -202,7 +202,7 @@ export default function HomePage() {
             {/* Framework Agnostic */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Zap className="w-5 h-5 text-[#10069F]" strokeWidth={2} />
+                <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Framework Agnostic
                 </h3>

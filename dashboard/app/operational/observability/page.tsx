@@ -161,7 +161,7 @@ response = client.chat.completions.create(
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <BarChart3 className="w-7 h-7 text-[#10069F]" />
+            <BarChart3 className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Observability
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -204,7 +204,7 @@ response = client.chat.completions.create(
         <div className="bg-zinc-900 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-[#10069F]" />
+              <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
               <h2 className="font-semibold">Connect Your Application</h2>
             </div>
             <button
@@ -239,7 +239,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">LLM Calls</span>
-            <Zap className="w-4 h-4 text-[#10069F]" />
+            <Zap className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {stats?.llmTraces || 0}
@@ -249,7 +249,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Tokens</span>
-            <BarChart3 className="w-4 h-4 text-[#10069F]" />
+            <BarChart3 className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {(stats?.totalTokens || 0).toLocaleString()}

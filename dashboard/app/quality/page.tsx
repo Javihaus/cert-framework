@@ -273,7 +273,7 @@ export default function QualityOverview() {
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-5 h-5 text-[#10069F]" />
+            <Sparkles className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Eval</span>
               {runningAutoEval ? (
@@ -302,7 +302,7 @@ export default function QualityOverview() {
           className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <Zap className="w-5 h-5 text-[#10069F]" />
+            <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">LLM Judge</span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{llmJudgeTraces.length} evaluated</p>
@@ -320,7 +320,7 @@ export default function QualityOverview() {
           className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <User className="w-5 h-5 text-[#10069F]" />
+            <User className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Human Review</span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{humanReviewTraces.length} reviewed</p>
@@ -344,7 +344,7 @@ export default function QualityOverview() {
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <FileCheck className="w-5 h-5 text-[#10069F]" />
+            <FileCheck className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check</span>
               {runningGrounding ? (
