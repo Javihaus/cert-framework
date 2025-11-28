@@ -177,12 +177,10 @@ response = client.chat.completions.create(
               onChange={(e) => setAutoRefresh(e.target.checked)}
               size="small"
               sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#10069F',
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#10069F',
-                },
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#10069F' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10069F' },
+                '.dark & .MuiSwitch-switchBase.Mui-checked': { color: '#9fc2e9' },
+                '.dark & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#9fc2e9' },
               }}
             />
             Auto-refresh

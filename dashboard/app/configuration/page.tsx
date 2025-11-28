@@ -254,6 +254,8 @@ export default function ConfigurationPage() {
                 sx={{
                   '& .MuiSwitch-switchBase.Mui-checked': { color: '#10069F' },
                   '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10069F' },
+                  '.dark & .MuiSwitch-switchBase.Mui-checked': { color: '#9fc2e9' },
+                  '.dark & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#9fc2e9' },
                 }}
               />
             </div>
@@ -272,7 +274,7 @@ export default function ConfigurationPage() {
                     min={0}
                     max={100}
                     step={5}
-                    sx={{ color: '#10069F' }}
+                    sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
                   />
                 </div>
                 <div>
@@ -286,7 +288,7 @@ export default function ConfigurationPage() {
                     min={0}
                     max={100}
                     step={5}
-                    sx={{ color: '#10069F' }}
+                    sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
                   />
                 </div>
               </div>
@@ -302,7 +304,7 @@ export default function ConfigurationPage() {
                   min={0}
                   max={10}
                   step={0.5}
-                  sx={{ color: '#10069F' }}
+                  sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
                 />
               </div>
             </div>
@@ -361,7 +363,7 @@ export default function ConfigurationPage() {
                 min={0}
                 max={10}
                 step={1}
-                sx={{ color: '#10069F' }}
+                sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
               />
             </div>
           </div>

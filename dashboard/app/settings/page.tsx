@@ -337,6 +337,8 @@ export default function SettingsPage() {
                           sx={{
                             '& .MuiSwitch-switchBase.Mui-checked': { color: '#10069F' },
                             '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10069F' },
+                            '.dark & .MuiSwitch-switchBase.Mui-checked': { color: '#9fc2e9' },
+                            '.dark & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#9fc2e9' },
                           }}
                         />
                         <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -734,6 +736,8 @@ export default function SettingsPage() {
                           sx={{
                             '& .MuiSwitch-switchBase.Mui-checked': { color: '#10069F' },
                             '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10069F' },
+                            '.dark & .MuiSwitch-switchBase.Mui-checked': { color: '#9fc2e9' },
+                            '.dark & .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#9fc2e9' },
                           }}
                         />
                       </div>

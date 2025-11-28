@@ -428,7 +428,7 @@ export default function HumanReviewPage() {
                     min={0}
                     max={10}
                     step={0.5}
-                    sx={{ color: '#10069F' }}
+                    sx={{ color: '#10069F', '.dark &': { color: '#9fc2e9' } }}
                   />
                   <div className="flex justify-between text-xs text-zinc-400 mt-1">
                     <span>Poor</span>
