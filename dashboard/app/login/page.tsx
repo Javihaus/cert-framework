@@ -115,15 +115,13 @@ export default function LoginPage() {
         <div className="hidden lg:flex lg:w-1/2 bg-[#10069f] dark:bg-[#0A0E14] flex-col justify-between p-12">
           <div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-white/10">
-                <Image
-                  src="/cert-logo.png"
-                  alt="CERT"
-                  width={32}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
+              <Image
+                src="/cert-logo-alt.png"
+                alt="CERT"
+                width={64}
+                height={64}
+                className="object-contain"
+              />
               <span className="text-white text-xl font-semibold">CERT</span>
             </div>
           </div>
@@ -174,15 +172,13 @@ export default function LoginPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
-                  <Image
-                    src="/cert-logo.png"
-                    alt="CERT"
-                    width={40}
-                    height={40}
-                    className="object-contain"
-                  />
-                </div>
+                <Image
+                  src="/cert-logo-alt.png"
+                  alt="CERT"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
                 <span className="text-[#10069f] dark:text-white text-xl font-semibold">CERT</span>
               </div>
             </div>
