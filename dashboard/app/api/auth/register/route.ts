@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json(
-        { error: 'Database not configured. Please set SUPABASE_URL and SUPABASE_KEY.' },
+        { error: 'Database not configured. Please set SUPABASE_URL and SUPABASE_KEY environment variables.' },
         { status: 503 }
       );
     }
