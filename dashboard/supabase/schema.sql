@@ -115,7 +115,8 @@ BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = '';
 
 -- Apply trigger to tables with updated_at
 DROP TRIGGER IF EXISTS users_updated_at ON public.users;
@@ -141,7 +142,8 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = '';
 
 -- Trigger to auto-create user profile on signup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
