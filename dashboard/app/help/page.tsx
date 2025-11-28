@@ -92,7 +92,7 @@ export default function HelpPage() {
 
       {/* Getting Started */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-white uppercase tracking-wider mb-4">
           Getting Started
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,7 +119,7 @@ export default function HelpPage() {
 
       {/* Core Concepts */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-white uppercase tracking-wider mb-4">
           Core Concepts
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -146,7 +146,7 @@ export default function HelpPage() {
 
       {/* Resources */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-white uppercase tracking-wider mb-4">
           Resources
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -173,7 +173,7 @@ export default function HelpPage() {
 
       {/* Contact & Support */}
       <section>
-        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-[#d4a4b0] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#47742d] dark:text-white uppercase tracking-wider mb-4">
           Support
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
