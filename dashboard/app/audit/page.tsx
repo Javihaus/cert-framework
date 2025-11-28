@@ -7,6 +7,7 @@ import FileUpload from '@/components/FileUpload';
 import { Upload, Play, Download, CheckCircle2, XCircle, AlertTriangle, Shield, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { typographyClasses } from '@/theme/typography';
+import Slider from '@mui/material/Slider';
 
 interface AuditResult {
   timestamp: string;
@@ -168,14 +169,13 @@ export default function AuditPage() {
                 <label className={cn(typographyClasses.label, "block mb-2")}>
                   Accuracy Threshold: {(threshold * 100).toFixed(0)}%
                 </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
+                <Slider
                   value={threshold}
-                  onChange={(e) => setThreshold(parseFloat(e.target.value))}
-                  className="w-full"
+                  onChange={(_, value) => setThreshold(value as number)}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  sx={{ color: '#10069F' }}
                 />
                 <div className={cn(typographyClasses.caption, "flex justify-between mt-1")}>
                   <span>0%</span>
