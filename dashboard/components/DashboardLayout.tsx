@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Activity,
-  Shield,
   FileText,
   BarChart3,
   Settings,
@@ -22,8 +21,11 @@ import {
   DollarSign,
   Zap,
   Home,
+  LogIn,
+  Key,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   name: string;
@@ -75,6 +77,8 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading: authLoading, logout } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -94,6 +98,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  const handleLogout = async () => {
+    await logout();
+    setUserMenuOpen(false);
+    router.push('/login');
+  };
+
+  // Get user initials
+  const getUserInitials = () => {
+    if (!user?.name) return '?';
+    const parts = user.name.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return user.name.substring(0, 2).toUpperCase();
+  };
 
   return (
     <div className={darkMode ? 'dark' : ''}>
@@ -182,18 +202,31 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Sidebar Footer */}
         <div className="px-3 py-3 border-t border-[#E3E8EE] dark:border-[#1D2530]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center">
-              <span className="text-white text-xs font-medium">JD</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[#0A2540] dark:text-[#E8ECF1] text-sm font-medium truncate">John Doe</p>
-              <p className="text-[#8792A2] text-xs truncate">Admin</p>
-            </div>
-            <button className="p-1.5 text-[#8792A2] hover:text-[#596780] dark:hover:text-[#E8ECF1] transition-colors">
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          {user ? (
+            <Link href="/account" className="flex items-center gap-3 hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] rounded-lg p-1 -m-1 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center">
+                <span className="text-white text-xs font-medium">{getUserInitials()}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#0A2540] dark:text-[#E8ECF1] text-sm font-medium truncate">{user.name}</p>
+                <p className="text-[#8792A2] text-xs truncate">{user.email}</p>
+              </div>
+              <button
+                onClick={(e) => { e.preventDefault(); handleLogout(); }}
+                className="p-1.5 text-[#8792A2] hover:text-[#596780] dark:hover:text-[#E8ECF1] transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-3 px-3 py-2 bg-[#10069F] hover:bg-[#2a3759] text-white rounded-lg transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              <span className="text-sm font-medium">Sign In</span>
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -235,49 +268,83 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
               </button>
 
-              <button className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors">
+              <Link
+                href="/configuration"
+                className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
+              >
                 <Settings className="w-[18px] h-[18px]" />
-              </button>
+              </Link>
 
               {/* User Menu */}
               <div className="relative ml-1">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center hover:ring-2 hover:ring-[#10069F]/20 transition-all"
-                >
-                  <span className="text-white text-xs font-medium">JD</span>
-                </button>
-
-                {/* User Dropdown - Stripe style */}
-                {userMenuOpen && (
+                {user ? (
                   <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#151B24] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.12)] border border-[#E3E8EE] dark:border-[#1D2530] py-1 z-50 animate-scale-in">
-                      <div className="px-4 py-3 border-b border-[#E3E8EE] dark:border-[#1D2530]">
-                        <p className="text-sm font-medium text-[#0A2540] dark:text-[#E8ECF1]">John Doe</p>
-                        <p className="text-xs text-[#8792A2]">john@company.com</p>
-                      </div>
-                      <div className="py-1">
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
-                          <User className="w-4 h-4" />
-                          Profile
-                        </a>
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
-                          <Settings className="w-4 h-4" />
-                          Settings
-                        </a>
-                      </div>
-                      <div className="border-t border-[#E3E8EE] dark:border-[#1D2530] pt-1">
-                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-[#DF1B41] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530]">
-                          <LogOut className="w-4 h-4" />
-                          Sign out
-                        </a>
-                      </div>
-                    </div>
+                    <button
+                      onClick={() => setUserMenuOpen(!userMenuOpen)}
+                      className="w-8 h-8 rounded-full bg-[#10069F] flex items-center justify-center hover:ring-2 hover:ring-[#10069F]/20 transition-all"
+                    >
+                      <span className="text-white text-xs font-medium">{getUserInitials()}</span>
+                    </button>
+
+                    {/* User Dropdown - Stripe style */}
+                    {userMenuOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setUserMenuOpen(false)}
+                        />
+                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#151B24] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.12)] border border-[#E3E8EE] dark:border-[#1D2530] py-1 z-50 animate-scale-in">
+                          <div className="px-4 py-3 border-b border-[#E3E8EE] dark:border-[#1D2530]">
+                            <p className="text-sm font-medium text-[#0A2540] dark:text-[#E8ECF1]">{user.name}</p>
+                            <p className="text-xs text-[#8792A2]">{user.email}</p>
+                          </div>
+                          <div className="py-1">
+                            <Link
+                              href="/account"
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
+                            >
+                              <User className="w-4 h-4" />
+                              Account
+                            </Link>
+                            <Link
+                              href="/account"
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
+                            >
+                              <Key className="w-4 h-4" />
+                              API Key
+                            </Link>
+                            <Link
+                              href="/configuration"
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
+                            >
+                              <Settings className="w-4 h-4" />
+                              Settings
+                            </Link>
+                          </div>
+                          <div className="border-t border-[#E3E8EE] dark:border-[#1D2530] pt-1">
+                            <button
+                              onClick={handleLogout}
+                              className="flex items-center gap-3 px-4 py-2 text-sm text-[#DF1B41] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] w-full text-left"
+                            >
+                              <LogOut className="w-4 h-4" />
+                              Sign out
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#10069F] hover:bg-[#2a3759] text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </Link>
                 )}
               </div>
             </div>
