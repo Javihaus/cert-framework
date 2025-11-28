@@ -91,7 +91,7 @@ export default function PerformancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Activity className="w-7 h-7 text-[#10069F]" />
+            <Activity className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Performance
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">

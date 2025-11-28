@@ -69,12 +69,12 @@ interface ConfigItemProps {
 function ConfigItem({ icon: Icon, title, description, href, onClick }: ConfigItemProps) {
   const content = (
     <div className="flex items-start gap-3 group cursor-pointer">
-      <Icon className="w-5 h-5 text-[#10069F] mt-0.5 flex-shrink-0" />
+      <Icon className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9] mt-0.5 flex-shrink-0" />
       <div>
         <h3 className="text-[14px] font-medium text-[#10069F] dark:text-[#7ea0bf] group-hover:text-[#2a3759] dark:group-hover:text-[#c9d4d8] transition-colors">
           {title}
         </h3>
-        <p className="text-[13px] text-[#596780] dark:text-[#8792A2] leading-relaxed mt-0.5">
+        <p className="text-[13px] text-[#596780] dark:text-[#afb6bf] leading-relaxed mt-0.5">
           {description}
         </p>
       </div>
@@ -178,7 +178,7 @@ export default function ConfigurationPage() {
 
       {/* Evaluation Settings */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
           Evaluation Settings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -205,7 +205,7 @@ export default function ConfigurationPage() {
 
       {/* Account Settings */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
           Account Settings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -217,7 +217,7 @@ export default function ConfigurationPage() {
 
       {/* Compliance & Documentation */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
           Compliance & Documentation
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -229,7 +229,7 @@ export default function ConfigurationPage() {
 
       {/* Help & Support */}
       <section>
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
           Help & Support
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -244,7 +244,7 @@ export default function ConfigurationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">Enable Auto-Evaluation</h4>
-                <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">Automatically evaluate traces using HuggingFace models</p>
+                <p className="text-[13px] text-[#596780] dark:text-[#afb6bf]">Automatically evaluate traces using HuggingFace models</p>
               </div>
               <button
                 onClick={() => setAutoEvalConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
@@ -262,7 +262,7 @@ export default function ConfigurationPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-[13px] mb-1">
-                    <span className="text-[#596780] dark:text-[#8792A2]">Semantic Similarity</span>
+                    <span className="text-[#596780] dark:text-[#afb6bf]">Semantic Similarity</span>
                     <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.semanticWeight}%</span>
                   </div>
                   <input
@@ -273,7 +273,7 @@ export default function ConfigurationPage() {
                 </div>
                 <div>
                   <div className="flex justify-between text-[13px] mb-1">
-                    <span className="text-[#596780] dark:text-[#8792A2]">NLI (Entailment)</span>
+                    <span className="text-[#596780] dark:text-[#afb6bf]">NLI (Entailment)</span>
                     <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.nliWeight}%</span>
                   </div>
                   <input
@@ -286,7 +286,7 @@ export default function ConfigurationPage() {
 
               <div className="mt-6">
                 <div className="flex justify-between text-[13px] mb-1">
-                  <span className="text-[#596780] dark:text-[#8792A2]">Pass Threshold</span>
+                  <span className="text-[#596780] dark:text-[#afb6bf]">Pass Threshold</span>
                   <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.passThreshold}/10</span>
                 </div>
                 <input
@@ -312,7 +312,7 @@ export default function ConfigurationPage() {
                 placeholder="Enter your API key"
                 className="w-full px-3 py-2 text-[14px] border border-[#E3E8EE] dark:border-[#1D2530] rounded-lg bg-white dark:bg-[#151B24] focus:outline-none focus:ring-2 focus:ring-[#10069F]/20 focus:border-[#10069F]"
               />
-              <p className="text-[12px] text-[#596780] dark:text-[#8792A2] mt-1">Stored locally in your browser.</p>
+              <p className="text-[12px] text-[#596780] dark:text-[#afb6bf] mt-1">Stored locally in your browser.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -342,7 +342,7 @@ export default function ConfigurationPage() {
 
             <div>
               <div className="flex justify-between text-[13px] mb-1">
-                <span className="text-[#596780] dark:text-[#8792A2]">Pass Threshold</span>
+                <span className="text-[#596780] dark:text-[#afb6bf]">Pass Threshold</span>
                 <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{judgeConfig.passThreshold}/10</span>
               </div>
               <input
@@ -362,10 +362,10 @@ export default function ConfigurationPage() {
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b border-[#E3E8EE] dark:border-[#1D2530]">
-                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider">Vendor</th>
-                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider">Model</th>
-                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider">Input $/1M</th>
-                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#8792A2] uppercase tracking-wider">Output $/1M</th>
+                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider">Vendor</th>
+                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider">Model</th>
+                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider">Input $/1M</th>
+                  <th className="text-left py-2 text-[11px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider">Output $/1M</th>
                 </tr>
               </thead>
               <tbody>
@@ -396,7 +396,7 @@ export default function ConfigurationPage() {
             <button onClick={() => { const id = Date.now().toString(); setPricing(prev => [...prev, { id, vendor: '', model: '', inputPricePerMillion: 0, outputPricePerMillion: 0 }]); }}
               className="text-[13px] text-[#10069F] dark:text-[#7ea0bf] font-medium hover:text-[#2a3759]">+ Add Model</button>
             <button onClick={() => setPricing(DEFAULT_PRICING)}
-              className="text-[13px] text-[#596780] dark:text-[#8792A2] font-medium hover:text-[#0A2540]">Reset to Defaults</button>
+              className="text-[13px] text-[#596780] dark:text-[#afb6bf] font-medium hover:text-[#0A2540]">Reset to Defaults</button>
           </div>
         </ConfigPanel>
       )}
