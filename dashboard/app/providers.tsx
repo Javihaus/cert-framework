@@ -1,9 +1,15 @@
 'use client';
 
+import { AuthProvider } from '@/contexts/AuthContext';
+
 /**
  * Application Providers
- * Simplified provider structure without Chakra UI
+ * Includes authentication and other global context providers
  */
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <AuthProvider>
+      {children}
+    </AuthProvider>
+  );
 }

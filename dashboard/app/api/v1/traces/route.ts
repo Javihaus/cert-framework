@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addTraces, getTraces, getStats, clearTraces, getTraceCount, CERTTrace } from '@/lib/trace-store';
+import { getAuthUser } from '@/lib/auth';
+import { getSupabaseClient, isSupabaseConfigured, DBTrace } from '@/lib/supabase';
 
 /**
  * OTLP Trace Receiver Endpoint
  *
  * Receives traces from OpenLLMetry/OpenTelemetry instrumented applications.
  * Supports both OTLP JSON format and simplified CERT format.
+ *
+ * Authentication:
+ * - If authenticated (API key or session): traces stored in Supabase with user association
+ * - If not authenticated: traces stored in memory/KV (legacy behavior, temporary)
  */
 
 // CORS headers for cross-origin requests (notebooks, external clients)
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
   'Access-Control-Max-Age': '86400',
 };
 
@@ -178,6 +184,73 @@ function parseCERTFormat(body: Record<string, unknown>): CERTTrace[] {
 }
 
 /**
+ * Convert CERTTrace to DBTrace format for Supabase
+ */
+function toDBTrace(trace: CERTTrace, userId: string, projectId?: string): Partial<DBTrace> & { user_id: string; name: string } {
+  return {
+    user_id: userId,
+    project_id: projectId,
+    trace_id: trace.traceId,
+    span_id: trace.spanId,
+    parent_span_id: trace.parentSpanId,
+    name: trace.name,
+    kind: trace.kind,
+    vendor: trace.llm?.vendor,
+    model: trace.llm?.model,
+    input_text: trace.llm?.input,
+    output_text: trace.llm?.output,
+    context: trace.llm?.context ? (Array.isArray(trace.llm.context) ? trace.llm.context : [trace.llm.context]) : undefined,
+    prompt_tokens: trace.llm?.promptTokens || 0,
+    completion_tokens: trace.llm?.completionTokens || 0,
+    total_tokens: trace.llm?.totalTokens || 0,
+    duration_ms: trace.durationMs,
+    start_time: trace.startTime,
+    end_time: trace.endTime,
+    status: trace.status,
+    metadata: trace.attributes,
+    source: trace.source,
+  };
+}
+
+/**
+ * Convert DBTrace to CERTTrace format for API response
+ */
+function toCERTTrace(dbTrace: DBTrace): CERTTrace {
+  return {
+    id: dbTrace.id,
+    traceId: dbTrace.trace_id || dbTrace.id,
+    spanId: dbTrace.span_id || 'span-0',
+    parentSpanId: dbTrace.parent_span_id,
+    name: dbTrace.name,
+    kind: dbTrace.kind,
+    startTime: dbTrace.start_time || dbTrace.created_at,
+    endTime: dbTrace.end_time || dbTrace.created_at,
+    durationMs: dbTrace.duration_ms,
+    status: dbTrace.status,
+    attributes: dbTrace.metadata,
+    llm: dbTrace.vendor || dbTrace.model ? {
+      vendor: dbTrace.vendor || 'unknown',
+      model: dbTrace.model || 'unknown',
+      promptTokens: dbTrace.prompt_tokens,
+      completionTokens: dbTrace.completion_tokens,
+      totalTokens: dbTrace.total_tokens,
+      input: dbTrace.input_text,
+      output: dbTrace.output_text,
+      context: dbTrace.context,
+    } : undefined,
+    evaluation: dbTrace.evaluation_score !== null && dbTrace.evaluation_score !== undefined ? {
+      score: dbTrace.evaluation_score,
+      status: dbTrace.evaluation_status,
+      criteria: dbTrace.evaluation_criteria,
+      judgeModel: dbTrace.evaluated_by,
+      evaluatedAt: dbTrace.evaluated_at,
+    } : undefined,
+    receivedAt: dbTrace.created_at,
+    source: dbTrace.source,
+  };
+}
+
+/**
  * POST /api/v1/traces - Receive traces
  */
 export async function POST(request: NextRequest) {
@@ -190,7 +263,7 @@ export async function POST(request: NextRequest) {
     } else if (contentType.includes('application/x-protobuf')) {
       return NextResponse.json(
         { error: 'Protobuf not supported yet. Use JSON format with Content-Type: application/json' },
-        { status: 415 }
+        { status: 415, headers: corsHeaders }
       );
     } else {
       body = await request.json();
@@ -205,22 +278,51 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         { error: 'Unknown trace format. Expected OTLP or CERT format.' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    // Store traces using shared store (async)
-    await addTraces(newTraces);
+    // Check for authentication
+    const authResult = await getAuthUser(request);
 
-    const total = await getTraceCount();
-    console.log(`[CERT] Received ${newTraces.length} traces. Total stored: ${total}`);
+    if (authResult.user && isSupabaseConfigured()) {
+      // Authenticated: store in Supabase
+      const supabase = getSupabaseClient();
 
-    return NextResponse.json({
-      success: true,
-      received: newTraces.length,
-      total,
-      storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
-    }, { headers: corsHeaders });
+      // Get user's default project
+      const projects = await supabase.getProjectsByUser(authResult.user.id);
+      const defaultProject = projects[0];
+
+      // Convert and insert traces
+      const dbTraces = newTraces.map(t => toDBTrace(t, authResult.user!.id, defaultProject?.id));
+      await supabase.insertTraces(dbTraces);
+
+      const total = await supabase.getTraceCount(authResult.user.id);
+      console.log(`[CERT] Received ${newTraces.length} traces for user ${authResult.user.email}. Total stored: ${total}`);
+
+      return NextResponse.json({
+        success: true,
+        received: newTraces.length,
+        total,
+        storage: 'supabase',
+        userId: authResult.user.id,
+      }, { headers: corsHeaders });
+
+    } else {
+      // Not authenticated: use legacy memory/KV storage
+      await addTraces(newTraces);
+      const total = await getTraceCount();
+      console.log(`[CERT] Received ${newTraces.length} traces (unauthenticated). Total in memory: ${total}`);
+
+      return NextResponse.json({
+        success: true,
+        received: newTraces.length,
+        total,
+        storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
+        authenticated: false,
+        message: 'Traces stored temporarily. Register for persistent storage.',
+      }, { headers: corsHeaders });
+    }
 
   } catch (error) {
     console.error('[CERT] Error processing traces:', error);
@@ -240,39 +342,105 @@ export async function GET(request: NextRequest) {
   const offset = parseInt(searchParams.get('offset') || '0');
   const model = searchParams.get('model') || undefined;
   const status = searchParams.get('status') || undefined;
-  const llmOnly = searchParams.get('llm_only') === 'true';
+  const llmOnly = searchParams.get('llm_only') === 'true' || searchParams.get('llmOnly') === 'true';
 
-  const traces = await getTraces({
-    limit,
-    offset,
-    llmOnly,
-    model,
-    status,
-  });
+  // Check for authentication
+  const authResult = await getAuthUser(request);
 
-  const stats = await getStats();
+  if (authResult.user && isSupabaseConfigured()) {
+    // Authenticated: get from Supabase
+    const supabase = getSupabaseClient();
 
-  return NextResponse.json({
-    traces,
-    pagination: {
-      total: stats.total,
+    const dbTraces = await supabase.getTraces({
+      userId: authResult.user.id,
       limit,
       offset,
-      hasMore: offset + limit < stats.total,
-    },
-    stats,
-    storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
-  }, { headers: corsHeaders });
+      model,
+      evaluationStatus: status,
+    });
+
+    // Filter for LLM traces if requested
+    let traces = dbTraces.map(toCERTTrace);
+    if (llmOnly) {
+      traces = traces.filter(t => t.llm);
+    }
+
+    const stats = await supabase.getTraceStats(authResult.user.id);
+
+    return NextResponse.json({
+      traces,
+      pagination: {
+        total: stats.total,
+        limit,
+        offset,
+        hasMore: offset + limit < stats.total,
+      },
+      stats: {
+        total: stats.total,
+        llmTraces: stats.total,
+        evaluated: stats.byStatus.pass + stats.byStatus.fail + stats.byStatus.review,
+        byStatus: stats.byStatus,
+        byVendor: stats.byVendor,
+        byModel: stats.byModel,
+        totalTokens: stats.totalTokens,
+      },
+      storage: 'supabase',
+      userId: authResult.user.id,
+    }, { headers: corsHeaders });
+
+  } else {
+    // Not authenticated: use legacy memory/KV storage
+    const traces = await getTraces({
+      limit,
+      offset,
+      llmOnly,
+      model,
+      status,
+    });
+
+    const stats = await getStats();
+
+    return NextResponse.json({
+      traces,
+      pagination: {
+        total: stats.total,
+        limit,
+        offset,
+        hasMore: offset + limit < stats.total,
+      },
+      stats,
+      storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
+      authenticated: false,
+    }, { headers: corsHeaders });
+  }
 }
 
 /**
  * DELETE /api/v1/traces - Clear traces
  */
-export async function DELETE() {
-  const count = await clearTraces();
+export async function DELETE(request: NextRequest) {
+  // Check for authentication
+  const authResult = await getAuthUser(request);
 
-  return NextResponse.json({
-    success: true,
-    deleted: count,
-  }, { headers: corsHeaders });
+  if (authResult.user && isSupabaseConfigured()) {
+    // Authenticated: delete from Supabase
+    const supabase = getSupabaseClient();
+    await supabase.deleteTraces(authResult.user.id);
+
+    return NextResponse.json({
+      success: true,
+      message: 'All traces deleted',
+      storage: 'supabase',
+    }, { headers: corsHeaders });
+
+  } else {
+    // Not authenticated: clear memory/KV storage
+    const count = await clearTraces();
+
+    return NextResponse.json({
+      success: true,
+      deleted: count,
+      storage: process.env.KV_REST_API_URL ? 'kv' : 'memory',
+    }, { headers: corsHeaders });
+  }
 }

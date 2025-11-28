@@ -8,30 +8,110 @@
 -- 4. Click "Run" to create all tables
 -- 5. Set SUPABASE_URL and SUPABASE_KEY environment variables in your application
 
--- Traces table: stores every LLM call
+-- ============================================================
+-- 1. USERS TABLE (must be created first)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    -- User info
+    email TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    company TEXT,
+    password_hash TEXT NOT NULL,
+
+    -- Account status
+    is_active BOOLEAN DEFAULT TRUE,
+    email_verified BOOLEAN DEFAULT FALSE,
+
+    -- API access (for notebook/SDK authentication)
+    api_key UUID DEFAULT gen_random_uuid(),
+
+    -- Settings stored as JSON
+    settings JSONB DEFAULT '{}'
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_api_key ON users(api_key);
+
+-- ============================================================
+-- 2. PROJECTS TABLE (references users)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS projects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    -- Owner (required)
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    -- Project info
+    name TEXT NOT NULL,
+    description TEXT,
+    version TEXT DEFAULT '1.0.0',
+
+    -- System metadata (for Annex IV)
+    intended_purpose TEXT,
+    architecture JSONB DEFAULT '{}',
+    data_governance JSONB DEFAULT '{}',
+
+    CONSTRAINT unique_project_name_per_user UNIQUE(user_id, name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_projects_user_id ON projects(user_id);
+CREATE INDEX IF NOT EXISTS idx_projects_name ON projects(name);
+
+-- ============================================================
+-- 3. TRACES TABLE (references users and projects)
+-- ============================================================
 CREATE TABLE IF NOT EXISTS traces (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
+    -- User/project identification
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+
     -- Core trace data
-    function_name TEXT NOT NULL,
+    trace_id TEXT,
+    span_id TEXT,
+    parent_span_id TEXT,
+    name TEXT NOT NULL,
+    kind TEXT DEFAULT 'CLIENT',
+
+    -- LLM-specific data
+    vendor TEXT,
+    model TEXT,
     input_text TEXT,
     output_text TEXT,
-    context TEXT,  -- For RAG systems
+    context JSONB,  -- For RAG systems - array of source chunks
+
+    -- Token usage
+    prompt_tokens INTEGER DEFAULT 0,
+    completion_tokens INTEGER DEFAULT 0,
+    total_tokens INTEGER DEFAULT 0,
 
     -- Timing
-    duration_ms FLOAT NOT NULL,
+    duration_ms FLOAT NOT NULL DEFAULT 0,
+    start_time TIMESTAMP WITH TIME ZONE,
+    end_time TIMESTAMP WITH TIME ZONE,
 
     -- Status
-    status TEXT NOT NULL CHECK (status IN ('success', 'error')),
+    status TEXT NOT NULL DEFAULT 'ok' CHECK (status IN ('ok', 'error', 'unset')),
     error_message TEXT,
+
+    -- Evaluation results (stored directly on trace for simplicity)
+    evaluation_score FLOAT,
+    evaluation_status TEXT CHECK (evaluation_status IN ('pass', 'fail', 'review')),
+    evaluation_criteria JSONB,
+    evaluated_at TIMESTAMP WITH TIME ZONE,
+    evaluated_by TEXT,  -- judge model name or 'human'
 
     -- Metadata
     metadata JSONB DEFAULT '{}',
-
-    -- User/project identification
-    user_id UUID,
-    project_id UUID,
+    source TEXT DEFAULT 'sdk' CHECK (source IN ('otlp', 'sdk', 'manual')),
 
     -- Constraints
     CONSTRAINT valid_duration CHECK (duration_ms >= 0)
@@ -39,12 +119,16 @@ CREATE TABLE IF NOT EXISTS traces (
 
 -- Indexes for fast queries
 CREATE INDEX IF NOT EXISTS idx_traces_created_at ON traces(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_traces_status ON traces(status);
 CREATE INDEX IF NOT EXISTS idx_traces_user_id ON traces(user_id);
 CREATE INDEX IF NOT EXISTS idx_traces_project_id ON traces(project_id);
-CREATE INDEX IF NOT EXISTS idx_traces_function_name ON traces(function_name);
+CREATE INDEX IF NOT EXISTS idx_traces_status ON traces(status);
+CREATE INDEX IF NOT EXISTS idx_traces_vendor ON traces(vendor);
+CREATE INDEX IF NOT EXISTS idx_traces_model ON traces(model);
+CREATE INDEX IF NOT EXISTS idx_traces_evaluation_status ON traces(evaluation_status);
 
--- Measurements table: stores accuracy measurements
+-- ============================================================
+-- 4. MEASUREMENTS TABLE (legacy - for detailed evaluation breakdown)
+-- ============================================================
 CREATE TABLE IF NOT EXISTS measurements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trace_id UUID NOT NULL REFERENCES traces(id) ON DELETE CASCADE,
@@ -64,17 +148,18 @@ CREATE TABLE IF NOT EXISTS measurements (
     CONSTRAINT unique_measurement_per_trace UNIQUE(trace_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_measurements_confidence ON measurements(confidence);
-CREATE INDEX IF NOT EXISTS idx_measurements_passed ON measurements(passed);
 CREATE INDEX IF NOT EXISTS idx_measurements_trace_id ON measurements(trace_id);
+CREATE INDEX IF NOT EXISTS idx_measurements_passed ON measurements(passed);
 
--- Compliance checks table: stores periodic compliance analysis
+-- ============================================================
+-- 5. COMPLIANCE CHECKS TABLE
+-- ============================================================
 CREATE TABLE IF NOT EXISTS compliance_checks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     -- Project identification
-    project_id UUID NOT NULL,
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
 
     -- Time period analyzed
     period_start TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -102,46 +187,58 @@ CREATE TABLE IF NOT EXISTS compliance_checks (
 CREATE INDEX IF NOT EXISTS idx_compliance_checks_project_id ON compliance_checks(project_id);
 CREATE INDEX IF NOT EXISTS idx_compliance_checks_created_at ON compliance_checks(created_at DESC);
 
--- Projects table: metadata about each AI system being monitored
-CREATE TABLE IF NOT EXISTS projects (
+-- ============================================================
+-- 6. SESSIONS TABLE (for authentication)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    -- Project info
-    name TEXT NOT NULL,
-    version TEXT NOT NULL,
-    provider_name TEXT NOT NULL,
+    -- Session token (stored in cookie)
+    token TEXT NOT NULL UNIQUE,
 
-    -- System metadata (for Annex IV)
-    intended_purpose TEXT,
-    architecture JSONB DEFAULT '{}',
-    data_governance JSONB DEFAULT '{}',
-
-    -- Owner
-    user_id UUID NOT NULL,
-
-    CONSTRAINT unique_project_name_per_user UNIQUE(user_id, name)
+    -- Device/browser info
+    user_agent TEXT,
+    ip_address TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_projects_user_id ON projects(user_id);
-CREATE INDEX IF NOT EXISTS idx_projects_name ON projects(name);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
 
--- Optional: Create a view for easy querying of traces with measurements
-CREATE OR REPLACE VIEW traces_with_measurements AS
+-- ============================================================
+-- VIEWS
+-- ============================================================
+
+-- View for traces with user info
+CREATE OR REPLACE VIEW traces_with_user AS
 SELECT
     t.*,
-    m.confidence,
-    m.semantic_score,
-    m.grounding_score,
-    m.passed
+    u.email as user_email,
+    u.name as user_name,
+    p.name as project_name
 FROM traces t
-LEFT JOIN measurements m ON t.id = m.trace_id;
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN projects p ON t.project_id = p.id;
+
+-- ============================================================
+-- FUNCTIONS
+-- ============================================================
+
+-- Function to clean up expired sessions
+CREATE OR REPLACE FUNCTION cleanup_expired_sessions()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM sessions WHERE expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql;
 
 -- Success message
 DO $$
 BEGIN
     RAISE NOTICE 'CERT Framework database schema created successfully!';
-    RAISE NOTICE 'Tables created: traces, measurements, compliance_checks, projects';
-    RAISE NOTICE 'View created: traces_with_measurements';
+    RAISE NOTICE 'Tables created: users, projects, traces, measurements, compliance_checks, sessions';
+    RAISE NOTICE 'Views created: traces_with_user';
 END $$;
