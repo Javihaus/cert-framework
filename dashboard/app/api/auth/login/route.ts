@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getSupabaseClient,
-  isSupabaseConfigured,
-  verifyPassword,
-  generateSessionToken,
-} from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/server';
 
 /**
- * POST /api/auth/login - Authenticate user and create session
+ * POST /api/auth/login - Authenticate user with Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
-    if (!isSupabaseConfigured()) {
-      return NextResponse.json(
-        { error: 'Database not configured. Please set SUPABASE_URL and SUPABASE_KEY.' },
-        { status: 503 }
-      );
-    }
-
+    const supabase = await createClient();
     const body = await request.json();
     const { email, password } = body;
 
@@ -29,67 +18,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseClient();
-
-    // Find user by email
-    const user = await supabase.getUserByEmail(email.toLowerCase().trim());
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is active
-    if (!user.is_active) {
-      return NextResponse.json(
-        { error: 'Account is deactivated. Please contact support.' },
-        { status: 403 }
-      );
-    }
-
-    // Verify password
-    const isValid = await verifyPassword(password, user.password_hash);
-    if (!isValid) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
-    }
-
-    // Create session
-    const token = generateSessionToken();
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-
-    await supabase.createSession({
-      user_id: user.id,
-      token,
-      expires_at: expiresAt.toISOString(),
-      user_agent: request.headers.get('user-agent') || undefined,
-      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+    // Sign in with Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
     });
 
-    // Set session cookie
-    const response = NextResponse.json({
+    if (error) {
+      console.error('[Auth] Supabase login error:', error);
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+
+    if (!data.user) {
+      return NextResponse.json(
+        { error: 'Login failed' },
+        { status: 500 }
+      );
+    }
+
+    // Get user profile from our users table
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        company: user.company,
-        apiKey: user.api_key,
+        id: data.user.id,
+        email: data.user.email,
+        name: profile?.name || data.user.user_metadata?.name || 'User',
+        company: profile?.company || data.user.user_metadata?.company,
+        apiKey: profile?.api_key,
       },
     });
-
-    response.cookies.set('cert-session', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: expiresAt,
-      path: '/',
-    });
-
-    return response;
 
   } catch (error) {
     console.error('[Auth] Login error:', error);
