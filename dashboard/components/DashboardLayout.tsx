@@ -111,6 +111,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  // Public pages that don't require authentication
+  const isPublicPage = pathname === '/login' || pathname === '/register' || pathname === '/';
+
   useEffect(() => {
     const saved = localStorage.getItem('cert-dark-mode');
     if (saved) {
@@ -127,12 +130,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }, [darkMode]);
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (only for protected pages)
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!isPublicPage && !authLoading && !user) {
       router.push('/login');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, isPublicPage]);
 
   const handleLogout = async () => {
     await logout();
@@ -150,7 +153,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return user.name.substring(0, 2).toUpperCase();
   };
 
-  // Show loading while checking authentication
+  // For public pages, render children directly without auth checks
+  if (isPublicPage) {
+    return <>{children}</>;
+  }
+
+  // Show loading while checking authentication (only for protected pages)
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F6F9FC] dark:bg-[#0A0E14]">
