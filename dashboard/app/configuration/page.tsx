@@ -17,6 +17,8 @@ import {
   X,
 } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress';
+import Switch from '@mui/material/Switch';
+import Slider from '@mui/material/Slider';
 import { cn } from '@/lib/utils';
 
 interface ModelPricing {
@@ -246,15 +248,14 @@ export default function ConfigurationPage() {
                 <h4 className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">Enable Auto-Evaluation</h4>
                 <p className="text-[13px] text-[#596780] dark:text-[#afb6bf]">Automatically evaluate traces using HuggingFace models</p>
               </div>
-              <button
-                onClick={() => setAutoEvalConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
-                className={cn(
-                  "relative w-11 h-6 rounded-full transition-colors",
-                  autoEvalConfig.enabled ? "bg-[#10069F]" : "bg-[#E3E8EE] dark:bg-[#1D2530]"
-                )}
-              >
-                <span className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-transform", autoEvalConfig.enabled ? "left-6" : "left-1")} />
-              </button>
+              <Switch
+                checked={autoEvalConfig.enabled}
+                onChange={(e) => setAutoEvalConfig(prev => ({ ...prev, enabled: e.target.checked }))}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': { color: '#10069F' },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10069F' },
+                }}
+              />
             </div>
 
             <div className={cn(!autoEvalConfig.enabled && "opacity-50 pointer-events-none")}>
@@ -265,10 +266,13 @@ export default function ConfigurationPage() {
                     <span className="text-[#596780] dark:text-[#afb6bf]">Semantic Similarity</span>
                     <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.semanticWeight}%</span>
                   </div>
-                  <input
-                    type="range" min="0" max="100" step="5" value={autoEvalConfig.semanticWeight}
-                    onChange={(e) => { const s = parseInt(e.target.value); setAutoEvalConfig(prev => ({ ...prev, semanticWeight: s, nliWeight: 100 - s })); }}
-                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#10069F]"
+                  <Slider
+                    value={autoEvalConfig.semanticWeight}
+                    onChange={(_, value) => { const s = value as number; setAutoEvalConfig(prev => ({ ...prev, semanticWeight: s, nliWeight: 100 - s })); }}
+                    min={0}
+                    max={100}
+                    step={5}
+                    sx={{ color: '#10069F' }}
                   />
                 </div>
                 <div>
@@ -276,10 +280,13 @@ export default function ConfigurationPage() {
                     <span className="text-[#596780] dark:text-[#afb6bf]">NLI (Entailment)</span>
                     <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.nliWeight}%</span>
                   </div>
-                  <input
-                    type="range" min="0" max="100" step="5" value={autoEvalConfig.nliWeight}
-                    onChange={(e) => { const n = parseInt(e.target.value); setAutoEvalConfig(prev => ({ ...prev, nliWeight: n, semanticWeight: 100 - n })); }}
-                    className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#10069F]"
+                  <Slider
+                    value={autoEvalConfig.nliWeight}
+                    onChange={(_, value) => { const n = value as number; setAutoEvalConfig(prev => ({ ...prev, nliWeight: n, semanticWeight: 100 - n })); }}
+                    min={0}
+                    max={100}
+                    step={5}
+                    sx={{ color: '#10069F' }}
                   />
                 </div>
               </div>
@@ -289,10 +296,13 @@ export default function ConfigurationPage() {
                   <span className="text-[#596780] dark:text-[#afb6bf]">Pass Threshold</span>
                   <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{autoEvalConfig.passThreshold}/10</span>
                 </div>
-                <input
-                  type="range" min="0" max="10" step="0.5" value={autoEvalConfig.passThreshold}
-                  onChange={(e) => setAutoEvalConfig(prev => ({ ...prev, passThreshold: parseFloat(e.target.value) }))}
-                  className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#10069F]"
+                <Slider
+                  value={autoEvalConfig.passThreshold}
+                  onChange={(_, value) => setAutoEvalConfig(prev => ({ ...prev, passThreshold: value as number }))}
+                  min={0}
+                  max={10}
+                  step={0.5}
+                  sx={{ color: '#10069F' }}
                 />
               </div>
             </div>
@@ -345,10 +355,13 @@ export default function ConfigurationPage() {
                 <span className="text-[#596780] dark:text-[#afb6bf]">Pass Threshold</span>
                 <span className="text-[#0A2540] dark:text-[#E8ECF1] font-mono">{judgeConfig.passThreshold}/10</span>
               </div>
-              <input
-                type="range" min="0" max="10" step="1" value={judgeConfig.passThreshold}
-                onChange={(e) => setJudgeConfig(prev => ({ ...prev, passThreshold: parseInt(e.target.value) }))}
-                className="w-full h-1.5 bg-[#E3E8EE] dark:bg-[#1D2530] rounded-lg appearance-none cursor-pointer accent-[#10069F]"
+              <Slider
+                value={judgeConfig.passThreshold}
+                onChange={(_, value) => setJudgeConfig(prev => ({ ...prev, passThreshold: value as number }))}
+                min={0}
+                max={10}
+                step={1}
+                sx={{ color: '#10069F' }}
               />
             </div>
           </div>

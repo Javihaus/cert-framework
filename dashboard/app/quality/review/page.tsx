@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
+import Slider from '@mui/material/Slider';
 
 interface LLMTrace {
   id: string;
@@ -421,14 +422,13 @@ export default function HumanReviewPage() {
                       {score}/10
                     </span>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.5"
+                  <Slider
                     value={score}
-                    onChange={(e) => setScore(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#10069F]"
+                    onChange={(_, value) => setScore(value as number)}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    sx={{ color: '#10069F' }}
                   />
                   <div className="flex justify-between text-xs text-zinc-400 mt-1">
                     <span>Poor</span>
