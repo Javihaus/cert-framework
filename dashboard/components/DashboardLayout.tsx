@@ -5,23 +5,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Activity,
-  BarChart3,
-  Settings,
-  Bell,
-  Moon,
-  Sun,
-  Menu,
-  X,
-  LogOut,
-  User,
-  HelpCircle,
-  DollarSign,
-  Zap,
-  Home,
-  Key,
-} from 'lucide-react';
+  LuLayoutDashboard,
+  LuActivity,
+  LuChartBar,
+  LuSettings,
+  LuBell,
+  LuMoon,
+  LuSun,
+  LuMenu,
+  LuX,
+  LuLogOut,
+  LuUser,
+  LuBadgeHelp,
+  LuDollarSign,
+  LuRepeat2,
+  LuHouse,
+  LuKey,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '@mui/joy/Button';
@@ -44,30 +44,30 @@ interface NavSection {
 const navigation: NavSection[] = [
   {
     items: [
-      { name: 'Home', href: '/', icon: Home },
+      { name: 'Home', href: '/', icon: LuHouse },
     ],
   },
   {
     label: 'Quality Evals',
     items: [
-      { name: 'Overview', href: '/quality', icon: LayoutDashboard },
-      { name: 'LLM Judge', href: '/quality/judge', icon: Zap },
-      { name: 'Human Review', href: '/quality/review', icon: User },
+      { name: 'Overview', href: '/quality', icon: LuLayoutDashboard },
+      { name: 'LLM Judge', href: '/quality/judge', icon: LuRepeat2 },
+      { name: 'Human Review', href: '/quality/review', icon: LuUser },
     ],
   },
   {
     label: 'Operational Evals',
     items: [
-      { name: 'Performance', href: '/operational/performance', icon: Activity },
-      { name: 'Cost Analysis', href: '/operational/costs', icon: DollarSign },
-      { name: 'Observability', href: '/operational/observability', icon: BarChart3 },
+      { name: 'Performance', href: '/operational/performance', icon: LuActivity },
+      { name: 'Cost Analysis', href: '/operational/costs', icon: LuDollarSign },
+      { name: 'Observability', href: '/operational/observability', icon: LuChartBar },
     ],
   },
   {
     label: 'Settings',
     items: [
-      { name: 'Configuration', href: '/configuration', icon: Settings },
-      { name: 'Help', href: '/help', icon: HelpCircle },
+      { name: 'Configuration', href: '/configuration', icon: LuSettings },
+      { name: 'Help', href: '/help', icon: LuBadgeHelp },
     ],
   },
 ];
@@ -197,7 +197,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               onClick={() => setMobileMenuOpen(false)}
               className="lg:hidden ml-auto p-1.5 text-[#596780] hover:text-[#0A2540] dark:hover:text-white"
             >
-              <X className="w-5 h-5" />
+              <LuX className="w-5 h-5" />
             </button>
           </div>
 
@@ -268,7 +268,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={(e) => { e.preventDefault(); handleLogout(); }}
                 className="p-1.5 text-[#8792A2] hover:text-[#596780] dark:hover:text-[#E8ECF1] transition-colors"
               >
-                <LogOut className="w-4 h-4" />
+                <LuLogOut className="w-4 h-4" />
               </button>
             </Link>
           </div>
@@ -284,7 +284,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => setMobileMenuOpen(true)}
                 className="lg:hidden p-2 text-[#596780] hover:text-[#0A2540] dark:hover:text-white transition-colors"
               >
-                <Menu className="w-5 h-5" />
+                <LuMenu className="w-5 h-5" />
               </button>
 
               {/* Spacer */}
@@ -294,14 +294,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="flex items-center gap-1">
                 {/* Icon buttons */}
                 <button className="relative p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors">
-                  <Bell className="w-[18px] h-[18px]" />
+                  <LuBell className="w-[18px] h-[18px]" />
                 </button>
 
                 <Link
                   href="/help"
                   className="hidden md:flex p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
                 >
-                  <HelpCircle className="w-[18px] h-[18px]" />
+                  <LuBadgeHelp className="w-[18px] h-[18px]" />
                 </Link>
 
                 {/* Dark Mode Toggle */}
@@ -309,14 +309,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   onClick={() => setDarkMode(!darkMode)}
                   className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
                 >
-                  {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+                  {darkMode ? <LuSun className="w-[18px] h-[18px]" /> : <LuMoon className="w-[18px] h-[18px]" />}
                 </button>
 
                 <Link
                   href="/configuration"
                   className="p-2 text-[#596780] hover:text-[#0A2540] dark:text-[#8792A2] dark:hover:text-white hover:bg-[#EDF1F7] dark:hover:bg-[#252D3A] rounded-md transition-colors"
                 >
-                  <Settings className="w-[18px] h-[18px]" />
+                  <LuSettings className="w-[18px] h-[18px]" />
                 </Link>
 
                 {/* User Menu */}
@@ -346,7 +346,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
                           >
-                            <User className="w-4 h-4" />
+                            <LuUser className="w-4 h-4" />
                             Account
                           </Link>
                           <Link
@@ -354,7 +354,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
                           >
-                            <Key className="w-4 h-4" />
+                            <LuKey className="w-4 h-4" />
                             API Key
                           </Link>
                           <Link
@@ -362,7 +362,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2 text-sm text-[#596780] dark:text-[#8792A2] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]"
                           >
-                            <Settings className="w-4 h-4" />
+                            <LuSettings className="w-4 h-4" />
                             Settings
                           </Link>
                         </div>
@@ -371,7 +371,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             onClick={handleLogout}
                             className="flex items-center gap-3 px-4 py-2 text-sm text-[#DF1B41] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] w-full text-left"
                           >
-                            <LogOut className="w-4 h-4" />
+                            <LuLogOut className="w-4 h-4" />
                             Sign out
                           </button>
                         </div>

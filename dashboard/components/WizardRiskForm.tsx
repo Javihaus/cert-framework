@@ -4,7 +4,7 @@ import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { RiskInputs } from '@/types/wizard';
-import { AlertTriangle, Shield, Users } from 'lucide-react';
+import { LuTriangleAlert, LuShield, LuUsers } from 'react-icons/lu';
 
 interface WizardRiskFormProps {
   inputs: RiskInputs;
@@ -78,7 +78,7 @@ export default function WizardRiskForm({ inputs, onChange, onSubmit }: WizardRis
       {/* Prohibited Uses (Article 5) */}
       <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
         <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle size={24} className="text-red-500" />
+          <LuTriangleAlert size={24} className="text-red-500" />
           <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Prohibited Uses (Article 5)
           </h3>
@@ -113,7 +113,7 @@ export default function WizardRiskForm({ inputs, onChange, onSubmit }: WizardRis
       {/* High-Risk Systems (Annex III) */}
       <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
         <div className="flex items-center gap-2 mb-4">
-          <Shield size={24} className="text-amber-500" />
+          <LuShield size={24} className="text-amber-500" />
           <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
             High-Risk Systems (Annex III)
           </h3>
@@ -168,7 +168,7 @@ export default function WizardRiskForm({ inputs, onChange, onSubmit }: WizardRis
       {/* Volume and Impact */}
       <Card className="mb-8 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
         <div className="flex items-center gap-2 mb-4">
-          <Users size={24} className="text-blue-600" />
+          <LuUsers size={24} className="text-blue-600" />
           <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Scale and Impact
           </h3>

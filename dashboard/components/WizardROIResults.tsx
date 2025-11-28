@@ -3,7 +3,7 @@
 import Card from './Card';
 import Button from './Button';
 import { ROIOutputs } from '@/types/wizard';
-import { CheckCircle2, AlertTriangle, TrendingUp } from 'lucide-react';
+import { LuCircleCheckBig, LuTriangleAlert, LuTrendingUp } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface WizardROIResultsProps {
@@ -14,10 +14,10 @@ interface WizardROIResultsProps {
 export default function WizardROIResults({ outputs, onNext }: WizardROIResultsProps) {
   const getConfidenceConfig = (level: string) => {
     switch (level) {
-      case 'high': return { colorClass: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-900/20', borderClass: 'border-green-600', Icon: CheckCircle2 };
-      case 'medium': return { colorClass: 'text-blue-600', bgClass: 'bg-blue-50 dark:bg-blue-900/20', borderClass: 'border-blue-600', Icon: TrendingUp };
-      case 'low': return { colorClass: 'text-amber-500', bgClass: 'bg-amber-50 dark:bg-amber-900/20', borderClass: 'border-amber-500', Icon: AlertTriangle };
-      default: return { colorClass: 'text-zinc-500', bgClass: 'bg-zinc-100', borderClass: 'border-zinc-300', Icon: AlertTriangle };
+      case 'high': return { colorClass: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-900/20', borderClass: 'border-green-600', Icon: LuCircleCheckBig };
+      case 'medium': return { colorClass: 'text-blue-600', bgClass: 'bg-blue-50 dark:bg-blue-900/20', borderClass: 'border-blue-600', Icon: LuTrendingUp };
+      case 'low': return { colorClass: 'text-amber-500', bgClass: 'bg-amber-50 dark:bg-amber-900/20', borderClass: 'border-amber-500', Icon: LuTriangleAlert };
+      default: return { colorClass: 'text-zinc-500', bgClass: 'bg-zinc-100', borderClass: 'border-zinc-300', Icon: LuTriangleAlert };
     }
   };
 
@@ -30,7 +30,7 @@ export default function WizardROIResults({ outputs, onNext }: WizardROIResultsPr
       <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">ROI Analysis Results</h2>
       <p className="text-base text-zinc-500 dark:text-zinc-400 mb-8">Here's your projected return on investment for AI automation</p>
 
-      {/* Key Metrics */}
+      {/* LuKey Metrics */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="border-2 border-red-500">
           <p className="text-sm text-zinc-500 mb-1">Current Monthly Cost</p>
@@ -77,7 +77,7 @@ export default function WizardROIResults({ outputs, onNext }: WizardROIResultsPr
       {outputs.risks.length > 0 && (
         <Card className="mb-8 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
           <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle size={20} className="text-amber-500" />
+            <LuTriangleAlert size={20} className="text-amber-500" />
             <span className="text-lg font-semibold text-zinc-900 dark:text-white">Risk Factors to Consider</span>
           </div>
           <div className="flex flex-col gap-1">

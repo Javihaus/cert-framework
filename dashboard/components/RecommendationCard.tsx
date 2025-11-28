@@ -3,7 +3,7 @@
 import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
-import { TrendingDown, Database, Scissors, Zap } from 'lucide-react';
+import { LuTrendingDown, LuDatabase, LuScissors, LuRepeat2 } from 'react-icons/lu';
 
 interface RecommendationCardProps {
   type: 'model_downgrade' | 'caching' | 'prompt_optimization' | 'batching';
@@ -16,22 +16,22 @@ interface RecommendationCardProps {
 
 const typeConfig = {
   model_downgrade: {
-    icon: TrendingDown,
+    icon: LuTrendingDown,
     label: 'Model Downgrade',
     colorClass: 'text-[#3C6098] dark:text-[#3C6098]',
   },
   caching: {
-    icon: Database,
+    icon: LuDatabase,
     label: 'Response Caching',
     colorClass: 'text-green-600 dark:text-green-500',
   },
   prompt_optimization: {
-    icon: Scissors,
+    icon: LuScissors,
     label: 'Prompt Optimization',
     colorClass: 'text-zinc-900 dark:text-white',
   },
   batching: {
-    icon: Zap,
+    icon: LuRepeat2,
     label: 'Request Batching',
     colorClass: 'text-amber-500',
   },

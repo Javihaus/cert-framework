@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import {
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Pause,
-  Play,
-  Filter,
-  ChevronDown,
-  Zap,
-} from 'lucide-react';
+  LuClock,
+  LuCircleAlert,
+  LuCircleCheck,
+  LuPause,
+  LuPlay,
+  LuFilter,
+  LuChevronDown,
+  LuRepeat2,
+} from 'react-icons/lu';
 import Card, { CardTitle } from './Card';
 import { IconButton } from './Button';
 import Badge from './Badge';
@@ -117,9 +117,9 @@ export default function LiveTraceMonitor({
         <div className="flex gap-2">
           <FilterDropdown value={filter} onChange={setFilter} />
           <IconButton
-            icon={isPaused ? <Play size={16} /> : <Pause size={16} />}
+            icon={isPaused ? <LuPlay size={16} /> : <LuPause size={16} />}
             onClick={() => setIsPaused(!isPaused)}
-            aria-label={isPaused ? 'Resume' : 'Pause'}
+            aria-label={isPaused ? 'Resume' : 'LuPause'}
             variant="secondary"
           />
         </div>
@@ -153,17 +153,17 @@ interface TraceRowProps {
 function TraceRow({ trace, onClick }: TraceRowProps) {
   const statusConfig = {
     success: {
-      icon: CheckCircle,
+      icon: LuCircleCheck,
       colorClass: 'text-green-600 dark:text-green-500',
       bgClass: 'bg-green-50 dark:bg-green-900/20',
     },
     error: {
-      icon: AlertCircle,
+      icon: LuCircleAlert,
       colorClass: 'text-red-500',
       bgClass: 'bg-red-50 dark:bg-red-900/20',
     },
     warning: {
-      icon: AlertCircle,
+      icon: LuCircleAlert,
       colorClass: 'text-amber-500',
       bgClass: 'bg-amber-50 dark:bg-amber-900/20',
     },
@@ -199,14 +199,14 @@ function TraceRow({ trace, onClick }: TraceRowProps) {
       {/* Metrics */}
       <div className="hidden md:flex items-center gap-6">
         <div className="flex items-center gap-1 min-w-[80px]">
-          <Clock size={14} className="text-zinc-400" />
+          <LuClock size={14} className="text-zinc-400" />
           <span className="text-[13px] text-zinc-500">
             {trace.latency}ms
           </span>
         </div>
 
         <div className="flex items-center gap-1 min-w-[80px]">
-          <Zap size={14} className="text-zinc-400" />
+          <LuRepeat2 size={14} className="text-zinc-400" />
           <span className="text-[13px] text-zinc-500">
             {trace.tokens.toLocaleString()}
           </span>
@@ -247,9 +247,9 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
         className="flex items-center gap-1 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[13px] text-zinc-500 cursor-pointer transition-all hover:border-blue-500"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Filter size={14} />
+        <LuFilter size={14} />
         <span>{selectedLabel}</span>
-        <ChevronDown size={14} />
+        <LuChevronDown size={14} />
       </button>
 
       {isOpen && (

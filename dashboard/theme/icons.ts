@@ -1,8 +1,8 @@
 /**
- * CERT Icon System - Using Lucide Icons
+ * CERT Icon System - Using react-icons/lu
  * Professional, consistent, clean Swiss design
  *
- * WHY LUCIDE:
+ * WHY react-icons/lu:
  * - Consistent 2px stroke width
  * - Clean, minimal style
  * - Professional appearance
@@ -11,67 +11,67 @@
 
 import {
   // Navigation
-  Home,
-  Upload,
-  Menu,
-  X,
-  ArrowRight,
-  ArrowLeft,
+  LuHouse,
+  LuUpload,
+  LuMenu,
+  LuX,
+  LuArrowRight,
+  LuArrowLeft,
 
   // Monitoring
-  LayoutDashboard,
-  AlertTriangle,
-  BarChart3,
-  FileText,
-  CheckCircle2,
-  XCircle,
-  Info,
+  LuLayoutDashboard,
+  LuTriangleAlert,
+  LuChartBar,
+  LuFileText,
+  LuCircleCheckBig,
+  LuCircleX,
+  LuInfo,
 
   // Files
-  File,
-  Download,
-  FolderOpen,
+  LuFile,
+  LuDownload,
+  LuFolderOpen,
 
   // Status
-  Lock,
-  Shield,
-  Zap,
-  Eye,
-  EyeOff,
+  LuLock,
+  LuShield,
+  LuRepeat2,
+  LuEye,
+  LuEyeOff,
 
-} from 'lucide-react';
+} from 'react-icons/lu';
 
 export const icons = {
   // Navigation
-  home: Home,
-  upload: Upload,
-  menu: Menu,
-  close: X,
-  arrowRight: ArrowRight,
-  arrowLeft: ArrowLeft,
+  home: LuHouse,
+  upload: LuUpload,
+  menu: LuMenu,
+  close: LuX,
+  arrowRight: LuArrowRight,
+  arrowLeft: LuArrowLeft,
 
   // Monitoring
-  dashboard: LayoutDashboard,
-  warning: AlertTriangle,
-  chart: BarChart3,
-  document: FileText,
+  dashboard: LuLayoutDashboard,
+  warning: LuTriangleAlert,
+  chart: LuChartBar,
+  document: LuFileText,
 
   // Status
-  success: CheckCircle2,
-  error: XCircle,
-  info: Info,
-  lock: Lock,
-  shield: Shield,
-  zap: Zap,
+  success: LuCircleCheckBig,
+  error: LuCircleX,
+  info: LuInfo,
+  lock: LuLock,
+  shield: LuShield,
+  zap: LuRepeat2,
 
   // Files
-  file: File,
-  download: Download,
-  folder: FolderOpen,
+  file: LuFile,
+  download: LuDownload,
+  folder: LuFolderOpen,
 
   // UI
-  eye: Eye,
-  eyeOff: EyeOff,
+  eye: LuEye,
+  eyeOff: LuEyeOff,
 } as const;
 
 // Icon sizes - smaller, more refined

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
+import { LuCircleCheck, LuCircleX, LuInfo, LuTriangleAlert } from 'react-icons/lu';
 import Button from '@/components/Button';
 
 /**
@@ -11,14 +11,14 @@ import Button from '@/components/Button';
  * and analyzing trace files.
  *
  * Flow:
- * 1. User clicks "Generate Documents"
+ * 1. LuUser clicks "Generate Documents"
  * 2. Frontend calls /api/generate-documents (Next.js API route)
  * 3. API route saves JSON data to temp files
  * 4. API route runs: python populate_templates.py risk.json compliance.json
  * 5. Python script reads JSONs, fills Word templates, outputs .docx files
  * 6. API route creates ZIP file from generated docs
  * 7. API route returns download URL to dashboard
- * 8. User clicks download link, gets ZIP file
+ * 8. LuUser clicks download link, gets ZIP file
  */
 
 export default function DocumentsPage() {
@@ -83,7 +83,7 @@ export default function DocumentsPage() {
           <div>
             <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 p-4 rounded-lg mb-4">
               <div className="flex items-start gap-3">
-                <Info size={20} className="text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
+                <LuInfo size={20} className="text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-zinc-700 dark:text-zinc-300">
                   This will generate 5 Word documents based on your trace analysis.
                   Documents will need expert review before delivery.
@@ -97,7 +97,7 @@ export default function DocumentsPage() {
               fullWidth
               size="lg"
             >
-              Generate Document Package
+              Generate Document LuPackage
             </Button>
 
             <div className="mt-4 p-4 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
@@ -141,7 +141,7 @@ export default function DocumentsPage() {
           <div>
             <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded-lg mb-4">
               <div className="flex items-start gap-3">
-                <CheckCircle size={20} className="text-green-600 dark:text-green-500 flex-shrink-0" />
+                <LuCircleCheck size={20} className="text-green-600 dark:text-green-500 flex-shrink-0" />
                 <p className="text-sm text-green-800 dark:text-green-400 font-semibold">
                   Documents generated successfully!
                 </p>
@@ -153,7 +153,7 @@ export default function DocumentsPage() {
               download
               className="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md text-lg font-medium transition-colors"
             >
-              Download Package (.zip)
+              LuDownload LuPackage (.zip)
             </a>
 
             <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border-l-4 border-amber-400">
@@ -163,10 +163,10 @@ export default function DocumentsPage() {
               <ol className="flex flex-col gap-2 text-sm text-zinc-700 dark:text-zinc-300 list-decimal list-inside">
                 <li>Extract the ZIP file</li>
                 <li>Open each Word document</li>
-                <li>Search for "[EXPERT INPUT REQUIRED]" markers</li>
+                <li>LuSearch for "[EXPERT INPUT REQUIRED]" markers</li>
                 <li>Fill in expert commentary (estimated 8-10 hours)</li>
                 <li>Export final documents to PDF</li>
-                <li>Package PDFs for client delivery</li>
+                <li>LuPackage PDFs for client delivery</li>
               </ol>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function DocumentsPage() {
         {status === 'error' && (
           <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-lg">
             <div className="flex items-start gap-3">
-              <XCircle size={20} className="text-red-600 dark:text-red-500 flex-shrink-0" />
+              <LuCircleX size={20} className="text-red-600 dark:text-red-500 flex-shrink-0" />
               <div>
                 <p className="font-bold text-red-800 dark:text-red-400">Error generating documents</p>
                 <p className="text-sm text-red-700 dark:text-red-400">{errorMessage}</p>

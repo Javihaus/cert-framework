@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import FileUpload from '@/components/FileUpload';
-import { Upload, Play, Download, CheckCircle2, XCircle, AlertTriangle, Shield, ChevronDown } from 'lucide-react';
+import { LuUpload, LuPlay, LuDownload, LuCircleCheckBig, LuCircleX, LuTriangleAlert, LuShield, LuChevronDown } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { typographyClasses } from '@/theme/typography';
 import Slider from '@mui/material/Slider';
@@ -194,7 +194,7 @@ export default function AuditPage() {
               <Button
                 onClick={handleRunAudit}
                 disabled={!tracesData || isRunning}
-                icon={isRunning ? undefined : <Play size={16} />}
+                icon={isRunning ? undefined : <LuPlay size={16} />}
                 variant="primary"
                 size="lg"
                 fullWidth
@@ -224,10 +224,10 @@ export default function AuditPage() {
               <details className="group">
                 <summary className={cn(typographyClasses.subsectionTitle, "cursor-pointer list-none flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors")}>
                   <span className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <LuShield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     For Regulated Industries
                   </span>
-                  <ChevronDown className="w-5 h-5 text-zinc-400 group-open:rotate-180 transition-transform" />
+                  <LuChevronDown className="w-5 h-5 text-zinc-400 group-open:rotate-180 transition-transform" />
                 </summary>
                 <div className="px-4 pb-4 pt-2 space-y-3">
                   <div>
@@ -265,9 +265,9 @@ export default function AuditPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {report.compliant ? (
-                    <CheckCircle2 size={48} className="text-green-600 dark:text-green-400" />
+                    <LuCircleCheckBig size={48} className="text-green-600 dark:text-green-400" />
                   ) : (
-                    <XCircle size={48} className="text-red-600 dark:text-red-400" />
+                    <LuCircleX size={48} className="text-red-600 dark:text-red-400" />
                   )}
                   <div>
                     <h2 className={cn(
@@ -288,7 +288,7 @@ export default function AuditPage() {
                   <Button onClick={() => setReport(null)} variant="secondary">
                     New Audit
                   </Button>
-                  <Button onClick={handleDownloadReport} icon={<Download size={16} />}>
+                  <Button onClick={handleDownloadReport} icon={<LuDownload size={16} />}>
                     Download Report
                   </Button>
                 </div>

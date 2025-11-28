@@ -3,7 +3,7 @@
 import Card from './Card';
 import Badge from './Badge';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { LuCircleCheckBig, LuCircleX, LuTriangleAlert } from 'react-icons/lu';
 
 interface ConnectorCardProps {
   name: string;
@@ -25,19 +25,19 @@ export default function ConnectorCard({
   const statusConfig = {
     active: {
       iconClass: 'text-green-600 dark:text-green-500',
-      icon: CheckCircle2,
+      icon: LuCircleCheckBig,
       label: 'Active',
       variant: 'success' as const,
     },
     disabled: {
       iconClass: 'text-zinc-400',
-      icon: XCircle,
+      icon: LuCircleX,
       label: 'Disabled',
       variant: 'default' as const,
     },
     error: {
       iconClass: 'text-red-500',
-      icon: AlertTriangle,
+      icon: LuTriangleAlert,
       label: 'Error',
       variant: 'error' as const,
     },
@@ -104,7 +104,7 @@ export default function ConnectorCard({
         {failureCount > 0 && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-500 rounded-md p-2">
             <div className="flex items-center gap-1">
-              <AlertTriangle size={16} className="text-red-500" />
+              <LuTriangleAlert size={16} className="text-red-500" />
               <span className="text-sm text-red-500">
                 {failureCount} recent {failureCount === 1 ? 'failure' : 'failures'} detected
               </span>

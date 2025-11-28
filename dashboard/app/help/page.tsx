@@ -3,20 +3,20 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  HelpCircle,
-  Settings,
-  Zap,
-  User,
-  Activity,
-  ChevronDown,
-  ChevronRight,
-  ArrowRight,
-  ExternalLink,
-  BookOpen,
-  FileText,
-  Play,
-  CheckSquare,
-} from 'lucide-react';
+  LuBadgeHelp,
+  LuSettings,
+  LuRepeat2,
+  LuUser,
+  LuActivity,
+  LuChevronDown,
+  LuChevronRight,
+  LuArrowRight,
+  LuExternalLink,
+  LuBookOpen,
+  LuFileText,
+  LuPlay,
+  LuSquareCheck,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface HelpItemProps {
@@ -97,19 +97,19 @@ export default function HelpPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HelpItem
-            icon={Play}
+            icon={LuPlay}
             title="Quick Start Guide"
             description="Set up CERT Framework in 4 easy steps. Configure connections, set up the LLM judge, and run your first evaluation."
             onClick={() => setShowGettingStartedPanel(true)}
           />
           <HelpItem
-            icon={Settings}
+            icon={LuSettings}
             title="Configuration"
             description="Learn how to configure API connections, LLM judge settings, and evaluation thresholds."
             href="/configuration"
           />
           <HelpItem
-            icon={BookOpen}
+            icon={LuBookOpen}
             title="Documentation"
             description="Complete reference documentation for all CERT Framework features and capabilities."
             href="https://github.com/anthropics/cert-framework"
@@ -124,19 +124,19 @@ export default function HelpPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HelpItem
-            icon={Zap}
+            icon={LuRepeat2}
             title="Quality Evals"
             description="Is the output good? Learn about LLM Judge, Human Review, and automatic evaluation methods."
             onClick={() => setShowQualityEvalsPanel(true)}
           />
           <HelpItem
-            icon={Activity}
+            icon={LuActivity}
             title="Operational Evals"
             description="Can we run this in production? Understand performance, cost, and observability metrics."
             onClick={() => setShowOperationalEvalsPanel(true)}
           />
           <HelpItem
-            icon={CheckSquare}
+            icon={LuSquareCheck}
             title="Evaluation Methods"
             description="Compare Auto-Eval, LLM Judge, Human Review, and Grounding Check evaluation approaches."
             onClick={() => setShowConfigurationPanel(true)}
@@ -151,19 +151,19 @@ export default function HelpPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HelpItem
-            icon={ExternalLink}
+            icon={LuExternalLink}
             title="GitHub Repository"
             description="View source code, report issues, and contribute to the CERT Framework project."
             href="https://github.com/anthropics/cert-framework"
           />
           <HelpItem
-            icon={FileText}
+            icon={LuFileText}
             title="EU AI Act Reference"
             description="Official documentation on Article 15 accuracy requirements and compliance guidelines."
             href="https://artificialintelligenceact.eu/"
           />
           <HelpItem
-            icon={ExternalLink}
+            icon={LuExternalLink}
             title="Anthropic Docs"
             description="Learn about Claude API and best practices for LLM integration."
             href="https://docs.anthropic.com"
@@ -178,7 +178,7 @@ export default function HelpPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HelpItem
-            icon={HelpCircle}
+            icon={LuBadgeHelp}
             title="FAQ"
             description="Frequently asked questions about CERT Framework setup and usage."
             href="#"
@@ -196,7 +196,7 @@ export default function HelpPage() {
                 Go to Configuration and add your API keys for Claude, OpenAI, or Gemini. You need at least one active connection to use the evaluation features.
               </p>
               <Link href="/configuration" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
-                Go to Configuration <ArrowRight className="w-4 h-4" />
+                Go to Configuration <LuArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -213,7 +213,7 @@ export default function HelpPage() {
                 Go to LLM Judge and either enter a manual input/output pair or upload a JSONL trace file for batch evaluation.
               </p>
               <Link href="/quality/judge" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
-                Go to LLM Judge <ArrowRight className="w-4 h-4" />
+                Go to LLM Judge <LuArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -223,7 +223,7 @@ export default function HelpPage() {
                 Check the Quality Dashboard for scores. Items below your confidence threshold will appear in the Human Review Queue for manual verification.
               </p>
               <Link href="/quality" className="text-[13px] text-[#47742d] dark:text-[#d4a4b0] mt-2 inline-flex items-center gap-1">
-                Go to Quality Overview <ArrowRight className="w-4 h-4" />
+                Go to Quality Overview <LuArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

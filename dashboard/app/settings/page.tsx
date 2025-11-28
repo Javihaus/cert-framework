@@ -2,23 +2,23 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Settings,
-  User,
-  Bell,
-  Shield,
-  Key,
-  Globe,
-  Palette,
-  Server,
-  Check,
-  BarChart3,
-  Euro,
-  Heart,
-  Sparkles,
-  AlertTriangle,
-  Upload,
-  RefreshCw,
-} from 'lucide-react';
+  LuSettings,
+  LuUser,
+  LuBell,
+  LuShield,
+  LuKey,
+  LuGlobe,
+  LuPalette,
+  LuServer,
+  LuCheck,
+  LuChartBar,
+  LuEuro,
+  LuHeart,
+  LuShieldBan,
+  LuTriangleAlert,
+  LuUpload,
+  LuRefreshCw,
+} from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 import Switch from '@mui/material/Switch';
 
@@ -26,15 +26,15 @@ import Switch from '@mui/material/Switch';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Icon mapping for compatibility
-const CogIcon = Settings;
-const UserCircleIcon = User;
-const BellIcon = Bell;
-const ShieldCheckIcon = Shield;
-const KeyIcon = Key;
-const GlobeAltIcon = Globe;
-const PaintBrushIcon = Palette;
-const ServerStackIcon = Server;
-const CheckIcon = Check;
+const CogIcon = LuSettings;
+const UserCircleIcon = LuUser;
+const BellIcon = LuBell;
+const ShieldCheckIcon = LuShield;
+const KeyIcon = LuKey;
+const GlobeAltIcon = LuGlobe;
+const PaintBrushIcon = LuPalette;
+const ServerStackIcon = LuServer;
+const CheckIcon = LuCheck;
 
 // Icon color palette based on design spec
 const iconColors = {
@@ -73,7 +73,7 @@ interface MetricsConfig {
 
 const settingsSections = [
   { id: 'profile', name: 'Profile', icon: UserCircleIcon, iconColor: iconColors.orange },
-  { id: 'metrics', name: 'Metrics', icon: BarChart3, iconColor: iconColors.teal },
+  { id: 'metrics', name: 'Metrics', icon: LuChartBar, iconColor: iconColors.teal },
   { id: 'notifications', name: 'Notifications', icon: BellIcon, iconColor: iconColors.yellow },
   { id: 'security', name: 'Security', icon: ShieldCheckIcon, iconColor: iconColors.purple },
   { id: 'api', name: 'API Keys', icon: KeyIcon, iconColor: iconColors.orange },
@@ -213,7 +213,7 @@ export default function SettingsPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <CogIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">LuSettings</h1>
           </div>
           <p className="text-gray-500 dark:text-gray-400">
             Manage your account and application preferences
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                     >
-                      {loading ? <CircularProgress size={20} sx={{ color: '#6B7280' }} /> : <RefreshCw className="w-5 h-5 text-gray-500" />}
+                      {loading ? <CircularProgress size={20} sx={{ color: '#6B7280' }} /> : <LuRefreshCw className="w-5 h-5 text-gray-500" />}
                     </button>
                   </div>
 
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="p-2 bg-success-50 dark:bg-success-500/20 rounded-lg">
-                          <Euro className="w-5 h-5 text-success-600" />
+                          <LuEuro className="w-5 h-5 text-success-600" />
                         </div>
                         <h3 className="font-medium text-gray-900 dark:text-white">Cost</h3>
                       </div>
@@ -351,7 +351,7 @@ export default function SettingsPage() {
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="p-2 bg-error-50 dark:bg-error-500/20 rounded-lg">
-                          <Heart className="w-5 h-5 text-error-600" />
+                          <LuHeart className="w-5 h-5 text-error-600" />
                         </div>
                         <h3 className="font-medium text-gray-900 dark:text-white">Health</h3>
                       </div>
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="p-2 bg-purple-50 dark:bg-purple-500/20 rounded-lg">
-                          <Sparkles className="w-5 h-5 text-purple-600" />
+                          <LuShieldBan className="w-5 h-5 text-purple-600" />
                         </div>
                         <h3 className="font-medium text-gray-900 dark:text-white">Quality Evaluation</h3>
                       </div>
@@ -544,9 +544,9 @@ export default function SettingsPage() {
                                     </div>
                                   ) : (
                                     <div className="flex flex-col items-center">
-                                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                                      <LuUpload className="w-8 h-8 text-gray-400 mb-2" />
                                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Upload evaluation dataset (JSONL)
+                                        LuUpload evaluation dataset (JSONL)
                                       </p>
                                       <p className="text-xs text-gray-400 mt-1">
                                         Each line should contain: {"{ \"input\": \"...\", \"expected_output\": \"...\" }"}
@@ -559,7 +559,7 @@ export default function SettingsPage() {
 
                             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                               <div className="flex items-start gap-2">
-                                <AlertTriangle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                <LuTriangleAlert className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                 <div className="text-sm text-blue-800 dark:text-blue-200">
                                   <p className="font-medium">Ground truth evaluation requires setup</p>
                                   <p className="mt-1">
@@ -602,7 +602,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    {/* General Settings */}
+                    {/* General LuSettings */}
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <h3 className="font-medium text-gray-900 dark:text-white mb-4">General</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -750,7 +750,7 @@ export default function SettingsPage() {
               {activeSection === 'security' && (
                 <div className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                    Security Settings
+                    Security LuSettings
                   </h2>
 
                   <div className="space-y-6">
@@ -814,7 +814,7 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <h3 className="font-medium text-gray-900 dark:text-white">
-                            Production API Key
+                            Production API LuKey
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             Use this key for production environments
@@ -826,11 +826,11 @@ export default function SettingsPage() {
                         <code className="flex-1 p-3 bg-gray-900 text-gray-100 rounded-lg text-sm font-mono">
                           cert_prod_••••••••••••••••••••••••
                         </code>
-                        <button className="btn btn-secondary btn-sm">Copy</button>
+                        <button className="btn btn-secondary btn-sm">LuCopy</button>
                       </div>
                     </div>
 
-                    <button className="btn btn-primary">Create New API Key</button>
+                    <button className="btn btn-primary">Create New API LuKey</button>
                   </div>
                 </div>
               )}

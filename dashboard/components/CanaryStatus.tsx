@@ -1,14 +1,14 @@
 'use client';
 
 import {
-  Bird,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-  Clock,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react';
+  LuBird,
+  LuCircleCheck,
+  LuTriangleAlert,
+  LuCircleX,
+  LuClock,
+  LuTrendingUp,
+  LuTrendingDown,
+} from 'react-icons/lu';
 import Card, { CardTitle } from './Card';
 import Badge from './Badge';
 import { cn } from '@/lib/utils';
@@ -96,7 +96,7 @@ export default function CanaryStatus({
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900/30">
-            <Bird size={16} className="text-blue-700 dark:text-blue-400" />
+            <LuBird size={16} className="text-blue-700 dark:text-blue-400" />
           </div>
           <CardTitle>Canary Status</CardTitle>
         </div>
@@ -142,17 +142,17 @@ interface CanaryCardProps {
 function CanaryCard({ canary }: CanaryCardProps) {
   const statusConfig = {
     healthy: {
-      icon: CheckCircle,
+      icon: LuCircleCheck,
       colorClass: 'text-green-600 dark:text-green-500',
       bgClass: 'bg-green-50 dark:bg-green-900/20',
     },
     warning: {
-      icon: AlertTriangle,
+      icon: LuTriangleAlert,
       colorClass: 'text-amber-500',
       bgClass: 'bg-amber-50 dark:bg-amber-900/20',
     },
     error: {
-      icon: XCircle,
+      icon: LuCircleX,
       colorClass: 'text-red-500',
       bgClass: 'bg-red-50 dark:bg-red-900/20',
     },
@@ -163,9 +163,9 @@ function CanaryCard({ canary }: CanaryCardProps) {
 
   const TrendIcon =
     canary.trend === 'up'
-      ? TrendingUp
+      ? LuTrendingUp
       : canary.trend === 'down'
-        ? TrendingDown
+        ? LuTrendingDown
         : null;
 
   const trendColorClass =
@@ -185,7 +185,7 @@ function CanaryCard({ canary }: CanaryCardProps) {
         <StatusIcon size={14} className={config.colorClass} />
       </div>
 
-      {/* Info */}
+      {/* LuInfo */}
       <div className="flex flex-col flex-1 min-w-0">
         <span className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">
           {canary.name}
@@ -200,7 +200,7 @@ function CanaryCard({ canary }: CanaryCardProps) {
 
       {/* Response Time */}
       <div className="flex items-center gap-1 text-zinc-400 dark:text-zinc-500">
-        <Clock size={12} />
+        <LuClock size={12} />
         <span className="text-[11px]">{canary.responseTime}ms</span>
       </div>
     </div>

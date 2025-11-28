@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
-import { Info, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { LuInfo, LuCircleCheckBig, LuTriangleAlert, LuCircleX } from 'react-icons/lu';
 
 interface InfoBoxProps {
   type: 'info' | 'success' | 'warning' | 'error';
@@ -13,25 +13,25 @@ export function InfoBox({ type, title, children }: InfoBoxProps) {
     info: {
       bg: 'bg-blue-50 dark:bg-blue-900/20',
       border: 'border-blue-600',
-      icon: Info,
+      icon: LuInfo,
       iconColor: 'text-blue-600',
     },
     success: {
       bg: 'bg-green-50 dark:bg-green-900/20',
       border: 'border-green-600',
-      icon: CheckCircle2,
+      icon: LuCircleCheckBig,
       iconColor: 'text-green-600',
     },
     warning: {
       bg: 'bg-amber-50 dark:bg-amber-900/20',
       border: 'border-amber-500',
-      icon: AlertTriangle,
+      icon: LuTriangleAlert,
       iconColor: 'text-amber-500',
     },
     error: {
       bg: 'bg-red-50 dark:bg-red-900/20',
       border: 'border-red-500',
-      icon: XCircle,
+      icon: LuCircleX,
       iconColor: 'text-red-500',
     },
   };

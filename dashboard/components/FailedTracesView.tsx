@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { AlertTriangle, Info, XCircle, HelpCircle, Download } from 'lucide-react';
+import { LuTriangleAlert, LuInfo, LuCircleX, LuBadgeHelp, LuDownload } from 'react-icons/lu';
 import Card from './Card';
 import Button from './Button';
 import Badge from './Badge';
@@ -16,10 +16,10 @@ interface FailedTracesViewProps {
 
 // Map icon names to Lucide icons
 const ICON_MAP: Record<string, React.ElementType> = {
-  MdWarning: AlertTriangle,
-  MdInfo: Info,
-  MdRemoveCircle: XCircle,
-  MdHelp: HelpCircle,
+  MdWarning: LuTriangleAlert,
+  MdInfo: LuInfo,
+  MdRemoveCircle: LuCircleX,
+  MdHelp: LuBadgeHelp,
 };
 
 // Pattern color classes
@@ -190,10 +190,10 @@ export default function FailedTracesView({ results, threshold }: FailedTracesVie
             }
           </h2>
           <div className="flex gap-3">
-            <Button onClick={handleExportCSV} variant="secondary" size="sm" icon={<Download size={18} />}>
+            <Button onClick={handleExportCSV} variant="secondary" size="sm" icon={<LuDownload size={18} />}>
               Export CSV
             </Button>
-            <Button onClick={handleExportJSON} variant="secondary" size="sm" icon={<Download size={18} />}>
+            <Button onClick={handleExportJSON} variant="secondary" size="sm" icon={<LuDownload size={18} />}>
               Export JSON
             </Button>
           </div>

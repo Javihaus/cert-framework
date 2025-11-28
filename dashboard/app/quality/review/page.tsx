@@ -3,20 +3,20 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  User,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  AlertCircle,
-  RefreshCw,
-  Save,
-  Star,
-  FileText,
-  BookOpen,
-} from 'lucide-react';
+  LuUser,
+  LuCircleCheck,
+  LuCircleX,
+  LuChevronLeft,
+  LuChevronRight,
+  LuChevronDown,
+  LuChevronUp,
+  LuCircleAlert,
+  LuRefreshCw,
+  LuSave,
+  LuStar,
+  LuFileText,
+  LuBookOpen,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import Slider from '@mui/material/Slider';
@@ -170,7 +170,7 @@ export default function HumanReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <User className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuUser className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Human Review
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -181,7 +181,7 @@ export default function HumanReviewPage() {
           onClick={loadTraces}
           className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" />
+          <LuRefreshCw className="w-4 h-4" />
           Refresh
         </button>
       </div>
@@ -235,7 +235,7 @@ export default function HumanReviewPage() {
           <div className="max-h-[500px] overflow-y-auto">
             {filteredTraces.length === 0 ? (
               <div className="p-8 text-center">
-                <CheckCircle className="w-6 h-6 text-emerald-500 mx-auto mb-3" />
+                <LuCircleCheck className="w-6 h-6 text-emerald-500 mx-auto mb-3" />
                 <p className="text-zinc-500 dark:text-zinc-400">
                   {filter === 'pending' ? 'All traces reviewed!' : 'No traces found'}
                 </p>
@@ -264,7 +264,7 @@ export default function HumanReviewPage() {
                         </p>
                         {trace.llm?.context && (
                           <span className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400">
-                            <BookOpen className="w-3 h-3" />
+                            <LuBookOpen className="w-3 h-3" />
                             Has source context
                           </span>
                         )}
@@ -281,7 +281,7 @@ export default function HumanReviewPage() {
                                 : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
                             )}
                           >
-                            <Star className="w-3 h-3" />
+                            <LuStar className="w-3 h-3" />
                             {trace.evaluation.humanScore}/10
                           </span>
                         ) : (
@@ -338,7 +338,7 @@ export default function HumanReviewPage() {
                         className="w-full flex items-center justify-between text-left"
                       >
                         <div className="flex items-center gap-2">
-                          <BookOpen className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+                          <LuBookOpen className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
                           <label className="text-xs font-medium text-[#10069F] dark:text-[#7ea0bf]">
                             Source Context (Retrieved Chunks)
                           </label>
@@ -349,9 +349,9 @@ export default function HumanReviewPage() {
                           </span>
                         </div>
                         {contextExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-zinc-400" />
+                          <LuChevronUp className="w-4 h-4 text-zinc-400" />
                         ) : (
-                          <ChevronDown className="w-4 h-4 text-zinc-400" />
+                          <LuChevronDown className="w-4 h-4 text-zinc-400" />
                         )}
                       </button>
 
@@ -375,7 +375,7 @@ export default function HumanReviewPage() {
                             </div>
                           )}
                           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 flex items-center gap-1">
-                            <FileText className="w-3 h-3" />
+                            <LuFileText className="w-3 h-3" />
                             Use this source content to verify the accuracy of the output above
                           </p>
                         </div>
@@ -387,7 +387,7 @@ export default function HumanReviewPage() {
                   {!selectedTrace.llm?.context && (
                     <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
                       <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                        <AlertCircle className="w-4 h-4" />
+                        <LuCircleAlert className="w-4 h-4" />
                         <span className="text-xs">
                           No source context available. Cannot verify output against source document.
                         </span>
@@ -502,7 +502,7 @@ export default function HumanReviewPage() {
                   {saving ? (
                     <CircularProgress size={16} sx={{ color: 'white' }} />
                   ) : (
-                    <Save className="w-4 h-4" />
+                    <LuSave className="w-4 h-4" />
                   )}
                   {saving ? 'Saving...' : 'Save Review'}
                 </button>
@@ -510,7 +510,7 @@ export default function HumanReviewPage() {
             </>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-              <Star className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
+              <LuStar className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
                 Select a trace to review
               </h3>

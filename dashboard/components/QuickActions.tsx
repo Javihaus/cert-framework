@@ -2,14 +2,14 @@
 
 import { ReactNode } from 'react';
 import {
-  Play,
-  Download,
-  Settings,
-  Plus,
-  Search,
-  BarChart3,
-  ArrowRight,
-} from 'lucide-react';
+  LuPlay,
+  LuDownload,
+  LuSettings,
+  LuPlus,
+  LuSearch,
+  LuChartBar,
+  LuArrowRight,
+} from 'react-icons/lu';
 import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
@@ -106,7 +106,7 @@ export default function QuickActions({
           {onViewFailed && (
             <Button
               variant="primary"
-              icon={<Search size={18} />}
+              icon={<LuSearch size={18} />}
               onClick={onViewFailed}
             >
               Investigate Failed Traces
@@ -115,7 +115,7 @@ export default function QuickActions({
           {onExport && (
             <Button
               variant="secondary"
-              icon={<Download size={18} />}
+              icon={<LuDownload size={18} />}
               onClick={onExport}
             >
               Export to CSV
@@ -124,7 +124,7 @@ export default function QuickActions({
           {onViewDistribution && (
             <Button
               variant="secondary"
-              icon={<BarChart3 size={18} />}
+              icon={<LuChartBar size={18} />}
               onClick={onViewDistribution}
             >
               View Distribution
@@ -143,7 +143,7 @@ export default function QuickActions({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <QuickActionCard
-          icon={<Play size={20} />}
+          icon={<LuPlay size={20} />}
           title="Run Compliance Check"
           description="Execute full compliance scan"
           onClick={onRunCheck || (() => {})}
@@ -151,21 +151,21 @@ export default function QuickActions({
         />
 
         <QuickActionCard
-          icon={<Download size={20} />}
+          icon={<LuDownload size={20} />}
           title="Export Report"
           description="Generate EU AI Act document"
           onClick={onExportReport || (() => {})}
         />
 
         <QuickActionCard
-          icon={<Plus size={20} />}
-          title="Add Monitor"
+          icon={<LuPlus size={20} />}
+          title="Add LuMonitor"
           description="Track a new endpoint"
           onClick={onAddMonitor || (() => {})}
         />
 
         <QuickActionCard
-          icon={<Settings size={20} />}
+          icon={<LuSettings size={20} />}
           title="Configure"
           description="Manage alert rules"
           onClick={onConfigure || (() => {})}
@@ -213,7 +213,7 @@ export function ActionLink({ children, onClick }: ActionLinkProps) {
       className="flex items-center gap-1 text-[#3C6098] dark:text-[#3C6098] text-sm font-medium cursor-pointer transition-colors hover:text-[#3C6098]/80 dark:hover:text-[#3C6098]/80"
     >
       {children}
-      <ArrowRight size={14} />
+      <LuArrowRight size={14} />
     </button>
   );
 }

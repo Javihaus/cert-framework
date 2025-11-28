@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  DollarSign,
-  RefreshCw,
-  Lightbulb,
-  CheckCircle,
-  AlertCircle,
-  Settings,
-} from 'lucide-react';
+  LuDollarSign,
+  LuRefreshCw,
+  LuLightbulb,
+  LuCircleCheck,
+  LuCircleAlert,
+  LuSettings,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -213,7 +213,7 @@ export default function CostAnalysisPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <DollarSign className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuDollarSign className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Cost Analysis
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -234,7 +234,7 @@ export default function CostAnalysisPage() {
             onClick={loadTraces}
             className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
           >
-            <RefreshCw className="w-4 h-4" />
+            <LuRefreshCw className="w-4 h-4" />
             Refresh
           </button>
         </div>
@@ -244,7 +244,7 @@ export default function CostAnalysisPage() {
       {!hasPricing && (
         <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <Settings className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+            <LuSettings className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
             <div>
               <h3 className="font-medium text-amber-800 dark:text-amber-300">
                 No pricing configured
@@ -263,7 +263,7 @@ export default function CostAnalysisPage() {
 
       {!costData || traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <DollarSign className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
+          <LuDollarSign className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             No trace data available
           </h2>
@@ -290,17 +290,17 @@ export default function CostAnalysisPage() {
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">Avg Cost/Query</span>
                 {costStatus === 'good' ? (
                   <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <CheckCircle className="w-3 h-3" />
+                    <LuCircleCheck className="w-3 h-3" />
                     Good
                   </span>
                 ) : costStatus === 'warning' ? (
                   <span className="flex items-center gap-1 text-xs font-medium text-amber-600">
-                    <AlertCircle className="w-3 h-3" />
+                    <LuCircleAlert className="w-3 h-3" />
                     High
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-xs font-medium text-red-600">
-                    <AlertCircle className="w-3 h-3" />
+                    <LuCircleAlert className="w-3 h-3" />
                     Very High
                   </span>
                 )}
@@ -455,7 +455,7 @@ export default function CostAnalysisPage() {
           <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+                <LuLightbulb className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
                 <h2 className="font-semibold text-zinc-900 dark:text-white">Pricing Configuration</h2>
               </div>
               <Link

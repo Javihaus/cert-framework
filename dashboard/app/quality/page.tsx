@@ -3,20 +3,20 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  LayoutDashboard,
-  Zap,
-  User,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  ArrowRight,
-  RefreshCw,
-  Clock,
-  Sparkles,
-  Play,
-  BookOpen,
-  FileCheck,
-} from 'lucide-react';
+  LuLayoutDashboard,
+  LuRepeat2,
+  LuUser,
+  LuCircleCheck,
+  LuCircleX,
+  LuCircleAlert,
+  LuArrowRight,
+  LuRefreshCw,
+  LuClock,
+  LuShieldBan,
+  LuPlay,
+  LuBookOpen,
+  LuFileCheck,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -254,7 +254,7 @@ export default function QualityOverview() {
           onClick={loadTraces}
           className="flex items-center gap-2 px-4 py-2 border border-[#E3E8EE] dark:border-[#1D2530] text-[#596780] dark:text-[#8792A2] rounded-lg hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] transition-colors"
         >
-          <RefreshCw className="w-4 h-4" />
+          <LuRefreshCw className="w-4 h-4" />
           Refresh
         </button>
       </div>
@@ -273,7 +273,7 @@ export default function QualityOverview() {
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuShieldBan className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Eval</span>
               {runningAutoEval ? (
@@ -288,7 +288,7 @@ export default function QualityOverview() {
               )}
             </div>
             {pendingTraces.length > 0 && !runningAutoEval && (
-              <Play className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
+              <LuPlay className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
             )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
@@ -302,12 +302,12 @@ export default function QualityOverview() {
           className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuRepeat2 className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">LLM Judge</span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{llmJudgeTraces.length} evaluated</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
+            <LuArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Use another model to check accuracy
@@ -320,12 +320,12 @@ export default function QualityOverview() {
           className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <User className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuUser className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Human Review</span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{humanReviewTraces.length} reviewed</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
+            <LuArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Check accuracy manually
@@ -344,7 +344,7 @@ export default function QualityOverview() {
           )}
         >
           <div className="flex items-center gap-3 mb-2">
-            <FileCheck className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuFileCheck className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check</span>
               {runningGrounding ? (
@@ -361,7 +361,7 @@ export default function QualityOverview() {
               )}
             </div>
             {tracesWithContext.length > 0 && !runningGrounding && (
-              <Play className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
+              <LuPlay className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
             )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
@@ -438,10 +438,10 @@ export default function QualityOverview() {
               <span className="text-xs text-[#596780] dark:text-[#8792A2]">Method:</span>
               {([
                 { key: 'all', label: 'All', icon: null, count: traces.length },
-                { key: 'auto', label: 'Auto-Eval', icon: Sparkles, count: autoEvalTraces.length },
-                { key: 'llm', label: 'LLM Judge', icon: Zap, count: llmJudgeTraces.length },
-                { key: 'human', label: 'Human', icon: User, count: humanReviewTraces.length },
-                { key: 'grounding', label: 'Grounding', icon: FileCheck, count: groundingTraces.length },
+                { key: 'auto', label: 'Auto-Eval', icon: LuShieldBan, count: autoEvalTraces.length },
+                { key: 'llm', label: 'LLM Judge', icon: LuRepeat2, count: llmJudgeTraces.length },
+                { key: 'human', label: 'Human', icon: LuUser, count: humanReviewTraces.length },
+                { key: 'grounding', label: 'Grounding', icon: LuFileCheck, count: groundingTraces.length },
               ] as const).map((m) => (
                 <button
                   key={m.key}
@@ -477,13 +477,13 @@ export default function QualityOverview() {
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-8 h-8 rounded-lg bg-[#F6F9FC] dark:bg-[#1D2530] flex items-center justify-center flex-shrink-0">
                       {trace.evaluation?.status === 'pass' ? (
-                        <CheckCircle className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+                        <LuCircleCheck className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
                       ) : trace.evaluation?.status === 'fail' ? (
-                        <XCircle className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+                        <LuCircleX className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
                       ) : trace.evaluation?.status === 'review' ? (
-                        <AlertCircle className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+                        <LuCircleAlert className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
                       ) : (
-                        <Clock className="w-4 h-4 text-[#8792A2]" />
+                        <LuClock className="w-4 h-4 text-[#8792A2]" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -500,17 +500,17 @@ export default function QualityOverview() {
                     {trace.evaluation?.judgeModel && (
                       <span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-[#F6F9FC] dark:bg-[#1D2530] text-[#596780] dark:text-[#8792A2]">
                         {getEvalMethod(trace) === 'auto' ? (
-                          <><Sparkles className="w-3 h-3" /> Auto</>
+                          <><LuShieldBan className="w-3 h-3" /> Auto</>
                         ) : getEvalMethod(trace) === 'grounding' ? (
-                          <><FileCheck className="w-3 h-3" /> Grounding</>
+                          <><LuFileCheck className="w-3 h-3" /> Grounding</>
                         ) : (
-                          <><Zap className="w-3 h-3" /> LLM</>
+                          <><LuRepeat2 className="w-3 h-3" /> LLM</>
                         )}
                       </span>
                     )}
                     {trace.evaluation?.status && !trace.evaluation?.judgeModel && (
                       <span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-[#F6F9FC] dark:bg-[#1D2530] text-[#596780] dark:text-[#8792A2]">
-                        <User className="w-3 h-3" /> Human
+                        <LuUser className="w-3 h-3" /> Human
                       </span>
                     )}
                     {trace.evaluation?.score !== undefined && (
@@ -534,7 +534,7 @@ export default function QualityOverview() {
                     {trace.evaluation?.criteria && (trace.evaluation.criteria.semantic !== undefined || trace.evaluation.criteria.nli !== undefined) && (
                       <div className="mb-4 p-3 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg border border-[#E3E8EE] dark:border-[#252D3A]">
                         <div className="flex items-center gap-2 mb-3">
-                          <Sparkles className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+                          <LuShieldBan className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
                           <span className="text-xs font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Evaluation Breakdown</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -574,7 +574,7 @@ export default function QualityOverview() {
                     {trace.evaluation?.criteria?.grounding !== undefined && (
                       <div className="mb-4 p-3 bg-[#F6F9FC] dark:bg-[#1D2530] rounded-lg border border-[#E3E8EE] dark:border-[#252D3A]">
                         <div className="flex items-center gap-2 mb-3">
-                          <FileCheck className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
+                          <LuFileCheck className="w-4 h-4 text-[#596780] dark:text-[#8792A2]" />
                           <span className="text-xs font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check Results</span>
                         </div>
                         <div>
