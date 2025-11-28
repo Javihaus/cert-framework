@@ -6,6 +6,14 @@ import { createClient } from '@/utils/supabase/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json(
+        { error: 'Database not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.' },
+        { status: 503 }
+      );
+    }
+
     const supabase = await createClient();
     const body = await request.json();
     const { email, password, name, company } = body;
@@ -55,25 +63,26 @@ export async function POST(request: NextRequest) {
 
     if (!authData.user) {
       return NextResponse.json(
-        { error: 'Failed to create account' },
+        { error: 'Failed to create account - no user returned' },
         { status: 500 }
       );
     }
 
-    // Create user profile in our users table
+    // Note: User profile is created automatically by the database trigger
+    // (handle_new_user function in schema.sql)
+    // If the trigger hasn't been set up, we try to create it manually
     const { error: profileError } = await supabase
       .from('users')
-      .insert({
+      .upsert({
         id: authData.user.id,
         email: email.toLowerCase().trim(),
         name: name.trim(),
         company: company?.trim(),
-      });
+      }, { onConflict: 'id' });
 
     if (profileError) {
       console.error('[Auth] Profile creation error:', profileError);
-      // User was created in auth but profile failed - still return success
-      // The profile can be created later on first login
+      // Continue anyway - the user can still log in
     }
 
     return NextResponse.json({
@@ -84,12 +93,14 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         company: company?.trim(),
       },
+      message: authData.user.email_confirmed_at ? 'Account created successfully' : 'Please check your email to confirm your account',
     });
 
   } catch (error) {
     console.error('[Auth] Registration error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create account. Please try again.' },
+      { error: `Registration failed: ${errorMessage}` },
       { status: 500 }
     );
   }
