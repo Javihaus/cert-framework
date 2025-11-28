@@ -233,7 +233,7 @@ export default function HumanReviewPage() {
           <div className="max-h-[500px] overflow-y-auto">
             {filteredTraces.length === 0 ? (
               <div className="p-8 text-center">
-                <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                <CheckCircle className="w-6 h-6 text-emerald-500 mx-auto mb-3" />
                 <p className="text-zinc-500 dark:text-zinc-400">
                   {filter === 'pending' ? 'All traces reviewed!' : 'No traces found'}
                 </p>
