@@ -262,9 +262,7 @@ export default function CostAnalysisPage() {
 
       {!costData || traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <DollarSign className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
-          </div>
+          <DollarSign className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             No trace data available
           </h2>
