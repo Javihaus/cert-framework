@@ -2,14 +2,14 @@
 
 import { ReactNode } from 'react';
 import {
-  Monitor,
-  FileText,
-  AlertCircle,
-  RefreshCw,
-  Inbox,
-  BarChart3,
-  Settings,
-} from 'lucide-react';
+  LuMonitor,
+  LuFileText,
+  LuCircleAlert,
+  LuRefreshCw,
+  LuInbox,
+  LuChartBar,
+  LuSettings,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import Button from './Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -83,32 +83,32 @@ interface EmptyStateProps {
 
 const typeConfig = {
   monitors: {
-    Icon: Monitor,
+    Icon: LuMonitor,
     defaultTitle: 'No monitors yet',
     defaultDescription: 'Start monitoring your LLM endpoints to track performance and compliance.',
   },
   traces: {
-    Icon: BarChart3,
+    Icon: LuChartBar,
     defaultTitle: 'No traces recorded',
     defaultDescription: 'Traces will appear here once you start making API calls.',
   },
   documents: {
-    Icon: FileText,
+    Icon: LuFileText,
     defaultTitle: 'No documents generated',
     defaultDescription: 'Generate your first compliance report to get started.',
   },
   alerts: {
-    Icon: AlertCircle,
+    Icon: LuCircleAlert,
     defaultTitle: 'No alerts',
     defaultDescription: 'You have no active alerts. Everything is running smoothly.',
   },
   data: {
-    Icon: Inbox,
+    Icon: LuInbox,
     defaultTitle: 'No data available',
     defaultDescription: 'There is no data to display at this time.',
   },
   settings: {
-    Icon: Settings,
+    Icon: LuSettings,
     defaultTitle: 'No configuration',
     defaultDescription: 'Configure your settings to get started.',
   },
@@ -166,7 +166,7 @@ export function ErrorState({
   return (
     <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
       <div className="flex items-center justify-center w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 mb-6">
-        <AlertCircle size={32} className="text-red-500" />
+        <LuCircleAlert size={32} className="text-red-500" />
       </div>
 
       <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
@@ -183,7 +183,7 @@ export function ErrorState({
       {onRetry && (
         <Button
           variant="secondary"
-          icon={<RefreshCw size={16} />}
+          icon={<LuRefreshCw size={16} />}
           onClick={onRetry}
         >
           Try Again

@@ -4,7 +4,7 @@ import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { ReadinessInputs } from '@/types/wizard';
-import { CheckCircle2, Circle, Database, Code, Users, Shield } from 'lucide-react';
+import { LuCircleCheckBig, LuCircle, LuDatabase, LuCode, LuUsers, LuShield } from 'react-icons/lu';
 
 interface WizardReadinessFormProps {
   inputs: ReadinessInputs;
@@ -48,9 +48,9 @@ export default function WizardReadinessForm({
       >
         <div className="flex-shrink-0 mt-0.5">
           {isChecked ? (
-            <CheckCircle2 size={20} className="text-blue-600" />
+            <LuCircleCheckBig size={20} className="text-blue-600" />
           ) : (
-            <Circle size={20} className="text-zinc-400" />
+            <LuCircle size={20} className="text-zinc-400" />
           )}
         </div>
         <div className="flex-1">
@@ -77,7 +77,7 @@ export default function WizardReadinessForm({
       {/* Data Readiness */}
       <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
         <div className="flex items-center gap-2 mb-4">
-          <Database size={24} className="text-blue-600" />
+          <LuDatabase size={24} className="text-blue-600" />
           <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Data Readiness
           </h3>
@@ -116,7 +116,7 @@ export default function WizardReadinessForm({
       {/* Technical Readiness */}
       <Card className="mb-6 bg-green-50 dark:bg-green-900/20 border-green-600">
         <div className="flex items-center gap-2 mb-4">
-          <Code size={24} className="text-green-600" />
+          <LuCode size={24} className="text-green-600" />
           <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Technical Readiness
           </h3>
@@ -131,8 +131,8 @@ export default function WizardReadinessForm({
 
           <CheckboxField
             field="hasInfrastructure"
-            label="Cloud Infrastructure"
-            description="Cloud infrastructure (AWS/Azure/GCP) set up for AI workloads"
+            label="LuCloud Infrastructure"
+            description="LuCloud infrastructure (AWS/Azure/GCP) set up for AI workloads"
           />
 
           <div className="p-4 rounded-md border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
@@ -157,7 +157,7 @@ export default function WizardReadinessForm({
       {/* Organizational Readiness */}
       <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
         <div className="flex items-center gap-2 mb-4">
-          <Users size={24} className="text-amber-500" />
+          <LuUsers size={24} className="text-amber-500" />
           <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Organizational Readiness
           </h3>
@@ -187,7 +187,7 @@ export default function WizardReadinessForm({
       {/* Compliance Readiness */}
       <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
         <div className="flex items-center gap-2 mb-4">
-          <Shield size={24} className="text-red-500" />
+          <LuShield size={24} className="text-red-500" />
           <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Compliance & Security Readiness
           </h3>

@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  BarChart3,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  RefreshCw,
-  Activity,
-  Clock,
-  Upload,
-  Copy,
-  Check,
-  Zap,
-  Server,
-} from 'lucide-react';
+  LuChartBar,
+  LuCircleCheck,
+  LuCircleX,
+  LuCircleAlert,
+  LuRefreshCw,
+  LuActivity,
+  LuClock,
+  LuUpload,
+  LuCopy,
+  LuCheck,
+  LuRepeat2,
+  LuServer,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -163,7 +163,7 @@ response = client.chat.completions.create(
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <BarChart3 className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuChartBar className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Observability
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -194,14 +194,14 @@ response = client.chat.completions.create(
                 : "bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600"
             )}
           >
-            <Server className="w-4 h-4" />
+            <LuServer className="w-4 h-4" />
             Integration
           </button>
           <button
             onClick={loadTraces}
             className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
           >
-            <RefreshCw className="w-5 h-5" />
+            <LuRefreshCw className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -211,14 +211,14 @@ response = client.chat.completions.create(
         <div className="bg-zinc-900 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
+              <LuRepeat2 className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
               <h2 className="font-semibold">Connect Your Application</h2>
             </div>
             <button
               onClick={() => copyCode(integrationCode)}
               className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors"
             >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? <LuCheck className="w-4 h-4" /> : <LuCopy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
@@ -236,7 +236,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Traces</span>
-            <Activity className="w-4 h-4 text-zinc-400" />
+            <LuActivity className="w-4 h-4 text-zinc-400" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {stats?.total || 0}
@@ -246,7 +246,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">LLM Calls</span>
-            <Zap className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuRepeat2 className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {stats?.llmTraces || 0}
@@ -256,7 +256,7 @@ response = client.chat.completions.create(
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">Total Tokens</span>
-            <BarChart3 className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuChartBar className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
           </div>
           <p className="text-3xl font-bold text-zinc-900 dark:text-white">
             {(stats?.totalTokens || 0).toLocaleString()}
@@ -286,7 +286,7 @@ response = client.chat.completions.create(
       {/* Live Traces */}
       {traces.length === 0 ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <Activity className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
+          <LuActivity className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Waiting for traces...
           </h2>
@@ -297,7 +297,7 @@ response = client.chat.completions.create(
             onClick={() => setShowIntegration(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#10069F] text-white rounded-lg hover:bg-[#10069F]/90 transition-colors"
           >
-            <Server className="w-4 h-4" />
+            <LuServer className="w-4 h-4" />
             View Integration Code
           </button>
         </div>
@@ -368,12 +368,12 @@ response = client.chat.completions.create(
                     <td className="px-6 py-3 whitespace-nowrap">
                       {trace.status === 'error' ? (
                         <span className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-                          <XCircle className="w-4 h-4" />
+                          <LuCircleX className="w-4 h-4" />
                           Error
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
-                          <CheckCircle className="w-4 h-4" />
+                          <LuCircleCheck className="w-4 h-4" />
                           OK
                         </span>
                       )}

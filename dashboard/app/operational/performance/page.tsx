@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Activity,
-  Clock,
-  Zap,
-  TrendingUp,
-  TrendingDown,
-  RefreshCw,
-  CheckCircle,
-  AlertCircle,
-} from 'lucide-react';
+  LuActivity,
+  LuClock,
+  LuRepeat2,
+  LuTrendingUp,
+  LuTrendingDown,
+  LuRefreshCw,
+  LuCircleCheck,
+  LuCircleAlert,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -92,7 +92,7 @@ export default function PerformancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Activity className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuActivity className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             Performance
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -114,14 +114,14 @@ export default function PerformancePage() {
             onClick={loadMetrics}
             className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
           >
-            <RefreshCw className="w-5 h-5" />
+            <LuRefreshCw className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {!metrics ? (
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-          <Activity className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
+          <LuActivity className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             No performance data yet
           </h2>
@@ -131,12 +131,12 @@ export default function PerformancePage() {
         </div>
       ) : (
         <>
-          {/* Key Metrics */}
+          {/* LuKey Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">P50 Latency</span>
-                <Clock className="w-4 h-4 text-zinc-400" />
+                <LuClock className="w-4 h-4 text-zinc-400" />
               </div>
               <p className="text-3xl font-bold text-zinc-900 dark:text-white">
                 {formatLatency(metrics.p50Latency)}
@@ -162,9 +162,9 @@ export default function PerformancePage() {
                       )}
                     >
                       {metrics.p95Latency < 30000 ? (
-                        <CheckCircle className="w-3 h-3" />
+                        <LuCircleCheck className="w-3 h-3" />
                       ) : (
-                        <AlertCircle className="w-3 h-3" />
+                        <LuCircleAlert className="w-3 h-3" />
                       )}
                       {status.label}
                     </span>
@@ -182,7 +182,7 @@ export default function PerformancePage() {
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">Throughput</span>
-                <Zap className="w-4 h-4 text-zinc-400" />
+                <LuRepeat2 className="w-4 h-4 text-zinc-400" />
               </div>
               <p className="text-3xl font-bold text-zinc-900 dark:text-white">
                 {metrics.throughput.toLocaleString()}

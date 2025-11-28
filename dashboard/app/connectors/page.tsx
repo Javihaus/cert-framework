@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Card from '@/components/Card';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, XCircle, Package, Code as CodeIcon, Zap } from 'lucide-react';
+import { LuCircleCheckBig, LuCircleX, LuPackage, LuCode as CodeIcon, LuRepeat2 } from 'react-icons/lu';
 
 interface Connector {
   name: string;
@@ -153,7 +153,7 @@ export default function ConnectorsPage() {
       {/* Quick Start */}
       <Card className="mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <Zap size={24} className="text-blue-600" />
+          <LuRepeat2 size={24} className="text-blue-600" />
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Quick Start
           </h2>
@@ -212,14 +212,14 @@ export default function ConnectorsPage() {
                   </h3>
                   {connector.status === 'available' ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-                      <CheckCircle2 size={14} className="text-green-600 dark:text-green-500" />
+                      <LuCircleCheckBig size={14} className="text-green-600 dark:text-green-500" />
                       <span className="text-xs font-medium text-green-600 dark:text-green-500">
                         Available
                       </span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-200 dark:bg-zinc-700 rounded-full">
-                      <Package size={14} className="text-zinc-500 dark:text-zinc-400" />
+                      <LuPackage size={14} className="text-zinc-500 dark:text-zinc-400" />
                       <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                         {connector.releaseDate}
                       </span>
@@ -240,7 +240,7 @@ export default function ConnectorsPage() {
               <div className="grid grid-cols-2 gap-1">
                 {connector.features.map((feature, idx) => (
                   <div key={idx} className="flex items-center gap-1">
-                    <CheckCircle2
+                    <LuCircleCheckBig
                       size={14}
                       className={cn(
                         connector.status === 'available'

@@ -1,6 +1,6 @@
 'use client';
 
-import { Upload, LayoutDashboard, AlertTriangle, BarChart3, FileText, Lock } from 'lucide-react';
+import { LuUpload, LuLayoutDashboard, LuTriangleAlert, LuChartBar, LuFileText, LuLock } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface SidebarItem {
@@ -23,11 +23,11 @@ export default function MonitoringSidebar({
 }: MonitoringSidebarProps) {
 
   const items: SidebarItem[] = [
-    { id: 'load', label: 'Load Data', icon: Upload, enabled: true },
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard, enabled: hasData },
-    { id: 'failed', label: 'Failed Traces', icon: AlertTriangle, enabled: hasData },
-    { id: 'distribution', label: 'Distribution', icon: BarChart3, enabled: hasData },
-    { id: 'documents', label: 'Documents', icon: FileText, enabled: hasData },
+    { id: 'load', label: 'Load Data', icon: LuUpload, enabled: true },
+    { id: 'overview', label: 'Overview', icon: LuLayoutDashboard, enabled: hasData },
+    { id: 'failed', label: 'Failed Traces', icon: LuTriangleAlert, enabled: hasData },
+    { id: 'distribution', label: 'Distribution', icon: LuChartBar, enabled: hasData },
+    { id: 'documents', label: 'Documents', icon: LuFileText, enabled: hasData },
   ];
 
   return (
@@ -66,7 +66,7 @@ export default function MonitoringSidebar({
       {/* Privacy Notice */}
       <div className="mt-auto px-6 py-8 border-t border-zinc-200 dark:border-zinc-700">
         <div className="flex items-start gap-1">
-          <Lock size={14} className="text-zinc-400 mt-0.5 flex-shrink-0" />
+          <LuLock size={14} className="text-zinc-400 mt-0.5 flex-shrink-0" />
           <span className="text-xs text-zinc-400 leading-relaxed">
             Your data stays private. All processing happens locally in your browser.
           </span>

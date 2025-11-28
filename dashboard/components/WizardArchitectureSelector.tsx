@@ -5,7 +5,7 @@ import Button from './Button';
 import { cn } from '@/lib/utils';
 import { ArchitectureInputs, ArchitectureRecommendation } from '@/types/wizard';
 import { selectArchitecture, getAllArchitectures, calculateMonthlyCost } from '@/lib/architecture-selector';
-import { Check, DollarSign, Code, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
+import { LuCheck, LuDollarSign, LuCode, LuCircleAlert, LuCircleCheckBig, LuRepeat2 } from 'react-icons/lu';
 import { useState } from 'react';
 
 interface WizardArchitectureSelectorProps {
@@ -30,13 +30,13 @@ export default function WizardArchitectureSelector({
   const getComplexityConfig = (complexity: string) => {
     switch (complexity) {
       case 'low':
-        return { colorClass: 'text-green-600', bgClass: 'bg-green-100 dark:bg-green-900/30', label: 'Easy Setup', icon: CheckCircle2 };
+        return { colorClass: 'text-green-600', bgClass: 'bg-green-100 dark:bg-green-900/30', label: 'Easy Setup', icon: LuCircleCheckBig };
       case 'medium':
-        return { colorClass: 'text-blue-600', bgClass: 'bg-blue-100 dark:bg-blue-900/30', label: 'Moderate Setup', icon: AlertCircle };
+        return { colorClass: 'text-blue-600', bgClass: 'bg-blue-100 dark:bg-blue-900/30', label: 'Moderate Setup', icon: LuCircleAlert };
       case 'high':
-        return { colorClass: 'text-amber-500', bgClass: 'bg-amber-100 dark:bg-amber-900/30', label: 'Complex Setup', icon: Zap };
+        return { colorClass: 'text-amber-500', bgClass: 'bg-amber-100 dark:bg-amber-900/30', label: 'Complex Setup', icon: LuRepeat2 };
       default:
-        return { colorClass: 'text-zinc-500', bgClass: 'bg-zinc-100 dark:bg-zinc-800', label: 'Unknown', icon: AlertCircle };
+        return { colorClass: 'text-zinc-500', bgClass: 'bg-zinc-100 dark:bg-zinc-800', label: 'Unknown', icon: LuCircleAlert };
     }
   };
 
@@ -58,7 +58,7 @@ export default function WizardArchitectureSelector({
         {isSelected && (
           <div className="absolute top-4 right-4">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <Check size={20} color="white" />
+              <LuCheck size={20} color="white" />
             </div>
           </div>
         )}
@@ -80,7 +80,7 @@ export default function WizardArchitectureSelector({
             </span>
           </div>
           <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/30">
-            <DollarSign size={16} className="text-blue-600" />
+            <LuDollarSign size={16} className="text-blue-600" />
             <span className="text-xs font-medium text-blue-600">
               ${estimatedCost.toFixed(0)}/mo
             </span>
@@ -119,7 +119,7 @@ export default function WizardArchitectureSelector({
             <div className="flex flex-col gap-1">
               {arch.pros.slice(0, 2).map((pro, idx) => (
                 <div key={idx} className="flex items-start gap-1">
-                  <CheckCircle2 size={12} className="text-green-600 mt-0.5 flex-shrink-0" />
+                  <LuCircleCheckBig size={12} className="text-green-600 mt-0.5 flex-shrink-0" />
                   <span className="text-xs text-zinc-500">{pro}</span>
                 </div>
               ))}
@@ -130,7 +130,7 @@ export default function WizardArchitectureSelector({
             <div className="flex flex-col gap-1">
               {arch.cons.slice(0, 2).map((con, idx) => (
                 <div key={idx} className="flex items-start gap-1">
-                  <AlertCircle size={12} className="text-red-500 mt-0.5 flex-shrink-0" />
+                  <LuCircleAlert size={12} className="text-red-500 mt-0.5 flex-shrink-0" />
                   <span className="text-xs text-zinc-500">{con}</span>
                 </div>
               ))}
@@ -141,7 +141,7 @@ export default function WizardArchitectureSelector({
         {isSelected && (
           <div className="p-4 bg-zinc-900 rounded-md">
             <div className="flex items-center gap-1 mb-2">
-              <Code size={14} className="text-white" />
+              <LuCode size={14} className="text-white" />
               <span className="text-xs font-semibold text-white">Quick Start Example</span>
             </div>
             <pre className="text-xs text-white overflow-auto whitespace-pre-wrap font-mono">
@@ -172,22 +172,22 @@ export default function WizardArchitectureSelector({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1">
-              <DollarSign size={14} className="text-blue-600" />
+              <LuDollarSign size={14} className="text-blue-600" />
               <span className="text-xs text-zinc-500">Budget: ${inputs.budgetPerMonth}/month</span>
             </div>
             <div className="flex items-center gap-1">
-              <Zap size={14} className="text-blue-600" />
+              <LuRepeat2 size={14} className="text-blue-600" />
               <span className="text-xs text-zinc-500">Volume: {inputs.volumeQueriesPerMonth.toLocaleString()} queries/month</span>
             </div>
             {inputs.dataResidency !== 'any' && (
               <div className="flex items-center gap-1">
-                <AlertCircle size={14} className="text-blue-600" />
+                <LuCircleAlert size={14} className="text-blue-600" />
                 <span className="text-xs text-zinc-500">Data Residency: {inputs.dataResidency.toUpperCase()}</span>
               </div>
             )}
             {inputs.teamSkills.length > 0 && (
               <div className="flex items-center gap-1">
-                <CheckCircle2 size={14} className="text-blue-600" />
+                <LuCircleCheckBig size={14} className="text-blue-600" />
                 <span className="text-xs text-zinc-500">Team Skills: {inputs.teamSkills.join(', ')}</span>
               </div>
             )}

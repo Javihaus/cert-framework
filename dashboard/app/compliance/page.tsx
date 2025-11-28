@@ -2,25 +2,25 @@
 
 import { useState } from 'react';
 import {
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  FileText,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+  LuShield,
+  LuTriangleAlert,
+  LuCircleCheck,
+  LuCircleX,
+  LuFileText,
+  LuArrowRight,
+  LuChevronDown,
+  LuChevronUp,
+} from 'react-icons/lu';
 
 // Icon mapping for compatibility
-const ShieldCheckIcon = Shield;
-const ExclamationTriangleIcon = AlertTriangle;
-const CheckCircleIcon = CheckCircle;
-const XCircleIcon = XCircle;
-const DocumentTextIcon = FileText;
-const ArrowRightIcon = ArrowRight;
-const ChevronDownIcon = ChevronDown;
-const ChevronUpIcon = ChevronUp;
+const ShieldCheckIcon = LuShield;
+const ExclamationTriangleIcon = LuTriangleAlert;
+const CheckCircleIcon = LuCircleCheck;
+const XCircleIcon = LuCircleX;
+const DocumentTextIcon = LuFileText;
+const ArrowRightIcon = LuArrowRight;
+const ChevronDownIcon = LuChevronDown;
+const ChevronUpIcon = LuChevronUp;
 
 // EU AI Act Articles with compliance status
 const complianceArticles = [

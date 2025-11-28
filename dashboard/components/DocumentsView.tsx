@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { LuDownload } from 'react-icons/lu';
 import { pdf } from '@react-pdf/renderer';
 import { InfoBox } from '@/components/ui';
 import Card from '@/components/Card';
@@ -87,7 +87,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
       // Generate PDF entirely in the browser - NO SERVER CALL
       const blob = await pdf(<CERTReportPDF report={report} />).toBlob();
 
-      // Download directly
+      // LuDownload directly
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -109,7 +109,7 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
       {/* PDF Report Section */}
       <Card className="p-8 mb-6">
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">
-          Download PDF Compliance Report
+          LuDownload PDF Compliance Report
         </h2>
         <p className="text-base text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
           Generate a professional PDF report with comprehensive evaluation metrics, failure analysis, and compliance recommendations. Generated entirely in your browser - no data sent to servers.
@@ -207,10 +207,10 @@ export default function DocumentsView({ summary, results }: DocumentsViewProps) 
           variant="primary"
           fullWidth
           size="lg"
-          icon={<Download size={20} />}
+          icon={<LuDownload size={20} />}
           disabled={loading}
         >
-          {loading ? 'Generating Report...' : 'Download PDF Report'}
+          {loading ? 'Generating Report...' : 'LuDownload PDF Report'}
         </Button>
       </Card>
 

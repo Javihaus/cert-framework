@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { LuCircleCheckBig, LuTriangleAlert, LuCircleX, LuChevronLeft, LuChevronRight, LuDownload } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface Question {
@@ -96,7 +96,7 @@ const READINESS_QUESTIONS: Question[] = [
     dimension: 'documentation',
     options: [
       { value: 'comprehensive', label: 'Comprehensive - All systems documented', score: 100 },
-      { value: 'partial', label: 'Partial - Key systems documented', score: 60 },
+      { value: 'partial', label: 'Partial - LuKey systems documented', score: 60 },
       { value: 'limited', label: 'Limited - Sparse documentation', score: 30 },
       { value: 'none', label: 'None', score: 0 },
     ],
@@ -141,10 +141,10 @@ const READINESS_QUESTIONS: Question[] = [
 const ALL_QUESTIONS = [...ANNEX_III_QUESTIONS, ...READINESS_QUESTIONS];
 
 const riskLevelConfig = {
-  PROHIBITED: { color: 'text-red-600', bgColor: 'bg-red-100 dark:bg-red-500/20', borderColor: 'border-red-500', icon: XCircle, label: 'Prohibited' },
-  HIGH_RISK: { color: 'text-amber-600', bgColor: 'bg-amber-100 dark:bg-amber-500/20', borderColor: 'border-amber-500', icon: AlertTriangle, label: 'High Risk' },
-  LIMITED_RISK: { color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-500/20', borderColor: 'border-blue-500', icon: CheckCircle2, label: 'Limited Risk' },
-  MINIMAL_RISK: { color: 'text-emerald-600', bgColor: 'bg-emerald-100 dark:bg-emerald-500/20', borderColor: 'border-emerald-500', icon: CheckCircle2, label: 'Minimal Risk' },
+  PROHIBITED: { color: 'text-red-600', bgColor: 'bg-red-100 dark:bg-red-500/20', borderColor: 'border-red-500', icon: LuCircleX, label: 'Prohibited' },
+  HIGH_RISK: { color: 'text-amber-600', bgColor: 'bg-amber-100 dark:bg-amber-500/20', borderColor: 'border-amber-500', icon: LuTriangleAlert, label: 'High Risk' },
+  LIMITED_RISK: { color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-500/20', borderColor: 'border-blue-500', icon: LuCircleCheckBig, label: 'Limited Risk' },
+  MINIMAL_RISK: { color: 'text-emerald-600', bgColor: 'bg-emerald-100 dark:bg-emerald-500/20', borderColor: 'border-emerald-500', icon: LuCircleCheckBig, label: 'Minimal Risk' },
 };
 
 export default function AssessmentPage() {
@@ -229,7 +229,7 @@ export default function AssessmentPage() {
     const common = ['Technical documentation', 'Record keeping', 'Transparency requirements'];
     if (riskLevel === 'PROHIBITED') return ['System cannot be deployed under EU AI Act'];
     if (riskLevel === 'HIGH_RISK') return [...common, 'Conformity assessment', 'Risk management system', 'Data governance', 'Human oversight', 'Accuracy requirements', 'Cybersecurity measures'];
-    if (riskLevel === 'LIMITED_RISK') return [...common, 'User disclosure requirements'];
+    if (riskLevel === 'LIMITED_RISK') return [...common, 'LuUser disclosure requirements'];
     return ['Basic transparency requirements'];
   };
 
@@ -316,7 +316,7 @@ export default function AssessmentPage() {
             <div className="space-y-2">
               {report.requirements.map((req, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-blue-600 flex-shrink-0" />
+                  <LuCircleCheckBig size={16} className="text-blue-600 flex-shrink-0" />
                   <span className="text-sm text-zinc-700 dark:text-zinc-300">{req}</span>
                 </div>
               ))}
@@ -369,9 +369,9 @@ export default function AssessmentPage() {
                 />
                 <Button
                   onClick={() => alert('Report will be sent to: ' + email)}
-                  icon={<Download size={16} />}
+                  icon={<LuDownload size={16} />}
                 >
-                  Download Report
+                  LuDownload Report
                 </Button>
               </div>
             </div>
@@ -446,7 +446,7 @@ export default function AssessmentPage() {
             variant="secondary"
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            icon={<ChevronLeft size={16} />}
+            icon={<LuChevronLeft size={16} />}
           >
             Previous
           </Button>
@@ -454,7 +454,7 @@ export default function AssessmentPage() {
           {currentQuestion === ALL_QUESTIONS.length - 1 && answers[question.id] && (
             <Button
               onClick={() => generateReport(answers)}
-              icon={<ChevronRight size={16} />}
+              icon={<LuChevronRight size={16} />}
               iconPosition="right"
             >
               View Results

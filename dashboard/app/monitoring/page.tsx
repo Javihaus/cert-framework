@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Zap,
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  Filter,
-  Search,
-  Play,
-  Pause,
-  Cpu,
-  Signal,
-} from 'lucide-react';
+  LuRepeat2,
+  LuClock,
+  LuTriangleAlert,
+  LuCircleCheck,
+  LuCircleX,
+  LuRefreshCw,
+  LuFilter,
+  LuSearch,
+  LuPlay,
+  LuPause,
+  LuCpu,
+  LuSignal,
+} from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Trace {
@@ -130,7 +130,7 @@ export default function MonitoringPage() {
         >
           {isLive ? (
             <>
-              <Pause className="w-4 h-4" />
+              <LuPause className="w-4 h-4" />
               Live
               <span className="relative flex h-2 w-2 ml-1">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
@@ -139,7 +139,7 @@ export default function MonitoringPage() {
             </>
           ) : (
             <>
-              <Play className="w-4 h-4" />
+              <LuPlay className="w-4 h-4" />
               Paused
             </>
           )}
@@ -151,7 +151,7 @@ export default function MonitoringPage() {
         <div className="metric-card">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary-50 dark:bg-planetarium/20 rounded-lg">
-              <Zap className="w-5 h-5 text-planetarium" />
+              <LuRepeat2 className="w-5 h-5 text-planetarium" />
             </div>
             <div>
               <div className="metric-value">{metrics.totalTraces}</div>
@@ -163,7 +163,7 @@ export default function MonitoringPage() {
         <div className="metric-card">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-50 dark:bg-purple-500/20 rounded-lg">
-              <Clock className="w-5 h-5 text-purple-600" />
+              <LuClock className="w-5 h-5 text-purple-600" />
             </div>
             <div>
               <div className="metric-value">{metrics.avgLatency}ms</div>
@@ -175,7 +175,7 @@ export default function MonitoringPage() {
         <div className="metric-card">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-error-50 dark:bg-error-500/20 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-error-600" />
+              <LuTriangleAlert className="w-5 h-5 text-error-600" />
             </div>
             <div>
               <div className="metric-value">{metrics.errorRate}%</div>
@@ -187,7 +187,7 @@ export default function MonitoringPage() {
         <div className="metric-card">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-success-50 dark:bg-success-500/20 rounded-lg">
-              <Signal className="w-5 h-5 text-success-600" />
+              <LuSignal className="w-5 h-5 text-success-600" />
             </div>
             <div>
               <div className="metric-value">{metrics.throughput}/min</div>
@@ -201,7 +201,7 @@ export default function MonitoringPage() {
       <div className="card p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-porpoise" />
+            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-porpoise" />
             <input
               type="text"
               placeholder="Search by endpoint, provider, or model..."
@@ -211,7 +211,7 @@ export default function MonitoringPage() {
             />
           </div>
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-porpoise" />
+            <LuFilter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-porpoise" />
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -262,13 +262,13 @@ export default function MonitoringPage() {
                   <td>
                     {trace.status === 'success' && (
                       <span className="badge badge-success">
-                        <CheckCircle className="w-3 h-3" />
+                        <LuCircleCheck className="w-3 h-3" />
                         success
                       </span>
                     )}
                     {trace.status === 'error' && (
                       <span className="badge badge-error">
-                        <XCircle className="w-3 h-3" />
+                        <LuCircleX className="w-3 h-3" />
                         error
                       </span>
                     )}
@@ -281,7 +281,7 @@ export default function MonitoringPage() {
                   </td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-porpoise" />
+                      <LuCpu className="w-4 h-4 text-porpoise" />
                       <span className="text-midnight dark:text-white">{trace.provider}</span>
                       <span className="text-porpoise">/ {trace.model}</span>
                     </div>
@@ -309,7 +309,7 @@ export default function MonitoringPage() {
 
         {filteredTraces.length === 0 && (
           <div className="p-12 text-center">
-            <Zap className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <LuRepeat2 className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-title text-midnight dark:text-white mb-2">No traces found</h3>
             <p className="text-porpoise">
               {searchQuery || filter !== 'all'

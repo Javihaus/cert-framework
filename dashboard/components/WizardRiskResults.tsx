@@ -4,7 +4,7 @@ import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { RiskOutputs } from '@/types/wizard';
-import { XCircle, AlertTriangle, Shield, CheckCircle2, Clock, DollarSign } from 'lucide-react';
+import { LuCircleX, LuTriangleAlert, LuShield, LuCircleCheckBig, LuClock, LuDollarSign } from 'react-icons/lu';
 
 interface WizardRiskResultsProps {
   outputs: RiskOutputs;
@@ -16,7 +16,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
     switch (classification) {
       case 'prohibited':
         return {
-          icon: XCircle,
+          icon: LuCircleX,
           colorClass: 'text-red-500',
           bgClass: 'bg-red-50 dark:bg-red-900/20',
           borderClass: 'border-red-500',
@@ -25,7 +25,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         };
       case 'high-risk':
         return {
-          icon: AlertTriangle,
+          icon: LuTriangleAlert,
           colorClass: 'text-amber-500',
           bgClass: 'bg-amber-50 dark:bg-amber-900/20',
           borderClass: 'border-amber-500',
@@ -34,7 +34,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         };
       case 'limited-risk':
         return {
-          icon: Shield,
+          icon: LuShield,
           colorClass: 'text-blue-600',
           bgClass: 'bg-blue-50 dark:bg-blue-900/20',
           borderClass: 'border-blue-600',
@@ -43,7 +43,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         };
       case 'minimal-risk':
         return {
-          icon: CheckCircle2,
+          icon: LuCircleCheckBig,
           colorClass: 'text-green-600',
           bgClass: 'bg-green-50 dark:bg-green-900/20',
           borderClass: 'border-green-600',
@@ -52,7 +52,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         };
       default:
         return {
-          icon: Shield,
+          icon: LuShield,
           colorClass: 'text-zinc-500',
           bgClass: 'bg-zinc-100 dark:bg-zinc-800',
           borderClass: 'border-zinc-300',
@@ -92,7 +92,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
       {isProhibited && outputs.prohibitionReason && (
         <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
           <div className="flex items-center gap-2 mb-4">
-            <XCircle size={24} className="text-red-500" />
+            <LuCircleX size={24} className="text-red-500" />
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Why This System is Prohibited
             </h3>
@@ -127,7 +127,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         <div className="grid grid-cols-2 gap-4 mb-6">
           <Card className="border-2 border-blue-600">
             <div className="flex items-center gap-2 mb-2">
-              <DollarSign size={20} className="text-blue-600" />
+              <LuDollarSign size={20} className="text-blue-600" />
               <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                 Estimated Compliance Cost
               </span>
@@ -139,7 +139,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
 
           <Card className="border-2 border-blue-600">
             <div className="flex items-center gap-2 mb-2">
-              <Clock size={20} className="text-blue-600" />
+              <LuClock size={20} className="text-blue-600" />
               <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                 Estimated Timeline
               </span>
@@ -159,7 +159,7 @@ export default function WizardRiskResults({ outputs, onNext }: WizardRiskResults
         <div className="flex flex-col gap-2">
           {outputs.complianceRequirements.map((requirement, idx) => (
             <div key={idx} className="flex items-start gap-2">
-              <CheckCircle2 size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <LuCircleCheckBig size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {requirement}
               </span>

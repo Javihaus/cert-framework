@@ -3,16 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Zap,
-  Play,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  RefreshCw,
-  ChevronDown,
-  Settings,
-  Eye,
-} from 'lucide-react';
+  LuRepeat2,
+  LuPlay,
+  LuCircleCheck,
+  LuCircleX,
+  LuCircleAlert,
+  LuRefreshCw,
+  LuChevronDown,
+  LuSettings,
+  LuEye,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -174,7 +174,7 @@ export default function LLMJudgePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Zap className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
+            <LuRepeat2 className="w-7 h-7 text-[#10069F] dark:text-[#9fc2e9]" />
             LLM Judge
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -185,7 +185,7 @@ export default function LLMJudgePage() {
           onClick={loadTraces}
           className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" />
+          <LuRefreshCw className="w-4 h-4" />
           Refresh
         </button>
       </div>
@@ -195,7 +195,7 @@ export default function LLMJudgePage() {
         <div className="bg-[#10069F]/10 dark:bg-[#10069F]/10 border border-[#10069F]/30 dark:border-[#10069F]/30 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Zap className="w-5 h-5 text-[#10069F] dark:text-[#7ea0bf]" />
+              <LuRepeat2 className="w-5 h-5 text-[#10069F] dark:text-[#7ea0bf]" />
               <div>
                 <p className="text-sm font-medium text-[#10069F] dark:text-[#7ea0bf]">
                   Judge Model: {judgeConfig.provider}/{judgeConfig.model}
@@ -279,11 +279,11 @@ export default function LLMJudgePage() {
                             )}
                           >
                             {trace.evaluation.status === 'pass' ? (
-                              <CheckCircle className="w-3 h-3" />
+                              <LuCircleCheck className="w-3 h-3" />
                             ) : trace.evaluation.status === 'fail' ? (
-                              <XCircle className="w-3 h-3" />
+                              <LuCircleX className="w-3 h-3" />
                             ) : (
-                              <AlertCircle className="w-3 h-3" />
+                              <LuCircleAlert className="w-3 h-3" />
                             )}
                             {trace.evaluation.score?.toFixed(1)}
                           </span>
@@ -373,7 +373,7 @@ export default function LLMJudgePage() {
                     </>
                   ) : (
                     <>
-                      <Play className="w-4 h-4" />
+                      <LuPlay className="w-4 h-4" />
                       Evaluate with {judgeConfig?.provider}/{judgeConfig?.model}
                     </>
                   )}
@@ -428,11 +428,11 @@ export default function LLMJudgePage() {
                         )}
                       >
                         {evaluationResult.status === 'pass' ? (
-                          <CheckCircle className="w-3 h-3" />
+                          <LuCircleCheck className="w-3 h-3" />
                         ) : evaluationResult.status === 'fail' ? (
-                          <XCircle className="w-3 h-3" />
+                          <LuCircleX className="w-3 h-3" />
                         ) : (
-                          <AlertCircle className="w-3 h-3" />
+                          <LuCircleAlert className="w-3 h-3" />
                         )}
                         Score: {evaluationResult.score.toFixed(1)}/10
                       </span>
@@ -456,7 +456,7 @@ export default function LLMJudgePage() {
             </>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-              <Eye className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
+              <LuEye className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
                 Select a trace to evaluate
               </h3>

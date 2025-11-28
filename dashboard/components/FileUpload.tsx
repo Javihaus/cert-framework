@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, CheckCircle2 } from 'lucide-react';
+import { LuUpload, LuCircleCheckBig } from 'react-icons/lu';
 import Button from './Button';
 
 interface FileUploadProps {
@@ -55,7 +55,7 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
       <label htmlFor="file-upload" className="cursor-pointer flex justify-center">
         <Button
           variant="secondary"
-          icon={<Upload size={20} />}
+          icon={<LuUpload size={20} />}
           className="pointer-events-none"
         >
           {label}
@@ -65,10 +65,10 @@ export default function FileUpload({ onFileLoad, accept, label }: FileUploadProp
       {fileName && (
         <div className="mt-4 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={24} className="text-green-600 dark:text-green-500" />
+            <LuCircleCheckBig size={24} className="text-green-600 dark:text-green-500" />
             <div>
               <p className="text-sm font-semibold text-green-600 dark:text-green-500">
-                File uploaded successfully
+                LuFile uploaded successfully
               </p>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 {fileName}

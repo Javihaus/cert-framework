@@ -5,7 +5,7 @@ import FileUpload from '@/components/FileUpload';
 import RecommendationCard from '@/components/RecommendationCard';
 import MetricCard from '@/components/MetricCard';
 import Card from '@/components/Card';
-import { Zap, DollarSign, TrendingDown, Target, Package } from 'lucide-react';
+import { LuRepeat2, LuDollarSign, LuTrendingDown, LuTarget, LuPackage } from 'react-icons/lu';
 import { Trace, OptimizationOpportunity } from '@/types/trace';
 import { TraceAnalyzer } from '@/lib/trace-analyzer';
 
@@ -67,19 +67,19 @@ export default function OptimizationPage() {
         )}
       </div>
 
-      {/* File upload */}
+      {/* LuFile upload */}
       {recommendations.length === 0 && (
         <Card>
           <div className="flex flex-col items-center gap-4 py-8">
-            <Zap size={48} className="text-amber-500" />
+            <LuRepeat2 size={48} className="text-amber-500" />
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-              Upload trace file to find optimization opportunities
+              LuUpload trace file to find optimization opportunities
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-[500px]">
-              Upload your cert_traces.jsonl file to discover ways to reduce costs
+              LuUpload your cert_traces.jsonl file to discover ways to reduce costs
             </p>
             <div className="w-full max-w-[500px]">
-              <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="Upload Trace File" />
+              <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="LuUpload Trace LuFile" />
             </div>
           </div>
         </Card>
@@ -92,19 +92,19 @@ export default function OptimizationPage() {
             <MetricCard
               label="Potential Savings"
               value={`$${totalSavings.toFixed(2)}`}
-              icon={DollarSign}
+              icon={LuDollarSign}
               variant="success"
             />
             <MetricCard
               label="Opportunities Found"
               value={recommendations.length.toString()}
-              icon={Target}
+              icon={LuTarget}
               variant="default"
             />
             <MetricCard
               label="Traces Analyzed"
               value={traces.length.toString()}
-              icon={Package}
+              icon={LuPackage}
               variant="default"
             />
           </div>

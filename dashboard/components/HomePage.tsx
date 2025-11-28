@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, Activity, ArrowRight, CheckCircle, Shield } from 'lucide-react';
+import { LuRepeat2, LuActivity, LuArrowRight, LuCircleCheck, LuShield } from 'react-icons/lu';
 import Link from 'next/link';
 
 /**
@@ -35,7 +35,7 @@ export default function HomePage() {
             className="inline-flex items-center gap-2 bg-[#10069F] text-white px-8 py-3.5 rounded-lg font-semibold text-base border border-[#10069F] hover:bg-[#2a3759] hover:border-[#2a3759] transition-all hover:-translate-y-0.5"
           >
             Start monitoring
-            <ArrowRight className="w-5 h-5" />
+            <LuArrowRight className="w-5 h-5" />
           </a>
         </div>
       </section>
@@ -49,7 +49,7 @@ export default function HomePage() {
             <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-10 transition-all hover:border-[#222d4a] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
               <div className="text-[#10069F] mb-6">
-                <Zap className="w-8 h-8" strokeWidth={2} />
+                <LuRepeat2 className="w-8 h-8" strokeWidth={2} />
               </div>
 
               {/* Title */}
@@ -65,15 +65,15 @@ export default function HomePage() {
               {/* Feature list */}
               <ul className="space-y-2.5 mb-6">
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>LLM Judge - Automated AI evaluation</span>
                 </li>
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>Human Review - Manual verification</span>
                 </li>
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>Test Results - Unit tests</span>
                 </li>
               </ul>
@@ -81,7 +81,7 @@ export default function HomePage() {
               {/* Explore link */}
               <span className="inline-flex items-center gap-2 text-[14px] font-medium text-[#10069F] dark:text-[#7ea0bf] group-hover:gap-3 transition-all">
                 Explore
-                <ArrowRight className="w-4 h-4" />
+                <LuArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
@@ -91,7 +91,7 @@ export default function HomePage() {
             <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-10 transition-all hover:border-[#222d4a] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
               <div className="text-[#10069F] mb-6">
-                <Activity className="w-8 h-8" strokeWidth={2} />
+                <LuActivity className="w-8 h-8" strokeWidth={2} />
               </div>
 
               {/* Title */}
@@ -107,15 +107,15 @@ export default function HomePage() {
               {/* Feature list */}
               <ul className="space-y-2.5 mb-6">
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>Performance - Latency P95 &lt; 30s</span>
                 </li>
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>Cost - API costs &lt; $0.25/query</span>
                 </li>
                 <li className="flex items-start gap-3 text-[14px] text-[#596780] dark:text-[#8792A2] leading-[1.6]">
-                  <CheckCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
+                  <LuCircleCheck className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-[#7b8f45]" strokeWidth={2.5} />
                   <span>Observability - Error rates, traces</span>
                 </li>
               </ul>
@@ -123,7 +123,7 @@ export default function HomePage() {
               {/* Explore link */}
               <span className="inline-flex items-center gap-2 text-[14px] font-medium text-[#10069F] dark:text-[#7ea0bf] group-hover:gap-3 transition-all">
                 Explore
-                <ArrowRight className="w-4 h-4" />
+                <LuArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
@@ -141,7 +141,7 @@ export default function HomePage() {
             {/* Self-hosted */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Shield className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
+                <LuShield className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Self-Hosted
                 </h3>
@@ -154,7 +154,7 @@ export default function HomePage() {
             {/* Production Grade */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Activity className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
+                <LuActivity className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Production Grade
                 </h3>
@@ -167,7 +167,7 @@ export default function HomePage() {
             {/* Framework Agnostic */}
             <div className="bg-[#FFFFFF] dark:bg-[#151B24] border border-[#10069F] rounded-xl p-8">
               <div className="flex items-center gap-3 mb-3">
-                <Zap className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
+                <LuRepeat2 className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" strokeWidth={2} />
                 <h3 className="text-[15px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">
                   Framework Agnostic
                 </h3>

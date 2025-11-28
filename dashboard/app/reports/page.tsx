@@ -2,30 +2,30 @@
 
 import { useState } from 'react';
 import {
-  FileText,
-  Download,
-  Calendar,
-  Filter,
-  Search,
-  Eye,
-  ArrowDownToLine,
-  BarChart3,
-  Shield,
-  Clock,
-} from 'lucide-react';
+  LuFileText,
+  LuDownload,
+  LuCalendar,
+  LuFilter,
+  LuSearch,
+  LuEye,
+  LuArrowDownToLine,
+  LuChartBar,
+  LuShield,
+  LuClock,
+} from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 
 // Icon mapping for compatibility
-const DocumentTextIcon = FileText;
-const DocumentArrowDownIcon = Download;
-const CalendarIcon = Calendar;
-const FunnelIcon = Filter;
-const MagnifyingGlassIcon = Search;
-const EyeIcon = Eye;
-const ArrowDownTrayIcon = ArrowDownToLine;
-const ChartBarIcon = BarChart3;
-const ShieldCheckIcon = Shield;
-const ClockIcon = Clock;
+const DocumentTextIcon = LuFileText;
+const DocumentArrowDownIcon = LuDownload;
+const CalendarIcon = LuCalendar;
+const FunnelIcon = LuFilter;
+const MagnifyingGlassIcon = LuSearch;
+const EyeIcon = LuEye;
+const ArrowDownTrayIcon = LuArrowDownToLine;
+const ChartBarIcon = LuChartBar;
+const ShieldCheckIcon = LuShield;
+const ClockIcon = LuClock;
 
 // Mock reports data
 const reports = [
@@ -211,7 +211,7 @@ export default function ReportsPage() {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search reports..."
+                placeholder="LuSearch reports..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input-field pl-10 w-full"
@@ -328,7 +328,7 @@ export default function ReportsPage() {
                         </button>
                         <button
                           className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                          title="Download"
+                          title="LuDownload"
                           disabled={report.status !== 'completed'}
                         >
                           <ArrowDownTrayIcon className="h-5 w-5" />

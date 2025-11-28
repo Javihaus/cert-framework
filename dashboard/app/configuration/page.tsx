@@ -3,19 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  DollarSign,
-  Check,
-  Zap,
-  Sliders,
-  User,
-  Shield,
-  FileText,
-  Database,
-  Bell,
-  Key,
-  HelpCircle,
-  X,
-} from 'lucide-react';
+  LuDollarSign,
+  LuCheck,
+  LuRepeat2,
+  LuSlidersHorizontal,
+  LuUser,
+  LuShield,
+  LuFileText,
+  LuDatabase,
+  LuBell,
+  LuKey,
+  LuBadgeHelp,
+  LuX,
+} from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 import Switch from '@mui/material/Switch';
 import Slider from '@mui/material/Slider';
@@ -108,7 +108,7 @@ function ConfigPanel({ title, onClose, wide, children }: ConfigPanelProps) {
         <div className="sticky top-0 bg-white dark:bg-[#151B24] border-b border-[#10069F] px-6 py-4 flex items-center justify-between">
           <h3 className="text-[16px] font-semibold text-[#0A2540] dark:text-[#E8ECF1]">{title}</h3>
           <button onClick={onClose} className="text-[#596780] hover:text-[#0A2540] dark:hover:text-[#E8ECF1]">
-            <X className="w-5 h-5" />
+            <LuX className="w-5 h-5" />
           </button>
         </div>
         <div className="p-6">{children}</div>
@@ -173,7 +173,7 @@ export default function ConfigurationPage() {
               : "bg-[#10069F] text-white hover:bg-[#2a3759]"
           )}
         >
-          {saving ? <CircularProgress size={16} sx={{ color: 'white' }} /> : saved ? <Check className="w-4 h-4" /> : null}
+          {saving ? <CircularProgress size={16} sx={{ color: 'white' }} /> : saved ? <LuCheck className="w-4 h-4" /> : null}
           {saved ? 'Saved' : 'Save Changes'}
         </button>
       </div>
@@ -185,19 +185,19 @@ export default function ConfigurationPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ConfigItem
-            icon={Sliders}
+            icon={LuSlidersHorizontal}
             title="Automatic Evaluation"
             description="Configure semantic similarity and NLI weights for automatic trace evaluation."
             onClick={() => setShowAutoEvalPanel(true)}
           />
           <ConfigItem
-            icon={Zap}
+            icon={LuRepeat2}
             title="LLM Judge"
             description="Set up API keys and model preferences for LLM-as-judge evaluations."
             onClick={() => setShowJudgePanel(true)}
           />
           <ConfigItem
-            icon={DollarSign}
+            icon={LuDollarSign}
             title="Model Pricing"
             description="Configure token pricing for cost analysis calculations."
             onClick={() => setShowPricingPanel(true)}
@@ -211,9 +211,9 @@ export default function ConfigurationPage() {
           Account Settings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ConfigItem icon={User} title="Profile" description="Manage your account details and preferences." href="#" />
-          <ConfigItem icon={Key} title="API Keys" description="View and manage your API keys for external integrations." href="#" />
-          <ConfigItem icon={Bell} title="Notifications" description="Configure email and in-app notification preferences." href="#" />
+          <ConfigItem icon={LuUser} title="Profile" description="Manage your account details and preferences." href="#" />
+          <ConfigItem icon={LuKey} title="API Keys" description="View and manage your API keys for external integrations." href="#" />
+          <ConfigItem icon={LuBell} title="Notifications" description="Configure email and in-app notification preferences." href="#" />
         </div>
       </section>
 
@@ -223,9 +223,9 @@ export default function ConfigurationPage() {
           Compliance & Documentation
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ConfigItem icon={FileText} title="Document Templates" description="Customize templates for compliance document generation." href="#" />
-          <ConfigItem icon={Shield} title="Compliance Rules" description="Configure EU AI Act compliance thresholds and requirements." href="#" />
-          <ConfigItem icon={Database} title="Data Management" description="Manage trace data storage and retention policies." href="#" />
+          <ConfigItem icon={LuFileText} title="Document Templates" description="Customize templates for compliance document generation." href="#" />
+          <ConfigItem icon={LuShield} title="Compliance Rules" description="Configure EU AI Act compliance thresholds and requirements." href="#" />
+          <ConfigItem icon={LuDatabase} title="Data Management" description="Manage trace data storage and retention policies." href="#" />
         </div>
       </section>
 
@@ -235,7 +235,7 @@ export default function ConfigurationPage() {
           Help & Support
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ConfigItem icon={HelpCircle} title="Documentation" description="Learn how to use CERT and configure your compliance workflow." href="/help" />
+          <ConfigItem icon={LuBadgeHelp} title="Documentation" description="Learn how to use CERT and configure your compliance workflow." href="/help" />
         </div>
       </section>
 

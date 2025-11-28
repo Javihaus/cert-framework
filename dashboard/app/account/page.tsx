@@ -4,18 +4,18 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-  User,
-  Mail,
-  Building,
-  Key,
-  Copy,
-  Check,
-  LogOut,
-  Calendar,
-  Database,
-  Activity,
-  BarChart3,
-} from 'lucide-react';
+  LuUser,
+  LuMail,
+  LuBuilding,
+  LuKey,
+  LuCopy,
+  LuCheck,
+  LuLogOut,
+  LuCalendar,
+  LuDatabase,
+  LuActivity,
+  LuChartBar,
+} from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 import { cn } from '@/lib/utils';
 
@@ -72,7 +72,7 @@ export default function AccountPage() {
           {loggingOut ? (
             <CircularProgress size={16} sx={{ color: 'inherit' }} />
           ) : (
-            <LogOut className="w-4 h-4" />
+            <LuLogOut className="w-4 h-4" />
           )}
           Sign Out
         </button>
@@ -87,7 +87,7 @@ export default function AccountPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#10069F] flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
+                <LuUser className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="text-[14px] font-medium text-[#0A2540] dark:text-[#E8ECF1]">
@@ -101,14 +101,14 @@ export default function AccountPage() {
 
             <div className="space-y-3 pt-4 border-t border-[#E3E8EE] dark:border-[#1D2530]">
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#596780]" />
+                <LuMail className="w-4 h-4 text-[#596780]" />
                 <span className="text-[14px] text-[#0A2540] dark:text-[#E8ECF1]">
                   {user.email}
                 </span>
               </div>
               {user.company && (
                 <div className="flex items-center gap-3">
-                  <Building className="w-4 h-4 text-[#596780]" />
+                  <LuBuilding className="w-4 h-4 text-[#596780]" />
                   <span className="text-[14px] text-[#0A2540] dark:text-[#E8ECF1]">
                     {user.company}
                   </span>
@@ -116,7 +116,7 @@ export default function AccountPage() {
               )}
               {user.createdAt && (
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-[#596780]" />
+                  <LuCalendar className="w-4 h-4 text-[#596780]" />
                   <span className="text-[14px] text-[#596780] dark:text-[#afb6bf]">
                     Member since {new Date(user.createdAt).toLocaleDateString()}
                   </span>
@@ -137,7 +137,7 @@ export default function AccountPage() {
 
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
-              <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#596780]" />
+              <LuKey className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#596780]" />
               <input
                 type="text"
                 readOnly
@@ -155,9 +155,9 @@ export default function AccountPage() {
               )}
             >
               {copied ? (
-                <Check className="w-4 h-4 text-green-600" />
+                <LuCheck className="w-4 h-4 text-green-600" />
               ) : (
-                <Copy className="w-4 h-4 text-[#596780]" />
+                <LuCopy className="w-4 h-4 text-[#596780]" />
               )}
             </button>
           </div>
@@ -184,7 +184,7 @@ headers = {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-[#F6F9FC] dark:bg-[#0A0E14] rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Database className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+                  <LuDatabase className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
                   <span className="text-[12px] font-medium text-[#596780] dark:text-[#afb6bf] uppercase">
                     Total Traces
                   </span>
@@ -196,7 +196,7 @@ headers = {
 
               <div className="p-4 bg-[#F6F9FC] dark:bg-[#0A0E14] rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Activity className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+                  <LuActivity className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
                   <span className="text-[12px] font-medium text-[#596780] dark:text-[#afb6bf] uppercase">
                     Tokens Used
                   </span>
@@ -208,7 +208,7 @@ headers = {
 
               <div className="col-span-2 p-4 bg-[#F6F9FC] dark:bg-[#0A0E14] rounded-lg">
                 <div className="flex items-center gap-2 mb-3">
-                  <BarChart3 className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
+                  <LuChartBar className="w-4 h-4 text-[#10069F] dark:text-[#9fc2e9]" />
                   <span className="text-[12px] font-medium text-[#596780] dark:text-[#afb6bf] uppercase">
                     Evaluation Status
                   </span>

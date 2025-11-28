@@ -4,7 +4,7 @@ import Card from './Card';
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { ReadinessOutputs } from '@/types/wizard';
-import { CheckCircle2, AlertTriangle, XCircle, TrendingUp, Clock, AlertCircle, Database, Code, Users, Shield } from 'lucide-react';
+import { LuCircleCheckBig, LuTriangleAlert, LuCircleX, LuTrendingUp, LuClock, LuCircleAlert, LuDatabase, LuCode, LuUsers, LuShield } from 'react-icons/lu';
 
 interface WizardReadinessResultsProps {
   outputs: ReadinessOutputs;
@@ -19,7 +19,7 @@ export default function WizardReadinessResults({
     switch (level) {
       case 'ready':
         return {
-          icon: CheckCircle2,
+          icon: LuCircleCheckBig,
           colorClass: 'text-green-600',
           bgClass: 'bg-green-50 dark:bg-green-900/20',
           borderClass: 'border-green-600',
@@ -28,7 +28,7 @@ export default function WizardReadinessResults({
         };
       case 'needs-preparation':
         return {
-          icon: AlertTriangle,
+          icon: LuTriangleAlert,
           colorClass: 'text-amber-500',
           bgClass: 'bg-amber-50 dark:bg-amber-900/20',
           borderClass: 'border-amber-500',
@@ -37,7 +37,7 @@ export default function WizardReadinessResults({
         };
       case 'not-ready':
         return {
-          icon: XCircle,
+          icon: LuCircleX,
           colorClass: 'text-red-500',
           bgClass: 'bg-red-50 dark:bg-red-900/20',
           borderClass: 'border-red-500',
@@ -46,7 +46,7 @@ export default function WizardReadinessResults({
         };
       default:
         return {
-          icon: AlertCircle,
+          icon: LuCircleAlert,
           colorClass: 'text-zinc-500',
           bgClass: 'bg-zinc-100 dark:bg-zinc-800',
           borderClass: 'border-zinc-300',
@@ -60,10 +60,10 @@ export default function WizardReadinessResults({
   const ReadinessIcon = config.icon;
 
   const categoryIcons = {
-    data: Database,
-    technical: Code,
-    organizational: Users,
-    compliance: Shield
+    data: LuDatabase,
+    technical: LuCode,
+    organizational: LuUsers,
+    compliance: LuShield
   };
 
   const getCategoryConfig = (score: number) => {
@@ -133,7 +133,7 @@ export default function WizardReadinessResults({
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="border-2 border-blue-600">
           <div className="flex items-center gap-2 mb-2">
-            <Clock size={20} className="text-blue-600" />
+            <LuClock size={20} className="text-blue-600" />
             <span className="text-sm font-semibold text-zinc-900 dark:text-white">
               Estimated Timeline
             </span>
@@ -148,7 +148,7 @@ export default function WizardReadinessResults({
 
         <Card className="border-2 border-red-500">
           <div className="flex items-center gap-2 mb-2">
-            <AlertCircle size={20} className="text-red-500" />
+            <LuCircleAlert size={20} className="text-red-500" />
             <span className="text-sm font-semibold text-zinc-900 dark:text-white">
               Gaps Identified
             </span>
@@ -166,7 +166,7 @@ export default function WizardReadinessResults({
       {outputs.gaps.length > 0 && (
         <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-500">
           <div className="flex items-center gap-2 mb-4">
-            <AlertCircle size={24} className="text-red-500" />
+            <LuCircleAlert size={24} className="text-red-500" />
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
               Gaps to Address
             </h3>
@@ -174,7 +174,7 @@ export default function WizardReadinessResults({
           <div className="flex flex-col gap-2">
             {outputs.gaps.map((gap, idx) => (
               <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
-                <XCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                <LuCircleX size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">
                   {gap}
                 </span>
@@ -187,7 +187,7 @@ export default function WizardReadinessResults({
       {/* Recommendations */}
       <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-600">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={24} className="text-blue-600" />
+          <LuTrendingUp size={24} className="text-blue-600" />
           <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
             Recommendations
           </h3>
@@ -195,7 +195,7 @@ export default function WizardReadinessResults({
         <div className="flex flex-col gap-2">
           {outputs.recommendations.map((rec, idx) => (
             <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
-              <CheckCircle2 size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <LuCircleCheckBig size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {rec}
               </span>
@@ -208,7 +208,7 @@ export default function WizardReadinessResults({
       {outputs.riskFactors.length > 0 && (
         <Card className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-500">
           <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle size={24} className="text-amber-500" />
+            <LuTriangleAlert size={24} className="text-amber-500" />
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
               Risk Factors
             </h3>
@@ -216,7 +216,7 @@ export default function WizardReadinessResults({
           <div className="flex flex-col gap-2">
             {outputs.riskFactors.map((risk, idx) => (
               <div key={idx} className="flex items-start gap-2 p-2 bg-white dark:bg-zinc-800 rounded-md">
-                <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                <LuTriangleAlert size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">
                   {risk}
                 </span>

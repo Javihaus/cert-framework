@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, Check } from 'lucide-react';
+import { LuCircleAlert, LuCheck } from 'react-icons/lu';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/joy/Button';
 import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
@@ -164,7 +164,7 @@ export default function RegisterPage() {
               ].map((feature, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/80">
                   <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3" />
+                    <LuCheck className="w-3 h-3" />
                   </div>
                   <span className="text-sm">{feature}</span>
                 </div>
@@ -241,7 +241,7 @@ export default function RegisterPage() {
               {/* Error Message */}
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                  <LuCircleAlert className="w-4 h-4 text-red-500 flex-shrink-0" />
                   <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                 </div>
               )}
@@ -320,7 +320,7 @@ export default function RegisterPage() {
                 />
                 {password && confirmPassword && password === confirmPassword && (
                   <div className="flex items-center gap-1 mt-1.5 text-green-600 dark:text-green-400">
-                    <Check className="w-3 h-3" />
+                    <LuCheck className="w-3 h-3" />
                     <span className="text-xs">Passwords match</span>
                   </div>
                 )}

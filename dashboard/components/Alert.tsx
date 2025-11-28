@@ -2,12 +2,12 @@
 
 import { ReactNode } from 'react';
 import {
-  AlertCircle,
-  CheckCircle,
-  AlertTriangle,
-  Info,
-  X,
-} from 'lucide-react';
+  LuCircleAlert,
+  LuCircleCheck,
+  LuTriangleAlert,
+  LuInfo,
+  LuX,
+} from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import Button from './Button';
 
@@ -27,31 +27,31 @@ const severityConfig = {
     bgClass: 'bg-[#3C6098]/10 dark:bg-[#3C6098]/20',
     borderClass: 'border-[#3C6098]',
     iconClass: 'text-[#3C6098]',
-    Icon: Info,
+    Icon: LuInfo,
   },
   success: {
     bgClass: 'bg-green-50 dark:bg-green-900/20',
     borderClass: 'border-green-500',
     iconClass: 'text-green-500',
-    Icon: CheckCircle,
+    Icon: LuCircleCheck,
   },
   warning: {
     bgClass: 'bg-amber-50 dark:bg-amber-900/20',
     borderClass: 'border-amber-500',
     iconClass: 'text-amber-500',
-    Icon: AlertTriangle,
+    Icon: LuTriangleAlert,
   },
   error: {
     bgClass: 'bg-red-50 dark:bg-red-900/20',
     borderClass: 'border-red-500',
     iconClass: 'text-red-500',
-    Icon: AlertCircle,
+    Icon: LuCircleAlert,
   },
   high: {
     bgClass: 'bg-red-100 dark:bg-red-900/30',
     borderClass: 'border-red-600',
     iconClass: 'text-red-600',
-    Icon: AlertCircle,
+    Icon: LuCircleAlert,
   },
 };
 
@@ -107,7 +107,7 @@ export default function Alert({
               onClick={onDismiss}
               className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
             >
-              <X size={16} />
+              <LuX size={16} />
             </button>
           )}
         </div>

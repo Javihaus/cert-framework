@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { LuTriangleAlert, LuCircleCheckBig } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface StatusBannerProps {
@@ -11,14 +11,14 @@ export default function StatusBanner({ isCompliant, accuracy, failedCount }: Sta
   const variant = isCompliant
     ? {
         borderClass: 'border-green-600',
-        icon: CheckCircle2,
+        icon: LuCircleCheckBig,
         iconClass: 'text-green-600',
         title: 'Meets Compliance Threshold',
         message: `Accuracy at ${(accuracy * 100).toFixed(1)}% (target: 90%). System ready for deployment.`,
       }
     : {
         borderClass: 'border-amber-500',
-        icon: AlertTriangle,
+        icon: LuTriangleAlert,
         iconClass: 'text-amber-500',
         title: 'Below Compliance Threshold',
         message: `Accuracy at ${(accuracy * 100).toFixed(1)}% (target: 90%). Review ${failedCount} failed traces to identify systematic issues.`,

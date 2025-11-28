@@ -2,25 +2,25 @@
 
 import { useState } from 'react';
 import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Euro,
-  Cpu,
-  Zap,
-  Clock,
-  Calendar,
-} from 'lucide-react';
+  LuChartBar,
+  LuTrendingUp,
+  LuTrendingDown,
+  LuEuro,
+  LuCpu,
+  LuRepeat2,
+  LuClock,
+  LuCalendar,
+} from 'react-icons/lu';
 
 // Icon mapping for compatibility
-const ChartBarIcon = BarChart3;
-const ArrowTrendingUpIcon = TrendingUp;
-const ArrowTrendingDownIcon = TrendingDown;
-const CurrencyEuroIcon = Euro;
-const CpuChipIcon = Cpu;
-const BoltIcon = Zap;
-const ClockIcon = Clock;
-const CalendarIcon = Calendar;
+const ChartBarIcon = LuChartBar;
+const ArrowTrendingUpIcon = LuTrendingUp;
+const ArrowTrendingDownIcon = LuTrendingDown;
+const CurrencyEuroIcon = LuEuro;
+const CpuChipIcon = LuCpu;
+const BoltIcon = LuRepeat2;
+const ClockIcon = LuClock;
+const CalendarIcon = LuCalendar;
 import {
   AreaChart,
   Area,
@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics</h1>
             </div>
             <p className="text-gray-500 dark:text-gray-400">
-              Monitor AI system usage, costs, and performance metrics
+              LuMonitor AI system usage, costs, and performance metrics
             </p>
           </div>
 

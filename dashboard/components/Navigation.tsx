@@ -1,15 +1,15 @@
 'use client';
 
 import {
-  LayoutDashboard,
-  Monitor,
-  FileCheck,
-  TrendingUp,
-  Settings,
-  Bell,
-  Menu,
-  X,
-} from 'lucide-react';
+  LuLayoutDashboard,
+  LuMonitor,
+  LuFileCheck,
+  LuTrendingUp,
+  LuSettings,
+  LuBell,
+  LuMenu,
+  LuX,
+} from 'react-icons/lu';
 import { useState } from 'react';
 import Badge, { CountBadge } from './Badge';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ type NavigationSection =
 interface Tab {
   id: NavigationSection;
   label: string;
-  icon: typeof LayoutDashboard;
+  icon: typeof LuLayoutDashboard;
   badge?: number;
 }
 
@@ -42,15 +42,15 @@ export default function Navigation({
   activeSection,
   onSectionChange,
   notificationCount = 0,
-  userName = 'User',
+  userName = 'LuUser',
 }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const tabs: Tab[] = [
-    { id: 'home', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'monitoring', label: 'Monitoring', icon: Monitor },
-    { id: 'compliance', label: 'Compliance', icon: FileCheck, badge: 3 },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'home', label: 'Dashboard', icon: LuLayoutDashboard },
+    { id: 'monitoring', label: 'Monitoring', icon: LuMonitor },
+    { id: 'compliance', label: 'Compliance', icon: LuFileCheck, badge: 3 },
+    { id: 'analytics', label: 'Analytics', icon: LuTrendingUp },
   ];
 
   return (
@@ -72,28 +72,28 @@ export default function Navigation({
             ))}
           </div>
 
-          {/* Right Section - User & Notifications */}
+          {/* Right Section - LuUser & Notifications */}
           <div className="flex items-center gap-4">
-            {/* Notification Bell */}
+            {/* Notification LuBell */}
             <NotificationBell count={notificationCount} />
 
-            {/* Settings */}
+            {/* LuSettings */}
             <NavIconButton
-              icon={Settings}
+              icon={LuSettings}
               isActive={activeSection === 'settings'}
               onClick={() => onSectionChange('settings')}
-              aria-label="Settings"
+              aria-label="LuSettings"
             />
 
-            {/* User Avatar */}
+            {/* LuUser Avatar */}
             <UserAvatar name={userName} />
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile LuMenu Toggle */}
             <div className="flex md:hidden">
               <NavIconButton
-                icon={mobileMenuOpen ? X : Menu}
+                icon={mobileMenuOpen ? LuX : LuMenu}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Menu"
+                aria-label="LuMenu"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ function NavTab({ tab, isActive, onClick }: NavTabProps) {
 }
 
 interface NavIconButtonProps {
-  icon: typeof Settings;
+  icon: typeof LuSettings;
   isActive?: boolean;
   onClick: () => void;
   'aria-label': string;
@@ -193,7 +193,7 @@ function NotificationBell({ count }: { count: number }) {
   return (
     <div className="relative">
       <NavIconButton
-        icon={Bell}
+        icon={LuBell}
         onClick={() => {}}
         aria-label={`Notifications${count > 0 ? ` (${count})` : ''}`}
       />

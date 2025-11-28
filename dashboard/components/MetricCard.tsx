@@ -1,6 +1,6 @@
 'use client';
 
-import { LucideIcon } from 'lucide-react';
+import { IconType } from 'react-icons';
 import Card from './Card';
 import { TrendBadge, StatusBadge } from './Badge';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,7 @@ type MetricVariant = 'default' | 'success' | 'warning' | 'error' | 'primary';
 interface MetricCardProps {
   label: string;
   value: string | number;
-  icon?: LucideIcon;
+  icon?: IconType;
   variant?: MetricVariant;
   trend?: number;
   trendSuffix?: string;

@@ -5,7 +5,7 @@ import FileUpload from '@/components/FileUpload';
 import MetricCard from '@/components/MetricCard';
 import CostTrendChart from '@/components/CostTrendChart';
 import Card from '@/components/Card';
-import { DollarSign, TrendingUp, TrendingDown, Calendar, Package } from 'lucide-react';
+import { LuDollarSign, LuTrendingUp, LuTrendingDown, LuCalendar, LuPackage } from 'react-icons/lu';
 import { Trace, CostSummary } from '@/types/trace';
 import { TraceAnalyzer } from '@/lib/trace-analyzer';
 
@@ -22,7 +22,7 @@ export default function CostsPage() {
   };
 
   const analyzeCosts = (allTraces: Trace[]) => {
-    // Filter by time range
+    // LuFilter by time range
     const now = new Date();
     const cutoff = new Date();
     if (timeRange === '7d') cutoff.setDate(now.getDate() - 7);
@@ -90,19 +90,19 @@ export default function CostsPage() {
         )}
       </div>
 
-      {/* File upload */}
+      {/* LuFile upload */}
       {!costData && (
         <Card>
           <div className="flex flex-col items-center gap-4 py-8">
-            <DollarSign size={48} className="text-blue-600" />
+            <LuDollarSign size={48} className="text-blue-600" />
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-              Upload trace file to analyze costs
+              LuUpload trace file to analyze costs
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-[500px]">
-              Upload your cert_traces.jsonl file to see detailed cost breakdowns, trends, and projections
+              LuUpload your cert_traces.jsonl file to see detailed cost breakdowns, trends, and projections
             </p>
             <div className="w-full max-w-[500px]">
-              <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="Upload Trace File" />
+              <FileUpload onFileLoad={handleFileLoad} accept=".jsonl,.json" label="LuUpload Trace LuFile" />
             </div>
           </div>
         </Card>
@@ -115,25 +115,25 @@ export default function CostsPage() {
             <MetricCard
               label="Total Cost"
               value={`$${costData.totalCost.toFixed(2)}`}
-              icon={DollarSign}
+              icon={LuDollarSign}
               variant="default"
             />
             <MetricCard
               label="Projected Monthly"
               value={`$${costData.projectedMonthlyCost.toFixed(2)}`}
-              icon={TrendingUp}
+              icon={LuTrendingUp}
               variant={costTrend === 'up' ? 'warning' : 'success'}
             />
             <MetricCard
               label="Avg per Task"
               value={`$${costData.avgPerTask.toFixed(4)}`}
-              icon={Calendar}
+              icon={LuCalendar}
               variant="default"
             />
             <MetricCard
               label="Platforms Used"
               value={Object.keys(costData.byPlatform).length.toString()}
-              icon={Package}
+              icon={LuPackage}
               variant="default"
             />
           </div>
