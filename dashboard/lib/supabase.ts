@@ -13,6 +13,7 @@ export interface User {
   email: string;
   name: string;
   company?: string;
+  password_hash: string;
   is_active: boolean;
   email_verified: boolean;
   api_key: string;
