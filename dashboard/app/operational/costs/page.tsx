@@ -11,6 +11,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface ModelPricing {
   id: string;
@@ -201,7 +202,7 @@ export default function CostAnalysisPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }

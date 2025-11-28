@@ -18,6 +18,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface LLMTrace {
   id: string;
@@ -157,7 +158,7 @@ export default function HumanReviewPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }
@@ -499,7 +500,7 @@ export default function HumanReviewPage() {
                   )}
                 >
                   {saving ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <CircularProgress size={16} sx={{ color: 'white' }} />
                   ) : (
                     <Save className="w-4 h-4" />
                   )}

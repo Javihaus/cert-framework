@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   DollarSign,
   Check,
-  Loader2,
   Zap,
   Sliders,
   User,
@@ -17,6 +16,7 @@ import {
   HelpCircle,
   X,
 } from 'lucide-react';
+import CircularProgress from '@mui/material/CircularProgress';
 import { cn } from '@/lib/utils';
 
 interface ModelPricing {
@@ -171,14 +171,14 @@ export default function ConfigurationPage() {
               : "bg-[#10069F] text-white hover:bg-[#2a3759]"
           )}
         >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : null}
+          {saving ? <CircularProgress size={16} sx={{ color: 'white' }} /> : saved ? <Check className="w-4 h-4" /> : null}
           {saved ? 'Saved' : 'Save Changes'}
         </button>
       </div>
 
       {/* Evaluation Settings */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-white uppercase tracking-wider mb-4">
           Evaluation Settings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -205,7 +205,7 @@ export default function ConfigurationPage() {
 
       {/* Account Settings */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-white uppercase tracking-wider mb-4">
           Account Settings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -217,7 +217,7 @@ export default function ConfigurationPage() {
 
       {/* Compliance & Documentation */}
       <section className="mb-10">
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-white uppercase tracking-wider mb-4">
           Compliance & Documentation
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -229,7 +229,7 @@ export default function ConfigurationPage() {
 
       {/* Help & Support */}
       <section>
-        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-[#afb6bf] uppercase tracking-wider mb-4">
+        <h2 className="text-[13px] font-semibold text-[#596780] dark:text-white uppercase tracking-wider mb-4">
           Help & Support
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from './Button';
+import CircularProgress from '@mui/material/CircularProgress';
 
 /**
  * Loading Spinner Component
@@ -22,19 +23,17 @@ interface SpinnerProps {
 }
 
 export function Spinner({ size = 'md', className }: SpinnerProps) {
-  const sizeClasses = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-6 h-6 border-[3px]',
-    lg: 'w-10 h-10 border-4',
+  const sizePx = {
+    sm: 16,
+    md: 24,
+    lg: 40,
   };
 
   return (
-    <div
-      className={cn(
-        'rounded-full border-zinc-200 border-t-[#3C6098] animate-spin',
-        sizeClasses[size],
-        className
-      )}
+    <CircularProgress
+      size={sizePx[size]}
+      sx={{ color: '#10069F' }}
+      className={className}
     />
   );
 }

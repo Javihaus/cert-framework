@@ -14,11 +14,11 @@ import {
   Clock,
   Sparkles,
   Play,
-  Loader2,
   BookOpen,
   FileCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface AutoEvalConfig {
   enabled: boolean;
@@ -233,7 +233,7 @@ export default function QualityOverview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }
@@ -278,7 +278,7 @@ export default function QualityOverview() {
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Eval</span>
               {runningAutoEval ? (
                 <div className="flex items-center gap-2 text-xs text-[#10069F] dark:text-[#7ea0bf]">
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <CircularProgress size={12} sx={{ color: '#10069F' }} />
                   Evaluating {autoEvalProgress.current}/{autoEvalProgress.total}...
                 </div>
               ) : pendingTraces.length > 0 ? (
@@ -349,7 +349,7 @@ export default function QualityOverview() {
               <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check</span>
               {runningGrounding ? (
                 <div className="flex items-center gap-2 text-xs text-[#10069F] dark:text-[#7ea0bf]">
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <CircularProgress size={12} sx={{ color: '#10069F' }} />
                   Checking {groundingProgress.current}/{groundingProgress.total}...
                 </div>
               ) : tracesWithContext.length > 0 ? (

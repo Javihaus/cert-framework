@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Zap,
   Play,
-  Loader2,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -15,6 +14,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface LLMTrace {
   id: string;
@@ -163,7 +163,7 @@ export default function LLMJudgePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }
@@ -368,7 +368,7 @@ export default function LLMJudgePage() {
                 >
                   {evaluating ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <CircularProgress size={16} sx={{ color: 'white' }} />
                       Evaluating with {judgeConfig?.model}...
                     </>
                   ) : (
