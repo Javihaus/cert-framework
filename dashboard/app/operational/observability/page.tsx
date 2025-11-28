@@ -16,6 +16,8 @@ import {
   Server,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Switch from '@mui/material/Switch';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface LLMData {
   vendor: string;
@@ -150,7 +152,7 @@ response = client.chat.completions.create(
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }
@@ -169,12 +171,19 @@ response = client.chat.completions.create(
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-            <input
-              type="checkbox"
+          <label className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <Switch
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
-              className="rounded"
+              size="small"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#10069F',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#10069F',
+                },
+              }}
             />
             Auto-refresh
           </label>

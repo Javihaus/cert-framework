@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Shield,
 } from 'lucide-react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function HomePage() {
   const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
@@ -41,7 +42,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-2 border-[#3C6098] border-t-transparent rounded-full" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }

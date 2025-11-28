@@ -2,6 +2,7 @@
 
 import { ReactNode, forwardRef, ButtonHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'outline' | 'link';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -168,6 +169,6 @@ export function ButtonGroup({
  */
 function LoadingSpinner() {
   return (
-    <span className="inline-block w-4 h-4 border-2 border-current border-r-transparent rounded-full animate-spin" />
+    <CircularProgress size={16} sx={{ color: 'currentColor' }} />
   );
 }

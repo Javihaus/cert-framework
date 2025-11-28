@@ -13,6 +13,7 @@ import {
   Shield,
   Clock,
 } from 'lucide-react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Icon mapping for compatibility
 const DocumentTextIcon = FileText;
@@ -312,7 +313,7 @@ export default function ReportsPage() {
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                          <span className="animate-spin h-3 w-3 border-2 border-amber-500 border-t-transparent rounded-full" />
+                          <CircularProgress size={12} sx={{ color: '#F59E0B' }} />
                           Generating
                         </span>
                       )}

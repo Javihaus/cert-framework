@@ -19,6 +19,7 @@ import {
   Upload,
   RefreshCw,
 } from 'lucide-react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // API base URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -256,7 +257,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                     >
-                      <RefreshCw className={`w-5 h-5 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+                      {loading ? <CircularProgress size={20} sx={{ color: '#6B7280' }} /> : <RefreshCw className="w-5 h-5 text-gray-500" />}
                     </button>
                   </div>
 

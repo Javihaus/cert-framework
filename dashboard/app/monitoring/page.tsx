@@ -15,6 +15,7 @@ import {
   Cpu,
   Signal,
 } from 'lucide-react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface Trace {
   id: string;
@@ -273,7 +274,7 @@ export default function MonitoringPage() {
                     )}
                     {trace.status === 'pending' && (
                       <span className="badge badge-warning">
-                        <RefreshCw className="w-3 h-3 animate-spin" />
+                        <CircularProgress size={12} sx={{ color: '#F59E0B' }} />
                         pending
                       </span>
                     )}

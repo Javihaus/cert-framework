@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface PerformanceMetrics {
   p50Latency: number;
@@ -80,7 +81,7 @@ export default function PerformancePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-zinc-400 animate-spin" />
+        <CircularProgress size={32} sx={{ color: '#10069F' }} />
       </div>
     );
   }
