@@ -190,27 +190,6 @@ export default function LLMJudgePage() {
         </button>
       </div>
 
-      {/* Configuration Warning */}
-      {!isConfigured && (
-        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <Settings className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-amber-800 dark:text-amber-300">
-                Judge not configured
-              </h3>
-              <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                Configure your LLM Judge settings in the{' '}
-                <Link href="/configuration" className="underline font-medium">
-                  Configuration page
-                </Link>{' '}
-                to run evaluations.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Current Judge Config */}
       {isConfigured && (
         <div className="bg-[#10069F]/10 dark:bg-[#10069F]/10 border border-[#10069F]/30 dark:border-[#10069F]/30 rounded-xl p-4">
@@ -477,9 +456,7 @@ export default function LLMJudgePage() {
             </>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-12 text-center">
-              <div className="w-16 h-16 bg-[#10069F]/10 dark:bg-[#10069F]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-[#10069F] dark:text-[#7ea0bf]" />
-              </div>
+              <Eye className="w-8 h-8 text-[#10069F] dark:text-[#9fc2e9] mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
                 Select a trace to evaluate
               </h3>
