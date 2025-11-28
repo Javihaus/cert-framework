@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getSupabaseClient,
-  isSupabaseConfigured,
-  hashPassword,
-  generateSessionToken,
-} from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/server';
 
 /**
- * POST /api/auth/register - Create a new user account
+ * POST /api/auth/register - Create a new user account using Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
-    if (!isSupabaseConfigured()) {
-      return NextResponse.json(
-        { error: 'Database not configured. Please set SUPABASE_URL and SUPABASE_KEY environment variables.' },
-        { status: 503 }
-      );
-    }
-
+    const supabase = await createClient();
     const body = await request.json();
     const { email, password, name, company } = body;
 
@@ -44,66 +33,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseClient();
-
-    // Check if user already exists
-    const existingUser = await supabase.getUserByEmail(email);
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'An account with this email already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Hash password and create user
-    const passwordHash = await hashPassword(password);
-    const user = await supabase.createUser({
+    // Sign up with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
-      name: name.trim(),
-      company: company?.trim(),
-      password_hash: passwordHash,
-    });
-
-    // Create session
-    const token = generateSessionToken();
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-
-    await supabase.createSession({
-      user_id: user.id,
-      token,
-      expires_at: expiresAt.toISOString(),
-      user_agent: request.headers.get('user-agent') || undefined,
-      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
-    });
-
-    // Create default project for user
-    await supabase.createProject({
-      user_id: user.id,
-      name: 'Default Project',
-      description: 'Your first CERT project',
-    });
-
-    // Set session cookie
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        company: user.company,
-        apiKey: user.api_key,
+      password,
+      options: {
+        data: {
+          name: name.trim(),
+          company: company?.trim(),
+        },
       },
     });
 
-    response.cookies.set('cert-session', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: expiresAt,
-      path: '/',
-    });
+    if (authError) {
+      console.error('[Auth] Supabase signup error:', authError);
+      return NextResponse.json(
+        { error: authError.message },
+        { status: 400 }
+      );
+    }
 
-    return response;
+    if (!authData.user) {
+      return NextResponse.json(
+        { error: 'Failed to create account' },
+        { status: 500 }
+      );
+    }
+
+    // Create user profile in our users table
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        email: email.toLowerCase().trim(),
+        name: name.trim(),
+        company: company?.trim(),
+      });
+
+    if (profileError) {
+      console.error('[Auth] Profile creation error:', profileError);
+      // User was created in auth but profile failed - still return success
+      // The profile can be created later on first login
+    }
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        name: name.trim(),
+        company: company?.trim(),
+      },
+    });
 
   } catch (error) {
     console.error('[Auth] Registration error:', error);
