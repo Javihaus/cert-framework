@@ -83,7 +83,7 @@ export default function HomePage() {
           <Link href="/quality" className="group block">
             <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#E3E8EE] dark:border-[#1D2530] rounded-xl p-10 transition-all hover:border-2 hover:border-[#10069F] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
-              <div className="text-[#10069F] mb-6">
+              <div className="text-[#10069F] dark:text-[#9fc2e9] mb-6">
                 <Zap className="w-8 h-8" strokeWidth={2} />
               </div>
 
@@ -125,7 +125,7 @@ export default function HomePage() {
           <Link href="/operational/performance" className="group block">
             <div className="h-full bg-[#FFFFFF] dark:bg-[#151B24] border border-[#E3E8EE] dark:border-[#1D2530] rounded-xl p-10 transition-all hover:border-2 hover:border-[#10069F] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,6,159,0.12)]">
               {/* Icon */}
-              <div className="text-[#10069F] mb-6">
+              <div className="text-[#10069F] dark:text-[#9fc2e9] mb-6">
                 <Activity className="w-8 h-8" strokeWidth={2} />
               </div>
 

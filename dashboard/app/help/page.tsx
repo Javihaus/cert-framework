@@ -82,7 +82,7 @@ export default function HelpPage() {
     <div className="max-w-5xl mx-auto">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-[22px] font-semibold text-[#47742d] dark:text-[#d4a4b0]">
+        <h1 className="text-[22px] font-semibold text-[#47742d] dark:text-white">
           Help & Documentation
         </h1>
         <p className="text-[15px] text-black dark:text-[#afb6bf] mt-1">
