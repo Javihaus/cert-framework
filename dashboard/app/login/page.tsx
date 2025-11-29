@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { LuCircleAlert, LuLoader2 } from 'react-icons/lu';
+import { LuCircleAlert, LuLoader } from 'react-icons/lu';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function LoginPage() {
   if (authLoading) {
     return (
       <div className={`min-h-screen flex items-center justify-center bg-[#F6F9FC] ${darkMode ? 'dark:bg-[#0A0E14]' : ''}`}>
-        <LuLoader2 className="w-8 h-8 text-[#10069f] animate-spin" />
+        <LuLoader className="w-8 h-8 text-[#10069f] animate-spin" />
       </div>
     );
   }
@@ -189,7 +189,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3 px-4 bg-[#10069f] hover:bg-[#0d0580] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              {loading && <LuLoader2 className="w-4 h-4 animate-spin" />}
+              {loading && <LuLoader className="w-4 h-4 animate-spin" />}
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>

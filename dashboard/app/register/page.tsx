@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { LuCircleAlert, LuCheck, LuLoader2 } from 'react-icons/lu';
+import { LuCircleAlert, LuCheck, LuLoader } from 'react-icons/lu';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -70,7 +70,7 @@ export default function RegisterPage() {
   if (authLoading) {
     return (
       <div className={`min-h-screen flex items-center justify-center bg-[#F6F9FC] ${darkMode ? 'dark:bg-[#0A0E14]' : ''}`}>
-        <LuLoader2 className="w-8 h-8 text-[#10069f] animate-spin" />
+        <LuLoader className="w-8 h-8 text-[#10069f] animate-spin" />
       </div>
     );
   }
@@ -245,7 +245,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full py-3 px-4 bg-[#10069f] hover:bg-[#0d0580] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              {loading && <LuLoader2 className="w-4 h-4 animate-spin" />}
+              {loading && <LuLoader className="w-4 h-4 animate-spin" />}
               {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
