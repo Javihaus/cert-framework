@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS public.projects (
 -- Traces table (for LLM observability)
 CREATE TABLE IF NOT EXISTS public.traces (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,  -- Required for searching past traces
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
   project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
   trace_id TEXT,
   span_id TEXT,
@@ -40,13 +40,13 @@ CREATE TABLE IF NOT EXISTS public.traces (
   model TEXT,
   input_text TEXT,
   output_text TEXT,
-  context TEXT[],
+  context TEXT[],  -- Source documents for Grounding Check
   prompt_tokens INTEGER DEFAULT 0,
   completion_tokens INTEGER DEFAULT 0,
   total_tokens INTEGER DEFAULT 0,
-  duration_ms INTEGER DEFAULT 0,
-  start_time TIMESTAMPTZ,
-  end_time TIMESTAMPTZ,
+  duration_ms FLOAT DEFAULT 0,  -- Float for precision
+  start_time TIMESTAMPTZ DEFAULT NOW(),  -- When the LLM call started
+  end_time TIMESTAMPTZ DEFAULT NOW(),    -- When the LLM call ended
   status TEXT DEFAULT 'ok' CHECK (status IN ('ok', 'error', 'unset')),
   error_message TEXT,
   evaluation_score DECIMAL(5,4),
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS public.traces (
   evaluated_at TIMESTAMPTZ,
   evaluated_by TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
-  source TEXT DEFAULT 'manual' CHECK (source IN ('otlp', 'sdk', 'manual'))
+  source TEXT DEFAULT 'sdk' CHECK (source IN ('otlp', 'sdk', 'manual'))
 );
 
 -- Indexes for performance
@@ -63,7 +63,11 @@ CREATE INDEX IF NOT EXISTS idx_projects_user_id ON public.projects(user_id);
 CREATE INDEX IF NOT EXISTS idx_traces_user_id ON public.traces(user_id);
 CREATE INDEX IF NOT EXISTS idx_traces_project_id ON public.traces(project_id);
 CREATE INDEX IF NOT EXISTS idx_traces_created_at ON public.traces(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_traces_start_time ON public.traces(start_time DESC);
 CREATE INDEX IF NOT EXISTS idx_traces_evaluation_status ON public.traces(evaluation_status);
+CREATE INDEX IF NOT EXISTS idx_traces_vendor ON public.traces(vendor);
+CREATE INDEX IF NOT EXISTS idx_traces_model ON public.traces(model);
+CREATE INDEX IF NOT EXISTS idx_traces_user_created ON public.traces(user_id, created_at DESC);  -- Compound index for user trace queries
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
 CREATE INDEX IF NOT EXISTS idx_users_api_key ON public.users(api_key);
 
@@ -129,10 +133,13 @@ CREATE TRIGGER projects_updated_at
   BEFORE UPDATE ON public.projects
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
--- Function to handle new user signup (creates profile automatically)
+-- Function to handle new user signup (creates profile and default project)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  new_user_id UUID;
 BEGIN
+  -- Create user profile
   INSERT INTO public.users (id, email, name, company)
   VALUES (
     NEW.id,
@@ -140,6 +147,15 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'name', 'User'),
     NEW.raw_user_meta_data->>'company'
   );
+
+  -- Create default project for the new user
+  INSERT INTO public.projects (user_id, name, description)
+  VALUES (
+    NEW.id,
+    'Default Project',
+    'Default project for trace collection'
+  );
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER
@@ -150,3 +166,17 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =====================================================
+-- IMPORTANT: Service Role Key Configuration
+-- =====================================================
+-- The CERT API uses the Supabase SERVICE ROLE KEY to:
+-- 1. Look up users by API key (bypasses RLS)
+-- 2. Insert traces on behalf of authenticated users
+-- 3. Create/manage projects
+--
+-- Make sure to set SUPABASE_SERVICE_ROLE_KEY in your environment.
+-- The service role key can be found in:
+-- Supabase Dashboard > Project Settings > API > service_role key
+--
+-- WARNING: Never expose the service role key to the client/browser!
