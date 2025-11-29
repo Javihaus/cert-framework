@@ -25,7 +25,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('[Auth] Supabase login error:', error);
+      console.error('[Auth] Supabase login error:', error.message, error.code);
+
+      // Provide more specific error messages
+      if (error.message?.includes('Email not confirmed')) {
+        return NextResponse.json(
+          { error: 'Please confirm your email address before logging in. Check your inbox for a confirmation link.' },
+          { status: 401 }
+        );
+      }
+
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
