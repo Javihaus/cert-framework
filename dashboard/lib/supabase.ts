@@ -73,8 +73,19 @@ export interface DBTrace {
 }
 
 // Check if Supabase is configured
+// Supports both SUPABASE_URL/KEY (service role) and NEXT_PUBLIC_ variants
 export function isSupabaseConfigured(): boolean {
-  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_KEY);
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+  return !!(url && key);
+}
+
+// Get Supabase credentials with fallbacks
+function getSupabaseCredentials(): { url: string; key: string } {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  // Prefer service role key for server-side operations (bypasses RLS)
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || '';
+  return { url, key };
 }
 
 // Generic Supabase REST API client
@@ -83,8 +94,9 @@ class SupabaseClient {
   private key: string;
 
   constructor() {
-    this.url = process.env.SUPABASE_URL || '';
-    this.key = process.env.SUPABASE_KEY || '';
+    const credentials = getSupabaseCredentials();
+    this.url = credentials.url;
+    this.key = credentials.key;
   }
 
   private async request<T>(
@@ -285,6 +297,38 @@ class SupabaseClient {
       });
     } catch {
       return null;
+    }
+  }
+
+  /**
+   * Get or create a default project for a user.
+   * This ensures every user has at least one project for storing traces.
+   */
+  async getOrCreateDefaultProject(userId: string, projectName?: string): Promise<Project> {
+    const name = projectName || 'Default Project';
+
+    // Try to get existing project
+    const existing = await this.getProjectByName(userId, name);
+    if (existing) {
+      return existing;
+    }
+
+    // Create new project
+    try {
+      return await this.createProject({
+        user_id: userId,
+        name,
+        description: projectName
+          ? `Project for ${projectName}`
+          : 'Default project for trace collection',
+      });
+    } catch (error) {
+      // If creation fails (e.g., race condition), try to get again
+      const retryGet = await this.getProjectByName(userId, name);
+      if (retryGet) {
+        return retryGet;
+      }
+      throw error;
     }
   }
 

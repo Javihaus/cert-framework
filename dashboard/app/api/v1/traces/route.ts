@@ -289,13 +289,43 @@ export async function POST(request: NextRequest) {
       // Authenticated: store in Supabase
       const supabase = getSupabaseClient();
 
-      // Get user's default project
-      const projects = await supabase.getProjectsByUser(authResult.user.id);
-      const defaultProject = projects[0];
+      // Extract project name from trace metadata if available
+      let projectName = 'Default Project';
+      if (newTraces.length > 0 && newTraces[0].attributes) {
+        const metadata = newTraces[0].attributes as Record<string, unknown>;
+        if (metadata.project && typeof metadata.project === 'string') {
+          projectName = metadata.project;
+        }
+      }
 
-      // Convert and insert traces
-      const dbTraces = newTraces.map(t => toDBTrace(t, authResult.user!.id, defaultProject?.id));
-      await supabase.insertTraces(dbTraces);
+      // Get or create project for this user
+      let project;
+      try {
+        project = await supabase.getOrCreateDefaultProject(authResult.user.id, projectName);
+        console.log(`[CERT] Using project: ${project.name} (${project.id})`);
+      } catch (error) {
+        console.error(`[CERT] Failed to get/create project:`, error);
+        // Continue without project - traces will still be stored
+      }
+
+      // Convert and insert traces with timestamps
+      const dbTraces = newTraces.map(t => ({
+        ...toDBTrace(t, authResult.user!.id, project?.id),
+        // Ensure timestamps are properly set
+        start_time: t.startTime || new Date().toISOString(),
+        end_time: t.endTime || new Date().toISOString(),
+      }));
+
+      try {
+        await supabase.insertTraces(dbTraces);
+      } catch (insertError) {
+        console.error(`[CERT] Failed to insert traces:`, insertError);
+        return NextResponse.json({
+          success: false,
+          error: 'Failed to store traces',
+          details: String(insertError),
+        }, { status: 500, headers: corsHeaders });
+      }
 
       const total = await supabase.getTraceCount(authResult.user.id);
       console.log(`[CERT] Received ${newTraces.length} traces for user ${authResult.user.email}. Total stored: ${total}`);
@@ -305,7 +335,10 @@ export async function POST(request: NextRequest) {
         received: newTraces.length,
         total,
         storage: 'supabase',
-        userId: authResult.user.id,
+        stored_in_db: true,
+        user_id: authResult.user.id,
+        project_id: project?.id,
+        project_name: project?.name,
       }, { headers: corsHeaders });
 
     } else {
