@@ -21,12 +21,10 @@ import {
   LuRepeat2,
   LuHouse,
   LuKey,
+  LuLoader,
 } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import Button from '@mui/joy/Button';
-import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
-import CircularProgress from '@mui/material/CircularProgress';
 
 interface NavItem {
   name: string;
@@ -71,33 +69,6 @@ const navigation: NavSection[] = [
     ],
   },
 ];
-
-// MUI Joy theme with custom colors
-const joyTheme = extendTheme({
-  colorSchemes: {
-    light: {
-      palette: {
-        primary: {
-          500: '#10069f',
-          600: '#0d0580',
-          solidBg: '#10069f',
-          solidHoverBg: '#0d0580',
-        },
-      },
-    },
-    dark: {
-      palette: {
-        primary: {
-          500: '#9fc2e9',
-          600: '#8ab4de',
-          solidBg: '#9fc2e9',
-          solidHoverBg: '#8ab4de',
-          solidColor: '#0A2540',
-        },
-      },
-    },
-  },
-});
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -162,7 +133,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F6F9FC] dark:bg-[#0A0E14]">
-        <CircularProgress sx={{ color: '#10069f' }} />
+        <LuLoader className="w-8 h-8 text-[#10069f] animate-spin" />
       </div>
     );
   }
@@ -171,14 +142,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F6F9FC] dark:bg-[#0A0E14]">
-        <CircularProgress sx={{ color: '#10069f' }} />
+        <LuLoader className="w-8 h-8 text-[#10069f] animate-spin" />
       </div>
     );
   }
 
   return (
-    <CssVarsProvider theme={joyTheme} defaultMode={darkMode ? 'dark' : 'light'}>
-      <div className={darkMode ? 'dark' : ''}>
+    <div className={darkMode ? 'dark' : ''}>
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
@@ -396,7 +366,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {children}
           </main>
         </div>
-      </div>
-    </CssVarsProvider>
+    </div>
   );
 }
