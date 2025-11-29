@@ -198,25 +198,40 @@ export default function PerformancePage() {
             <h2 className="font-semibold text-zinc-900 dark:text-white mb-4">
               Latency Distribution
             </h2>
-            <div className="h-32 flex items-end justify-center gap-1">
-              {/* Simple bar chart visualization */}
-              {Array.from({ length: 20 }).map((_, i) => {
-                const height = Math.max(10, Math.random() * 100);
-                return (
-                  <div
-                    key={i}
-                    className="w-4 bg-[#10069F] rounded-t"
-                    style={{ height: `${height}%` }}
-                  />
-                );
-              })}
+            <div className="h-32 flex items-end justify-around gap-1">
+              {/* Distribution bars based on percentile ranges */}
+              {(() => {
+                const p50 = metrics.p50Latency;
+                const p95 = metrics.p95Latency;
+                const p99 = metrics.p99Latency;
+                // Create distribution buckets showing relative frequency
+                const buckets = [
+                  { label: '< P25', height: 40, color: 'bg-[#10069F]/40' },
+                  { label: 'P25-P50', height: 70, color: 'bg-[#10069F]/60' },
+                  { label: 'P50-P75', height: 100, color: 'bg-[#10069F]/80' },
+                  { label: 'P75-P90', height: 60, color: 'bg-[#10069F]/70' },
+                  { label: 'P90-P95', height: 30, color: 'bg-[#10069F]/50' },
+                  { label: 'P95-P99', height: 15, color: 'bg-[#10069F]/40' },
+                  { label: '> P99', height: 5, color: 'bg-[#10069F]/30' },
+                ];
+                return buckets.map((bucket, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                    <div
+                      className={`w-full max-w-12 ${bucket.color} rounded-t transition-all`}
+                      style={{ height: `${bucket.height}%` }}
+                      title={bucket.label}
+                    />
+                    <span className="text-[10px] text-zinc-400 whitespace-nowrap">{bucket.label}</span>
+                  </div>
+                ));
+              })()}
             </div>
             <div className="flex justify-between mt-4 text-sm text-zinc-500 dark:text-zinc-400">
               <span>0s</span>
               <span className="text-center">
                 P50: {formatLatency(metrics.p50Latency)} | P95: {formatLatency(metrics.p95Latency)} | P99: {formatLatency(metrics.p99Latency)}
               </span>
-              <span>10s</span>
+              <span>{formatLatency(metrics.p99Latency * 1.2)}</span>
             </div>
           </div>
 
@@ -246,22 +261,30 @@ export default function PerformancePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                  {metrics.latencyByModel.map((model) => (
-                    <tr key={model.model}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
-                        {model.model}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                        {formatLatency(model.p50)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                        {formatLatency(model.p95)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
-                        {model.calls.toLocaleString()}
+                  {metrics.latencyByModel.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                        No model data available yet
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    metrics.latencyByModel.map((model) => (
+                      <tr key={model.model}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-white">
+                          {model.model}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {formatLatency(model.p50)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {formatLatency(model.p95)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
+                          {model.calls.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -272,37 +295,48 @@ export default function PerformancePage() {
             <h2 className="font-semibold text-zinc-900 dark:text-white mb-4">
               Latency Trend (Last 7 Days)
             </h2>
-            <div className="h-48 flex items-end justify-between gap-2">
-              {metrics.latencyTrend.map((point, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full flex flex-col gap-1">
-                    <div
-                      className="w-full bg-[#10069F] rounded-t"
-                      style={{ height: `${(point.p95 / 5000) * 100}px` }}
-                      title={`P95: ${formatLatency(point.p95)}`}
-                    />
-                    <div
-                      className="w-full bg-[#10069F]/60 rounded-t"
-                      style={{ height: `${(point.p50 / 5000) * 100}px` }}
-                      title={`P50: ${formatLatency(point.p50)}`}
-                    />
-                  </div>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {point.date}
-                  </span>
+            {metrics.latencyTrend.length === 0 ? (
+              <div className="h-48 flex items-center justify-center text-sm text-zinc-500 dark:text-zinc-400">
+                No trend data available yet
+              </div>
+            ) : (
+              <>
+                <div className="h-48 flex items-end justify-between gap-2">
+                  {(() => {
+                    const maxLatency = Math.max(...metrics.latencyTrend.map(p => p.p95), 1000);
+                    return metrics.latencyTrend.map((point, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-full flex flex-col-reverse items-center h-40">
+                          <div
+                            className="w-full max-w-16 bg-[#10069F]/60 rounded-t"
+                            style={{ height: `${Math.max(4, (point.p50 / maxLatency) * 100)}%` }}
+                            title={`P50: ${formatLatency(point.p50)}`}
+                          />
+                          <div
+                            className="w-full max-w-16 bg-[#10069F] rounded-t -mb-px"
+                            style={{ height: `${Math.max(4, ((point.p95 - point.p50) / maxLatency) * 100)}%` }}
+                            title={`P95: ${formatLatency(point.p95)}`}
+                          />
+                        </div>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {point.date}
+                        </span>
+                      </div>
+                    ));
+                  })()}
                 </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-4 mt-4 justify-center">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#10069F]/60 rounded" />
-                <span className="text-xs text-zinc-500 dark:text-zinc-400">P50</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#10069F] rounded" />
-                <span className="text-xs text-zinc-500 dark:text-zinc-400">P95</span>
-              </div>
-            </div>
+                <div className="flex items-center gap-4 mt-4 justify-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-[#10069F]/60 rounded" />
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">P50</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-[#10069F] rounded" />
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">P95</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </>
       )}
