@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Get or create project for this user
-      let project;
+      let project: { id: string; name: string } | undefined;
       try {
         project = await supabase.getOrCreateDefaultProject(authResult.user.id, projectName);
         console.log(`[CERT] Using project: ${project.name} (${project.id})`);
