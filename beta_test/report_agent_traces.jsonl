@@ -1,2 +1,0 @@
-{"timestamp": "2025-11-23T17:27:10.467076Z", "function": "generate_report", "duration_ms": 464.7107124328613, "status": "success", "error": null, "metadata": {"agent": "report_generation"}}
-{"timestamp": "2025-11-23T17:27:11.586032Z", "function": "generate_report", "duration_ms": 520.4043388366699, "status": "success", "error": null, "metadata": {"agent": "report_generation"}}
