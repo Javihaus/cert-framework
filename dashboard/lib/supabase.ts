@@ -342,10 +342,26 @@ class SupabaseClient {
   }
 
   async insertTraces(traces: Array<Partial<DBTrace> & { user_id: string; name: string }>): Promise<DBTrace[]> {
-    return this.request<DBTrace[]>('traces', 'POST', {
+    console.log(`[Supabase] Inserting ${traces.length} traces...`);
+
+    // Log first trace for debugging
+    if (traces.length > 0) {
+      console.log(`[Supabase] First trace:`, JSON.stringify({
+        user_id: traces[0].user_id,
+        project_id: traces[0].project_id,
+        name: traces[0].name,
+        model: traces[0].model,
+        vendor: traces[0].vendor,
+      }));
+    }
+
+    const result = await this.request<DBTrace[]>('traces', 'POST', {
       body: traces,
       select: '*',
     });
+
+    console.log(`[Supabase] Insert result: ${result?.length || 0} traces inserted`);
+    return result;
   }
 
   async getTraces(options: {
