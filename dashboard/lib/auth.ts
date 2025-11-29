@@ -3,6 +3,8 @@
  */
 
 import { NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { getSupabaseClient, isSupabaseConfigured, User } from './supabase';
 
 export interface AuthResult {
@@ -11,9 +13,48 @@ export interface AuthResult {
 }
 
 /**
+ * Get user from Supabase Auth session (dashboard login)
+ */
+async function getSupabaseAuthUser(): Promise<User | null> {
+  try {
+    const cookieStore = await cookies();
+
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {
+            // Read-only for this use case
+          },
+        },
+      }
+    );
+
+    const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
+
+    if (!authUser) {
+      return null;
+    }
+
+    // Get the user profile from our users table
+    const supabase = getSupabaseClient();
+    const user = await supabase.getUserById(authUser.id);
+
+    return user;
+  } catch (error) {
+    console.error('[Auth] Error getting Supabase Auth user:', error);
+    return null;
+  }
+}
+
+/**
  * Get the authenticated user from the request.
  * Supports:
- * 1. Session cookie (web dashboard)
+ * 1. Supabase Auth session (web dashboard)
  * 2. API Key header (notebooks/SDK)
  * 3. Bearer token (API clients)
  */
@@ -24,19 +65,7 @@ export async function getAuthUser(request: NextRequest): Promise<AuthResult> {
 
   const supabase = getSupabaseClient();
 
-  // 1. Check session cookie (web dashboard)
-  const sessionToken = request.cookies.get('cert-session')?.value;
-  if (sessionToken) {
-    const session = await supabase.getSessionByToken(sessionToken);
-    if (session) {
-      const user = await supabase.getUserById(session.user_id);
-      if (user && user.is_active) {
-        return { user };
-      }
-    }
-  }
-
-  // 2. Check API Key header (notebooks/SDK)
+  // 1. Check API Key header first (notebooks/SDK) - most common for trace ingestion
   const apiKey = request.headers.get('x-api-key');
   if (apiKey) {
     const user = await supabase.getUserByApiKey(apiKey);
@@ -46,27 +75,24 @@ export async function getAuthUser(request: NextRequest): Promise<AuthResult> {
     return { user: null, error: 'Invalid API key' };
   }
 
-  // 3. Check Authorization header (Bearer token)
+  // 2. Check Authorization header (Bearer token)
   const authHeader = request.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
 
-    // First try as API key
-    let user = await supabase.getUserByApiKey(token);
+    // Try as API key
+    const user = await supabase.getUserByApiKey(token);
     if (user && user.is_active) {
       return { user };
     }
 
-    // Then try as session token
-    const session = await supabase.getSessionByToken(token);
-    if (session) {
-      user = await supabase.getUserById(session.user_id);
-      if (user && user.is_active) {
-        return { user };
-      }
-    }
-
     return { user: null, error: 'Invalid token' };
+  }
+
+  // 3. Check Supabase Auth session (web dashboard)
+  const authUser = await getSupabaseAuthUser();
+  if (authUser && authUser.is_active) {
+    return { user: authUser };
   }
 
   return { user: null };
