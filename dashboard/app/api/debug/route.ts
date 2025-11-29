@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
 /**
@@ -78,4 +78,60 @@ export async function GET() {
   }
 
   return NextResponse.json(results, { status: 200 });
+}
+
+/**
+ * POST /api/debug - Test login with provided credentials
+ * Send: { "email": "your@email.com", "password": "yourpassword" }
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, password } = body;
+
+    if (!email || !password) {
+      return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+
+    // Test login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    });
+
+    if (error) {
+      return NextResponse.json({
+        success: false,
+        errorMessage: error.message,
+        errorCode: error.code,
+        errorStatus: error.status,
+        errorName: error.name,
+        fullError: JSON.stringify(error),
+      }, { status: 200 });
+    }
+
+    // Check user details
+    const userInfo = {
+      id: data.user?.id,
+      email: data.user?.email,
+      emailConfirmedAt: data.user?.email_confirmed_at,
+      createdAt: data.user?.created_at,
+      lastSignIn: data.user?.last_sign_in_at,
+      metadata: data.user?.user_metadata,
+    };
+
+    return NextResponse.json({
+      success: true,
+      user: userInfo,
+      hasSession: !!data.session,
+    }, { status: 200 });
+
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 500 });
+  }
 }
