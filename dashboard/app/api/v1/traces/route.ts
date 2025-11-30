@@ -185,31 +185,55 @@ function parseCERTFormat(body: Record<string, unknown>): CERTTrace[] {
 
 /**
  * Convert CERTTrace to DBTrace format for Supabase
+ * Ensures all values are valid for PostgreSQL insertion
  */
 function toDBTrace(trace: CERTTrace, userId: string, projectId?: string): Partial<DBTrace> & { user_id: string; name: string } {
-  return {
+  // Ensure metadata is a valid JSON object (not undefined, not circular)
+  let safeMetadata: Record<string, unknown> = {};
+  try {
+    if (trace.attributes && typeof trace.attributes === 'object') {
+      // Deep clone to avoid circular references and ensure serializable
+      safeMetadata = JSON.parse(JSON.stringify(trace.attributes));
+    }
+  } catch {
+    safeMetadata = {};
+  }
+
+  // Build trace object, only including defined values
+  const dbTrace: Partial<DBTrace> & { user_id: string; name: string } = {
     user_id: userId,
-    project_id: projectId,
-    trace_id: trace.traceId,
-    span_id: trace.spanId,
-    parent_span_id: trace.parentSpanId,
-    name: trace.name,
-    kind: trace.kind,
-    vendor: trace.llm?.vendor,
-    model: trace.llm?.model,
-    input_text: trace.llm?.input,
-    output_text: trace.llm?.output,
-    context: trace.llm?.context ? (Array.isArray(trace.llm.context) ? trace.llm.context : [trace.llm.context]) : undefined,
+    name: trace.name || 'unknown',
+    kind: trace.kind || 'llm',
+    status: trace.status || 'ok',
+    source: trace.source || 'sdk',
     prompt_tokens: trace.llm?.promptTokens || 0,
     completion_tokens: trace.llm?.completionTokens || 0,
     total_tokens: trace.llm?.totalTokens || 0,
-    duration_ms: trace.durationMs,
-    start_time: trace.startTime,
-    end_time: trace.endTime,
-    status: trace.status,
-    metadata: trace.attributes,
-    source: trace.source,
+    duration_ms: typeof trace.durationMs === 'number' ? trace.durationMs : 0,
+    metadata: safeMetadata,
   };
+
+  // Only add optional fields if they have values (avoid sending null/undefined)
+  if (projectId) dbTrace.project_id = projectId;
+  if (trace.traceId) dbTrace.trace_id = trace.traceId;
+  if (trace.spanId) dbTrace.span_id = trace.spanId;
+  if (trace.parentSpanId) dbTrace.parent_span_id = trace.parentSpanId;
+  if (trace.llm?.vendor) dbTrace.vendor = trace.llm.vendor;
+  if (trace.llm?.model) dbTrace.model = trace.llm.model;
+  if (trace.llm?.input) dbTrace.input_text = trace.llm.input;
+  if (trace.llm?.output) dbTrace.output_text = trace.llm.output;
+  if (trace.startTime) dbTrace.start_time = trace.startTime;
+  if (trace.endTime) dbTrace.end_time = trace.endTime;
+
+  // Handle context array properly - only include if it has values
+  if (trace.llm?.context) {
+    const contextArray = Array.isArray(trace.llm.context) ? trace.llm.context : [trace.llm.context];
+    if (contextArray.length > 0 && contextArray[0]) {
+      dbTrace.context = contextArray;
+    }
+  }
+
+  return dbTrace;
 }
 
 /**
