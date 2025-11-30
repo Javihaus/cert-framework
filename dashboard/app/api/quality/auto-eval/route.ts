@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateEvaluation } from '@/lib/trace-store';
+import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
+import { getAuthUser } from '@/lib/auth';
 
 /**
  * CERT Auto-Evaluation API
@@ -333,11 +335,60 @@ async function computeNLIScore(
 }
 
 /**
+ * Helper to update evaluation in Supabase or fallback to trace-store
+ */
+async function saveEvaluation(
+  traceId: string,
+  userId: string,
+  evaluation: {
+    score: number;
+    status: 'pass' | 'fail' | 'review';
+    criteria: { semantic?: number; nli?: number; grounding?: number };
+    judgeModel: string;
+    evaluatedAt: string;
+  }
+): Promise<boolean> {
+  // Try Supabase first
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseClient();
+      await supabase.updateTraceEvaluation(traceId, userId, {
+        evaluation_score: evaluation.score,
+        evaluation_status: evaluation.status,
+        evaluation_criteria: evaluation.criteria,
+        evaluated_by: evaluation.judgeModel,
+      });
+      return true;
+    } catch (error) {
+      console.error('[Auto-Eval] Supabase update failed:', error);
+    }
+  }
+
+  // Fallback to trace-store (KV/memory)
+  return updateEvaluation(traceId, {
+    score: evaluation.score,
+    status: evaluation.status,
+    criteria: evaluation.criteria,
+    judgeModel: evaluation.judgeModel,
+    evaluatedAt: evaluation.evaluatedAt,
+  });
+}
+
+/**
  * POST /api/quality/auto-eval
  * Performs automatic evaluation using HuggingFace API or algorithmic fallback
  */
 export async function POST(request: NextRequest) {
   try {
+    // Get authenticated user
+    const authResult = await getAuthUser(request);
+    if (!authResult.user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const body: AutoEvalRequest = await request.json();
 
     const {
@@ -406,7 +457,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Update trace with evaluation
-    const success = await updateEvaluation(traceId, {
+    const success = await saveEvaluation(traceId, authResult.user.id, {
       score: result.score,
       status: result.status,
       criteria: {
@@ -440,6 +491,15 @@ export async function POST(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
+    // Get authenticated user
+    const authResult = await getAuthUser(request);
+    if (!authResult.user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const { traces, semanticWeight = 30, nliWeight = 70, passThreshold = 7 } = await request.json();
 
     if (!traces || !Array.isArray(traces)) {
@@ -472,7 +532,8 @@ export async function PUT(request: NextRequest) {
         ? 'huggingface'
         : 'algorithmic';
 
-      await updateEvaluation(trace.id, {
+      // Save to Supabase or fallback
+      await saveEvaluation(trace.id, authResult.user.id, {
         score: Math.round(finalScore * 10) / 10,
         status,
         criteria: { semantic: semanticResult.score, nli: nliResult.score },
@@ -499,7 +560,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Batch auto-eval error:', error);
     return NextResponse.json(
-      { error: 'Batch auto-evaluation failed' },
+      { error: 'Batch auto-evaluation failed', details: String(error) },
       { status: 500 }
     );
   }

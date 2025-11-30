@@ -3,19 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  LuLayoutDashboard,
   LuRepeat2,
   LuUser,
   LuCircleCheck,
   LuCircleX,
   LuCircleAlert,
-  LuArrowRight,
   LuRefreshCw,
   LuClock,
   LuShieldBan,
-  LuPlay,
-  LuBookOpen,
   LuFileCheck,
+  LuRotateCcw,
 } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -65,6 +62,7 @@ export default function QualityOverview() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [methodFilter, setMethodFilter] = useState<MethodFilter>('all');
   const [selectedTrace, setSelectedTrace] = useState<LLMTrace | null>(null);
+  const [rerunningTraceId, setRerunningTraceId] = useState<string | null>(null);
 
   const getEvalMethod = (trace: LLMTrace): 'auto' | 'llm' | 'human' | 'grounding' | 'pending' => {
     if (!trace.evaluation?.judgeModel && !trace.evaluation?.status) return 'pending';
@@ -194,6 +192,44 @@ export default function QualityOverview() {
     setRunningGrounding(false);
   };
 
+  const reRunEvaluation = async (trace: LLMTrace, e: React.MouseEvent) => {
+    e.stopPropagation(); // Don't expand the trace row
+
+    if (!trace.llm?.input || !trace.llm?.output) {
+      alert('Cannot re-run evaluation: missing input or output');
+      return;
+    }
+
+    setRerunningTraceId(trace.id);
+
+    try {
+      const response = await fetch('/api/quality/auto-eval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          traceId: trace.id,
+          input: trace.llm.input,
+          output: trace.llm.output,
+          semanticWeight: autoEvalConfig?.semanticWeight ?? 30,
+          nliWeight: autoEvalConfig?.nliWeight ?? 70,
+          passThreshold: autoEvalConfig?.passThreshold ?? 7,
+        }),
+      });
+
+      if (response.ok) {
+        await loadTraces();
+      } else {
+        const error = await response.json();
+        alert(`Re-evaluation failed: ${error.error}`);
+      }
+    } catch (e) {
+      console.error('Re-evaluation error:', e);
+      alert('Re-evaluation failed. Check the console for details.');
+    }
+
+    setRerunningTraceId(null);
+  };
+
   // Calculate metrics
   const evaluatedTraces = traces.filter(t => t.evaluation?.status);
   const passedTraces = traces.filter(t => t.evaluation?.status === 'pass');
@@ -261,92 +297,95 @@ export default function QualityOverview() {
 
       {/* Quick Actions - Evaluation Methods */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Auto-Eval Card */}
+        {/* Auto-Eval Card - Clickable button */}
         <button
           onClick={runAutoEvaluation}
           disabled={runningAutoEval || pendingTraces.length === 0}
           className={cn(
             "bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-all group",
             pendingTraces.length > 0
-              ? "hover:border-2 hover:border-[#10069F] cursor-pointer"
+              ? "hover:border-2 hover:border-[#10069F] dark:hover:border-[#5B8DEF] cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
           <div className="flex items-center gap-3 mb-2">
             <LuShieldBan className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
-              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Auto-Eval</span>
+              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1] group-hover:text-[#10069F] dark:group-hover:text-[#5B8DEF] transition-colors">
+                Auto-Eval
+              </span>
               {runningAutoEval ? (
                 <div className="flex items-center gap-2 text-xs text-[#10069F] dark:text-[#7ea0bf]">
                   <CircularProgress size={12} sx={{ color: '#10069F' }} />
                   Evaluating {autoEvalProgress.current}/{autoEvalProgress.total}...
                 </div>
               ) : pendingTraces.length > 0 ? (
-                <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{pendingTraces.length} pending · {autoEvalTraces.length} evaluated</p>
+                <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{pendingTraces.length} pending · Click to run</p>
               ) : (
                 <p className="text-xs text-[#8792A2]">{autoEvalTraces.length} evaluated · No pending</p>
               )}
             </div>
-            {pendingTraces.length > 0 && !runningAutoEval && (
-              <LuPlay className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
-            )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Automatic validation using semantic similarity + NLI
           </p>
         </button>
 
-        {/* LLM Judge Card */}
+        {/* LLM Judge Card - Link to page */}
         <Link
           href="/quality/judge"
-          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
+          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] dark:hover:border-[#5B8DEF] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
             <LuRepeat2 className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
-              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">LLM Judge</span>
+              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1] group-hover:text-[#10069F] dark:group-hover:text-[#5B8DEF] transition-colors">
+                LLM Judge
+              </span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{llmJudgeTraces.length} evaluated</p>
             </div>
-            <LuArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Use another model to check accuracy
           </p>
         </Link>
 
-        {/* Human Review Card */}
+        {/* Human Review Card - Link to page */}
         <Link
           href="/quality/review"
-          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] transition-all group"
+          className="bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 hover:border-2 hover:border-[#10069F] dark:hover:border-[#5B8DEF] transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
             <LuUser className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
-              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Human Review</span>
+              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1] group-hover:text-[#10069F] dark:group-hover:text-[#5B8DEF] transition-colors">
+                Human Review
+              </span>
               <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">{humanReviewTraces.length} reviewed</p>
             </div>
-            <LuArrowRight className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Check accuracy manually
           </p>
         </Link>
 
-        {/* Grounding Check Card */}
+        {/* Grounding Check Card - Clickable button */}
         <button
           onClick={runGroundingCheck}
           disabled={runningGrounding || tracesWithContext.length === 0}
           className={cn(
             "bg-[#FFFFFF] dark:bg-[#151B24] rounded-lg border border-[#E3E8EE] dark:border-[#1D2530] p-5 text-left transition-all group",
             tracesWithContext.length > 0
-              ? "hover:border-2 hover:border-[#10069F] cursor-pointer"
+              ? "hover:border-2 hover:border-[#10069F] dark:hover:border-[#5B8DEF] cursor-pointer"
               : "opacity-60 cursor-not-allowed"
           )}
         >
           <div className="flex items-center gap-3 mb-2">
             <LuFileCheck className="w-5 h-5 text-[#10069F] dark:text-[#9fc2e9]" />
             <div className="flex-1">
-              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1]">Grounding Check</span>
+              <span className="font-medium text-[#0A2540] dark:text-[#E8ECF1] group-hover:text-[#10069F] dark:group-hover:text-[#5B8DEF] transition-colors">
+                Grounding Check
+              </span>
               {runningGrounding ? (
                 <div className="flex items-center gap-2 text-xs text-[#10069F] dark:text-[#7ea0bf]">
                   <CircularProgress size={12} sx={{ color: '#10069F' }} />
@@ -354,15 +393,12 @@ export default function QualityOverview() {
                 </div>
               ) : tracesWithContext.length > 0 ? (
                 <p className="text-xs text-[#10069F] dark:text-[#7ea0bf]">
-                  {tracesWithContext.length} with context · {groundingTraces.length} checked
+                  {tracesWithContext.length} with context · Click to run
                 </p>
               ) : (
                 <p className="text-xs text-[#8792A2]">No traces with source context</p>
               )}
             </div>
-            {tracesWithContext.length > 0 && !runningGrounding && (
-              <LuPlay className="w-5 h-5 text-[#10069F] group-hover:text-[#222d4a] transition-colors" />
-            )}
           </div>
           <p className="text-[13px] text-[#596780] dark:text-[#8792A2]">
             Verify output is grounded in source documents
@@ -524,6 +560,21 @@ export default function QualityOverview() {
                     <span className="text-xs text-[#8792A2]">
                       {trace.durationMs}ms
                     </span>
+                    {/* Re-run Evaluation Button */}
+                    {trace.evaluation?.status && trace.llm?.input && trace.llm?.output && (
+                      <button
+                        onClick={(e) => reRunEvaluation(trace, e)}
+                        disabled={rerunningTraceId === trace.id}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-[#596780] dark:text-[#8792A2] hover:text-[#10069F] dark:hover:text-[#5B8DEF] hover:bg-[#F6F9FC] dark:hover:bg-[#1D2530] transition-colors"
+                        title="Re-run evaluation with current config"
+                      >
+                        {rerunningTraceId === trace.id ? (
+                          <CircularProgress size={12} sx={{ color: '#10069F' }} />
+                        ) : (
+                          <LuRotateCcw className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 
