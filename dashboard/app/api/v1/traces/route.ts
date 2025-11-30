@@ -206,10 +206,10 @@ function toDBTrace(trace: CERTTrace, userId: string, projectId?: string): Partia
     kind: trace.kind || 'llm',
     status: trace.status || 'ok',
     source: trace.source || 'sdk',
-    prompt_tokens: trace.llm?.promptTokens || 0,
-    completion_tokens: trace.llm?.completionTokens || 0,
-    total_tokens: trace.llm?.totalTokens || 0,
-    duration_ms: typeof trace.durationMs === 'number' ? trace.durationMs : 0,
+    prompt_tokens: Math.round(trace.llm?.promptTokens || 0),
+    completion_tokens: Math.round(trace.llm?.completionTokens || 0),
+    total_tokens: Math.round(trace.llm?.totalTokens || 0),
+    duration_ms: Math.round(typeof trace.durationMs === 'number' ? trace.durationMs : 0),
     metadata: safeMetadata,
   };
 
