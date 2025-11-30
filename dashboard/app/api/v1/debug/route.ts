@@ -13,18 +13,25 @@ export async function GET(request: NextRequest) {
     env: {
       hasSupabaseUrl: !!process.env.SUPABASE_URL || !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      hasSupabaseKey: !!process.env.SUPABASE_KEY,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     },
   };
 
   // Check authentication
   const authResult = await getAuthUser(request);
+
+  // Check for Supabase Auth cookies (they start with 'sb-')
+  const allCookies = request.cookies.getAll();
+  const supabaseAuthCookies = allCookies.filter(c => c.name.startsWith('sb-'));
+
   debug.auth = {
     authenticated: !!authResult.user,
     userId: authResult.user?.id,
     email: authResult.user?.email,
+    apiKey: authResult.user?.api_key ? `${authResult.user.api_key.substring(0, 10)}...` : null,
     error: authResult.error,
-    hasSessionCookie: !!request.cookies.get('cert-session')?.value,
+    hasSupabaseAuthCookies: supabaseAuthCookies.length > 0,
+    supabaseAuthCookieNames: supabaseAuthCookies.map(c => c.name),
     hasApiKeyHeader: !!request.headers.get('x-api-key'),
   };
 
