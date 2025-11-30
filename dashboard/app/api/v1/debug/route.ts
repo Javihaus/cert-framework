@@ -24,16 +24,65 @@ export async function GET(request: NextRequest) {
   const allCookies = request.cookies.getAll();
   const supabaseAuthCookies = allCookies.filter(c => c.name.startsWith('sb-'));
 
+  // Get API key from header if present
+  const apiKeyFromHeader = request.headers.get('x-api-key');
+
   debug.auth = {
     authenticated: !!authResult.user,
     userId: authResult.user?.id,
     email: authResult.user?.email,
-    apiKey: authResult.user?.api_key ? `${authResult.user.api_key.substring(0, 10)}...` : null,
-    error: authResult.error,
+    userApiKey: authResult.user?.api_key ? `${authResult.user.api_key.substring(0, 15)}...` : null,
+    authError: authResult.error,
     hasSupabaseAuthCookies: supabaseAuthCookies.length > 0,
     supabaseAuthCookieNames: supabaseAuthCookies.map(c => c.name),
-    hasApiKeyHeader: !!request.headers.get('x-api-key'),
+    hasApiKeyHeader: !!apiKeyFromHeader,
+    apiKeyFromHeader: apiKeyFromHeader ? `${apiKeyFromHeader.substring(0, 15)}...` : null,
   };
+
+  // If API key was provided but auth failed, try to diagnose why
+  if (apiKeyFromHeader && !authResult.user) {
+    try {
+      const supabase = getSupabaseClient();
+      // Check if the key exists in the database at all
+      const testUser = await supabase.getUserByApiKey(apiKeyFromHeader);
+      debug.apiKeyDiagnostics = {
+        keyFound: !!testUser,
+        keyActive: testUser?.is_active || false,
+        keyUserEmail: testUser?.email || null,
+      };
+    } catch (error) {
+      debug.apiKeyDiagnostics = {
+        error: String(error),
+      };
+    }
+  }
+
+  // List all users for diagnostics (only if accessed with service role)
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseClient();
+      // This only works with service role key
+      const allUsersResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/users?select=id,email,api_key,is_active`,
+        {
+          headers: {
+            'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          },
+        }
+      );
+      if (allUsersResponse.ok) {
+        const allUsers = await allUsersResponse.json();
+        debug.usersInDatabase = allUsers.map((u: { email: string; api_key: string; is_active: boolean }) => ({
+          email: u.email,
+          apiKey: u.api_key ? `${u.api_key.substring(0, 15)}...` : 'NO_API_KEY',
+          isActive: u.is_active,
+        }));
+      }
+    } catch (error) {
+      debug.usersQueryError = String(error);
+    }
+  }
 
   // If authenticated and Supabase is configured, check data
   if (authResult.user && isSupabaseConfigured()) {
