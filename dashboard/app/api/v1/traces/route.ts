@@ -347,14 +347,37 @@ export async function POST(request: NextRequest) {
         end_time: t.endTime || new Date().toISOString(),
       }));
 
+      // Log the first trace for debugging
+      if (dbTraces.length > 0) {
+        console.log(`[CERT] First dbTrace to insert:`, JSON.stringify(dbTraces[0], null, 2).substring(0, 1000));
+      }
+
       try {
         await supabase.insertTraces(dbTraces);
       } catch (insertError) {
-        console.error(`[CERT] Failed to insert traces:`, insertError);
+        const errorMsg = String(insertError);
+        console.error(`[CERT] Failed to insert traces:`, errorMsg);
+
+        // Log the problematic trace data for debugging
+        console.error(`[CERT] Trace data that failed:`, JSON.stringify(dbTraces[0], null, 2).substring(0, 2000));
+
         return NextResponse.json({
           success: false,
           error: 'Failed to store traces',
-          details: String(insertError),
+          details: errorMsg,
+          // Include trace keys to help debug which field is problematic
+          traceFields: dbTraces.length > 0 ? Object.keys(dbTraces[0]) : [],
+          sampleValues: dbTraces.length > 0 ? {
+            name: dbTraces[0].name,
+            kind: dbTraces[0].kind,
+            status: dbTraces[0].status,
+            source: dbTraces[0].source,
+            vendor: dbTraces[0].vendor,
+            model: dbTraces[0].model,
+            input_text_length: dbTraces[0].input_text?.length,
+            output_text_length: dbTraces[0].output_text?.length,
+            metadata_keys: dbTraces[0].metadata ? Object.keys(dbTraces[0].metadata) : [],
+          } : null,
         }, { status: 500, headers: corsHeaders });
       }
 
