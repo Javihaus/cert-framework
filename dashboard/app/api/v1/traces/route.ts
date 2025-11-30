@@ -279,6 +279,10 @@ function toCERTTrace(dbTrace: DBTrace): CERTTrace {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Log incoming request details
+    const apiKeyHeader = request.headers.get('x-api-key');
+    console.log(`[CERT] POST /api/v1/traces - API Key: ${apiKeyHeader ? apiKeyHeader.substring(0, 15) + '...' : 'none'}`);
+
     const contentType = request.headers.get('content-type') || '';
     let body: Record<string, unknown>;
 
@@ -306,8 +310,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(`[CERT] Parsed ${newTraces.length} traces`);
+
     // Check for authentication
     const authResult = await getAuthUser(request);
+    console.log(`[CERT] Auth result: user=${authResult.user?.email || 'none'}, error=${authResult.error || 'none'}`);
 
     if (authResult.user && isSupabaseConfigured()) {
       // Authenticated: store in Supabase
